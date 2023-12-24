@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>StealthChad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="StealthChad (c) Bok Consulting Pty Ltd 2023" />
+    <meta name="author" content="BokkyPooBah" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@BokkyPooBah" />
+    <meta name="twitter:creator" content="@BokkyPooBah" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue-icons.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/app.css" />
+    <script src="js/vue.js"></script>
+    <script src="js/bootstrap-vue.min.js"></script>
+    <script src="js/bootstrap-vue-icons.min.js"></script>
+    <script src="js/ethers-5.7.umd.min.js" type="application/javascript"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="globals.js"></script>
+    <script src="customNames.js"></script>
+    <script src="deploymentData.js"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/site.webmanifest">
+    <link rel="mask-icon" href="images/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="images/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body>
+    <div id="app">
+      <b-container fluid class="m-0 p-0">
+        <b-navbar toggleable="sm" variant="light" class="mx-1 my-0 p-0">
+          <b-navbar-brand to="https://bokkypoobah.github.io/StealthChad/" variant="primary">
+            <b-avatar rounded variant="light" size="3.0rem" src="images/LarvaChad_1532_zoomed_transparentbg.png" v-b-popover.hover.bottom="'gm'" class="ml-0"></b-avatar>
+            <em v-b-popover.hover.bottom="'gm gm gm'">StealthChad</em>
+          </b-navbar-brand>
+          <b-navbar-nav class="ml-auto">
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Approvals'">Approvals</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Events'">Events</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Accounts'">Accounts</b-nav-item>
+            <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+          </b-navbar-nav>
+        </b-navbar>
+
+        <b-card no-body class="p-0 mt-0" style="min-height: 666px;">
+          <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
+            Warning: This is experimental unaudited software. Please check your transaction data carefully before signing
+          </b-alert>
+          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
+            <b-card-text>
+              Please install the MetaMask extension and connect to the Ethereum Mainnet or an EVM compatible chain. Then refresh this page, and click the [Connect] button on the top right.
+            </b-card-text>
+          </b-card>
+
+          <!-- :MODALAPPROVAL -->
+          <b-modal id="modal-approval" hide-footer size="lg">
+            <template #modal-title>
+              View/Update {{ modalApproval.item.type.toUpperCase() }} {{ modalApproval.item.approvalType }}
+            </template>
+            <b-form-group v-if="modalApproval.item" label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.symbol" label="Symbol:" label-for="approval-symbol" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-symbol" :value="modalApproval.item.symbol" class="w-25"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.name" label="Name:" label-for="approval-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-name" :value="modalApproval.item.name" class="w-75"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type" label="Type:" label-for="approval-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-type" :value="accountTypeOptions.filter(e => e.value == modalApproval.item.type)[0].text" class="w-25"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.decimals" label="Decimals:" label-for="approval-decimals" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-decimals" :value="modalApproval.item.decimals" class="w-25"></b-form-input>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group v-if="modalApproval.item" label-cols-lg="2" label="Approval" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item.approvalType" label="Type:" label-for="approval-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-type" :value="modalApproval.item.approvalType" class="w-25"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.owner" label="Owner:" label-for="approval-owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Attached)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.spender" label="Spender:" label-for="approval-spender" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-spender" :href="'https://etherscan.io/address/' + modalApproval.item.spender" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.spender, 42) }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc20'" label="Tokens:" label-for="approval-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-tokens" :value="modalApproval.item.value" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc721' && modalApproval.item.approvalType == 'Approval'" label="Token Id:" label-for="approval-tokenid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-tokenid" :value="modalApproval.item.value" class="w-50"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.approvalType == 'ApprovalForAll'" label="Approved:" label-for="approval-approved" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-approved" :value="modalApproval.item.value == 1 ? 'true' : 'false'" class="w-25"></b-form-input>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group v-if="modalApproval.item" label-cols-lg="2" label="Update" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item.type == 'erc20'" label="Tokens:" label-for="approval-update-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="approval-update-tokens" v-model="modalApproval.tokens" class="w-100" :placeholder="'Number with ' + modalApproval.item.decimals + ' decimal places, e.g., 0'"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc721' && modalApproval.item.approvalType == 'Approval'" label="Spender:" label-for="approval-update-spender" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="approval-update-spender" v-model="modalApproval.spender" class="w-75" placeholder="Spender, e.g., 0x1234...6789"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc721' && modalApproval.item.approvalType == 'Approval'" label="Token Id:" label-for="approval-update-tokenid" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="approval-update-tokenid" v-model="modalApproval.tokenId" class="w-50" placeholder="Token Id, e.g., 1234"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.approvalType == 'ApprovalForAll'" label="Approved:" label-for="approval-update-approved" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-select size="sm" id="approval-update-approved" v-model="modalApproval.approved" :options="falseTrueOptions" class="w-25"></b-form-select>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc20'" label="" label-for="approval-update-submit1" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalApproval.tokens || modalApproval.item.owner != coinbase" id="approval-update-submit1" @click="updateApproval()" variant="warning">Update</b-button>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.type == 'erc721' && modalApproval.item.approvalType == 'Approval'" label="" label-for="approval-update-submit2" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalApproval.spender || !modalApproval.tokenId || modalApproval.item.owner != coinbase" id="approval-update-submit2" @click="updateApproval()" variant="warning">Update</b-button>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item.approvalType == 'ApprovalForAll'" label="" label-for="approval-update-submit3" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="modalApproval.item.owner != coinbase" id="approval-update-submit3" @click="updateApproval()" variant="warning">Update</b-button>
+              </b-form-group>
+            </b-form-group>
+          </b-modal>
+
+          <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
+            <!-- :TOOLBAR -->
+            <b-card-text v-if="coinbase" class="m-0 p-0">
+              <div class="d-flex flex-wrap m-0 p-0">
+                <div v-if="settings.tabIndex == 0 || settings.tabIndex == 1" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
+                    Attached
+                  </b-form-checkbox>
+                </div>
+                <div v-if="!settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
+                  <b-form-textarea :disabled="sync.section != null" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
+                    Inactive
+                  </b-form-checkbox>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include less important events like ERC-721 Approval to Null:0x0000...0000'">
+                    Fluff
+                  </b-form-checkbox>
+                </div>
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
+                </div>
+                <div v-if="false && !sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                </div>
+                <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
+                  <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
+                    <b-progress-bar :value="sync.completed">
+                      {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+                    </b-progress-bar>
+                  </b-progress>
+                </div>
+                <div class="ml-0 mt-1">
+                  <b-link v-if="sync.section" size="sm" @click="halt" variant="link" v-b-popover.hover.bottom="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-link>
+                </div>
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <div class="mt-0 pl-1">
+                  <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><span v-if="settings.showInfo"><b-icon-info-circle-fill shift-v="+1" font-scale="1.0"></b-icon-info-circle-fill></span><span v-else><b-icon-info-circle shift-v="+1" font-scale="1.0"></b-icon-info-circle></span></b-button>
+                </div>
+                <div class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.approvalsTable.sortOption" @change="saveSettings" :options="approvalsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(totalEvents) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# accounts'">{{ commify0(totalAccounts) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.eventsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedEvents.length" :per-page="settings.eventsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.approvalsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.eventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+              </div>
+            </b-card-text>
+
+            <b-card-text class="m-0 p-0">
+              <!-- :INFO -->
+              <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h4>Welcome</h4>
+                  A lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts on Ethereum-Virtual-Machine compatible chains.
+
+                  <h5 class="mt-4">How This Works</h5>
+                  <ul>
+                    <li>This tool scans for <b-link href="https://eips.ethereum.org/EIPS/eip-20#events" target="_blank">ERC-20</b-link>, <b-link href="https://eips.ethereum.org/EIPS/eip-721#specification" target="_blank">ERC-721</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-1155#specification" target="_blank">ERC-1155</b-link> <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b-link href="https://docs.ethers.org/v5/api/providers/provider/#Provider-getLogs" target="_blank">getLogs(filter)</b-link> web3 call</li>
+                    <li>These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts</li>
+                    <li>The latest ERC-20 approval amounts are retrieved using the ERC-20 <b>allowance(...)</b> function</li>
+                  </ul>
+
+                  <h5 class="mt-3">Requirements</h5>
+                  <ul>
+                    <li>This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet, and should work with other Ethereum-Virtual-Machine compatible chains</li>
+                  </ul>
+
+                  <h5 class="mt-3">References</h5>
+                  <ul>
+                    <li>Dapp: <b-link href="https://bokkypoobah.github.io/StealthChad/" target="_blank">https://bokkypoobah.github.io/StealthChad/</b-link></li>
+                    <li>GitHub: <b-link href="https://github.com/bokkypoobah/StealthChad" target="_blank">https://github.com/bokkypoobah/StealthChad</b-link></li>
+                    <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/StealthChad/blob/main/docs/index.html" target="_blank">https://github.com/bokkypoobah/StealthChad/blob/main/docs/index.html</b-link></li>
+                  </ul>
+
+                  <h5 class="mt-3">Running Locally</h5>
+                  <ul>
+                    <li>In a folder on your computer, <b>git clone <b-link href="https://github.com/bokkypoobah/StealthChad" target="_blank">https://github.com/bokkypoobah/StealthChad</b-link></b></li>
+                    <li>Run a tool like <b-link href="https://www.npmjs.com/package/anywhere" target="_blank">anywhere</b-link> in the <b>./docs</b> subdirectory of the folder created above</li>
+                  </ul>
+
+                  <h5 class="mt-3">Design</h5>
+                  <ul>
+                    <li>This dapp is designed to have minimal external dependencies - all code is statically served from GitHub</li>
+                    <li>No backend servers are necessary, only a web3 connection</li>
+                  </ul>
+
+                  <h5 class="mt-3">Warning</h5>
+                  <ul>
+                    <li>This is experimental unaudited software. Please check your transaction data carefully when updating your approvals!</li>
+                  </ul>
+
+                  <h5 class="mt-3">Troubleshooting</h5>
+                  <ul>
+                    <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
+                    <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>approval</b></li>
+                  </ul>
+                </b-card-body>
+              </b-card>
+
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
+                </template>
+                <template #cell(symbol)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.symbol }}</b-badge>
+                </template>
+                <template #cell(name)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ data.item.name }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(approvalType)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.approvalType }}</b-badge>
+                </template>
+                <template #cell(owner)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 24) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(spender)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 24) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(approved)="data">
+                  <!-- <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                  </b-link> -->
+                  <span v-if="data.item.type == 'erc20'">
+                    <span v-if="data.item.value.toString().length > 30">
+                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
+                    </span>
+                    <span v-else>
+                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
+                    </span>
+                  </span>
+                  <span v-else-if="data.item.approvalType == 'Approval'">
+                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ==  1 ? "true" : "false" }}</b-badge>
+                  </span>
+                </template>
+              </b-table>
+
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
+                    </b-link>
+                  </font>
+                </template>
+                <template #cell(owner)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(eventName)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.eventName }}</b-badge>
+                </template>
+                <template #cell(spender)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(approved)="data">
+                  <span v-if="data.item.type == 'erc20'">
+                    <span v-if="data.item.value.toString().length > 30">
+                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
+                    </span>
+                    <span v-else>
+                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
+                    </span>
+                  </span>
+                  <span v-else-if="data.item.eventName == 'Approval'">
+                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ? "true" : "false" }}</b-badge>
+                  </span>
+                </template>
+              </b-table>
+
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo && accounts" small fixed striped responsive hover :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(address)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.address" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ data.item.address.substring(0, 6) + '...' + data.item.address.substring(38) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(source)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Owner, contract or spender from approvals'" class="px-0">{{ data.item.source.substring(0, 1).toUpperCase() + data.item.source.substring(1) }}</b-badge>
+                </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected account type'" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
+                </template>
+                <template #cell(customType)="data">
+                  <b-form-select size="sm" v-model="data.item.customType" @change="customTypeUpdated(data.item.address, $event)" :options="accountTypeOptions" v-b-popover.hover.bottom="'Override detected type'"></b-form-select>
+                </template>
+                <template #cell(symbol)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Symbol for ERC-20, ERC-721 and ERC-1155: ' + data.item.symbol " class="px-0">{{ data.item.symbol }}</b-badge>
+                </template>
+                <template #cell(name)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Name: ' + data.item.name" class="px-0">{{ data.item.name }}</b-badge>
+                </template>
+                <template #cell(customName)="data">
+                  <b-form-input size="sm" v-model="data.item.customName" @change="customNameUpdated(data.item.address, $event)" placeholder="Custom name" v-b-popover.hover.bottom="'Override detected name'"></b-form-input>
+                </template>
+                <template #cell(decimals)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected decimals'" class="px-0">{{ data.item.decimals }}</b-badge>
+                </template>
+                <template #cell(customDecimals)="data">
+                  <span v-if="(data.item.customType == null && data.item.type == 'erc20') || data.item.customType == 'erc20'">
+                    <b-form-select size="sm" v-model="data.item.customDecimals" @change="customDecimalsUpdated(data.item.address, $event)" :options="decimalsOptions" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-select>
+                  </span>
+                </template>
+              </b-table>
+
+            </b-card-text>
+          </b-card>
+        </b-card>
+
+        <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
+          <div class="d-flex flex-wrap m-0 p-0">
+            <div class="ml-0 mt-1 pl-1">
+              <font v-if="connected" size="-2">
+                <!-- <b-link v-if="coinbase" :href="'https://etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
+                  {{ coinbase.substring(0, 10) }}
+                </b-link> -->
+                <b-link v-if="chainId" :href="'https://etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
+                  {{ chainId == '1' ? 'Mainnet' : 'Unsupported' }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
+                  {{ '#' + commify0(blockNumber) }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
+                  {{ formatTimeDiff(timestamp) }}
+                </b-link>
+              </font>
+            </div>
+            <div class="mt-0 flex-grow-1">
+            </div>
+            <div class="mt-0 pl-1 pr-1">
+              gm, and enjoy! <i>StealthChad</i> &copy; Bok Consulting Pty Ltd 2023
+            </div>
+          </div>
+        </b-card>
+      </b-container>
+    </div>
+
+    <script>
+      window.app = new Vue({
+        el: '#app',
+        // --- DATA ---
+        data: {
+          connected: false,
+          chainId: null,
+          coinbase: null,
+          blockNumber: null,
+          timestamp: null,
+          forceRefresh: 0,
+
+          settings: {
+            tabIndex: 0,
+            showInfo: false,
+            reportingDateTime: 0,
+            searchAttachedAccount: true,
+            searchAccounts: null,
+            approvalsTable: {
+              filter: null,
+              includeInactive: false,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'typenameasc',
+            },
+            eventsTable: {
+              includeFluff: false,
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'txorderdsc',
+            },
+            accountsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'typenameasc',
+            },
+            version: 12,
+          },
+          sync: {
+            section: null,
+            total: null,
+            completed: null,
+            halt: false,
+          },
+          events: {},
+          accounts: {},
+          blockTimestamps: {},
+          modalApproval: {
+            item: null,
+            tokens: null, // ERC-20 Approval
+            spender: null, // ERC-721 Approval
+            tokenId: null, // ERC-721 Approval
+            approved: false, // ERC-721 & ERC-1155 ApprovalForAll
+          },
+          approvalsSortOptions: [
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
+            { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
+          ],
+          eventsSortOptions: [
+            { value: 'txorderasc', text: '▲ TxOrder' },
+            { value: 'txorderdsc', text: '▼ TxOrder' },
+          ],
+          accountsSortOptions: [
+            { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
+            { value: 'addressasc', text: '▲ Address' },
+            { value: 'addressdsc', text: '▼ Address' },
+          ],
+          pageSizes: [
+            { value: 5, text: '5' },
+            { value: 10, text: '10' },
+            { value: 25, text: '25' },
+            { value: 50, text: '50' },
+            { value: 100, text: '100' },
+            { value: 500, text: '500' },
+            { value: 1000, text: '1k' },
+            { value: 2500, text: '2.5k' },
+            { value: 10000, text: '10k' },
+          ],
+          falseTrueOptions: [
+            { value: false, text: 'false' },
+            { value: true, text: 'true' },
+          ],
+          accountTypeOptions: [
+            { value: null, text: '(use default)' },
+            { value: "eoa", text: 'EOA' },
+            { value: "erc20", text: 'ERC-20' },
+            { value: "erc721", text: 'ERC-721' },
+            { value: "erc1155", text: 'ERC-1155' },
+            { value: "ftexchange", text: 'FTExchange' },
+            { value: "nftexchange", text: 'NFTExchange' },
+            { value: "unknown", text: '(Unknown)' },
+          ],
+          decimalsOptions: [
+            { value: null, text: '(use default)' },
+            { value: "0", text: '0' },
+            { value: "1", text: '1' },
+            { value: "2", text: '2' },
+            { value: "3", text: '3' },
+            { value: "4", text: '4' },
+            { value: "5", text: '5' },
+            { value: "6", text: '6 (some)' },
+            { value: "7", text: '7' },
+            { value: "8", text: '8' },
+            { value: "9", text: '9' },
+            { value: "10", text: '10' },
+            { value: "11", text: '11' },
+            { value: "12", text: '12' },
+            { value: "13", text: '13' },
+            { value: "14", text: '14' },
+            { value: "15", text: '15' },
+            { value: "16", text: '16' },
+            { value: "17", text: '17' },
+            { value: "18", text: '18 (common)' },
+          ],
+          approvalsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'approved', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          eventsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'eventName', label: 'Event', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          accountsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'customType', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'customName', label: '', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'customDecimals', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+          ],
+          reportingDateTimeOptions: [
+            { value: 0, text: 'Local Time' },
+            { value: 1, text: 'UTC Time' },
+          ],
+        },
+
+        // --- COMPUTED ---
+        computed: {
+          accountsToSearch() {
+            return this.settings.searchAttachedAccount ? [ this.coinbase ] : (this.settings.searchAccounts && this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => name.match(/0x[0-9a-fA-F]{40}/)) || []);
+          },
+          approvals() {
+            // TODO: Fix janky workaround
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const accounts = this.accounts[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(accounts)) {
+              const [ contract, type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ address, accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
+              for (let owner of this.accountsToSearch) {
+                const approvals = 'approvals' in accountData && owner in accountData.approvals && accountData.approvals[owner] || null;
+                if (approvals) {
+                  if (type == "erc721") {
+                    for (const [value, spender] of Object.entries(approvals)) {
+                      results.push({ contract, type: customType || type, approvalType: "Approval", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
+                    }
+                  } else if (type == "erc20") {
+                    for (const [spender, value] of Object.entries(approvals)) {
+                      results.push({ contract, type: customType || type, approvalType: "Approval", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
+                    }
+                  }
+                }
+                const approvalsForAll = 'approvalsForAll' in accountData && owner in accountData.approvalsForAll && accountData.approvalsForAll[owner] || null;
+                if (approvalsForAll) {
+                  for (const [spender, value] of Object.entries(approvalsForAll)) {
+                    results.push({ contract, type: customType || type, approvalType: "ApprovalForAll", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
+                  }
+                }
+              }
+            }
+            return results;
+          },
+          filteredApprovals() {
+            let results = [];
+            for (const approval of this.approvals) {
+              let include = true;
+              if (!this.settings.approvalsTable.includeInactive) {
+                if (approval.type == "erc20") {
+                  if (approval.value.toString() == "0") {
+                    include = false;
+                  }
+                } else if (approval.type == "erc721" && approval.approvalType == "Approval") {
+                  if (approval.spender == ADDRESS0) {
+                    include = false;
+                  }
+                } else {
+                  if (approval.value.toString() == "0") {
+                    include = false;
+                  }
+                }
+              }
+              if (include) {
+                results.push(approval);
+              }
+            }
+            return results;
+          },
+          filteredSortedApprovals() {
+            let results = this.filteredApprovals;
+            if (this.settings.approvalsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  if (('' + b.approvalType).localeCompare(a.approvalType) == 0) {
+                    return ('' + a.owner).localeCompare(b.owner);
+                  } else {
+                    return ('' + b.approvalType).localeCompare(a.approvalType);
+                  }
+                } else {
+                  return ('' + a.name).localeCompare(b.name);
+                }
+              });
+            } else if (this.settings.approvalsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  if (('' + a.approvalType).localeCompare(b.approvalType) == 0) {
+                    return ('' + b.owner).localeCompare(a.owner);
+                  } else {
+                    return ('' + a.approvalType).localeCompare(b.approvalType);
+                  }
+                } else {
+                  return ('' + b.name).localeCompare(a.name);
+                }
+              });
+            } else if (this.settings.approvalsTable.sortOption == 'typenameasc') {
+              results.sort((a, b) => {
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == a.type);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == b.type);
+                if (sortIndexA == sortIndexB) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    if (('' + b.approvalType).localeCompare(a.approvalType) == 0) {
+                      return ('' + a.owner).localeCompare(b.owner);
+                    } else {
+                      return ('' + b.approvalType).localeCompare(a.approvalType);
+                    }
+                  } else {
+                    return ('' + a.name).localeCompare(b.name);
+                  }
+                } else {
+                  return sortIndexA - sortIndexB;
+                }
+              });
+            } else if (this.settings.approvalsTable.sortOption == 'typenamedsc') {
+              results.sort((a, b) => {
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == a.type);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == b.type);
+                if (sortIndexA == sortIndexB) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    if (('' + a.approvalType).localeCompare(b.approvalType) == 0) {
+                      return ('' + b.owner).localeCompare(a.owner);
+                    } else {
+                      return ('' + a.approvalType).localeCompare(b.approvalType);
+                    }
+                  } else {
+                    return ('' + b.name).localeCompare(a.name);
+                  }
+                } else {
+                  return sortIndexB - sortIndexA;
+                }
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedApprovals() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedApprovals - results[0..9]: " + JSON.stringify(this.filteredSortedApprovals.slice(0, 10), null, 2));
+            return this.filteredSortedApprovals.slice((this.settings.approvalsTable.currentPage - 1) * this.settings.approvalsTable.pageSize, this.settings.approvalsTable.currentPage * this.settings.approvalsTable.pageSize);
+          },
+
+          totalEvents() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events)) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData)) {
+                result++;
+              }
+            }
+            return result;
+          },
+          filteredEvents() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                let include = true;
+                const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].type || null;
+                const contractCustomType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].customType || null;
+                const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].decimals : undefined;
+                const customDecimals = (contractCustomType == "erc20" || (contractCustomType == null && contractType == "erc20")) ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].customDecimals : undefined;
+                if (!this.settings.eventsTable.includeFluff) {
+                  if (contractType == "erc721" && eventData.spender == ADDRESS0) {
+                    include = false;
+                  }
+                }
+                if (include) {
+                  if (!(this.accountsToSearch.includes(eventData.owner))) {
+                    include = false;
+                  }
+                }
+                if (include) {
+                  const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
+                  results.push({ blockNumber, logIndex, ...eventData, type: contractCustomType || contractType, decimals: customDecimals || decimals, timestamp });
+                }
+              }
+            }
+            // console.log(moment().format("HH:mm:ss") + " filteredEvents - results: " + JSON.stringify(results, null, 2));
+            return results;
+          },
+          filteredSortedEvents() {
+            let results = this.filteredEvents;
+            if (this.settings.eventsTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return a.logIndex - b.logIndex;
+                  } else {
+                    return a.txIndex - b.txIndex;
+                  }
+                } else {
+                  return a.blockNumber - b.blockNumber;
+                }
+              });
+            } else if (this.settings.eventsTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return b.logIndex - a.logIndex;
+                  } else {
+                    return b.txIndex - a.txIndex;
+                  }
+                } else {
+                  return b.blockNumber - a.blockNumber;
+                }
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedEvents() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10), null, 2));
+            return this.filteredSortedEvents.slice((this.settings.eventsTable.currentPage - 1) * this.settings.eventsTable.pageSize, this.settings.eventsTable.currentPage * this.settings.eventsTable.pageSize);
+          },
+
+          totalAccounts() {
+            const accounts = this.accounts[this.chainId] || {};
+            return Object.keys(accounts).length;
+          },
+          filteredAccounts() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const accounts = this.accounts[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(accounts)) {
+              const [ type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
+              results.push({ address, type, symbol, name, decimals, source, customType, customName, customDecimals });
+            }
+            return results;
+          },
+          filteredSortedAccounts() {
+            let results = this.filteredAccounts;
+            if (this.settings.accountsTable.sortOption == 'typenameasc') {
+              results.sort((a, b) => {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + namea).localeCompare(nameb);
+                } else {
+                  return sortIndexA - sortIndexB;
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
+              results.sort((a, b) => {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + nameb).localeCompare(namea);
+                } else {
+                  return sortIndexB - sortIndexA;
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                return ('' + a.name).localeCompare(b.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                return ('' + b.name).localeCompare(a.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.address).localeCompare(b.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.address).localeCompare(a.address);
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedAccounts() {
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
+            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
+          },
+        },
+
+        // --- METHODS ---
+        methods: {
+          approvalsRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " approvalsRowSelected: " + JSON.stringify(item));
+            if (item && item.length > 0) {
+              this.modalApproval.item = item[0];
+              this.$bvModal.show('modal-approval');
+              this.$refs.approvalsTable.clearSelected();
+            }
+          },
+
+          async updateApproval() {
+            console.log(moment().format("HH:mm:ss") + " updateApproval: " + JSON.stringify(this.modalApproval));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const item = this.modalApproval.item;
+            if (item.type == 'erc20') {
+              const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.approve(item.spender, ethers.utils.parseUnits(this.modalApproval.tokens, item.decimals));
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval ERC-20.approve(...) error: " + JSON.stringify(e));
+              }
+            } else if (item.type == 'erc721' && item.approvalType == 'Approval') {
+              const contract = new ethers.Contract(item.contract, ERC721ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.approve(this.modalApproval.spender, this.modalApproval.tokenId);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval ERC-721 approve(...) error: " + JSON.stringify(e));
+              }
+            } else if (item.type == 'erc721' && item.approvalType == 'ApprovalForAll') {
+              const contract = new ethers.Contract(item.contract, ERC721ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.setApprovalForAll(item.spender, this.modalApproval.approved);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval ERC-721 setApprovalForAll(...) error: " + JSON.stringify(e));
+              }
+            } else if (item.type == 'erc1155' && item.approvalType == 'ApprovalForAll') {
+              const contract = new ethers.Contract(item.contract, ERC1155ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.setApprovalForAll(this.modalApproval.item.spender, this.modalApproval.approved);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval ERC-1155 setApprovalForAll(...) error: " + JSON.stringify(e));
+              }
+            }
+          },
+
+          async syncIt(devMode) {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            this.coinbase = await signer.getAddress();
+            localStorage.approvalToolCoinbase = this.coinbase;
+            const network = await provider.getNetwork();
+            localStorage.approvalToolChainId = network.chainId;
+            const block = await provider.getBlock();
+            const latestBlockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+
+            if (!devMode) {
+              await this.syncEvents(provider, latestBlockNumber);
+            }
+            if (!devMode) {
+              await this.syncBlockTimestamps(provider);
+            }
+            if (!devMode) {
+              await this.syncAccounts(provider, devMode);
+            }
+            if (!devMode) {
+              await this.processData(provider);
+            }
+            this.sync.section = null;
+            this.sync.halt = false;
+          },
+
+          async syncEvents(provider, latestBlockNumber) {
+            // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+            // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+            // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+            // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+            // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+            // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+            // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
+            // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+            console.log(moment().format("HH:mm:ss") + " syncEvents BEGIN");
+            this.sync.completed = 0;
+            this.sync.total = 0;
+            this.sync.section = 'Approval Events';
+            const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
+            const approvalLogs = await provider.getLogs({
+              address: null,
+              fromBlock: 0,
+              toBlock: latestBlockNumber,
+              topics: [[
+                  '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
+                  '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31'
+                ],
+                accountsAs32Bytes,
+                null
+              ],
+            });
+            this.sync.completed = approvalLogs.length;
+            const events = this.events;
+            if (!(this.chainId in events)) {
+              events[this.chainId] = {};
+            }
+            for (const log of approvalLogs) {
+              const topic0 = log.topics[0];
+              const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll' : 'Approval';
+              let owner = null;
+              let spender = null;
+              let value = null;
+              if (log.topics.length == 3) {
+                owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                value = ethers.BigNumber.from(log.data).toString();
+              } else if (log.topics.length == 4) {
+                owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                value = ethers.BigNumber.from(log.topics[3]).toString();
+              } else {
+                console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
+              }
+              if (owner) {
+                if (!(log.blockNumber in events[this.chainId])) {
+                  events[this.chainId][log.blockNumber] = {};
+                }
+                if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                  events[this.chainId][log.blockNumber][log.logIndex] = {
+                    txIndex: log.transactionIndex,
+                    txHash: log.transactionHash,
+                    contract: log.address,
+                    eventName,
+                    owner,
+                    spender,
+                    value,
+                    latestBlockNumber,
+                  };
+                }
+              }
+            }
+            localStorage.approvalEvents = JSON.stringify(events);
+            Vue.set(this, 'events', events);
+            // console.log(moment().format("HH:mm:ss") + " syncEvents - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncEvents END");
+          },
+
+          async syncBlockTimestamps(provider) {
+            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
+            const blockTimestamps = this.blockTimestamps;
+            if (!(this.chainId in blockTimestamps)) {
+              blockTimestamps[this.chainId] = {};
+            }
+            const events = this.events[this.chainId] || {};
+            const newBlockNumbersMap = {};
+            for (const blockNumber of Object.keys(events)) {
+              if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
+                newBlockNumbersMap[blockNumber] = true;
+              }
+            }
+            const newBlockNumbers = Object.keys(newBlockNumbersMap);
+            this.sync.completed = 0;
+            this.sync.total = newBlockNumbers.length;
+            this.sync.section = 'Block Timestamps';
+            for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
+              const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
+              blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
+              this.sync.completed++;
+            }
+            if (!this.sync.halt) {
+              localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
+              Vue.set(this, 'blockTimestamps', blockTimestamps);
+            }
+            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
+          },
+
+          async syncAccounts(provider, devMode) {
+            console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
+            const accounts = devMode ? {} : this.accounts;
+            if (!(this.chainId in accounts)) {
+              accounts[this.chainId] = {};
+            }
+            const newAccountsMap = {};
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.owner in newAccountsMap)) {
+                  newAccountsMap[eventData.owner] = { source: "owner" };
+                }
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.contract in newAccountsMap)) {
+                  newAccountsMap[eventData.contract] = { source: "contract" };
+                }
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.spender in newAccountsMap)) {
+                  newAccountsMap[eventData.spender] = { source: "spender" };
+                }
+              }
+            }
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+            this.sync.completed = 0;
+            this.sync.total = Object.keys(newAccountsMap).length;
+            this.sync.section = 'Accounts';
+            const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
+
+            for (const [account, accountData] of Object.entries(newAccountsMap)) {
+              if ((account in CUSTOMNAMES)) {
+                accountData.type = CUSTOMNAMES[account][0];
+                accountData.symbol = CUSTOMNAMES[account][1];
+                accountData.name = CUSTOMNAMES[account][2];
+                accountData.decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
+              } else {
+                let accountType = null;
+                let symbol = undefined;
+                let name = undefined;
+                let decimals = undefined;
+                let totalSupply = undefined;
+                const code = await provider.getCode(account);
+                if (code.length == 2) {
+                  accountType = "eoa";
+                } else {
+                  const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
+                  if (!accountType) {
+                    try {
+                      const result = await erc165Contract.supportsInterface(ERC721_INTERFACE);
+                      if (result) {
+                        accountType = "erc721";
+                      }
+                    } catch (e1) {
+                    }
+                  }
+                  if (!accountType) {
+                    try {
+                      const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
+                      if (result) {
+                        accountType = "erc1155";
+                      }
+                    } catch (e1) {
+                    }
+                  }
+                  const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                  try {
+                    symbol = await erc20Contract.symbol();
+                  } catch (e1) {
+                  }
+                  try {
+                    name = await erc20Contract.name();
+                  } catch (e1) {
+                  }
+                  try {
+                    decimals = await erc20Contract.decimals();
+                  } catch (e1) {
+                  }
+                  try {
+                    totalSupply = await erc20Contract.totalSupply();
+                  } catch (e1) {
+                  }
+                }
+                console.log(moment().format("HH:mm:ss") + " syncAccounts " + account + " => code.length: " + code.length + ", accountType: " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
+                if (!accountType && decimals && totalSupply) {
+                  accountType = "erc20";
+                  accountData.decimals = parseInt(decimals);
+                  accountData.totalSupply = totalSupply.toString();
+                }
+                accountData.type = accountType || "unknown";
+                accountData.symbol = symbol;
+                accountData.name = name;
+              }
+              accounts[this.chainId][account] = accountData;
+              this.sync.completed++;
+              if (this.sync.halt) {
+                break;
+              }
+            }
+            // ETH Mainnet ENS
+            if (this.chainId == 1) {
+              for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
+                const type = accountData.customType || accountData.type;
+                console.log(account + " " + type + " " + accountData.customType);
+                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(type)) && !(account in CUSTOMNAMES) && !this.sync.halt) {
+                  const allnames = await ensReverseRecordsContract.getNames([account]);
+                  if (allnames.length >= 0 && allnames[0].length > 0) {
+                    accounts[this.chainId][account].name = allnames[0];
+                  }
+                }
+              }
+            }
+            // console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
+            if (!this.sync.halt) {
+              localStorage.approvalAccounts = JSON.stringify(accounts);
+              Vue.set(this, 'accounts', accounts);
+            }
+            console.log(moment().format("HH:mm:ss") + " syncAccounts END");
+          },
+
+          async processData(provider) {
+            console.log(moment().format("HH:mm:ss") + " processData BEGIN");
+            const accounts = this.accounts;
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                const contract = eventData.contract;
+                const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
+                // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
+                if (account) {
+                  const type = account.customType || account.type;
+                  if (type == "erc20") {
+                    if (!('approvals' in account)) {
+                      account.approvals = {};
+                    }
+                    if (!(eventData.owner in account.approvals)) {
+                      account.approvals[eventData.owner] = {};
+                    }
+                    account.approvals[eventData.owner][eventData.spender] = eventData.value;
+                  } else if (type == "erc721") {
+                    if (eventData.eventName == "Approval") {
+                      if (!('approvals' in account)) {
+                        account.approvals = {};
+                      }
+                      if (!(eventData.owner in account.approvals)) {
+                        account.approvals[eventData.owner] = {};
+                      }
+                      account.approvals[eventData.owner][eventData.value] = eventData.spender;
+                    } else if (eventData.eventName == "ApprovalForAll") {
+                      if (!('approvalsForAll' in account)) {
+                        account.approvalsForAll = {};
+                      }
+                      if (!(eventData.owner in account.approvalsForAll)) {
+                        account.approvalsForAll[eventData.owner] = {};
+                      }
+                      account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
+                    }
+                  } else if (type == "erc1155") {
+                    if (!('approvalsForAll' in account)) {
+                      account.approvalsForAll = {};
+                    }
+                    if (!(eventData.owner in account.approvalsForAll)) {
+                      account.approvalsForAll[eventData.owner] = {};
+                    }
+                    account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
+                  }
+                  Vue.set(this.accounts[this.chainId], contract, account);
+                } else {
+                  console.log(moment().format("HH:mm:ss") + " processData - account: " + contract + " not found");
+                }
+              }
+            }
+            // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
+            this.sync.total = 0;
+            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
+              const type = accountData.customType || accountData.type;
+              if (type == "erc20") {
+                for (const owner of this.accountsToSearch) {
+                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
+                  for (const [spender, approved] of Object.entries(approvals)) {
+                    this.sync.total++;
+                  }
+                }
+              }
+            }
+            this.sync.completed = 0;
+            this.sync.section = 'Latest ERC-20 Allowances';
+            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
+              const type = accountData.customType || accountData.type;
+              if (type == "erc20" && !this.sync.halt) {
+                for (const owner of this.accountsToSearch) {
+                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
+                  for (const [spender, approved] of Object.entries(approvals)) {
+                    const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                    const newValue = await erc20Contract.allowance(owner, spender);
+                    accountData.approvals[owner][spender] = newValue.toString();
+                    Vue.set(this.accounts[this.chainId], account, accountData);
+                    this.sync.completed++;
+                  }
+                }
+              }
+            }
+            if (!this.sync.halt) {
+              localStorage.approvalAccounts = JSON.stringify(accounts);
+              Vue.set(this, 'accounts', accounts);
+            }
+            this.forceRefresh++; // UI refresh workaround
+            console.log(moment().format("HH:mm:ss") + " processData END");
+          },
+
+          customTypeUpdated(address, type) {
+            Vue.set(this.accounts[this.chainId][address], 'customType', type);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+          },
+          customNameUpdated(address, name) {
+            Vue.set(this.accounts[this.chainId][address], 'customName', name);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+          },
+          customDecimalsUpdated(address, decimals) {
+            Vue.set(this.accounts[this.chainId][address], 'customDecimals', decimals);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+          },
+
+          saveSettings() {
+            localStorage.approvalToolSettings = JSON.stringify(this.settings);
+          },
+          async processNewBlock(blockNumber) {
+            console.log(moment().format("HH:mm:ss") + " processNewBlock[" + this.chainId + "] #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
+          },
+          async halt() {
+            this.sync.halt = true;
+            console.log(moment().format("HH:mm:ss") + " halt()");
+          },
+          commify0(n) {
+            if (n != null) {
+              return Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+            return null;
+          },
+          formatETH(e, precision = 9) {
+            try {
+              if (precision == 0) {
+                return e ? ethers.utils.formatEther(e) : null;
+              } else {
+                return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(precision) : null;
+              }
+            } catch (err) {
+            }
+            return e.toFixed(precision);
+          },
+          formatDecimals(e, decimals = 18) {
+            return e ? ethers.utils.formatUnits(e, decimals) : null;
+          },
+          formatTimestamp(ts) {
+            if (ts != null) {
+              if (this.settings.reportingDateTime == 1) {
+                return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
+              } else {
+                return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+              }
+            }
+            return null;
+          },
+          formatTimeDiff(unixtime) {
+            if (!unixtime) {
+              return "";
+            } else {
+              return moment.unix(unixtime).fromNow();
+            }
+          },
+          nameOrAddress(address, length = 0) {
+            let result = null;
+            const accounts = this.accounts[this.chainId] || {};
+            if (address in accounts) {
+              result = accounts[address].customName || accounts[address].name || address;
+            } else {
+              result = address;
+            }
+            if (result && length > 0) {
+              result = result.substring(0, length);
+            }
+            return result;
+          },
+          addressDescription(address) {
+            const accounts = this.accounts[this.chainId] || {};
+            if (address in accounts) {
+              result = "address=" + address;
+              for (let key of ['type', 'customType', 'symbol', 'name', 'customName', 'decimals', 'customDecimals', 'source']) {
+                if (key in accounts[address] && accounts[address][key]) {
+                  result = result + "; " + key + "=" + accounts[address][key];
+                }
+              }
+            } else {
+              result = address;
+            }
+            return result;
+          },
+          copyToClipboard(str) {
+            navigator.clipboard.writeText(str);
+          },
+          async connectToWeb3() {
+            if (!window.ethereum) {
+              this.connected = false;
+            } else {
+              try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                this.connected = window.ethereum.isConnected();
+              } catch (e) {
+                console.log("window.ethereum.request error: " + e.message);
+                this.connected = false;
+              }
+            }
+            if (!this.connected) {
+              alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
+            } else {
+              const t = this;
+              function handleChainChanged(_chainId) {
+                t.chainId = _chainId;
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId);
+                alert('Ethereum chain has changed - reloading this page.')
+                window.location.reload();
+              }
+              window.ethereum.on('chainChanged', handleChainChanged);
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              async function handleAccountsChanged(accounts) {
+                const signer = provider.getSigner();
+                t.coinbase = await signer.getAddress();
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleAccountsChanged: " + t.coinbase);
+              }
+              window.ethereum.on('accountsChanged', handleAccountsChanged);
+              async function handleNewBlock(blockNumber) {
+                if (!t.blockNumber || blockNumber > t.blockNumber) {
+                  const block = await provider.getBlock("latest");
+                  t.blockNumber = block.number;
+                  t.timestamp = block.timestamp;
+                  await t.processNewBlock(blockNumber);
+                }
+              }
+              provider.on("block", handleNewBlock);
+              const signer = provider.getSigner();
+              this.coinbase = await signer.getAddress();
+              const network = await provider.getNetwork();
+              this.chainId = network.chainId;
+              console.log(moment().format("HH:mm:ss") + " connectToWeb3[" + this.chainId + "]");
+            }
+          },
+        },
+
+        // --- MOUNTED ---
+        mounted() {
+          (async() => {
+            await this.connectToWeb3();
+          })();
+          if ('approvalToolChainId' in localStorage) {
+            this.chainId = localStorage.approvalToolChainId;
+          }
+          if ('approvalToolCoinbase' in localStorage) {
+            this.coinbase = localStorage.approvalToolCoinbase;
+          }
+          if ('approvalToolSettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.approvalToolSettings);
+            if ('version' in tempSettings && tempSettings.version == this.settings.version) {
+              this.settings = tempSettings;
+              if (this.settings.approvalsTable.currentPage > 1) {
+                this.settings.approvalsTable.currentPage = 1;
+              }
+              if (this.settings.eventsTable.currentPage > 1) {
+                this.settings.eventsTable.currentPage = 1;
+              }
+              if (this.settings.accountsTable.currentPage > 1) {
+                this.settings.accountsTable.currentPage = 1;
+              }
+              // Restore other settings for the same version
+              if ('approvalEvents' in localStorage) {
+                this.events = JSON.parse(localStorage.approvalEvents);
+              }
+              if ('approvalAccounts' in localStorage) {
+                this.accounts = JSON.parse(localStorage.approvalAccounts);
+              }
+              if ('approvalBlockTimestamps' in localStorage) {
+                this.blockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
+              }
+            }
+          }
+        },
+      })
+    </script>
+  </body>
+</html>

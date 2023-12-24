@@ -1,0 +1,48 @@
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.hidden {
+  display:none;
+}
+
+span.icon {
+ font-family: 'Glyphicons Halflings';
+}
+
+/* navbar */
+.navbar-default {
+    background-color: #F8F8F8;
+    border-color: #E7E7E7;
+}
+/* Title */
+.navbar-default .navbar-brand {
+    color: #000;
+}
+
+img {
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-pixelated;
+    image-rendering: pixelated !important;
+}
+
+.hidden_header {
+  display: none;
+}
+
+.confirm-modal {
+  background-color: #F8F8F8 !important;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-size: 75%;
+  wrap: off !important;
+}
+
+.popover-max-width {
+  max-width: 600px !important;
+}
