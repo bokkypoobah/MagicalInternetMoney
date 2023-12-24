@@ -54,9 +54,9 @@
           <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
             Warning: This is experimental unaudited software. Please check your transaction data carefully before signing
           </b-alert>
-          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
+          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase || chainId != 11155111">
             <b-card-text>
-              Please install the MetaMask extension and connect to the Ethereum Mainnet or an EVM compatible chain. Then refresh this page, and click the [Connect] button on the top right.
+              Please install the MetaMask extension and connect to the Ethereum Sepolia Testnet or an EVM compatible chain. Then refresh this page, and click the [Connect] button on the top right.
             </b-card-text>
           </b-card>
 
@@ -269,6 +269,14 @@
                     <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
                     <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>approval</b></li>
                   </ul> -->
+                </b-card-body>
+              </b-card>
+
+              <!-- :INFO -->
+              <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h4>Welcome</h4>
+
                 </b-card-body>
               </b-card>
 
