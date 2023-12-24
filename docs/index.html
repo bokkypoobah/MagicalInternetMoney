@@ -474,7 +474,7 @@
                   {{ coinbase.substring(0, 10) }}
                 </b-link> -->
                 <b-link v-if="chainId" :href="'https://etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
-                  {{ chainId == '1' ? 'Mainnet' : 'Unsupported' }}
+                  {{ chainId == '1' ? 'Mainnet' : (chainId == '11155111' ? 'Sepolia' : 'Unsupported') }}
                 </b-link>
                 <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
                   {{ '#' + commify0(blockNumber) }}
