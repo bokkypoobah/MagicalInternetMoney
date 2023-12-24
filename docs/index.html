@@ -289,14 +289,17 @@
                     <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-button size="sm" id="generate-keys-submit" @click="generateKeys()" variant="warning">Generate</b-button>
                     </b-form-group>
+                    <b-form-group label="" label-for="display-private-keys" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-checkbox size="sm" v-model.trim="displayPrivateKeys">Display Private Keys</b-form-checkbox>
+                    </b-form-group>
                     <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" readonly size="sm" id="spending-privatekey" :value="spendingPrivateKey" class="w-75"></b-form-input>
+                      <b-form-input type="text" readonly size="sm" id="spending-privatekey" :value="displayPrivateKeys ? spendingPrivateKey : (spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-form-input type="text" readonly size="sm" id="spending-publickey" :value="spendingPublicKey" class="w-75"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" readonly size="sm" id="viewing-privatekey" :value="viewingPrivateKey" class="w-75"></b-form-input>
+                      <b-form-input type="text" readonly size="sm" id="viewing-privatekey" :value="displayPrivateKeys ? viewingPrivateKey : (spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                     </b-form-group>
                     <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-form-input type="text" readonly size="sm" id="viewing-publickey" :value="viewingPublicKey" class="w-75"></b-form-input>
@@ -503,6 +506,7 @@
           timestamp: null,
 
           message: "I want to login into my stealth wallet on Ethereum mainnet.",
+          displayPrivateKeys: false,
           spendingPrivateKey: null,
           spendingPublicKey: null,
           viewingPrivateKey: null,

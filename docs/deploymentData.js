@@ -17,3 +17,7 @@ ERC1155ABI = [{"inputs":[{"internalType":"contract ENS","name":"_ens","type":"ad
 
 const CHAINID_MAINNET = 1;
 const CHAINID_SEPOLIA = 11155111;
+
+// Sepolia
+const STEALTHTRANSACTIONHELPERADDRESS = "0x054Aa0E0b4C92142a583fDfa9369FF3558F8dea4";
+const STEALTHTRANSACTIONHELPERABI = [{"inputs":[{"internalType":"address payable","name":"messengerAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"bytes","name":"ephemeralPubKey","type":"bytes"},{"internalType":"bytes","name":"metadata","type":"bytes"}],"name":"transferAndAnnounce","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"bytes","name":"ephemeralPubKey","type":"bytes"},{"internalType":"bytes","name":"metadata","type":"bytes"}],"name":"transferAndStakeAndAnnounce","outputs":[],"stateMutability":"payable","type":"function"}];
