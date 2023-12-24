@@ -289,11 +289,20 @@
                     <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-button size="sm" id="generate-keys-submit" @click="generateKeys()" variant="warning">Generate</b-button>
                     </b-form-group>
-                    <b-form-group label="Signature 1:" label-for="signature-signature1" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" readonly size="sm" id="signature-signature1" :value="signature1" class="w-50"></b-form-input>
+                    <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" readonly size="sm" id="spending-privatekey" :value="spendingPrivateKey" class="w-75"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="Signature 2:" label-for="signature-signature2" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-input type="text" readonly size="sm" id="signature-signature2" :value="signature2" class="w-50"></b-form-input>
+                    <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" readonly size="sm" id="spending-publickey" :value="spendingPublicKey" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" readonly size="sm" id="viewing-privatekey" :value="viewingPrivateKey" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" readonly size="sm" id="viewing-publickey" :value="viewingPublicKey" class="w-75"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Stealth Meta Address:" label-for="stealth-meta-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" readonly size="sm" id="stealth-meta-address" :value="stealthMetaAddress" class="w-100"></b-form-input>
                     </b-form-group>
                   </b-form-group>
                 </b-card-body>
@@ -493,10 +502,12 @@
           blockNumber: null,
           timestamp: null,
 
-          message: "The quick brown fox jumps over the lazy dog",
-          signature: null,
-          signature1: null,
-          signature2: null,
+          message: "I want to login into my stealth wallet on Ethereum mainnet.",
+          spendingPrivateKey: null,
+          spendingPublicKey: null,
+          viewingPrivateKey: null,
+          viewingPublicKey: null,
+          stealthMetaAddress: null,
 
           forceRefresh: 0,
 
@@ -923,19 +934,58 @@
         // --- METHODS ---
         methods: {
           async generateKeys() {
+            // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
             console.log(moment().format("HH:mm:ss") + " generateKeys - message: " + this.message);
             const hexValue = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.message));
             console.log(moment().format("HH:mm:ss") + " generateKeys - hexValue: " + hexValue);
 
-            this.signature = await ethereum.request({
+            const signature = await ethereum.request({
                 method: 'personal_sign',
                 params: [hexValue, this.coinbase],
             });
-            console.log("signature: " + this.signature);
-            this.signature1 = this.signature.slice(2, 66);
-            this.signature2 = this.signature.slice(66, 130);
-            console.log("signature1: " + this.signature1);
-            console.log("signature2: " + this.signature2);
+            console.log("signature: " + signature);
+            const signature1 = signature.slice(2, 66);
+            const signature2 = signature.slice(66, 130);
+            console.log("signature1: " + signature1);
+            console.log("signature2: " + signature2);
+
+            // Hash "v" and "r" values using SHA-256
+            const hashedV = ethers.utils.sha256("0x" + signature1);
+            const hashedR = ethers.utils.sha256("0x" + signature2);
+            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+
+            console.log("hashedV: " + hashedV);
+            console.log("hashedR: " + hashedR);
+
+            // // Calculate the private keys by taking the hash values modulo the curve order
+            const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+            const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+
+            const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+            const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+            this.spendingPrivateKey = keyPair1.privateKey;
+            this.viewingPrivateKey = keyPair2.privateKey;
+
+            console.log("this.spendingPrivateKey: " + this.spendingPrivateKey);
+            console.log("this.viewingPrivateKey: " + this.viewingPrivateKey);
+
+            this.spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+            this.viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+
+
+            // // Generate the key pairs
+            // const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+            // const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+            //
+            // console.log("keyPair1: " + JSON.stringify(keyPair1, null, 2));
+            // console.log("keyPair2: " + JSON.stringify(keyPair2, null, 2));
+
+            // spendingPrivateKey: null,
+            // spendingPublicKey: null,
+            // viewingPrivateKey: null,
+            // viewingPublicKey: null,
+
+            this.stealthMetaAddress = "st:eth:" + this.spendingPublicKey + this.viewingPublicKey.substring(2);
 
           },
 
