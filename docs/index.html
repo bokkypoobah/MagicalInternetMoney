@@ -869,10 +869,18 @@
             console.log("ephemeralPublicKey: " + ephemeralPublicKey.toString());
 
             const sharedSecret = nobleCurves.secp256k1.getSharedSecret(ephemeralPrivateKey, R_pubkey_view, false);
-            console.log('sharedSecret:', sharedSecret.toString());
-            console.log('sharedSecret.length:', sharedSecret.length);
+            console.log('sharedSecret: ', sharedSecret.toString());
+            console.log('sharedSecret.length: ', sharedSecret.length);
             const hashedSharedSecret = ethers.utils.keccak256(sharedSecret.slice(1));
-            console.log('hashedSharedSecret:', hashedSharedSecret.toString());
+            console.log('hashedSharedSecret: ', hashedSharedSecret.toString());
+            console.log('hashedSharedSecret.length: ', hashedSharedSecret.length);
+
+            const viewTag = hashedSharedSecret.substring(2, 4);
+            console.log('viewTag:', viewTag);
+
+            const hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(hashedSharedSecret.substring(2));
+            console.log('hashedSharedSecretPoint:', hashedSharedSecretPoint);
+
 
             // const p = getPublicKey();
             // console.log("etc: " + JSON.stringify(etc));
