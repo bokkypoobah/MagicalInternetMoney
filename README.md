@@ -23,6 +23,8 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 * [secp256k1-js](https://github.com/lionello/secp256k1-js)
   * https://unpkg.com/bn.js@4.11.8/lib/bn.js
   * https://unpkg.com/@lionello/secp256k1-js@1.1.0/src/secp256k1.js
+* https://github.com/paulmillr/noble-secp256k1/releases/download/2.0.0/noble-secp256k1.min.js
+* https://github.com/paulmillr/noble-curves
 
 <br />
 
