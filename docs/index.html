@@ -137,42 +137,42 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <div v-if="false && (settings.tabIndex == 0 || settings.tabIndex == 1)" class="mt-1 pr-1">
+                <!-- <div v-if="false && (settings.tabIndex == 0 || settings.tabIndex == 1)" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
                     Attached
                   </b-form-checkbox>
-                </div>
-                <div v-if="false && !settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
+                </div> -->
+                <!-- <div v-if="false && !settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
                   <b-form-textarea :disabled="sync.section != null" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
-                </div>
-                <div v-if="false && settings.tabIndex == 0" class="mt-1 pr-1">
+                </div> -->
+                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
                     Inactive
                   </b-form-checkbox>
-                </div>
-                <div v-if="false && settings.tabIndex == 1" class="mt-1 pr-1">
+                </div> -->
+                <!-- <div v-if="false && settings.tabIndex == 1" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include less important events like ERC-721 Approval to Null:0x0000...0000'">
                     Fluff
                   </b-form-checkbox>
-                </div>
+                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="false && !sync.section" class="mt-0 pr-1">
+                <!-- <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
-                </div>
-                <div v-if="false && !sync.section" class="mt-0 pr-1">
+                </div> -->
+                <!-- <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
-                </div>
-                <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
+                </div> -->
+                <!-- <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
                     </b-progress-bar>
                   </b-progress>
-                </div>
-                <div class="ml-0 mt-1">
+                </div> -->
+                <!-- <div class="ml-0 mt-1">
                   <b-link v-if="sync.section" size="sm" @click="halt" variant="link" v-b-popover.hover.bottom="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-link>
-                </div>
+                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div class="mt-0 pl-1">
@@ -180,42 +180,18 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
+                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.approvalsTable.sortOption" @change="saveSettings" :options="approvalsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                </div>
-                <div v-if="false && settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                </div>
-                <div v-if="false && settings.tabIndex == 2" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                </div>
-                <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
+                </div> -->
+                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
-                </div>
-                <div v-if="false && settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(totalEvents) }}</font>
-                </div>
-                <div v-if="false && settings.tabIndex == 2" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# accounts'">{{ commify0(totalAccounts) }}</font>
-                </div>
-                <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
+                </div> -->
+                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
-                </div>
-                <div v-if="false && settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.eventsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedEvents.length" :per-page="settings.eventsTable.pageSize" style="height: 0;"></b-pagination>
-                </div>
-                <div v-if="false && settings.tabIndex == 2" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
-                </div>
-                <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
+                </div> -->
+                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.approvalsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
-                </div>
-                <div v-if="false && settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.eventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
-                </div>
-                <div v-if="false && settings.tabIndex == 2" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
-                </div>
+                </div> -->
               </div>
             </b-card-text>
 
@@ -275,217 +251,65 @@
               <!-- :MAIN -->
               <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
-                  <h4>Stealth Meta-Address</h4>
-
+                  <h5>Stealth Meta-Address</h5>
                   <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-                    <!-- <b-form-group v-if="modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <font size="-1">
-                        <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
-                      </font>
-                    </b-form-group> -->
                     <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your keys from your web3 attached account">
-                      <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="message" class="w-50"></b-form-input>
+                      <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="settings.stealthMetaAddress.message" @input="saveSettings" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-button size="sm" id="generate-keys-submit" @click="generateKeys()" variant="warning">Generate</b-button>
                     </b-form-group>
                     <b-form-group label="" label-for="display-private-keys" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-form-checkbox size="sm" v-model.trim="displayPrivateKeys">Display Private Keys</b-form-checkbox>
+                      <b-form-checkbox size="sm" v-model.trim="stealthMetaAddress.display">Display Private Keys</b-form-checkbox>
                     </b-form-group>
                     <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="spending-privatekey" :value="displayPrivateKeys ? spendingPrivateKey : (spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
+                        <b-form-input type="text" readonly id="spending-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.spendingPrivateKey : (stealthMetaAddress.spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                         <b-input-group-append>
-                          <b-button :disabled="!spendingPrivateKey" @click="copyToClipboard(spendingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                          <b-button :disabled="!stealthMetaAddress.spendingPrivateKey" @click="copyToClipboard(stealthMetaAddress.spendingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
                     <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="spending-publickey" :value="spendingPublicKey" class="w-75"></b-form-input>
+                        <b-form-input type="text" readonly id="spending-publickey" :value="settings.stealthMetaAddress.spendingPublicKey" class="w-75"></b-form-input>
                         <b-input-group-append>
-                          <b-button :disabled="!spendingPublicKey" @click="copyToClipboard(spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                          <b-button :disabled="!settings.stealthMetaAddress.spendingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
                     <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="viewing-privatekey" :value="displayPrivateKeys ? viewingPrivateKey : (spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
+                        <b-form-input type="text" readonly id="viewing-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.viewingPrivateKey : (stealthMetaAddress.viewingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                         <b-input-group-append>
-                          <b-button :disabled="!viewingPrivateKey" @click="copyToClipboard(viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                          <b-button :disabled="!stealthMetaAddress.viewingPrivateKey" @click="copyToClipboard(stealthMetaAddress.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
                     <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="viewing-publickey" :value="viewingPublicKey" class="w-75"></b-form-input>
+                        <b-form-input type="text" readonly id="viewing-publickey" :value="settings.stealthMetaAddress.viewingPublicKey" class="w-75"></b-form-input>
                         <b-input-group-append>
-                          <b-button :disabled="!viewingPublicKey" @click="copyToClipboard(viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                          <b-button :disabled="!settings.stealthMetaAddress.viewingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
                     <b-form-group label="Stealth Meta Address:" label-for="stealth-meta-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="stealth-meta-address" :value="stealthMetaAddress"></b-form-input>
+                        <b-form-input type="text" readonly id="stealth-meta-address" :value="settings.stealthMetaAddress.stealthMetaAddress"></b-form-input>
                         <b-input-group-append>
-                          <b-button :disabled="!stealthMetaAddress" @click="copyToClipboard(stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                          <b-button :disabled="!settings.stealthMetaAddress.stealthMetaAddress" @click="copyToClipboard(settings.stealthMetaAddress.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
                   </b-form-group>
                 </b-card-body>
               </b-card>
-
-              <b-table v-if="false && settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
-                <template #cell(number)="data">
-                  <font size="-1">
-                    {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
-                  </font>
-                </template>
-                <template #cell(type)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
-                </template>
-                <template #cell(symbol)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ data.item.symbol }}</b-badge>
-                </template>
-                <template #cell(name)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ data.item.name }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(approvalType)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ data.item.approvalType }}</b-badge>
-                </template>
-                <template #cell(owner)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 24) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(spender)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 24) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(approved)="data">
-                  <!-- <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
-                  </b-link> -->
-                  <span v-if="data.item.type == 'erc20'">
-                    <span v-if="data.item.value.toString().length > 30">
-                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
-                    </span>
-                    <span v-else>
-                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
-                    </span>
-                  </span>
-                  <span v-else-if="data.item.approvalType == 'Approval'">
-                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
-                    </b-link>
-                  </span>
-                  <span v-else>
-                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ==  1 ? "true" : "false" }}</b-badge>
-                  </span>
-                </template>
-              </b-table>
-
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
-                <template #cell(number)="data">
-                  <font size="-1">
-                    {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
-                  </font>
-                </template>
-                <template #cell(timestamp)="data">
-                  <font size="-1">
-                    <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-                      <span v-if="data.item.timestamp">
-                        {{ formatTimestamp(data.item.timestamp) }}
-                      </span>
-                      <span v-else>
-                        {{ '#' + commify0(data.item.blockNumber) }}
-                      </span>
-                    </b-link>
-                  </font>
-                </template>
-                <template #cell(owner)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 28) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(type)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
-                </template>
-                <template #cell(contract)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(eventName)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ data.item.eventName }}</b-badge>
-                </template>
-                <template #cell(spender)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(approved)="data">
-                  <span v-if="data.item.type == 'erc20'">
-                    <span v-if="data.item.value.toString().length > 30">
-                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
-                    </span>
-                    <span v-else>
-                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
-                    </span>
-                  </span>
-                  <span v-else-if="data.item.eventName == 'Approval'">
-                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
-                    </b-link>
-                  </span>
-                  <span v-else>
-                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ? "true" : "false" }}</b-badge>
-                  </span>
-                </template>
-              </b-table>
-
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo && accounts" small fixed striped responsive hover :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
-                <template #cell(number)="data">
-                  <font size="-1">
-                    {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
-                  </font>
-                </template>
-                <template #cell(address)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.address" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ data.item.address.substring(0, 6) + '...' + data.item.address.substring(38) }}</b-badge>
-                  </b-link>
-                </template>
-                <template #cell(source)="data">
-                  <b-badge pill variant="transparent" v-b-popover.hover="'Owner, contract or spender from approvals'" class="px-0">{{ data.item.source.substring(0, 1).toUpperCase() + data.item.source.substring(1) }}</b-badge>
-                </template>
-                <template #cell(type)="data">
-                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected account type'" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
-                </template>
-                <template #cell(customType)="data">
-                  <b-form-select size="sm" v-model="data.item.customType" @change="customTypeUpdated(data.item.address, $event)" :options="accountTypeOptions" v-b-popover.hover.bottom="'Override detected type'"></b-form-select>
-                </template>
-                <template #cell(symbol)="data">
-                  <b-badge pill variant="transparent" v-b-popover.hover="'Symbol for ERC-20, ERC-721 and ERC-1155: ' + data.item.symbol " class="px-0">{{ data.item.symbol }}</b-badge>
-                </template>
-                <template #cell(name)="data">
-                  <b-badge pill variant="transparent" v-b-popover.hover="'Name: ' + data.item.name" class="px-0">{{ data.item.name }}</b-badge>
-                </template>
-                <template #cell(customName)="data">
-                  <b-form-input size="sm" v-model="data.item.customName" @change="customNameUpdated(data.item.address, $event)" placeholder="Custom name" v-b-popover.hover.bottom="'Override detected name'"></b-form-input>
-                </template>
-                <template #cell(decimals)="data">
-                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected decimals'" class="px-0">{{ data.item.decimals }}</b-badge>
-                </template>
-                <template #cell(customDecimals)="data">
-                  <span v-if="(data.item.customType == null && data.item.type == 'erc20') || data.item.customType == 'erc20'">
-                    <b-form-select size="sm" v-model="data.item.customDecimals" @change="customDecimalsUpdated(data.item.address, $event)" :options="decimalsOptions" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-select>
-                  </span>
-                </template>
-              </b-table>
+              <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h5>Send From EOA To Stealth Meta-Address</h5>
+                </b-card-body>
+              </b-card>
 
             </b-card-text>
           </b-card>
@@ -530,43 +354,25 @@
           blockNumber: null,
           timestamp: null,
 
-          message: "I want to login into my stealth wallet on Ethereum mainnet.",
-          displayPrivateKeys: false,
-          spendingPrivateKey: null,
-          spendingPublicKey: null,
-          viewingPrivateKey: null,
-          viewingPublicKey: null,
-          stealthMetaAddress: null,
-
           forceRefresh: 0,
+
+          stealthMetaAddress: {
+            display: false,
+            spendingPrivateKey: null, // TODO: Don't save this
+            viewingPrivateKey: null,
+          },
 
           settings: {
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            searchAttachedAccount: true,
-            searchAccounts: null,
-            approvalsTable: {
-              filter: null,
-              includeInactive: false,
-              currentPage: 1,
-              pageSize: 100,
-              sortOption: 'typenameasc',
+            stealthMetaAddress: {
+              message: "I want to login into my stealth wallet on Ethereum mainnet.",
+              spendingPublicKey: null,
+              viewingPublicKey: null,
+              stealthMetaAddress: null,
             },
-            eventsTable: {
-              includeFluff: false,
-              filter: null,
-              currentPage: 1,
-              pageSize: 100,
-              sortOption: 'txorderdsc',
-            },
-            accountsTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 100,
-              sortOption: 'typenameasc',
-            },
-            version: 12,
+            version: 13,
           },
           sync: {
             section: null,
@@ -964,8 +770,8 @@
         methods: {
           async generateKeys() {
             // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
-            console.log(moment().format("HH:mm:ss") + " generateKeys - message: " + this.message);
-            const hexValue = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.message));
+            console.log(moment().format("HH:mm:ss") + " generateKeys - message: " + this.settings.stealthMetaAddress.message);
+            const hexValue = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.message));
             console.log(moment().format("HH:mm:ss") + " generateKeys - hexValue: " + hexValue);
 
             const signature = await ethereum.request({
@@ -989,17 +795,16 @@
             // // Calculate the private keys by taking the hash values modulo the curve order
             const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            this.spendingPrivateKey = keyPair1.privateKey;
-            this.viewingPrivateKey = keyPair2.privateKey;
+            this.stealthMetaAddress.spendingPrivateKey = keyPair1.privateKey;
+            this.stealthMetaAddress.viewingPrivateKey = keyPair2.privateKey;
 
-            console.log("this.spendingPrivateKey: " + this.spendingPrivateKey);
-            console.log("this.viewingPrivateKey: " + this.viewingPrivateKey);
+            console.log("this.stealthMetaAddress.spendingPrivateKey: " + this.stealthMetaAddress.spendingPrivateKey);
+            console.log("this.stealthMetaAddress.viewingPrivateKey: " + this.stealthMetaAddress.viewingPrivateKey);
 
-            this.spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-            this.viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+            this.settings.stealthMetaAddress.spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+            this.settings.stealthMetaAddress.viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
 
 
             // // Generate the key pairs
@@ -1014,8 +819,8 @@
             // viewingPrivateKey: null,
             // viewingPublicKey: null,
 
-            this.stealthMetaAddress = "st:eth:" + this.spendingPublicKey + this.viewingPublicKey.substring(2);
-
+            this.settings.stealthMetaAddress.stealthMetaAddress = "st:eth:" + this.settings.stealthMetaAddress.spendingPublicKey + this.settings.stealthMetaAddress.viewingPublicKey.substring(2);
+            this.saveSettings();
           },
 
           approvalsRowSelected(item) {
@@ -1424,6 +1229,7 @@
           },
 
           saveSettings() {
+            console.log(moment().format("HH:mm:ss") + " saveSettings: " + JSON.stringify(this.settings));
             localStorage.stealthChadToolSettings = JSON.stringify(this.settings);
           },
           async processNewBlock(blockNumber) {
@@ -1563,25 +1369,19 @@
             const tempSettings = JSON.parse(localStorage.stealthChadToolSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              if (this.settings.approvalsTable.currentPage > 1) {
-                this.settings.approvalsTable.currentPage = 1;
-              }
-              if (this.settings.eventsTable.currentPage > 1) {
-                this.settings.eventsTable.currentPage = 1;
-              }
-              if (this.settings.accountsTable.currentPage > 1) {
-                this.settings.accountsTable.currentPage = 1;
-              }
-              // Restore other settings for the same version
-              if ('stealthChadEvents' in localStorage) {
-                this.events = JSON.parse(localStorage.stealthChadEvents);
-              }
-              if ('stealthChadAccounts' in localStorage) {
-                this.accounts = JSON.parse(localStorage.stealthChadAccounts);
-              }
-              if ('stealthChadBlockTimestamps' in localStorage) {
-                this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
-              }
+              // if (this.settings.approvalsTable.currentPage > 1) {
+              //   this.settings.approvalsTable.currentPage = 1;
+              // }
+              // // Restore other settings for the same version
+              // if ('stealthChadEvents' in localStorage) {
+              //   this.events = JSON.parse(localStorage.stealthChadEvents);
+              // }
+              // if ('stealthChadAccounts' in localStorage) {
+              //   this.accounts = JSON.parse(localStorage.stealthChadAccounts);
+              // }
+              // if ('stealthChadBlockTimestamps' in localStorage) {
+              //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
+              // }
             }
           }
         },
