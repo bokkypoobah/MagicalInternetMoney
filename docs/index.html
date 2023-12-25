@@ -20,6 +20,8 @@
     <script src="js/ethers-5.7.umd.min.js" type="application/javascript"></script>
     <script src="js/moment.min.js"></script>
     <script src="js/noble_secp256k1_2.0.0.js"></script>
+    <!-- <script src="js/bn.js"></script> -->
+    <!-- <script src="js/secp256k1.js"></script> -->
     <script src="globals.js"></script>
     <script src="customNames.js"></script>
     <script src="deploymentData.js"></script>
@@ -849,7 +851,20 @@
           },
 
           async transferEthToStealthMetaAddress() {
-            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress");
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress - this.settings.transfer.recipientStealthMetaAddress: " + this.settings.transfer.recipientStealthMetaAddress);
+
+            // const privateKeyBuf = window.crypto.getRandomValues(new Uint8Array(32))
+            // const privateKey = Secp256k1.uint256(privateKeyBuf, 16)
+
+            console.log("B256: " + B256);
+            // import * as secp from "js/noble_secp256k1_2.0.0.js";
+
+//            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress - privateKey: " + privateKey);
+
+            // const R_pubkey_spend = new Point.fromHex(this.settings.transfer.recipientStealthMetaAddress.slice(9,75));
+            // console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress - R_pubkey_spend: " + R_pubkey_spend);
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress END");
           },
 
           approvalsRowSelected(item) {

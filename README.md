@@ -20,6 +20,9 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 * [ERC-5564 Stealth Addresses](https://ethereum-magicians.org/t/erc-5564-stealth-addresses/10614)
 * [EIP-5564: Improving Privacy on Ethereum through Stealth Address Wallets](https://medium.com/@toni_w/eip-5564-improving-privacy-on-ethereum-through-stealth-address-wallets-fdf3250e81a1)
 * [Ethereum stealth addresses (ERC-5564) library](https://github.com/jsign/zig-stealth-addresses)
+* [secp256k1-js](https://github.com/lionello/secp256k1-js)
+  * https://unpkg.com/bn.js@4.11.8/lib/bn.js
+  * https://unpkg.com/@lionello/secp256k1-js@1.1.0/src/secp256k1.js
 
 <br />
 
