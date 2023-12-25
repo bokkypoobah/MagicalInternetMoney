@@ -6,9 +6,7 @@ pragma solidity ^0.8.19;
 /// @notice Registry to map an address or other identifier to its stealth meta-address.
 contract ERC5564Registry {
   /// @dev Emitted when a registrant updates their stealth meta-address.
-  event StealthMetaAddressSet(
-    bytes indexed registrant, uint256 indexed scheme, bytes stealthMetaAddress
-  );
+  event StealthMetaAddressSet(bytes indexed registrant, uint256 indexed scheme, bytes stealthMetaAddress);
 
   /// @notice Maps a registrant's identifier to the scheme to the stealth meta-address.
   /// @dev Registrant may be a 160 bit address or other recipient identifier, such as an ENS name.
@@ -21,6 +19,7 @@ contract ERC5564Registry {
   /// @param stealthMetaAddress The stealth meta-address to register.
   function registerKeys(uint256 scheme, bytes memory stealthMetaAddress) external {
     stealthMetaAddressOf[abi.encode(msg.sender)][scheme] = stealthMetaAddress;
+    emit StealthMetaAddressSet(abi.encode(msg.sender), scheme, stealthMetaAddress);
   }
 
   /// @notice Sets the `registrant`s stealth meta-address for the given scheme.
@@ -30,12 +29,7 @@ contract ERC5564Registry {
   /// @param stealthMetaAddress The stealth meta-address to register.
   /// @dev MUST support both EOA signatures and EIP-1271 signatures.
   /// @dev MUST revert if the signature is invalid.
-  function registerKeysOnBehalf(
-    address registrant,
-    uint256 scheme,
-    bytes memory signature,
-    bytes memory stealthMetaAddress
-  ) external {
+  function registerKeysOnBehalf(address registrant, uint256 scheme, bytes memory signature, bytes memory stealthMetaAddress) external {
     // TODO If registrant has no code, spit signature into r, s, and v and call `ecrecover`.
     // TODO If registrant has code, call `isValidSignature` on the registrant.
   }
@@ -47,12 +41,7 @@ contract ERC5564Registry {
   /// @param stealthMetaAddress The stealth meta-address to register.
   /// @dev MUST support both EOA signatures and EIP-1271 signatures.
   /// @dev MUST revert if the signature is invalid.
-  function registerKeysOnBehalf(
-    bytes memory registrant,
-    uint256 scheme,
-    bytes memory signature,
-    bytes memory stealthMetaAddress
-  ) external {
+  function registerKeysOnBehalf(bytes memory registrant, uint256 scheme, bytes memory signature, bytes memory stealthMetaAddress) external {
     // TODO How to best generically support any registrant identifier / name
     // system without e.g. hardcoding support just for ENS?
   }

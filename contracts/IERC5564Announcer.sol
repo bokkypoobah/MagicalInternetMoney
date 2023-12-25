@@ -7,13 +7,7 @@ pragma solidity ^0.8.19;
 interface IERC5564Announcer {
   /// @dev Emitted when sending something to a stealth address.
   /// @dev See the `announce` method for documentation on the parameters.
-  event Announcement (
-    uint256 indexed schemeId,
-    address indexed stealthAddress,
-    address indexed caller,
-    bytes ephemeralPubKey,
-    bytes metadata
-  );
+  event Announcement(uint256 indexed schemeId, address indexed stealthAddress, address indexed caller, bytes ephemeralPubKey, bytes metadata);
 
   /// @dev Called by integrators to emit an `Announcement` event.
   /// @param schemeId The integer specifying the applied stealth address scheme.
@@ -37,11 +31,5 @@ interface IERC5564Announcer {
   ///   - Bytes 6-25 are the token contract address.
   ///   - Bytes 26-57 are the amount of tokens being sent/interacted with for fungible tokens, or
   ///     the token ID for non-fungible tokens.
-  function announce (
-    uint256 schemeId,
-    address stealthAddress,
-    bytes memory ephemeralPubKey,
-    bytes memory metadata
-  )
-    external;
+  function announce(uint256 schemeId, address stealthAddress, bytes memory ephemeralPubKey, bytes memory metadata) external;
 }

@@ -283,7 +283,7 @@
                         <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
                       </font>
                     </b-form-group> -->
-                    <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your keys">
+                    <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your keys from your web3 attached account">
                       <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="message" class="w-50"></b-form-input>
                     </b-form-group>
                     <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
