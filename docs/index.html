@@ -880,7 +880,15 @@
 
             const hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(hashedSharedSecret.substring(2));
             console.log('hashedSharedSecretPoint:', hashedSharedSecretPoint);
+            console.log('nobleCurves.secp256k1.ProjectivePoint.fromHex(R_pubkey_spend):', nobleCurves.secp256k1.ProjectivePoint.fromHex(R_pubkey_spend));
+            console.log('nobleCurves.secp256k1.ProjectivePoint.fromHex(R_pubkey_spend).toHex():', nobleCurves.secp256k1.ProjectivePoint.fromHex(R_pubkey_spend).toHex());
 
+            const stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(R_pubkey_spend).add(hashedSharedSecretPoint);
+            console.log('stealthPublicKey:', stealthPublicKey);
+            console.log('stealthPublicKey.toHex():', stealthPublicKey.toHex(false));
+
+            const stealthAddress = ethers.utils.computeAddress("0x" + stealthPublicKey.toHex(false));
+            console.log('stealthAddress:', stealthAddress);
 
             // const p = getPublicKey();
             // console.log("etc: " + JSON.stringify(etc));
