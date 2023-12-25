@@ -253,16 +253,18 @@
                 <b-card-body class="mt-1 p-1">
                   <h5>Stealth Meta-Address</h5>
                   <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-                    <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your keys from your web3 attached account">
+                    <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your keys from your web3 attached account">
                       <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="settings.stealthMetaAddress.message" @input="saveSettings" class="w-50"></b-form-input>
                     </b-form-group>
-                    <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                    <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-button size="sm" id="generate-keys-submit" @click="generateKeys()" variant="warning">Generate</b-button>
                     </b-form-group>
-                    <b-form-group label="" label-for="display-private-keys" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  </b-form-group>
+                  <b-form-group label-cols-lg="2" label="Private Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="" label-for="display-private-keys" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-form-checkbox size="sm" v-model.trim="stealthMetaAddress.display">Display Private Keys</b-form-checkbox>
                     </b-form-group>
-                    <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                    <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
                         <b-form-input type="text" readonly id="spending-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.spendingPrivateKey : (stealthMetaAddress.spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                         <b-input-group-append>
@@ -270,15 +272,7 @@
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
-                    <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="spending-publickey" :value="settings.stealthMetaAddress.spendingPublicKey" class="w-75"></b-form-input>
-                        <b-input-group-append>
-                          <b-button :disabled="!settings.stealthMetaAddress.spendingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                    <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                    <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
                         <b-form-input type="text" readonly id="viewing-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.viewingPrivateKey : (stealthMetaAddress.viewingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
                         <b-input-group-append>
@@ -286,7 +280,17 @@
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
-                    <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  </b-form-group>
+                  <b-form-group label-cols-lg="2" label="Public Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-input type="text" readonly id="spending-publickey" :value="settings.stealthMetaAddress.spendingPublicKey" class="w-75"></b-form-input>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.stealthMetaAddress.spendingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
                         <b-form-input type="text" readonly id="viewing-publickey" :value="settings.stealthMetaAddress.viewingPublicKey" class="w-75"></b-form-input>
                         <b-input-group-append>
@@ -294,9 +298,9 @@
                         </b-input-group-append>
                       </b-input-group>
                     </b-form-group>
-                    <b-form-group label="Stealth Meta Address:" label-for="stealth-meta-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                    <b-form-group label="Stealth Meta Address:" label-for="stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                       <b-input-group size="sm" class="w-75">
-                        <b-form-input type="text" readonly id="stealth-meta-address" :value="settings.stealthMetaAddress.stealthMetaAddress"></b-form-input>
+                        <b-form-textarea type="text" readonly id="stealth-meta-address" :value="settings.stealthMetaAddress.stealthMetaAddress"></b-form-textarea>
                         <b-input-group-append>
                           <b-button :disabled="!settings.stealthMetaAddress.stealthMetaAddress" @click="copyToClipboard(settings.stealthMetaAddress.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
@@ -307,7 +311,23 @@
               </b-card>
               <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
-                  <h5>Send From EOA To Stealth Meta-Address</h5>
+                  <h5>Transfer ETH From EOA To Stealth Meta-Address</h5>
+                  <b-form-group label-cols-lg="2" label="Transfer Details" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="Recipient Stealth Meta Address:" label-for="recipient-stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-textarea type="text" id="recipient-stealth-meta-address" v-model.trim="settings.transfer.recipientStealthMetaAddress" @input="saveSettings"></b-form-textarea>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.transfer.recipientStealthMetaAddress" @click="copyToClipboard(settings.transfer.recipientStealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Amount in ETH">
+                      <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="settings.transfer.amount" @input="saveSettings" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+                    </b-form-group>
+                  </b-form-group>
                 </b-card-body>
               </b-card>
 
@@ -372,7 +392,11 @@
               viewingPublicKey: null,
               stealthMetaAddress: null,
             },
-            version: 13,
+            transfer: {
+              recipientStealthMetaAddress: null,
+              amount: 0.01,
+            },
+            version: 14,
           },
           sync: {
             section: null,
@@ -821,6 +845,10 @@
 
             this.settings.stealthMetaAddress.stealthMetaAddress = "st:eth:" + this.settings.stealthMetaAddress.spendingPublicKey + this.settings.stealthMetaAddress.viewingPublicKey.substring(2);
             this.saveSettings();
+          },
+
+          async transferEthToStealthMetaAddress() {
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress");
           },
 
           approvalsRowSelected(item) {
