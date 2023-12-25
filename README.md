@@ -19,6 +19,7 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 * [An incomplete guide to stealth addresses](https://vitalik.eth.limo/general/2023/01/20/stealth.html)
 * [ERC-5564 Stealth Addresses](https://ethereum-magicians.org/t/erc-5564-stealth-addresses/10614)
 * [EIP-5564: Improving Privacy on Ethereum through Stealth Address Wallets](https://medium.com/@toni_w/eip-5564-improving-privacy-on-ethereum-through-stealth-address-wallets-fdf3250e81a1)
+* [Ethereum stealth addresses (ERC-5564) library](https://github.com/jsign/zig-stealth-addresses)
 
 <br />
 
