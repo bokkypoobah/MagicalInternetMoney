@@ -681,7 +681,7 @@
           },
 
           pagedFilteredSortedActivity() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
@@ -741,7 +741,7 @@
           },
 
           pagedFilteredSortedRegistryActivity() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
             return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
@@ -1188,6 +1188,7 @@
               Vue.set(this, 'txs', txs);
             }
             this.forceRefresh++; // UI refresh workaround
+            console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs));
             console.log(moment().format("HH:mm:ss") + " syncTransactions END");
           },
 
@@ -1416,7 +1417,7 @@
           },
 
           saveSettings() {
-            console.log(moment().format("HH:mm:ss") + " saveSettings: " + JSON.stringify(this.settings));
+            // console.log(moment().format("HH:mm:ss") + " saveSettings: " + JSON.stringify(this.settings));
             localStorage.stealthChadSettings = JSON.stringify(this.settings);
           },
           async processNewBlock(blockNumber) {
