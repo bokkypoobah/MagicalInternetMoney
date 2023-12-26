@@ -525,6 +525,7 @@
           registryEvents: {},
           accounts: {},
           blockTimestamps: {},
+          txs: {},
           modalApproval: {
             item: null,
             tokens: null, // ERC-20 Approval
@@ -1021,6 +1022,9 @@
               await this.syncBlockTimestamps(provider);
             }
             // if (!devMode) {
+              await this.syncTransactions(provider);
+            // }
+            // if (!devMode) {
             //   await this.syncAccounts(provider, devMode);
             // }
             // if (!devMode) {
@@ -1155,6 +1159,36 @@
             }
             this.forceRefresh++; // UI refresh workaround
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
+          },
+
+          async syncTransactions(provider) {
+            console.log(moment().format("HH:mm:ss") + " syncTransactions BEGIN");
+            const txs = this.txs;
+            if (!(this.chainId in txs)) {
+              txs[this.chainId] = {};
+            }
+            // const events = this.events[this.chainId] || {};
+            // const newBlockNumbersMap = {};
+            // for (const blockNumber of Object.keys(events)) {
+            //   if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
+            //     newBlockNumbersMap[blockNumber] = true;
+            //   }
+            // }
+            // const newBlockNumbers = Object.keys(newBlockNumbersMap);
+            // this.sync.completed = 0;
+            // this.sync.total = newBlockNumbers.length;
+            // this.sync.section = 'Block Timestamps';
+            // for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
+            //   const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
+            //   blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
+            //   this.sync.completed++;
+            // }
+            if (!this.sync.halt) {
+              localStorage.stealthChadTxs = JSON.stringify(txs);
+              Vue.set(this, 'txs', txs);
+            }
+            this.forceRefresh++; // UI refresh workaround
+            console.log(moment().format("HH:mm:ss") + " syncTransactions END");
           },
 
           async syncAccounts(provider, devMode) {
@@ -1534,6 +1568,9 @@
               }
               if ('stealthChadRegistryEvents' in localStorage) {
                 this.registryEvents = JSON.parse(localStorage.stealthChadRegistryEvents);
+              }
+              if ('stealthChadTxs' in localStorage) {
+                this.txs = JSON.parse(localStorage.stealthChadTxs);
               }
               // if ('stealthChadAccounts' in localStorage) {
               //   this.accounts = JSON.parse(localStorage.stealthChadAccounts);
