@@ -1163,32 +1163,74 @@
 
           async syncTransactions(provider) {
             console.log(moment().format("HH:mm:ss") + " syncTransactions BEGIN");
-            const txs = this.txs;
+            // TODO: Dev const txs = this.txs;
+            const txs = {};
             if (!(this.chainId in txs)) {
               txs[this.chainId] = {};
             }
-            // const events = this.events[this.chainId] || {};
-            // const newBlockNumbersMap = {};
-            // for (const blockNumber of Object.keys(events)) {
-            //   if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
-            //     newBlockNumbersMap[blockNumber] = true;
-            //   }
-            // }
-            // const newBlockNumbers = Object.keys(newBlockNumbersMap);
-            // this.sync.completed = 0;
-            // this.sync.total = newBlockNumbers.length;
-            // this.sync.section = 'Block Timestamps';
-            // for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
-            //   const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
-            //   blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
-            //   this.sync.completed++;
-            // }
+            const newTxsMap = {};
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                if (!(eventData.txHash in txs[this.chainId]) && !(eventData.txHash in newTxsMap)) {
+                  newTxsMap[eventData.txHash] = true;
+                }
+              }
+            }
+            const registryEvents = this.registryEvents[this.chainId] || {};
+            for (const blockNumber of Object.keys(registryEvents).sort((a, b) => { return a - b })) {
+              const blockNumberData = registryEvents[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = registryEvents[blockNumber][logIndex];
+                if (!(eventData.txHash in txs[this.chainId]) && !(eventData.txHash in newTxsMap)) {
+                  newTxsMap[eventData.txHash] = true;
+                }
+              }
+            }
+            // console.log(JSON.stringify(newTxsMap));
+            const newTxs = Object.keys(newTxsMap);
+            this.sync.completed = 0;
+            this.sync.total = newTxs.length;
+            this.sync.section = 'Transactions';
+            for (let i = 0; i < newTxs.length && !this.sync.halt; i++) {
+              console.log(newTxs[i]);
+              const tx = await provider.getTransaction(newTxs[i]);
+              const txReceipt = await provider.getTransactionReceipt(newTxs[i]);
+              txs[this.chainId][newTxs[i]] = {
+                hash: tx.hash,
+                type: tx.type,
+                blockHash: tx.blockHash,
+                blockNumber: tx.blockNumber,
+                transactionIndex: tx.transactionIndex,
+                from: tx.from,
+                gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+                gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+                to: tx.to,
+                value: ethers.BigNumber.from(tx.value).toString(),
+                nonce: tx.nonce,
+                data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+                chainId: tx.chainId,
+                contractAddress: txReceipt.contractAddress,
+                transactionIndex: txReceipt.transactionIndex,
+                gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+                blockHash: txReceipt.blockHash,
+                logs: txReceipt.logs,
+                blockNumber: txReceipt.blockNumber,
+                cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+                effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+                status: txReceipt.status,
+                type: txReceipt.type,
+              };
+              this.sync.completed++;
+            }
             if (!this.sync.halt) {
               localStorage.stealthChadTxs = JSON.stringify(txs);
               Vue.set(this, 'txs', txs);
             }
             this.forceRefresh++; // UI refresh workaround
-            console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs));
+            console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncTransactions END");
           },
 
