@@ -1,7 +1,11 @@
+Compiled 1 Solidity file successfully (evm target: paris).
 
 
   StealthChad
     Deployment
+      transferAndAnnounce - recipient: 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+0x1234
+0x2345
 transferAndAnnounceReceipt_1: LogDescription {
   fragment: EventFragment {
     type: 'event',
@@ -20,8 +24,8 @@ transferAndAnnounceReceipt_1: LogDescription {
     '0x2345'
   ]
 }
-      ✔ Do Something (777ms)
+      ✔ Do Something (764ms)
 
 
-  1 passing (778ms)
+  1 passing (765ms)
 

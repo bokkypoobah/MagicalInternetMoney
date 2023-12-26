@@ -5,6 +5,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "hardhat/console.sol";
+
 /// @notice Interface for announcing when something is sent to a stealth address.
 interface IERC5564Announcer {
   /// @dev Emitted when sending something to a stealth address.
@@ -48,6 +50,10 @@ contract StealthChad {
     }
 
     function transferAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
+        console.log("      transferAndAnnounce - recipient: %s", recipient);
+        // console.log("      transferAndAnnounce - recipient:", recipient);
+        console.logBytes(ephemeralPubKey);
+        console.logBytes(metadata);
         announcer.announce(1, recipient, ephemeralPubKey, metadata);
         (bool sent, ) = recipient.call{value: msg.value}("");
         if (!sent) {
