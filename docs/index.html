@@ -643,7 +643,7 @@
             return result;
           },
           filteredActivity() {
-            let results = [];
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
             const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
               const blockNumberData = events[blockNumber];
@@ -703,7 +703,7 @@
           },
 
           filteredRegistryActivity() {
-            let results = [];
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
             const registryEvents = this.registryEvents[this.chainId] || {};
             for (const blockNumber of Object.keys(registryEvents).sort((a, b) => { return a - b })) {
               const blockNumberData = registryEvents[blockNumber];
@@ -1213,9 +1213,9 @@
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
-            localStorage.stealthChadToolCoinbase = this.coinbase;
+            localStorage.stealthChadCoinbase = this.coinbase;
             const network = await provider.getNetwork();
-            localStorage.stealthChadToolChainId = network.chainId;
+            localStorage.stealthChadChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
@@ -1362,6 +1362,7 @@
               localStorage.stealthChadBlockTimestamps = JSON.stringify(blockTimestamps);
               Vue.set(this, 'blockTimestamps', blockTimestamps);
             }
+            this.forceRefresh++; // UI refresh workaround
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
           },
 
@@ -1591,7 +1592,7 @@
 
           saveSettings() {
             console.log(moment().format("HH:mm:ss") + " saveSettings: " + JSON.stringify(this.settings));
-            localStorage.stealthChadToolSettings = JSON.stringify(this.settings);
+            localStorage.stealthChadSettings = JSON.stringify(this.settings);
           },
           async processNewBlock(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " processNewBlock[" + this.chainId + "] #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
@@ -1720,14 +1721,14 @@
           (async() => {
             await this.connectToWeb3();
           })();
-          if ('stealthChadToolChainId' in localStorage) {
-            this.chainId = localStorage.stealthChadToolChainId;
+          if ('stealthChadChainId' in localStorage) {
+            this.chainId = localStorage.stealthChadChainId;
           }
-          if ('stealthChadToolCoinbase' in localStorage) {
-            this.coinbase = localStorage.stealthChadToolCoinbase;
+          if ('stealthChadCoinbase' in localStorage) {
+            this.coinbase = localStorage.stealthChadCoinbase;
           }
-          if ('stealthChadToolSettings' in localStorage) {
-            const tempSettings = JSON.parse(localStorage.stealthChadToolSettings);
+          if ('stealthChadSettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.stealthChadSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
               if (this.settings.activityTable.currentPage > 1) {
