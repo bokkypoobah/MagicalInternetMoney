@@ -645,7 +645,8 @@
               for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
                 const eventData = events[blockNumber][logIndex];
                 const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
-                results.push({ blockNumber, timestamp, logIndex, ...eventData });
+                const tx = this.txs[this.chainId] && this.txs[this.chainId][eventData.txHash] || null;
+                results.push({ blockNumber, timestamp, logIndex, ...eventData, tx });
               }
             }
             return results;
@@ -705,7 +706,8 @@
               for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
                 const eventData = registryEvents[blockNumber][logIndex];
                 const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
-                results.push({ blockNumber, timestamp, logIndex, ...eventData });
+                const tx = this.txs[this.chainId] && this.txs[this.chainId][eventData.txHash] || null;
+                results.push({ blockNumber, timestamp, logIndex, ...eventData, tx });
               }
             }
             return results;
