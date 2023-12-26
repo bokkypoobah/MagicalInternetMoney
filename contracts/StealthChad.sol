@@ -56,7 +56,7 @@ interface IERC5564Announcer {
 contract StealthChad {
     IERC5564Announcer announcer;
 
-    error ZeroValue();
+    error NoPointInSendingAZeroValue();
     error TransferFailure();
 
     constructor(address payable _announcer) {
@@ -70,7 +70,7 @@ contract StealthChad {
     /// @param viewTag The view tag derived from the shared secret.
     function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag) external payable {
         if (msg.value == 0) {
-            revert ZeroValue();
+            revert NoPointInSendingAZeroValue();
         }
         bytes memory metadata = new bytes(57);
         uint i;

@@ -22,8 +22,8 @@ Compiled 1 Solidity file successfully (evm target: paris).
             '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000001b69b4bacd05f15'
           ]
         }
-      ✔ Do Something (731ms)
+      ✔ Do Something (740ms)
 
 
-  1 passing (732ms)
+  1 passing (742ms)
 
