@@ -28,7 +28,6 @@ describe("StealthChad", function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, otherAccount } = await loadFixture(deployContractsFixture);
       // expect(await stealthChad.unlockTime()).to.equal(unlockTime);
 
-      // function transferEthAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
       const schemeId = 0; // https://eips.ethereum.org/assets/eip-5564/scheme_ids
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
