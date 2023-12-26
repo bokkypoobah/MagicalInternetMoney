@@ -46,6 +46,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -184,14 +185,26 @@
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalEvents) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalActivity) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalRegistryActivity) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="totalActivity" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="totalRegistryActivity" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -390,6 +403,41 @@
 
             </b-card-text>
           </b-card>
+
+          <!-- :REGISTRY -->
+          <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
+          <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+            <template #cell(number)="data">
+              <font size="-1">
+                {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
+              </font>
+            </template>
+            <template #cell(timestamp)="data">
+              <font size="-1">
+                <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                  <span v-if="data.item.timestamp">
+                    {{ formatTimestamp(data.item.timestamp) }}
+                  </span>
+                  <span v-else>
+                    {{ '#' + commify0(data.item.blockNumber) }}
+                  </span>
+                </b-link>
+              </font>
+            </template>
+            <template #cell(contract)="data">
+              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+              </b-link>
+            </template>
+            <template #cell(details)="data">
+              <font size="-1">
+                <pre>
+  {{ data.item }}
+                </pre>
+              </font>
+            </template>
+          </b-table>
+
         </b-card>
 
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
@@ -459,7 +507,13 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 15,
+            registryActivityTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'txorderdsc',
+            },
+            version: 16,
           },
           sync: {
             section: null,
@@ -468,6 +522,7 @@
             halt: false,
           },
           events: {},
+          registryEvents: {},
           accounts: {},
           blockTimestamps: {},
           modalApproval: {
@@ -484,6 +539,10 @@
             { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
           ],
           activitySortOptions: [
+            { value: 'txorderasc', text: '▲ TxOrder' },
+            { value: 'txorderdsc', text: '▼ TxOrder' },
+          ],
+          registryActivitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
@@ -553,6 +612,17 @@
             // { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
+          registryActivityFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'details', label: 'Details', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
           reportingDateTimeOptions: [
             { value: 0, text: 'Local Time' },
             { value: 1, text: 'UTC Time' },
@@ -562,7 +632,7 @@
         // --- COMPUTED ---
         computed: {
           totalActivity() {
-            let result = 0;
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
             const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events)) {
               const blockNumberData = events[blockNumber];
@@ -618,6 +688,66 @@
           pagedFilteredSortedActivity() {
             console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
+          },
+
+          totalRegistryActivity() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            const registryEvents = this.registryEvents[this.chainId] || {};
+            for (const blockNumber of Object.keys(registryEvents)) {
+              const blockNumberData = registryEvents[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData)) {
+                result++;
+              }
+            }
+            return result;
+          },
+
+          filteredRegistryActivity() {
+            let results = [];
+            const registryEvents = this.registryEvents[this.chainId] || {};
+            for (const blockNumber of Object.keys(registryEvents).sort((a, b) => { return a - b })) {
+              const blockNumberData = registryEvents[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = registryEvents[blockNumber][logIndex];
+                const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
+                results.push({ blockNumber, timestamp, logIndex, ...eventData });
+              }
+            }
+            return results;
+          },
+          filteredSortedRegistryActivity() {
+            let results = this.filteredRegistryActivity;
+            if (this.settings.registryActivityTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return a.logIndex - b.logIndex;
+                  } else {
+                    return a.txIndex - b.txIndex;
+                  }
+                } else {
+                  return a.blockNumber - b.blockNumber;
+                }
+              });
+            } else if (this.settings.registryActivityTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return b.logIndex - a.logIndex;
+                  } else {
+                    return b.txIndex - a.txIndex;
+                  }
+                } else {
+                  return b.blockNumber - a.blockNumber;
+                }
+              });
+            }
+            return results;
+          },
+
+          pagedFilteredSortedRegistryActivity() {
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
+            return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
           accountsToSearch() {
@@ -1177,18 +1307,18 @@
               ],
             });
             this.sync.completed = registryLogs.length;
-            const events = this.events;
-            if (!(this.chainId in events)) {
-              events[this.chainId] = {};
+            const registryEvents = this.registryEvents;
+            if (!(this.chainId in registryEvents)) {
+              registryEvents[this.chainId] = {};
             }
             for (const log of registryLogs) {
               const logData = erc5564RegistryContract.interface.parseLog(log);
-              if (!(log.blockNumber in events[this.chainId])) {
-                events[this.chainId][log.blockNumber] = {};
+              if (!(log.blockNumber in registryEvents[this.chainId])) {
+                registryEvents[this.chainId][log.blockNumber] = {};
               }
               console.log(logData);
-              if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
-                events[this.chainId][log.blockNumber][log.logIndex] = {
+              if (!(log.logIndex in registryEvents[this.chainId][log.blockNumber])) {
+                registryEvents[this.chainId][log.blockNumber][log.logIndex] = {
                   txIndex: log.transactionIndex,
                   txHash: log.transactionHash,
                   contract: log.address,
@@ -1200,9 +1330,9 @@
                 };
               }
             }
-            localStorage.stealthChadEvents = JSON.stringify(events);
-            Vue.set(this, 'events', events);
-            // console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - events: " + JSON.stringify(events, null, 2));
+            localStorage.stealthChadRegistryEvents = JSON.stringify(registryEvents);
+            Vue.set(this, 'registryEvents', registryEvents);
+            // console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - registryEvents: " + JSON.stringify(registryEvents, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
           },
 
@@ -1603,9 +1733,15 @@
               if (this.settings.activityTable.currentPage > 1) {
                 this.settings.activityTable.currentPage = 1;
               }
+              if (this.settings.registryActivityTable.currentPage > 1) {
+                this.settings.registryActivityTable.currentPage = 1;
+              }
               // Restore other settings for the same version
               if ('stealthChadEvents' in localStorage) {
                 this.events = JSON.parse(localStorage.stealthChadEvents);
+              }
+              if ('stealthChadRegistryEvents' in localStorage) {
+                this.registryEvents = JSON.parse(localStorage.stealthChadRegistryEvents);
               }
               // if ('stealthChadAccounts' in localStorage) {
               //   this.accounts = JSON.parse(localStorage.stealthChadAccounts);
