@@ -1045,9 +1045,9 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            // if (!devMode) {
-            //   await this.syncAnnouncementEvents(provider, latestBlockNumber);
-            // }
+            if (!devMode) {
+              await this.syncAnnouncementEvents(provider, latestBlockNumber);
+            }
             if (!devMode) {
               await this.syncRegistryEvents(provider, latestBlockNumber);
             }
@@ -1115,8 +1115,8 @@
 
           async syncRegistryEvents(provider, latestBlockNumber) {
             // TODO: Get event signature
-            // StealthMetaAddressSet (index_topic_1 bytes registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-            // 0x17ebe1e40dda58c17d7e78f550b0767797e9763f981694f2a9ee52791d44b4fb
+            // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
             const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
             this.sync.completed = 0;
@@ -1127,7 +1127,7 @@
               fromBlock: 0,
               toBlock: latestBlockNumber,
               topics: [
-                '0x17ebe1e40dda58c17d7e78f550b0767797e9763f981694f2a9ee52791d44b4fb',
+                '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
                 null,
                 null
               ],
@@ -1149,9 +1149,9 @@
                   txHash: log.transactionHash,
                   contract: log.address,
                   name: logData.name,
-                  registrant: logData.args[0],
-                  schemeId: parseInt(logData.args[2]),
-                  stealthMetaAddress: logData.args[3],
+                  registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
+                  schemeId: parseInt(logData.args[1]),
+                  stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
                   latestBlockNumber,
                 };
               }

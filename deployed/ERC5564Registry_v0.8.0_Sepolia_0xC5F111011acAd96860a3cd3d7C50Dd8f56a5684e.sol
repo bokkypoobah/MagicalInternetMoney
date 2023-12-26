@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at Etherscan.io on 2023-12-26
+*/
+
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
@@ -5,7 +9,7 @@ pragma solidity ^0.8.19;
 //
 // From https://eips.ethereum.org/EIPS/eip-6538, with `bytes` updated to `bytes32`
 //
-// Deployed to Sepolia
+// Deployed to Sepolia 0xC5F111011acAd96860a3cd3d7C50Dd8f56a5684e
 //
 // https://github.com/bokkypoobah/StealthChad
 //
@@ -13,8 +17,6 @@ pragma solidity ^0.8.19;
 //
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
-
-// import "hardhat/console.sol";
 
 /// @notice Registry to map an address or other identifier to its stealth meta-address.
 contract ERC5564Registry {

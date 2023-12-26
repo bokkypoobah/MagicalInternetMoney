@@ -27,7 +27,7 @@ describe("StealthChad", function () {
   describe("Deployment", function () {
     it("Do Something", async function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, owner } = await loadFixture(deployContractsFixture);
-      // console.log("owner: " + owner.address);
+      console.log("owner: " + owner.address);
       // expect(await stealthChad.unlockTime()).to.equal(unlockTime);
 
       const schemeId = 0; // https://eips.ethereum.org/assets/eip-5564/scheme_ids
@@ -40,13 +40,19 @@ describe("StealthChad", function () {
       //   console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
       // });
 
+      // console.log(ethers);
+
       const stealthMetaAddress = "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96";
       const registerKeysTx_1 = await erc5564Registry.registerKeys(schemeId, ethers.hexlify(ethers.toUtf8Bytes(stealthMetaAddress)));
       const registerKeysReceipt_1 = await registerKeysTx_1.wait();
       registerKeysReceipt_1.logs.forEach((log) => {
         const parsedLog = erc5564Registry.interface.parseLog(log);
-        const registrant = parsedLog.args[0].hash;
+        const registrant = parsedLog.args[0];
         console.log("registrant: " + registrant);
+        // const n = ethers.FixedNumber.fromBytes(registrant);
+        // console.log("registrant: " + ethers.arrayify(registrant));
+        // console.log(ethers.defaultAbiCoder);
+        // ethers.defaultAbiCoder.decode([ "address" ], registrant);
         // event StealthMetaAddressSet(bytes indexed registrant, uint256 indexed scheme, bytes stealthMetaAddress);
         // console.log("      registerKeysReceipt_1:\n" + util.inspect(erc5564Registry.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
       });
