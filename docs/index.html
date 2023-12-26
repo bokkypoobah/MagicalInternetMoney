@@ -1044,6 +1044,7 @@
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPubKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             console.log(moment().format("HH:mm:ss") + " syncEvents BEGIN");
+            const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Announcements';
@@ -1063,40 +1064,24 @@
               events[this.chainId] = {};
             }
             for (const log of announcementLogs) {
-              console.log("log: ", log);
-              // const topic0 = log.topics[0];
-            //   const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll' : 'Approval';
-            //   let owner = null;
-            //   let spender = null;
-            //   let value = null;
-            //   if (log.topics.length == 3) {
-            //     owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-            //     spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-            //     value = ethers.BigNumber.from(log.data).toString();
-            //   } else if (log.topics.length == 4) {
-            //     owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-            //     spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-            //     value = ethers.BigNumber.from(log.topics[3]).toString();
-            //   } else {
-            //     console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
-            //   }
-            //   if (owner) {
-            //     if (!(log.blockNumber in events[this.chainId])) {
-            //       events[this.chainId][log.blockNumber] = {};
-            //     }
-            //     if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
-            //       events[this.chainId][log.blockNumber][log.logIndex] = {
-            //         txIndex: log.transactionIndex,
-            //         txHash: log.transactionHash,
-            //         contract: log.address,
-            //         eventName,
-            //         owner,
-            //         spender,
-            //         value,
-            //         latestBlockNumber,
-            //       };
-            //     }
-            //   }
+              const logData = erc5564AnnouncerContract.interface.parseLog(log);
+              if (!(log.blockNumber in events[this.chainId])) {
+                events[this.chainId][log.blockNumber] = {};
+              }
+              if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                events[this.chainId][log.blockNumber][log.logIndex] = {
+                  txIndex: log.transactionIndex,
+                  txHash: log.transactionHash,
+                  contract: log.address,
+                  name: logData.name,
+                  schemeId: parseInt(logData.args[0]),
+                  stealthAddress: logData.args[1],
+                  caller: logData.args[2],
+                  ephemeralPubKey: logData.args[3],
+                  metadata: logData.args[4],
+                  latestBlockNumber,
+                };
+              }
             }
             localStorage.stealthChadEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
@@ -1498,13 +1483,14 @@
             const tempSettings = JSON.parse(localStorage.stealthChadToolSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              // if (this.settings.approvalsTable.currentPage > 1) {
-              //   this.settings.approvalsTable.currentPage = 1;
-              // }
-              // // Restore other settings for the same version
-              // if ('stealthChadEvents' in localStorage) {
-              //   this.events = JSON.parse(localStorage.stealthChadEvents);
-              // }
+              if (this.settings.activityTable.currentPage > 1) {
+                this.settings.activityTable.currentPage = 1;
+              }
+              // Restore other settings for the same version
+              if ('stealthChadEvents' in localStorage) {
+                this.events = JSON.parse(localStorage.stealthChadEvents);
+                console.log("events: " + JSON.stringify(this.events, null, 2));
+              }
               // if ('stealthChadAccounts' in localStorage) {
               //   this.accounts = JSON.parse(localStorage.stealthChadAccounts);
               // }
