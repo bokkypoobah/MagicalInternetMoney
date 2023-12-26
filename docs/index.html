@@ -289,7 +289,11 @@
                   </b-link>
                 </template>
                 <template #cell(details)="data">
-                  {{ data.item }}
+                  <font size="-1">
+                    <pre>
+{{ data.item }}
+                    </pre>
+                  </font>
                   <!-- <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge> -->
                 </template>
               </b-table>
