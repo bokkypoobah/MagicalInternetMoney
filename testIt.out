@@ -1,11 +1,12 @@
+Compiled 1 Solidity file successfully (evm target: paris).
 
 
   StealthChad
     Deployment
-      transferAndAnnounce - recipient: 0x70997970c51812dc3a010c7d01b50e0d17dc79c8
+      transferEthAndAnnounce - schemeId: 0, recipient: 0x70997970c51812dc3a010c7d01b50e0d17dc79c8, viewTag: 255
 0x1234
 0x2345
-      transferAndAnnounceReceipt_1:
+      transferEthAndAnnounceReceipt_1:
       LogDescription {
         fragment: EventFragment {
           type: 'event',
@@ -17,15 +18,15 @@
         signature: 'Announcement(uint256,address,address,bytes,bytes)',
         topic: '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
         args: Result(5) [
-          1n,
+          0n,
           '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
           '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
           '0x1234',
           '0x2345'
         ]
       }
-      ✔ Do Something (776ms)
+      ✔ Do Something (725ms)
 
 
-  1 passing (778ms)
+  1 passing (725ms)
 

@@ -28,14 +28,16 @@ describe("StealthChad", function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, otherAccount } = await loadFixture(deployContractsFixture);
       // expect(await stealthChad.unlockTime()).to.equal(unlockTime);
 
-      // function transferAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
+      // function transferEthAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
+      const schemeId = 0; // https://eips.ethereum.org/assets/eip-5564/scheme_ids
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
+      const viewTag = 0xff;
       const metadata = "0x2345";
-      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(recipient, ephemeralPubKey, metadata);
-      const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
-      transferAndAnnounceReceipt_1.logs.forEach((log) => {
-        console.log("      transferAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(6)));
+      const transferEthAndAnnounceTx_1 = await stealthChad.transferEthAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, metadata);
+      const transferEthAndAnnounceReceipt_1 = await transferEthAndAnnounceTx_1.wait();
+      transferEthAndAnnounceReceipt_1.logs.forEach((log) => {
+        console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(6)));
       });
 
     });

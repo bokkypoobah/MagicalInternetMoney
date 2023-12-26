@@ -49,12 +49,17 @@ contract StealthChad {
         announcer = IERC5564Announcer(_announcer);
     }
 
-    function transferAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
-        console.log("      transferAndAnnounce - recipient: %s", recipient);
-        // console.log("      transferAndAnnounce - recipient:", recipient);
+    /// @dev Transfer ETH and announce
+    /// @param schemeId The integer specifying the applied stealth address scheme.
+    /// @param recipient The computed stealth address for the recipient.
+    /// @param ephemeralPubKey Ephemeral public key used by the sender.
+    /// @param viewTag The view tag derived from the shared secret.
+    /// @param metadata An arbitrary field MUST include the view tag in the first byte.
+    function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, bytes memory metadata) external payable {
+        console.log("      transferEthAndAnnounce - schemeId: %s, recipient: %s, viewTag: %s", schemeId, recipient, viewTag);
         console.logBytes(ephemeralPubKey);
         console.logBytes(metadata);
-        announcer.announce(1, recipient, ephemeralPubKey, metadata);
+        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
         (bool sent, ) = recipient.call{value: msg.value}("");
         if (!sent) {
             revert TransferFailure();
