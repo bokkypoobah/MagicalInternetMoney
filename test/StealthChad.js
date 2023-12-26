@@ -35,7 +35,7 @@ describe("StealthChad", function () {
       const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(recipient, ephemeralPubKey, metadata);
       const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
       transferAndAnnounceReceipt_1.logs.forEach((log) => {
-        console.log("transferAndAnnounceReceipt_1: " + util.inspect(erc5564Announcer.interface.parseLog(log)))
+        console.log("      transferAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(6)));
       });
 
     });
