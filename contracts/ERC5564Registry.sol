@@ -14,6 +14,8 @@ pragma solidity ^0.8.19;
 // Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
 // ----------------------------------------------------------------------------
 
+import "hardhat/console.sol";
+
 /// @notice Registry to map an address or other identifier to its stealth meta-address.
 contract ERC5564Registry {
   /// @dev Emitted when a registrant updates their stealth meta-address.
@@ -29,9 +31,33 @@ contract ERC5564Registry {
   /// @param scheme An integer identifier for the stealth address scheme.
   /// @param stealthMetaAddress The stealth meta-address to register.
   function registerKeys(uint256 scheme, bytes memory stealthMetaAddress) external {
+    console.log("msg.sender: ", msg.sender);
+    // console.logBytes(abi.encode(msg.sender));
+    // console.logBytes(abi.encodePacked(msg.sender));
+    bytes memory registrant = abi.encode(msg.sender);
+    console.logBytes(registrant);
     stealthMetaAddressOf[abi.encode(msg.sender)][scheme] = stealthMetaAddress;
-    emit StealthMetaAddressSet(abi.encode(msg.sender), scheme, stealthMetaAddress);
+    // emit StealthMetaAddressSet(abi.encode(msg.sender), scheme, stealthMetaAddress);
+    emit StealthMetaAddressSet(registrant, scheme, stealthMetaAddress);
+
+    uint i;
+    uint j;
+    bytes memory registrantInBytes = new bytes(32);
+    bytes32 registrantInBytes32 = bytes32(uint256(uint160(msg.sender)));
+    console.logBytes32(registrantInBytes32);
+    for (i = 0; i < 32; i++) {
+        registrantInBytes[j++] = registrantInBytes32[i];
+    }
+    emit StealthMetaAddressSet(registrantInBytes, scheme, stealthMetaAddress);
   }
+
+  // function bytesToBytes32(bytes memory inputBytes) public view returns (bytes32 outputBytes32) {
+  //     uint value;
+  //     for (uint i = 0; i < 32; i++) {
+  //         value = value + inputBytes[i] * 2
+  //     }
+  // }
+
 
   /// @notice Sets the `registrant`s stealth meta-address for the given scheme.
   /// @param registrant Recipient identifier, such as an ENS name.
