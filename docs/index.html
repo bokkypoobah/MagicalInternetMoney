@@ -161,16 +161,16 @@
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
                 </div>
-                <!-- <div v-if="false && !sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
-                </div> -->
-                <!-- <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                </div>
+                <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
                     </b-progress-bar>
                   </b-progress>
-                </div> -->
+                </div>
                 <!-- <div class="ml-0 mt-1">
                   <b-link v-if="sync.section" size="sm" @click="halt" variant="link" v-b-popover.hover.bottom="'Click to stop. It may take a few minutes to clean up. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-link>
                 </div> -->
@@ -220,7 +220,7 @@
                   <h5 class="mt-3">Contracts on Sepolia</h5>
                   <ul>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x4f58404f363f8a3282648e80440e075e5c1e28a1#code" target="_blank">ERC5564Announcer</b-link></li>
-                    <li><b-link href="https://sepolia.etherscan.io/address/0x8FC6345eE24E3DaDb2FCaeC7F133a509dfe4C3DE#code" target="_blank">ERC5564Registry</b-link></li>
+                    <li><b-link href="https://sepolia.etherscan.io/address/0xC5F111011acAd96860a3cd3d7C50Dd8f56a5684e#code" target="_blank">ERC5564Registry v0.8.0</b-link></li>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code" target="_blank">StealthChad v0.8.0</b-link></li>
                   </ul>
 
@@ -265,13 +265,30 @@
 
               <!-- :ACTIVITY -->
               <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
-                <!-- <template #cell(number)="data">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
                   </font>
                 </template>
-                <template #cell(type)="data">
+                <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
+                    </b-link>
+                  </font>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <!-- <template #cell(type)="data">
                   <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
                 </template> -->
               </b-table>
@@ -520,37 +537,15 @@
             { value: "17", text: '17' },
             { value: "18", text: '18 (common)' },
           ],
-          approvalsFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'approved', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          eventsFields: [
+          activityFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'eventName', label: 'Event', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          accountsFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'customType', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'customName', label: '', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'customDecimals', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           reportingDateTimeOptions: [
             { value: 0, text: 'Local Time' },
@@ -578,7 +573,8 @@
               const blockNumberData = events[blockNumber];
               for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
                 const eventData = events[blockNumber][logIndex];
-                results.push({ blockNumber, logIndex, ...eventData });
+                const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
+                results.push({ blockNumber, timestamp, logIndex, ...eventData });
               }
             }
             return results;
@@ -614,7 +610,7 @@
           },
 
           pagedFilteredSortedActivity() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
@@ -1094,9 +1090,9 @@
             if (!devMode) {
               await this.syncRegistryEvents(provider, latestBlockNumber);
             }
-            // if (!devMode) {
-            //   await this.syncBlockTimestamps(provider);
-            // }
+            if (!devMode) {
+              await this.syncBlockTimestamps(provider);
+            }
             // if (!devMode) {
             //   await this.syncAccounts(provider, devMode);
             // }
@@ -1152,12 +1148,11 @@
             }
             localStorage.stealthChadEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents - events: " + JSON.stringify(events, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents END");
           },
 
           async syncRegistryEvents(provider, latestBlockNumber) {
-            // TODO: Get event signature
             // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
             // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
@@ -1201,7 +1196,7 @@
             }
             localStorage.stealthChadEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - events: " + JSON.stringify(events, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
           },
 
@@ -1605,14 +1600,13 @@
               // Restore other settings for the same version
               if ('stealthChadEvents' in localStorage) {
                 this.events = JSON.parse(localStorage.stealthChadEvents);
-                console.log("events: " + JSON.stringify(this.events, null, 2));
               }
               // if ('stealthChadAccounts' in localStorage) {
               //   this.accounts = JSON.parse(localStorage.stealthChadAccounts);
               // }
-              // if ('stealthChadBlockTimestamps' in localStorage) {
-              //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
-              // }
+              if ('stealthChadBlockTimestamps' in localStorage) {
+                this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
+              }
             }
           }
         },
