@@ -1,6 +1,7 @@
 const { time, loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
+// const { BigNumber } = require("ethers");
 const util = require('util');
 
 describe("StealthChad", function () {
@@ -36,6 +37,13 @@ describe("StealthChad", function () {
       const transferEthAndAnnounceReceipt_1 = await transferEthAndAnnounceTx_1.wait();
       transferEthAndAnnounceReceipt_1.logs.forEach((log) => {
         console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
+      });
+
+      const stealthMetaAddress = "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96";
+      const registerKeysTx_1 = await erc5564Registry.registerKeys(schemeId, ethers.hexlify(ethers.toUtf8Bytes(stealthMetaAddress)));
+      const registerKeysReceipt_1 = await registerKeysTx_1.wait();
+      registerKeysReceipt_1.logs.forEach((log) => {
+        console.log("      registerKeysReceipt_1:\n" + util.inspect(erc5564Registry.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
       });
 
     });

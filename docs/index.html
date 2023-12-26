@@ -358,6 +358,11 @@
                       </b-input-group>
                     </b-form-group>
                   </b-form-group>
+                  <b-form-group label-cols-lg="2" label="Register Stealth Meta Address" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="" label-for="register-keys-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="register-keys-submit" @click="registerKey()" variant="warning">Register</b-button>
+                    </b-form-group>
+                  </b-form-group>
                 </b-card-body>
               </b-card>
 
@@ -885,6 +890,22 @@
             this.saveSettings();
           },
 
+          async registerKey() {
+            console.log(moment().format("HH:mm:ss") + " registerKey BEGIN");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+            const contractWithSigner = contract.connect(provider.getSigner());
+            const schemeId = 0;
+            try {
+              const stealthMetaAddress = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.stealthMetaAddress));
+              const tx = await contractWithSigner.registerKeys(schemeId, stealthMetaAddress);
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("registerKey ERC5564Registry.registerKeys(...) error: " + JSON.stringify(e));
+            }
+            console.log(moment().format("HH:mm:ss") + " registerKey END");
+          },
+
           async transferEthToStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
             function generateStealthAddress(stealthMetaAddress) {
@@ -1024,8 +1045,11 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
+            // if (!devMode) {
+            //   await this.syncAnnouncementEvents(provider, latestBlockNumber);
+            // }
             if (!devMode) {
-              await this.syncEvents(provider, latestBlockNumber);
+              await this.syncRegistryEvents(provider, latestBlockNumber);
             }
             // if (!devMode) {
             //   await this.syncBlockTimestamps(provider);
@@ -1040,10 +1064,10 @@
             this.sync.halt = false;
           },
 
-          async syncEvents(provider, latestBlockNumber) {
+          async syncAnnouncementEvents(provider, latestBlockNumber) {
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPubKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
-            console.log(moment().format("HH:mm:ss") + " syncEvents BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents BEGIN");
             const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             this.sync.completed = 0;
             this.sync.total = 0;
@@ -1085,8 +1109,57 @@
             }
             localStorage.stealthChadEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log(moment().format("HH:mm:ss") + " syncEvents - events: " + JSON.stringify(events, null, 2));
-            console.log(moment().format("HH:mm:ss") + " syncEvents END");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents END");
+          },
+
+          async syncRegistryEvents(provider, latestBlockNumber) {
+            // TODO: Get event signature
+            // StealthMetaAddressSet (index_topic_1 bytes registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // 0x17ebe1e40dda58c17d7e78f550b0767797e9763f981694f2a9ee52791d44b4fb
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
+            const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+            this.sync.completed = 0;
+            this.sync.total = 0;
+            this.sync.section = 'Stealth Address Registry';
+            const registryLogs = await provider.getLogs({
+              address: ERC5564REGISTRYADDRESS_SEPOLIA,
+              fromBlock: 0,
+              toBlock: latestBlockNumber,
+              topics: [
+                '0x17ebe1e40dda58c17d7e78f550b0767797e9763f981694f2a9ee52791d44b4fb',
+                null,
+                null
+              ],
+            });
+            this.sync.completed = registryLogs.length;
+            const events = this.events;
+            if (!(this.chainId in events)) {
+              events[this.chainId] = {};
+            }
+            for (const log of registryLogs) {
+              const logData = erc5564RegistryContract.interface.parseLog(log);
+              if (!(log.blockNumber in events[this.chainId])) {
+                events[this.chainId][log.blockNumber] = {};
+              }
+              console.log(logData);
+              if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                events[this.chainId][log.blockNumber][log.logIndex] = {
+                  txIndex: log.transactionIndex,
+                  txHash: log.transactionHash,
+                  contract: log.address,
+                  name: logData.name,
+                  registrant: logData.args[0],
+                  schemeId: parseInt(logData.args[2]),
+                  stealthMetaAddress: logData.args[3],
+                  latestBlockNumber,
+                };
+              }
+            }
+            localStorage.stealthChadEvents = JSON.stringify(events);
+            Vue.set(this, 'events', events);
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
           },
 
           async syncBlockTimestamps(provider) {

@@ -5,7 +5,7 @@
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
-// StealthChad v 0.8.0 - Experiments in ERC-5564: Stealth Addresses
+// StealthChad v0.8.0 - Experiments in ERC-5564: Stealth Addresses
 //
 // Deployed to Sepolia 0x3834bcA9093e375893D65975ad765179A149D017
 //

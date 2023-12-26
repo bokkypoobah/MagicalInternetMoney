@@ -45,3 +45,5 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 npx hardhat
 > 2.19.3
+
+npm install --save-dev @nomicfoundation/hardhat-ethers ethers

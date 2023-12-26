@@ -1,4 +1,3 @@
-Compiled 1 Solidity file successfully (evm target: paris).
 
 
   StealthChad
@@ -22,8 +21,28 @@ Compiled 1 Solidity file successfully (evm target: paris).
             '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000001b69b4bacd05f15'
           ]
         }
-      ✔ Do Something (740ms)
+      registerKeysReceipt_1:
+        LogDescription {
+          fragment: EventFragment {
+            type: 'event',
+            inputs: [ [ParamType], [ParamType], [ParamType] ],
+            name: 'StealthMetaAddressSet',
+            anonymous: false
+          },
+          name: 'StealthMetaAddressSet',
+          signature: 'StealthMetaAddressSet(bytes,uint256,bytes)',
+          topic: '0x17ebe1e40dda58c17d7e78f550b0767797e9763f981694f2a9ee52791d44b4fb',
+          args: Result(3) [
+            Indexed {
+              hash: '0xd9c5115d8ca09413513b0348ccd4aa5d5d2b8183823763b527bfd81f40d86f2a',
+              _isIndexed: true
+            },
+            0n,
+            '0x73743a6574683a3078303339343431643838326430636633333536356464613963373532393130663962623133313836353535343935633038316539643333653339313531383435366334303365613862616162303438366137623462363035366437376533356138663062353533343535306664666535336136393138303838356561313066626563623936'
+          ]
+        }
+      ✔ Do Something (729ms)
 
 
-  1 passing (742ms)
+  1 passing (730ms)
 

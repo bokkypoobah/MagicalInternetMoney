@@ -1,7 +1,18 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+// ----------------------------------------------------------------------------
+// ERC5564Registry v0.8.0 - Experiments in ERC-5564: Stealth Addresses
+//
 // From https://eips.ethereum.org/EIPS/eip-6538
+//
+// Deployed to Sepolia
+//
+// https://github.com/bokkypoobah/StealthChad
+//
+// SPDX-License-Identifier: MIT
+//
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
+// ----------------------------------------------------------------------------
 
 /// @notice Registry to map an address or other identifier to its stealth meta-address.
 contract ERC5564Registry {
