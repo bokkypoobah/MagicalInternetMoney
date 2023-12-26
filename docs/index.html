@@ -221,7 +221,7 @@
                   <ul>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x4f58404f363f8a3282648e80440e075e5c1e28a1#code" target="_blank">ERC5564Announcer</b-link></li>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x8FC6345eE24E3DaDb2FCaeC7F133a509dfe4C3DE#code" target="_blank">ERC5564Registry</b-link></li>
-                    <li><b-link href="https://sepolia.etherscan.io/address/0x5D02904F6EF664F3853D4C0702bd203F6FE7005D#code" target="_blank">StealthChad</b-link></li>
+                    <li><b-link href="https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code" target="_blank">StealthChad v0.8.0</b-link></li>
                   </ul>
 
                   <h5 class="mt-3">References</h5>
@@ -900,6 +900,20 @@
 
             const stealthAddress = ethers.utils.computeAddress("0x" + stealthPublicKey.toHex(false));
             console.log('stealthAddress:', stealthAddress);
+
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(STEALTHCHADADDRESS_SEPOLIA, STEALTHCHADABI_SEPOLIA, provider);
+            const contractWithSigner = contract.connect(provider.getSigner());
+            const schemeId = 0;
+            const recipient = stealthAddress;
+            const value = ethers.utils.parseEther(this.settings.transfer.amount);
+            try {
+              const tx = await contractWithSigner.transferEthAndAnnounce(schemeId, stealthAddress, ephemeralPublicKey, "0x" + viewTag, { value });
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("transferEthToStealthMetaAddress StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
+            }
 
             // const p = getPublicKey();
             // console.log("etc: " + JSON.stringify(etc));
