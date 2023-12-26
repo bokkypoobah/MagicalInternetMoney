@@ -181,18 +181,18 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.approvalsTable.sortOption" @change="saveSettings" :options="approvalsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                </div> -->
-                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
-                </div> -->
-                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
-                </div> -->
-                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.approvalsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
-                </div> -->
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalEvents) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="totalActivity" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
               </div>
             </b-card-text>
 
@@ -461,7 +461,7 @@
             { value: 'typenameasc', text: '▲ Type, ▲ Name' },
             { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
           ],
-          eventsSortOptions: [
+          activitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
@@ -560,6 +560,17 @@
 
         // --- COMPUTED ---
         computed: {
+          totalActivity() {
+            let result = 0;
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events)) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData)) {
+                result++;
+              }
+            }
+            return result;
+          },
           filteredActivity() {
             let results = [];
             const events = this.events[this.chainId] || {};
@@ -574,6 +585,31 @@
           },
           filteredSortedActivity() {
             let results = this.filteredActivity;
+            if (this.settings.activityTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return a.logIndex - b.logIndex;
+                  } else {
+                    return a.txIndex - b.txIndex;
+                  }
+                } else {
+                  return a.blockNumber - b.blockNumber;
+                }
+              });
+            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return b.logIndex - a.logIndex;
+                  } else {
+                    return b.txIndex - a.txIndex;
+                  }
+                } else {
+                  return b.blockNumber - a.blockNumber;
+                }
+              });
+            }
             return results;
           },
 
