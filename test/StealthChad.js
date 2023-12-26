@@ -1,6 +1,7 @@
 const { time, loadFixture } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
+const util = require('util');
 
 describe("StealthChad", function () {
   async function deployContractsFixture() {
@@ -24,8 +25,19 @@ describe("StealthChad", function () {
 
   describe("Deployment", function () {
     it("Do Something", async function () {
-      const { erc5564Announcer, erc5564Registry, stealthChad } = await loadFixture(deployContractsFixture);
-      // expect(await lock.unlockTime()).to.equal(unlockTime);
+      const { erc5564Announcer, erc5564Registry, stealthChad, otherAccount } = await loadFixture(deployContractsFixture);
+      // expect(await stealthChad.unlockTime()).to.equal(unlockTime);
+
+      // function transferAndAnnounce(address recipient, bytes memory ephemeralPubKey, bytes memory metadata) external payable {
+      const recipient = otherAccount;
+      const ephemeralPubKey = "0x1234";
+      const metadata = "0x2345";
+      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(recipient, ephemeralPubKey, metadata);
+      const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
+      transferAndAnnounceReceipt_1.logs.forEach((log) => {
+        console.log("transferAndAnnounceReceipt_1: " + util.inspect(erc5564Announcer.interface.parseLog(log)))
+      });
+
     });
     // it.skip("Should set the right unlockTime", async function () {
     //   const { lock, unlockTime } = await loadFixture(deployContractsFixture);

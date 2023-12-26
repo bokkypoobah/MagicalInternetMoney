@@ -2,8 +2,26 @@
 
   StealthChad
     Deployment
-      ✔ Do Something (690ms)
+transferAndAnnounceReceipt_1: LogDescription {
+  fragment: EventFragment {
+    type: 'event',
+    inputs: [ [ParamType], [ParamType], [ParamType], [ParamType], [ParamType] ],
+    name: 'Announcement',
+    anonymous: false
+  },
+  name: 'Announcement',
+  signature: 'Announcement(uint256,address,address,bytes,bytes)',
+  topic: '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+  args: Result(5) [
+    1n,
+    '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+    '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
+    '0x1234',
+    '0x2345'
+  ]
+}
+      ✔ Do Something (777ms)
 
 
-  1 passing (692ms)
+  1 passing (778ms)
 
