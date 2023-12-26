@@ -850,13 +850,6 @@
 
           async transferEthToStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
-            // console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress - this.settings.transfer.recipientStealthMetaAddress: " + this.settings.transfer.recipientStealthMetaAddress);
-
-            // function generateStealthAddress(bytes memory stealthMetaAddress)
-              // external
-              // view
-              // returns (address stealthAddress, bytes memory ephemeralPubKey, bytes1 viewTag);
-
             function generateStealthAddress(stealthMetaAddress) {
                 const result = {};
                 result.stealthMetaAddress = stealthMetaAddress;
@@ -874,10 +867,9 @@
                 result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
                 return result;
             }
-
             const result = generateStealthAddress(this.settings.transfer.recipientStealthMetaAddress);
             for (const [k, v] of Object.entries(result)) {
-              console.log("      ", k, "=>", v);
+              console.log("    ", k, "=>", v);
             }
 
             // // const R_pubkey_spend = nobleCurves.secp256k1.ProjectivePoint.fromHex(this.settings.transfer.recipientStealthMetaAddress.slice(9, 75));
