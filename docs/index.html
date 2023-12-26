@@ -562,7 +562,14 @@
         computed: {
           filteredActivity() {
             let results = [];
-            results.push({ blah: "one", bleargh: "two" });
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                results.push({ blockNumber, logIndex, ...eventData });
+              }
+            }
             return results;
           },
           filteredSortedActivity() {
