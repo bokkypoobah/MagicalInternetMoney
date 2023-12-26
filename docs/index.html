@@ -43,9 +43,9 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">StealthChad</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Approvals'">Approvals</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Events'">Events</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Accounts'">Accounts</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -158,9 +158,9 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <!-- <div v-if="false && !sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
-                </div> -->
+                <div v-if="!sync.section" class="mt-0 pr-1">
+                  <b-button size="sm" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
+                </div>
                 <!-- <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div> -->
@@ -262,8 +262,45 @@
                 </b-card-body>
               </b-card>
 
-              <!-- :MAIN -->
-              <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+
+              <!-- :ACTIVITY -->
+              <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+                <!-- <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
+                </template> -->
+              </b-table>
+
+              <!-- :TRANSFERS -->
+              <b-card v-if="settings.tabIndex == 1 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h5>Transfer ETH From EOA To Stealth Meta-Address</h5>
+                  <b-form-group label-cols-lg="2" label="Transfer Details" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="Recipient Stealth Meta Address:" label-for="recipient-stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-textarea type="text" id="recipient-stealth-meta-address" v-model.trim="settings.transfer.recipientStealthMetaAddress" @input="saveSettings"></b-form-textarea>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.transfer.recipientStealthMetaAddress" @click="copyToClipboard(settings.transfer.recipientStealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Amount in ETH">
+                      <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="settings.transfer.amount" @input="saveSettings" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+                    </b-form-group>
+                  </b-form-group>
+                </b-card-body>
+              </b-card>
+
+              <!-- :ADDRESSES -->
+              <b-card v-if="settings.tabIndex == 2 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Stealth Meta-Address</h5>
                   <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
@@ -319,27 +356,6 @@
                           <b-button :disabled="!settings.stealthMetaAddress.stealthMetaAddress" @click="copyToClipboard(settings.stealthMetaAddress.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                         </b-input-group-append>
                       </b-input-group>
-                    </b-form-group>
-                  </b-form-group>
-                </b-card-body>
-              </b-card>
-              <b-card v-if="!settings.showInfo && coinbase != null" no-body class="my-1 p-1">
-                <b-card-body class="mt-1 p-1">
-                  <h5>Transfer ETH From EOA To Stealth Meta-Address</h5>
-                  <b-form-group label-cols-lg="2" label="Transfer Details" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-                    <b-form-group label="Recipient Stealth Meta Address:" label-for="recipient-stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-input-group size="sm" class="w-75">
-                        <b-form-textarea type="text" id="recipient-stealth-meta-address" v-model.trim="settings.transfer.recipientStealthMetaAddress" @input="saveSettings"></b-form-textarea>
-                        <b-input-group-append>
-                          <b-button :disabled="!settings.transfer.recipientStealthMetaAddress" @click="copyToClipboard(settings.transfer.recipientStealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                    <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Amount in ETH">
-                      <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="settings.transfer.amount" @input="saveSettings" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
                     </b-form-group>
                   </b-form-group>
                 </b-card-body>
@@ -410,7 +426,13 @@
               recipientStealthMetaAddress: null,
               amount: 0.01,
             },
-            version: 14,
+            activityTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'txorderdsc',
+            },
+            version: 15,
           },
           sync: {
             section: null,
@@ -533,6 +555,21 @@
 
         // --- COMPUTED ---
         computed: {
+          filteredActivity() {
+            let results = [];
+            results.push({ blah: "one", bleargh: "two" });
+            return results;
+          },
+          filteredSortedActivity() {
+            let results = this.filteredActivity;
+            return results;
+          },
+
+          pagedFilteredSortedActivity() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
+            return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
+          },
+
           accountsToSearch() {
             return this.settings.searchAttachedAccount ? [ this.coinbase ] : (this.settings.searchAccounts && this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => name.match(/0x[0-9a-fA-F]{40}/)) || []);
           },
@@ -990,88 +1027,80 @@
             if (!devMode) {
               await this.syncEvents(provider, latestBlockNumber);
             }
-            if (!devMode) {
-              await this.syncBlockTimestamps(provider);
-            }
-            if (!devMode) {
-              await this.syncAccounts(provider, devMode);
-            }
-            if (!devMode) {
-              await this.processData(provider);
-            }
+            // if (!devMode) {
+            //   await this.syncBlockTimestamps(provider);
+            // }
+            // if (!devMode) {
+            //   await this.syncAccounts(provider, devMode);
+            // }
+            // if (!devMode) {
+            //   await this.processData(provider);
+            // }
             this.sync.section = null;
             this.sync.halt = false;
           },
 
           async syncEvents(provider, latestBlockNumber) {
-            // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
-            // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-            // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
-            // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-            // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
-            // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
-            // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
-            // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+            // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPubKey, bytes metadata)
+            // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             console.log(moment().format("HH:mm:ss") + " syncEvents BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
-            this.sync.section = 'Approval Events';
-            const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
-            const approvalLogs = await provider.getLogs({
-              address: null,
+            this.sync.section = 'Stealth Address Announcements';
+            const announcementLogs = await provider.getLogs({
+              address: ERC5564ANNOUNCERADDRESS_SEPOLIA,
               fromBlock: 0,
               toBlock: latestBlockNumber,
-              topics: [[
-                  '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
-                  '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31'
-                ],
-                accountsAs32Bytes,
+              topics: [
+                '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+                null,
                 null
               ],
             });
-            this.sync.completed = approvalLogs.length;
+            this.sync.completed = announcementLogs.length;
             const events = this.events;
             if (!(this.chainId in events)) {
               events[this.chainId] = {};
             }
-            for (const log of approvalLogs) {
-              const topic0 = log.topics[0];
-              const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll' : 'Approval';
-              let owner = null;
-              let spender = null;
-              let value = null;
-              if (log.topics.length == 3) {
-                owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                value = ethers.BigNumber.from(log.data).toString();
-              } else if (log.topics.length == 4) {
-                owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                value = ethers.BigNumber.from(log.topics[3]).toString();
-              } else {
-                console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
-              }
-              if (owner) {
-                if (!(log.blockNumber in events[this.chainId])) {
-                  events[this.chainId][log.blockNumber] = {};
-                }
-                if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
-                  events[this.chainId][log.blockNumber][log.logIndex] = {
-                    txIndex: log.transactionIndex,
-                    txHash: log.transactionHash,
-                    contract: log.address,
-                    eventName,
-                    owner,
-                    spender,
-                    value,
-                    latestBlockNumber,
-                  };
-                }
-              }
+            for (const log of announcementLogs) {
+              console.log("log: ", log);
+              // const topic0 = log.topics[0];
+            //   const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll' : 'Approval';
+            //   let owner = null;
+            //   let spender = null;
+            //   let value = null;
+            //   if (log.topics.length == 3) {
+            //     owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+            //     spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+            //     value = ethers.BigNumber.from(log.data).toString();
+            //   } else if (log.topics.length == 4) {
+            //     owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+            //     spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+            //     value = ethers.BigNumber.from(log.topics[3]).toString();
+            //   } else {
+            //     console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
+            //   }
+            //   if (owner) {
+            //     if (!(log.blockNumber in events[this.chainId])) {
+            //       events[this.chainId][log.blockNumber] = {};
+            //     }
+            //     if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+            //       events[this.chainId][log.blockNumber][log.logIndex] = {
+            //         txIndex: log.transactionIndex,
+            //         txHash: log.transactionHash,
+            //         contract: log.address,
+            //         eventName,
+            //         owner,
+            //         spender,
+            //         value,
+            //         latestBlockNumber,
+            //       };
+            //     }
+            //   }
             }
             localStorage.stealthChadEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            // console.log(moment().format("HH:mm:ss") + " syncEvents - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncEvents - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncEvents END");
           },
 
