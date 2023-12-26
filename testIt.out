@@ -2,7 +2,7 @@
 
   StealthChad
     Deployment
-      ✔ Should set the right unlockTime (702ms)
+      ✔ Should set the right unlockTime (734ms)
       ✔ Should set the right owner
       ✔ Should receive and store the funds to lock
       ✔ Should fail if the unlockTime is not in the future
@@ -17,5 +17,5 @@
         ✔ Should transfer the funds to the owner
 
 
-  9 passing (774ms)
+  9 passing (812ms)
 
