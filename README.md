@@ -34,7 +34,7 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 * [ERC5564Announcer.sol](deployed/ERC5564Announcer_Sepolia_0x4f58404f363f8a3282648e80440e075e5c1e28a1.sol) on Sepolia [0x4f58404f363f8a3282648e80440e075e5c1e28a1](https://sepolia.etherscan.io/address/0x4f58404f363f8a3282648e80440e075e5c1e28a1#code)
 * [ERC5564Registry.sol](deployed/ERC5564Registry_Sepolia_0x8FC6345eE24E3DaDb2FCaeC7F133a509dfe4C3DE.sol) on Sepolia [0x8fc6345ee24e3dadb2fcaec7f133a509dfe4c3de](https://sepolia.etherscan.io/address/0x8fc6345ee24e3dadb2fcaec7f133a509dfe4c3de#code)
-* [StealthChad.sol](deployed/StealthChad_Sepolia_0x5D02904F6EF664F3853D4C0702bd203F6FE7005D.sol) on Sepolia [0x5D02904F6EF664F3853D4C0702bd203F6FE7005D](https://sepolia.etherscan.io/address/0x5D02904F6EF664F3853D4C0702bd203F6FE7005D#code)
+* [StealthChad.sol v0.8.0](deployed/StealthChad_v0.8.0_Sepolia_0x3834bcA9093e375893D65975ad765179A149D017.sol) on Sepolia [0x3834bcA9093e375893D65975ad765179A149D017](https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code)
 
 
 <br />
