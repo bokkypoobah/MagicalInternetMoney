@@ -39,10 +39,16 @@ interface IERC5564Announcer {
 }
 
 
+function onePlus(uint x) pure returns (uint) {
+    unchecked { return 1 + x; }
+}
+
+
 /// @notice Stealth Chad things
 contract StealthChad {
     IERC5564Announcer announcer;
 
+    error ZeroValue();
     error TransferFailure();
 
     constructor(address payable _announcer) {
@@ -54,11 +60,29 @@ contract StealthChad {
     /// @param recipient The computed stealth address for the recipient.
     /// @param ephemeralPubKey Ephemeral public key used by the sender.
     /// @param viewTag The view tag derived from the shared secret.
-    /// @param metadata An arbitrary field MUST include the view tag in the first byte.
-    function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, bytes memory metadata) external payable {
-        console.log("      transferEthAndAnnounce - schemeId: %s, recipient: %s, viewTag: %s", schemeId, recipient, viewTag);
-        console.logBytes(ephemeralPubKey);
-        console.logBytes(metadata);
+    function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag) external payable {
+        // console.log("      transferEthAndAnnounce - schemeId: %s, recipient: %s, viewTag: %s", schemeId, recipient, viewTag);
+        // console.logBytes(ephemeralPubKey);
+        if (msg.value == 0) {
+            revert ZeroValue();
+        }
+        // console.logBytes(metadata);
+        /// - When sending/interacting with the native token of the blockchain (cf. ETH), the metadata SHOULD be structured as follows:
+        ///     - Byte 1 MUST be the view tag, as specified above.
+        ///     - Bytes 2-5 are `0xeeeeeeee`
+        ///     - Bytes 6-25 are the address 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE.
+        ///     - Bytes 26-57 are the amount of ETH being sent.
+        bytes memory metadata = new bytes(57);
+        uint i;
+        uint j;
+        metadata[j++] = bytes1(viewTag);
+        for (; i < 24; i = onePlus(i)) {
+            metadata[j++] = 0xee;
+        }
+        bytes32 msgValueInBytes = bytes32(msg.value);
+        for (i = 0; i < 32; i = onePlus(i)) {
+            metadata[j++] = msgValueInBytes[i];
+        }
         announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
         (bool sent, ) = recipient.call{value: msg.value}("");
         if (!sent) {

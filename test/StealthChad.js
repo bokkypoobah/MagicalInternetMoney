@@ -33,11 +33,10 @@ describe("StealthChad", function () {
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
       const viewTag = 0xff;
-      const metadata = "0x2345";
-      const transferEthAndAnnounceTx_1 = await stealthChad.transferEthAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, metadata);
+      const transferEthAndAnnounceTx_1 = await stealthChad.transferEthAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, { value: 123456789123456789n });
       const transferEthAndAnnounceReceipt_1 = await transferEthAndAnnounceTx_1.wait();
       transferEthAndAnnounceReceipt_1.logs.forEach((log) => {
-        console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(6)));
+        console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
       });
 
     });
