@@ -117,7 +117,7 @@
                 <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.stealthMetaAddressName" class="w-100"></b-form-input>
               </b-form-group>
               <b-form-group label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="modalNewStealthMetaAddress.keys.inAddressBook ? 'Already in Address Book' : 'Click to add to Address Book'" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="modalNewStealthMetaAddress.keys.inAddressBook" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBook()" variant="warning">Add To Address Book</b-button>
+                <b-button size="sm" :disabled="modalNewStealthMetaAddress.keys.inAddressBook || !modalNewStealthMetaAddress.stealthMetaAddressName" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBook()" variant="warning">Add To Address Book</b-button>
               </b-form-group>
             </b-form-group>
             <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Registry" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
@@ -1085,9 +1085,9 @@
             } else {
               Vue.set(this.addresses[this.chainId][this.coinbase], 'name', this.modalNewStealthMetaAddress.name);
             }
-            const stealthMetaAddresses = this.addresses[this.chainId][this.coinbase].stealthMetaAddresses;
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBook - stealthMetaAddresses: " + JSON.stringify(stealthMetaAddresses));
-            // Vue.set(this.addresses[this.chainId][this.coinbase], 'stealthMetaAddresses', this.modalNewStealthMetaAddress.name);
+            // const stealthMetaAddresses = this.addresses[this.chainId][this.coinbase].stealthMetaAddresses;
+            // console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBook - stealthMetaAddresses: " + JSON.stringify(stealthMetaAddresses));
+            Vue.set(this.addresses[this.chainId][this.coinbase].stealthMetaAddresses, this.modalNewStealthMetaAddress.keys.stealthMetaAddress, { phrase:  this.modalNewStealthMetaAddress.phrase, stealthMetaAddressName: this.modalNewStealthMetaAddress.stealthMetaAddressName });
 
             // for (const [address, accountData] of Object.entries(addresses)) {
             //   console.log(address + " => " + JSON.stringify(accountData));
