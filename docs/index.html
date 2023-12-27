@@ -901,7 +901,7 @@
             return results;
           },
           pagedFilteredSortedRegistryActivity() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
             return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
@@ -1424,9 +1424,15 @@
             if (!(this.chainId in blockTimestamps)) {
               blockTimestamps[this.chainId] = {};
             }
-            const events = this.events[this.chainId] || {};
             const newBlockNumbersMap = {};
+            const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events)) {
+              if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
+                newBlockNumbersMap[blockNumber] = true;
+              }
+            }
+            const registryEvents = this.registryEvents[this.chainId] || {};
+            for (const blockNumber of Object.keys(registryEvents)) {
               if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
                 newBlockNumbersMap[blockNumber] = true;
               }
