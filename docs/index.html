@@ -217,6 +217,20 @@
             </b-form-group>
           </b-modal>
 
+          <!-- :MODALREGISTRY -->
+          <b-modal id="modal-registry" hide-footer size="xl">
+            <template #modal-title>
+              <font size="-1">
+                Registry ({{ coinbase }})
+              </font>
+            </template>
+            <font size="-1">
+              <pre>
+{{ modalRegistry }}
+              </pre>
+            </font>
+          </b-modal>
+
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
@@ -548,7 +562,7 @@
 
           <!-- :REGISTRY -->
           <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
-          <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+          <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
             <template #cell(number)="data">
               <font size="-1">
                 {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
@@ -576,13 +590,15 @@
             </template>
             <template #cell(stealthMetaAddress)="data">
               <font size="-1">
-                <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0">{{ data.item.stealthMetaAddress }}</b-badge>
+                <!-- <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0"> -->
+                  {{ data.item.stealthMetaAddress }}
+                <!-- </b-badge> -->
               </font>
-              <font size="-2">
+              <!-- <font size="-2">
                 <pre>
 {{ data.item }}
                 </pre>
-              </font>
+              </font> -->
             </template>
             <!-- <template #cell(contract)="data">
               <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
@@ -733,6 +749,9 @@
             name: null,
             stealthMetaAddressName: null,
             keys: {},
+          },
+          modalRegistry: {
+            item: null,
           },
           activitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
@@ -1282,6 +1301,15 @@
               this.modalActivity.item = item[0];
               this.$bvModal.show('modal-activity');
               this.$refs.activityTable.clearSelected();
+            }
+          },
+
+          registryRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item));
+            if (item && item.length > 0) {
+              this.modalRegistry.item = item[0];
+              this.$bvModal.show('modal-registry');
+              this.$refs.registryTable.clearSelected();
             }
           },
 
