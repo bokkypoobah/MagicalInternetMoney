@@ -45,7 +45,7 @@
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Address Book'">Address Book</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
@@ -81,7 +81,7 @@
                 </font>
               </b-form-group> -->
             </b-form-group>
-            <b-form-group label-cols-lg="2" label="Generate" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact phrase is required to recover your stealth meta-address with your web3 attached account. Save this information securely!">
                 <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase" class="w-100"></b-form-textarea>
               </b-form-group>
@@ -89,7 +89,28 @@
                 <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddress()" variant="warning">Generate</b-button>
               </b-form-group>
             </b-form-group>
-            <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Generated" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Generated Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Spending Private Key:" label-for="newsma-spendingprivatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-spendingprivatekey" :value="modalNewStealthMetaAddress.keys.spendingPrivateKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Viewing Private Key:" label-for="newsma-viewingprivatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-viewingprivatekey" :value="modalNewStealthMetaAddress.keys.viewingPrivateKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Spending Public Key:" label-for="newsma-spendingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-spendingpublickey" :value="modalNewStealthMetaAddress.keys.spendingPublicKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Viewing Public Key:" label-for="newsma-viewingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-viewingpublickey" :value="modalNewStealthMetaAddress.keys.viewingPublicKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Stealth Meta-Address:" label-for="newsma-viewingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" readonly id="newsma-viewingpublickey" :value="modalNewStealthMetaAddress.keys.stealthMetaAddress" class="w-100"></b-form-textarea>
+              </b-form-group>
+              <b-form-group label="In Address Book:" label-for="newsma-inaddressbook" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddress.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox>
+              </b-form-group>
+              <b-form-group label="In Registry:" label-for="newsma-inregistry" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-checkbox size="sm" disabled id="newsma-inregistry" value="1" :checked="modalNewStealthMetaAddress.keys.inRegistry ? 1 : 0" class="mt-1"></b-form-checkbox>
+              </b-form-group>
             </b-form-group>
           </b-modal>
 
@@ -953,7 +974,9 @@
               "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
               "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
               "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-              "stealthMetaAddress": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96"
+              "stealthMetaAddress": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
+              "inAddressBook": true,
+              "inRegistry": true,
             };
             this.$bvModal.show('modal-newstealthmetaaddress');
           },
