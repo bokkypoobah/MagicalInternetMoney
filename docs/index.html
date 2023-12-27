@@ -543,6 +543,21 @@
                 </b-link>
               </font>
             </template>
+            <template #cell(registrant)="data">
+              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.registrant" target="_blank">
+                <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.registrant)" class="px-0">{{ nameOrAddress(data.item.registrant, 28) }}</b-badge>
+              </b-link>
+            </template>
+            <template #cell(stealthMetaAddress)="data">
+              <font size="-1">
+                <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0">{{ data.item.stealthMetaAddress }}</b-badge>
+              </font>
+              <font size="-2">
+                <pre>
+{{ data.item }}
+                </pre>
+              </font>
+            </template>
             <template #cell(contract)="data">
               <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
                 <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
@@ -772,9 +787,11 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'details', label: 'Details', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 65%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            // { key: 'details', label: 'Details', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
             // { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
