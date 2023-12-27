@@ -970,37 +970,35 @@
             console.log(moment().format("HH:mm:ss") + " newStealthMetaAddress");
             this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
             this.modalNewStealthMetaAddress.keys = {
-              "spendingPrivateKey": "0xca4fb233c029c040147c414070ad40fb0bb08b0601618103a7c407d986e937e2",
-              "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
-              "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
-              "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-              "stealthMetaAddress": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-              "inAddressBook": true,
-              "inRegistry": true,
+              "spendingPrivateKey": "0x3795c0f4e8bda3b59b249eb3e64a8b3235ab29531fc83809a134b22d30c31cda",
+              "viewingPrivateKey": "0xb8293d4764cb158b9e395e3aed255d588c8e3380e0798921446d8735eecced91",
+              "spendingPublicKey": "0x037772573d8d959eaf076128f467c81083063d0f333ad77b59f04ab7d4a927d6b5",
+              "viewingPublicKey": "0x03daab8862af2ba106420b20fdc62278281544fa20256d65f13ab19fc5d5d6bd44",
+              "stealthMetaAddress": "st:eth:0x037772573d8d959eaf076128f467c81083063d0f333ad77b59f04ab7d4a927d6b503daab8862af2ba106420b20fdc62278281544fa20256d65f13ab19fc5d5d6bd44",
+              "inAddressBook": false,
+              "inRegistry": false,
             };
             this.$bvModal.show('modal-newstealthmetaaddress');
           },
           async generateNewStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " generateNewStealthMetaAddress - phrase: " + this.modalNewStealthMetaAddress.phrase);
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalNewStealthMetaAddress.phrase));
-            console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
+            // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
                 method: 'personal_sign',
                 params: [phraseInHex, this.coinbase],
             });
-            console.log("signature: " + signature);
+            // console.log("signature: " + signature);
             const signature1 = signature.slice(2, 66);
             const signature2 = signature.slice(66, 130);
-            console.log("signature1: " + signature1);
-            console.log("signature2: " + signature2);
-
+            // console.log("signature1: " + signature1);
+            // console.log("signature2: " + signature2);
             // Hash "v" and "r" values using SHA-256
             const hashedV = ethers.utils.sha256("0x" + signature1);
             const hashedR = ethers.utils.sha256("0x" + signature2);
             const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-            console.log("hashedV: " + hashedV);
-            console.log("hashedR: " + hashedR);
-
+            // console.log("hashedV: " + hashedV);
+            // console.log("hashedR: " + hashedR);
             // // Calculate the private keys by taking the hash values modulo the curve order
             const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
@@ -1014,6 +1012,37 @@
             Vue.set(this.modalNewStealthMetaAddress.keys, 'spendingPublicKey', spendingPublicKey);
             Vue.set(this.modalNewStealthMetaAddress.keys, 'viewingPublicKey', viewingPublicKey);
             Vue.set(this.modalNewStealthMetaAddress.keys, 'stealthMetaAddress', stealthMetaAddress);
+            let inAddressBook = false;
+            const addresses = this.addresses[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(addresses)) {
+              console.log(address + " => " + JSON.stringify(accountData));
+              for (const [checkStealthMetaAddress, checkStealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
+                if (checkStealthMetaAddress == stealthMetaAddress) {
+                  inAddressBook = true;
+                  break;
+                }
+              }
+              if (inAddressBook) {
+                break;
+              }
+            }
+            let inRegistry = false;
+            const registryEvents = this.registryEvents[this.chainId] || {};
+            for (const blockNumber of Object.keys(registryEvents).sort((a, b) => { return a - b })) {
+              const blockNumberData = registryEvents[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = registryEvents[blockNumber][logIndex];
+                if (eventData.stealthMetaAddress == stealthMetaAddress) {
+                  inRegistry = true;
+                  break;
+                }
+              }
+              if (inRegistry) {
+                break;
+              }
+            }
+            Vue.set(this.modalNewStealthMetaAddress.keys, 'inAddressBook', inAddressBook);
+            Vue.set(this.modalNewStealthMetaAddress.keys, 'inRegistry', inRegistry);
             console.log("this.modalNewStealthMetaAddress.keys: " + JSON.stringify(this.modalNewStealthMetaAddress.keys, null, 2));
           },
           async generateKeys() {
