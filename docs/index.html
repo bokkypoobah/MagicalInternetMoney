@@ -63,6 +63,15 @@
           </b-card>
 
           <!-- :MODALAPPROVAL -->
+          <b-modal id="modal-newstealthmetaaddress" hide-footer size="lg">
+            <template #modal-title>
+              <font size="-1">
+                New Stealth Meta-Address ({{ coinbase }})
+              </font>
+            </template>
+          </b-modal>
+
+          <!-- :MODALAPPROVAL -->
           <b-modal id="modal-approval" hide-footer size="lg">
             <template #modal-title>
               View/Update {{ modalApproval.item.type.toUpperCase() }} {{ modalApproval.item.approvalType }}
@@ -919,6 +928,7 @@
         methods: {
           newStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " newStealthMetaAddress");
+            this.$bvModal.show('modal-newstealthmetaaddress');
           },
           async generateKeys() {
             // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
