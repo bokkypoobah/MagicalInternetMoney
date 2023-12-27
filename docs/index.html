@@ -185,11 +185,17 @@
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalActivity) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ /*commify0(filteredApprovals.length) + '/' +*/ commify0(totalRegistryActivity) }}</font>
@@ -197,11 +203,17 @@
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="totalActivity" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="totalAddresses" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="totalRegistryActivity" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -507,13 +519,19 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
+            addressesTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'eoaasc',
+            },
             registryActivityTable: {
               filter: null,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 16,
+            version: 17,
           },
           sync: {
             section: null,
@@ -523,7 +541,21 @@
           },
           events: {},
           registryEvents: {},
-          accounts: {},
+          addresses: {
+            "0x000001f568875F378Bf6d170B790967FE429C81A": {
+              name: "My Account",
+              stealthMetaAddresses: [
+                { phrase: "I want to login into my stealth wallet on Ethereum mainnet.", stealthMetaAddress: "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96" },
+                { phrase: "I want to login into my stealth wallet on Ethereum mainnet.1", stealthMetaAddress: "st:eth:0x027aa1f6cd1760c20a333c564230681e2a08abe03b80b142eb187a39e1d2a00dd402d142d4eb630301a9d0bf8e18e673d89d4dd749190b2264979da7ec869b0dc3e1" },
+              ],
+            },
+            "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362": {
+              name: "My Sepolia Testing Account",
+              stealthMetaAddresses: [
+                { phrase: "st:eth:0x03db0fb987c911ac999e54061ed812f3a74357373afd828a30df8b79bbfef13dd30358e291c3a8935e479ad66e2894b1ff235e1e60b0426187ed1f4082476a4b68c4" },
+              ],
+            },
+          },
           blockTimestamps: {},
           txs: {},
           modalApproval: {
@@ -536,6 +568,10 @@
           activitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
+          ],
+          addressesSortOptions: [
+            { value: 'eoaasc', text: '▲ EOA' },
+            { value: 'eoadsc', text: '▼ EOA' },
           ],
           registryActivitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
@@ -680,7 +716,6 @@
             }
             return results;
           },
-
           pagedFilteredSortedActivity() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
@@ -697,7 +732,6 @@
             }
             return result;
           },
-
           filteredRegistryActivity() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const registryEvents = this.registryEvents[this.chainId] || {};
@@ -741,17 +775,17 @@
             }
             return results;
           },
-
           pagedFilteredSortedRegistryActivity() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
             return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
-          totalAccounts() {
-            const accounts = this.accounts[this.chainId] || {};
-            return Object.keys(accounts).length;
+          totalAddresses() {
+            // const accounts = this.accounts[this.chainId] || {};
+            // return Object.keys(accounts).length;
+            return 100;
           },
-          filteredAccounts() {
+          filteredAddresses() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const accounts = this.accounts[this.chainId] || {};
             for (const [address, accountData] of Object.entries(accounts)) {
@@ -760,9 +794,9 @@
             }
             return results;
           },
-          filteredSortedAccounts() {
-            let results = this.filteredAccounts;
-            if (this.settings.accountsTable.sortOption == 'typenameasc') {
+          filteredSortedAddresses() {
+            let results = this.filteredAddresses;
+            if (this.settings.addressesTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
                 const typeA = a.customType || a.type;
                 const typeB = b.customType || b.type;
@@ -776,7 +810,7 @@
                   return sortIndexA - sortIndexB;
                 }
               });
-            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
+            } else if (this.settings.addressesTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
                 const typeA = a.customType || a.type;
                 const typeB = b.customType || b.type;
@@ -790,28 +824,28 @@
                   return sortIndexB - sortIndexA;
                 }
               });
-            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+            } else if (this.settings.addressesTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
                 return ('' + a.name).localeCompare(b.name);
               });
-            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+            } else if (this.settings.addressesTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
                 return ('' + b.name).localeCompare(a.name);
               });
-            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+            } else if (this.settings.addressesTable.sortOption == 'addressasc') {
               results.sort((a, b) => {
                 return ('' + a.address).localeCompare(b.address);
               });
-            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+            } else if (this.settings.addressesTable.sortOption == 'addressdsc') {
               results.sort((a, b) => {
                 return ('' + b.address).localeCompare(a.address);
               });
             }
             return results;
           },
-          pagedFilteredSortedAccounts() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
-            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
+          pagedFilteredSortedAddresses() {
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+            return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
         },
 
@@ -1510,9 +1544,9 @@
           },
           nameOrAddress(address, length = 0) {
             let result = null;
-            const accounts = this.accounts[this.chainId] || {};
-            if (address in accounts) {
-              result = accounts[address].customName || accounts[address].name || address;
+            const addresses = this.addresses[this.chainId] || {};
+            if (address in addresses) {
+              result = addresses[address].customName || addresses[address].name || address;
             } else {
               result = address;
             }
@@ -1522,12 +1556,12 @@
             return result;
           },
           addressDescription(address) {
-            const accounts = this.accounts[this.chainId] || {};
-            if (address in accounts) {
+            const addresses = this.addresses[this.chainId] || {};
+            if (address in addresses) {
               result = "address=" + address;
               for (let key of ['type', 'customType', 'symbol', 'name', 'customName', 'decimals', 'customDecimals', 'source']) {
-                if (key in accounts[address] && accounts[address][key]) {
-                  result = result + "; " + key + "=" + accounts[address][key];
+                if (key in addresses[address] && addresses[address][key]) {
+                  result = result + "; " + key + "=" + addresses[address][key];
                 }
               }
             } else {
