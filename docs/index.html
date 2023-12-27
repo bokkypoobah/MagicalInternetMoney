@@ -594,28 +594,25 @@
             "11155111": {
               "0x000001f568875F378Bf6d170B790967FE429C81A": {
                 name: "My Account",
-                stealthMetaAddresses: [
-                {
-                  name: "My First Stealth Meta-Account",
-                  phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
-                  stealthMetaAddress: "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96"
-                },
-                {
-                  name: "My Second Stealth Meta-Account",
-                  phrase: "I want to login into my stealth wallet on Ethereum mainnet.1",
-                  stealthMetaAddress: "st:eth:0x027aa1f6cd1760c20a333c564230681e2a08abe03b80b142eb187a39e1d2a00dd402d142d4eb630301a9d0bf8e18e673d89d4dd749190b2264979da7ec869b0dc3e1"
-                },
-                ],
+                stealthMetaAddresses: {
+                  "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96": {
+                    name: "My First Stealth Meta-Account",
+                    phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
+                  },
+                  "st:eth:0x027aa1f6cd1760c20a333c564230681e2a08abe03b80b142eb187a39e1d2a00dd402d142d4eb630301a9d0bf8e18e673d89d4dd749190b2264979da7ec869b0dc3e1": {
+                    name: "My Second Stealth Meta-Account",
+                    phrase: "I want to login into my stealth wallet on Ethereum mainnet.1",
+                  }
+                }
               },
               "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362": {
                 name: "My Sepolia Testing Account",
-                stealthMetaAddresses: [
-                  {
+                stealthMetaAddresses: {
+                  "st:eth:0x03db0fb987c911ac999e54061ed812f3a74357373afd828a30df8b79bbfef13dd30358e291c3a8935e479ad66e2894b1ff235e1e60b0426187ed1f4082476a4b68c4": {
                     name: "My Third Stealth Meta-Account",
                     phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
-                    stealthMetaAddress: "st:eth:0x03db0fb987c911ac999e54061ed812f3a74357373afd828a30df8b79bbfef13dd30358e291c3a8935e479ad66e2894b1ff235e1e60b0426187ed1f4082476a4b68c4"
-                  },
-                ],
+                  }
+                }
               },
             }
           },
@@ -847,8 +844,7 @@
             let result = this.forceRefresh % 2 == 0 ? 0 : 0;
             const addresses = this.addresses[this.chainId] || {};
             for (const [address, accountData] of Object.entries(addresses)) {
-              const stealthMetaAddresses = accountData.stealthMetaAddresses;
-              for (const stealthMetaAddressInfo of stealthMetaAddresses) {
+              for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
                 result++;
               }
             }
@@ -859,13 +855,9 @@
             const addresses = this.addresses[this.chainId] || {};
             for (const [address, accountData] of Object.entries(addresses)) {
               console.log(address + " => " + JSON.stringify(accountData));
-              const stealthMetaAddresses = accountData.stealthMetaAddresses;
-              for (const stealthMetaAddressInfo of stealthMetaAddresses) {
-                console.log("  " + JSON.stringify(stealthMetaAddressInfo));
-                results.push({ address, accountName: accountData.name, ...stealthMetaAddressInfo })
+              for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
+                results.push({ address, accountName: accountData.name, stealthMetaAddress, ...stealthMetaAddressData })
               }
-              // const [ type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
-              // results.push({ address, type, symbol, name, decimals, source, customType, customName, customDecimals });
             }
             return results;
           },
