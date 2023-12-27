@@ -347,6 +347,41 @@
               </b-card>
 
               <!-- :ADDRESSES -->
+              <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1"> -->
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedAddresses" show-empty empty-html="TODO: Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
+                    </b-link>
+                  </font>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(details)="data">
+                  <font size="-1">
+                    <pre>
+      {{ data.item }}
+                    </pre>
+                  </font>
+                </template>
+              </b-table>
+
+
+              <!-- :ADDRESSES OLD -->
               <b-card v-if="settings.tabIndex == 2 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Stealth Meta-Address</h5>
@@ -542,19 +577,33 @@
           events: {},
           registryEvents: {},
           addresses: {
-            "0x000001f568875F378Bf6d170B790967FE429C81A": {
-              name: "My Account",
-              stealthMetaAddresses: [
-                { phrase: "I want to login into my stealth wallet on Ethereum mainnet.", stealthMetaAddress: "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96" },
-                { phrase: "I want to login into my stealth wallet on Ethereum mainnet.1", stealthMetaAddress: "st:eth:0x027aa1f6cd1760c20a333c564230681e2a08abe03b80b142eb187a39e1d2a00dd402d142d4eb630301a9d0bf8e18e673d89d4dd749190b2264979da7ec869b0dc3e1" },
-              ],
-            },
-            "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362": {
-              name: "My Sepolia Testing Account",
-              stealthMetaAddresses: [
-                { phrase: "st:eth:0x03db0fb987c911ac999e54061ed812f3a74357373afd828a30df8b79bbfef13dd30358e291c3a8935e479ad66e2894b1ff235e1e60b0426187ed1f4082476a4b68c4" },
-              ],
-            },
+            "11155111": {
+              "0x000001f568875F378Bf6d170B790967FE429C81A": {
+                name: "My Account",
+                stealthMetaAddresses: [
+                {
+                  name: "My First Stealth Meta-Account",
+                  phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
+                  stealthMetaAddress: "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96"
+                },
+                {
+                  name: "My Second Stealth Meta-Account",
+                  phrase: "I want to login into my stealth wallet on Ethereum mainnet.1",
+                  stealthMetaAddress: "st:eth:0x027aa1f6cd1760c20a333c564230681e2a08abe03b80b142eb187a39e1d2a00dd402d142d4eb630301a9d0bf8e18e673d89d4dd749190b2264979da7ec869b0dc3e1"
+                },
+                ],
+              },
+              "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362": {
+                name: "My Sepolia Testing Account",
+                stealthMetaAddresses: [
+                  {
+                    name: "My Third Stealth Meta-Account",
+                    phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
+                    stealthMetaAddress: "st:eth:0x03db0fb987c911ac999e54061ed812f3a74357373afd828a30df8b79bbfef13dd30358e291c3a8935e479ad66e2894b1ff235e1e60b0426187ed1f4082476a4b68c4"
+                  },
+                ],
+              },
+            }
           },
           blockTimestamps: {},
           txs: {},
@@ -787,10 +836,16 @@
           },
           filteredAddresses() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            const accounts = this.accounts[this.chainId] || {};
-            for (const [address, accountData] of Object.entries(accounts)) {
-              const [ type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
-              results.push({ address, type, symbol, name, decimals, source, customType, customName, customDecimals });
+            const addresses = this.addresses[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(addresses)) {
+              console.log(address + " => " + JSON.stringify(accountData));
+              const stealthMetaAddresses = accountData.stealthMetaAddresses;
+              for (const stealthMetaAddressInfo of stealthMetaAddresses) {
+                console.log("  " + JSON.stringify(stealthMetaAddressInfo));
+                results.push({ address, accountName: accountData.name, ...stealthMetaAddressInfo })
+              }
+              // const [ type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
+              // results.push({ address, type, symbol, name, decimals, source, customType, customName, customDecimals });
             }
             return results;
           },
