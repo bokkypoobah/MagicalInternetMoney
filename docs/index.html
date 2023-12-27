@@ -1147,7 +1147,7 @@
               if (!(log.blockNumber in registryEvents[this.chainId])) {
                 registryEvents[this.chainId][log.blockNumber] = {};
               }
-              console.log(logData);
+              // console.log(logData);
               if (!(log.logIndex in registryEvents[this.chainId][log.blockNumber])) {
                 registryEvents[this.chainId][log.blockNumber][log.logIndex] = {
                   txIndex: log.transactionIndex,
@@ -1199,8 +1199,7 @@
 
           async syncTransactions(provider) {
             console.log(moment().format("HH:mm:ss") + " syncTransactions BEGIN");
-            // TODO: Dev const txs = this.txs;
-            const txs = {};
+            const txs = this.txs;
             if (!(this.chainId in txs)) {
               txs[this.chainId] = {};
             }
@@ -1231,7 +1230,7 @@
             this.sync.total = newTxs.length;
             this.sync.section = 'Transactions';
             for (let i = 0; i < newTxs.length && !this.sync.halt; i++) {
-              console.log(newTxs[i]);
+              // console.log(newTxs[i]);
               const tx = await provider.getTransaction(newTxs[i]);
               const txReceipt = await provider.getTransactionReceipt(newTxs[i]);
               txs[this.chainId][newTxs[i]] = {
@@ -1266,7 +1265,7 @@
               Vue.set(this, 'txs', txs);
             }
             this.forceRefresh++; // UI refresh workaround
-            console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncTransactions END");
           },
 
