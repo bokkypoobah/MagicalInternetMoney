@@ -830,9 +830,15 @@
           },
 
           totalAddresses() {
-            // const accounts = this.accounts[this.chainId] || {};
-            // return Object.keys(accounts).length;
-            return 100;
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            const addresses = this.addresses[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(addresses)) {
+              const stealthMetaAddresses = accountData.stealthMetaAddresses;
+              for (const stealthMetaAddressInfo of stealthMetaAddresses) {
+                result++;
+              }
+            }
+            return result;
           },
           filteredAddresses() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
