@@ -465,7 +465,7 @@
                 </template>
                 <template #cell(details)="data">
                   <font size="-2">
-                    schemeId: {{ data.item.schemeId }}, ephemeralPubKey: {{ data.item.ephemeralPubKey }}, metadata: {{ data.item.metadata }}
+                    schemeId: {{ data.item.schemeId }}, ephemeralPublicKey: {{ data.item.ephemeralPublicKey }}, metadata: {{ data.item.metadata }}
                   </font>
                   <!-- <br />
                   <font size="-1">
@@ -745,7 +745,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 17,
+            version: 18,
           },
           sync: {
             section: null,
@@ -1496,7 +1496,7 @@
           },
 
           async syncAnnouncementEvents(provider, latestBlockNumber) {
-            // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPubKey, bytes metadata)
+            // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents BEGIN");
             const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
@@ -1532,7 +1532,7 @@
                   schemeId: parseInt(logData.args[0]),
                   stealthAddress: logData.args[1],
                   caller: logData.args[2],
-                  ephemeralPubKey: logData.args[3],
+                  ephemeralPublicKey: logData.args[3],
                   metadata: logData.args[4],
                   latestBlockNumber,
                 };
@@ -1833,27 +1833,29 @@
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
           },
           async processData(provider) {
-            function checkStealthAddress(stealthAddress, ephemeralPubKey, viewingPrivateKey, spendingPublicKey) {
-              console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPubKey: " + ephemeralPubKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+            function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
+              // console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+              console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+
             }
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
-            console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(this.events));
-            console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses));
+            // console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(this.events));
+            // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses));
             const events = this.events[this.chainId] || {};
             const addresses = this.addresses[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
               for (const logIndex of Object.keys(events[blockNumber]).sort((a, b) => { return a - b })) {
                 const eventData = events[blockNumber][logIndex];
-                console.log(blockNumber + "." + logIndex + " " + eventData.stealthAddress + " " + eventData.ephemeralPubKey);
+                console.log(blockNumber + "." + logIndex + " " + eventData.stealthAddress + " " + eventData.ephemeralPublicKey);
                 for (const [address, accountData] of Object.entries(addresses)) {
                   for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
                     console.log("  Checking " + address.substring(0, 20) + " " + stealthMetaAddress.substring(0, 30));
-                    console.log(JSON.stringify(stealthMetaAddressData));
+                    // console.log(JSON.stringify(stealthMetaAddressData));
                     const stealthAddress = eventData.stealthAddress;
-                    const ephemeralPubKey = eventData.ephemeralPubKey;
+                    const ephemeralPublicKey = eventData.ephemeralPublicKey;
                     const viewingPrivateKey = stealthMetaAddressData.viewingPrivateKey;
                     const spendingPublicKey = stealthMetaAddressData.spendingPublicKey;
-                    const status = checkStealthAddress(stealthAddress, ephemeralPubKey, viewingPrivateKey, spendingPublicKey);
+                    const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
 
 
                   }
