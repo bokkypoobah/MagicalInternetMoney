@@ -1849,19 +1849,19 @@
             function computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
               const result = {};
               // console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-              console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey); //  + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPrivateKey: " + spendingPrivateKey);
+              // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey); //  + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPrivateKey: " + spendingPrivateKey);
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-              result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
-              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt("0x" + result.hashedSharedSecretPoint.toHex().slice(2))) % BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141");
+              // console.log("hashedSharedSecret: " + result.hashedSharedSecret);
+              // console.log("spendingPrivateKey: " + spendingPrivateKey);
+              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141");
               const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
               result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
-              console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
-              result.stealthPublicKey = nobleCurves.secp256k1.getPublicKey(stealthPrivateKeyNumber, isCompressed=true);
-              console.log("      stealthPublicKey: ", result.stealthPublicKey);
-              // result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
-              // console.log("      match: " + (result.stealthAddress == stealthAddress));
-              // result.match = result.stealthAddress == stealthAddress;
+              // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
+              result.stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber);
+              // console.log("      stealthPublicKey: ", result.stealthPublicKey.toHex(true));
+              result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
+              // console.log("      stealthAddress: ", result.stealthAddress);
               return result;
             }
 
@@ -1883,13 +1883,13 @@
                     const spendingPrivateKey = stealthMetaAddressData.spendingPrivateKey;
                     const spendingPublicKey = stealthMetaAddressData.spendingPublicKey;
                     const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-                    // console.log("    checkStealthAddress: " + (status && status.match));
+                    console.log("    checkStealthAddress: " + (status && status.match));
                     // for (const [k, v] of Object.entries(status)) {
                     //   console.log("    ", k, "=>", v);
                     // }
                     if (status && status.match) {
                       const computedStealthKey = computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
-                    //   console.log("computedStealthKey: " + computedStealthKey);
+                      console.log("computedStealthKey: " + computedStealthKey.stealthAddress + " vs stealthAddress: " + stealthAddress);
                     //   // for (const [k, v] of Object.entries(status)) {
                     //   //   console.log("    ", k, "=>", v);
                     //   // }
