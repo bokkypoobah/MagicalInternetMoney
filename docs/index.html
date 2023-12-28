@@ -1008,7 +1008,7 @@
             for (const [address, accountData] of Object.entries(addresses)) {
               // console.log(address + " => " + JSON.stringify(accountData));
               for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
-                results.push({ address, accountName: accountData.name, stealthMetaAddress, ...stealthMetaAddressData })
+                results.push({ address, accountName: accountData.name, ensName: accountData.ensName, stealthMetaAddress, ...stealthMetaAddressData })
               }
             }
             return results;
@@ -1170,7 +1170,7 @@
               Vue.set(this.addresses, this.chainId, {});
             }
             if (!(this.coinbase in addresses)) {
-              Vue.set(this.addresses[this.chainId], this.coinbase, { name: this.modalNewStealthMetaAddress.name, stealthMetaAddresses: {} });
+              Vue.set(this.addresses[this.chainId], this.coinbase, { name: this.modalNewStealthMetaAddress.name, ensName: null, stealthMetaAddresses: {} });
             } else {
               Vue.set(this.addresses[this.chainId][this.coinbase], 'name', this.modalNewStealthMetaAddress.name);
             }
@@ -1404,18 +1404,24 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            if (!devMode) {
+            const CHAINID_MAINNET = 1;
+            const CHAINID_SEPOLIA = 11155111;
+
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
             }
-            if (!devMode) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEvents(provider, latestBlockNumber);
             }
-            if (!devMode) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncBlockTimestamps(provider);
             }
-            // if (!devMode) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncTransactions(provider);
-            // }
+            }
+            if (network.chainId == CHAINID_MAINNET) {
+              await this.syncENSNames(provider);
+            }
             // if (!devMode) {
             //   await this.syncAccounts(provider, devMode);
             // }
@@ -1629,6 +1635,20 @@
             this.forceRefresh++; // UI refresh workaround
             // console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncTransactions END");
+          },
+
+          async syncENSNames(provider) {
+            console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+            for (const [chainId, chainData] of Object.entries(this.addresses)) {
+              for (const [account, accountData] of Object.entries(chainData)) {
+                const allnames = await ensReverseRecordsContract.getNames([account]);
+                Vue.set(this.addresses[chainId][account], 'ensName', allnames.length >= 0 && allnames[0] || null);
+                console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
+              }
+            }
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
           async syncAccounts(provider, devMode) {
