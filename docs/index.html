@@ -64,6 +64,34 @@
             </b-card-text>
           </b-card>
 
+          <!-- :MODALACCOUNT -->
+          <b-modal id="modal-account" hide-footer size="xl">
+            <template #modal-title>
+              {{ modalAccount.source }} {{ modalAccount.item.address }}
+            </template>
+            <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalAccount.item && modalAccount.item.address" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
+              </b-form-group>
+              <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
+                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="Stealth Meta-Addresses" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalAccount.item" label="Stealth Meta-Addresses:" label-for="account-stealthmetaaddresses" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea readonly size="sm" id="account-stealthmetaaddresses" :value="JSON.stringify(modalAccount.item.stealthMetaAddresses, null, 2)" class="w-100" rows="10"></b-form-textarea>
+              </b-form-group>
+            </b-form-group>
+          </b-modal>
+
           <!-- :MODALACTIVITY -->
           <b-modal id="modal-activity" hide-footer size="xl">
             <template #modal-title>
@@ -102,7 +130,7 @@
             <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="newsma-attachedaccount" :href="'https://etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" variant="link" id="newsma-attachedaccount" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ coinbase }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group label="Name:" label-for="newsma-attachedaccountname" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -110,7 +138,7 @@
               </b-form-group>
               <!-- <b-form-group label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://sepolia.etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
                 </font>
               </b-form-group> -->
             </b-form-group>
@@ -168,7 +196,7 @@
             <b-form-group v-if="modalApproval.item" label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://sepolia.etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.symbol" label="Symbol:" label-for="approval-symbol" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -190,12 +218,12 @@
               </b-form-group>
               <b-form-group v-if="modalApproval.item.owner" label="Owner:" label-for="approval-owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Attached)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://sepolia.etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Attached)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.spender" label="Spender:" label-for="approval-spender" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-spender" :href="'https://etherscan.io/address/' + modalApproval.item.spender" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.spender, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-spender" :href="'https://sepolia.etherscan.io/address/' + modalApproval.item.spender" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.spender, 42) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.type == 'erc20'" label="Tokens:" label-for="approval-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -426,12 +454,12 @@
                   </font>
                 </template>
                 <template #cell(sender)="data">
-                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.tx.from" target="_blank">
+                  <b-link @click="viewAccount(data.item.tx.from, 'sender')">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.tx.from)" class="px-0">{{ nameOrAddress(data.item.tx.from, 28) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(receiver)="data">
-                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.stealthAddress" target="_blank">
+                  <b-link @click="viewAccount(data.item.stealthAddress, 'receiver')">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.stealthAddress)" class="px-0">{{ nameOrAddress(data.item.stealthAddress, 28) }}</b-badge>
                   </b-link>
                 </template>
@@ -480,7 +508,7 @@
                     {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
                   </font>
                 </template>
-                <template #cell(timestamp)="data">
+                <!-- <template #cell(timestamp)="data">
                   <font size="-1">
                     <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       <span v-if="data.item.timestamp">
@@ -491,6 +519,11 @@
                       </span>
                     </b-link>
                   </font>
+                </template> -->
+                <template #cell(address)="data">
+                  <b-link @click="viewAccount(data.item.address, 'address')">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ nameOrAddress(data.item.address, 28) }}</b-badge>
+                  </b-link>
                 </template>
                 <template #cell(contract)="data">
                   <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
@@ -597,7 +630,7 @@
               </font>
             </template>
             <template #cell(registrant)="data">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.registrant" target="_blank">
+              <b-link @click="viewAccount(data.item.registrant, 'registrant')">
                 <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.registrant)" class="px-0">{{ nameOrAddress(data.item.registrant, 28) }}</b-badge>
               </b-link>
             </template>
@@ -636,16 +669,16 @@
           <div class="d-flex flex-wrap m-0 p-0">
             <div class="ml-0 mt-1 pl-1">
               <font v-if="connected" size="-2">
-                <!-- <b-link v-if="coinbase" :href="'https://etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
+                <!-- <b-link v-if="coinbase" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
                   {{ coinbase.substring(0, 10) }}
                 </b-link> -->
-                <b-link v-if="chainId" :href="'https://etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
+                <b-link v-if="chainId" :href="'https://sepolia.etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
                   {{ chainId == '1' ? 'Mainnet' : (chainId == '11155111' ? 'Sepolia' : 'Unsupported') }}
                 </b-link>
-                <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
+                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
                   {{ '#' + commify0(blockNumber) }}
                 </b-link>
-                <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
+                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
                   {{ formatTimeDiff(timestamp) }}
                 </b-link>
               </font>
@@ -750,6 +783,11 @@
           },
           blockTimestamps: {},
           txs: {},
+          modalAccount: {
+            source: null,
+            item: null,
+            name: null,
+          },
           modalActivity: {
             item: null,
           },
@@ -1165,6 +1203,21 @@
             Vue.set(this.modalNewStealthMetaAddress.keys, 'inRegistry', inRegistry);
             console.log("this.modalNewStealthMetaAddress.keys: " + JSON.stringify(this.modalNewStealthMetaAddress.keys, null, 2));
           },
+          updateModalAccountName() {
+            console.log(moment().format("HH:mm:ss") + " updateModalAccountName from: " + (this.modalAccount.item && this.modalAccount.item.name || "(null)") + ", to: " + this.modalAccount.name);
+            if (!(this.chainId in this.addresses)) {
+              Vue.set(this.addresses, this.chainId, {});
+            }
+            console.log("addresses: " + JSON.stringify(Object.keys(this.addresses[this.chainId])));
+            if (!(this.modalAccount.item.address in this.addresses[this.chainId])) {
+              Vue.set(this.addresses[this.chainId], this.modalAccount.item.address, { name: this.modalAccount.name, ensName: null, source: this.modalAccount.source, stealthMetaAddresses: {} });
+            } else {
+              Vue.set(this.addresses[this.chainId][this.modalAccount.item.address], 'name', this.modalAccount.name);
+            }
+            Vue.set(this.modalAccount.item, 'name', this.modalAccount.name);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " updateModalAccountName - addresses: " + JSON.stringify(this.addresses, null, 2));
+          },
           addStealthMetaAddressToAddressBook() {
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBook");
             const addresses = this.addresses[this.chainId] || {};
@@ -1322,6 +1375,14 @@
               console.log("transferEthToStealthMetaAddress StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
             }
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress END");
+          },
+
+          viewAccount(address, source) {
+            console.log(moment().format("HH:mm:ss") + " viewAccount: " + address + ", source: " + source);
+            this.modalAccount.source = source;
+            this.modalAccount.item = { address, ...this.addresses[this.chainId][address] };
+            this.modalAccount.name = this.addresses[this.chainId] && this.addresses[this.chainId][address] && this.addresses[this.chainId][address].name || null;
+            this.$bvModal.show('modal-account');
           },
 
           activityRowSelected(item) {
@@ -1929,7 +1990,6 @@
             let result = null;
             const addresses = this.addresses[this.chainId] || {};
             if (address in addresses) {
-              console.log("address: " + JSON.stringify(addresses[address]));
               result = addresses[address].ensName || addresses[address].name || address;
             } else {
               result = address;
@@ -1943,7 +2003,7 @@
             const addresses = this.addresses[this.chainId] || {};
             if (address in addresses) {
               result = "address=" + address;
-              for (let key of ['type', 'customType', 'symbol', 'name', 'customName', 'decimals', 'customDecimals', 'source']) {
+              for (let key of ['type', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source']) {
                 if (key in addresses[address] && addresses[address][key]) {
                   result = result + "; " + key + "=" + addresses[address][key];
                 }
