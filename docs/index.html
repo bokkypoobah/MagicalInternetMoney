@@ -45,7 +45,7 @@
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Address Book'">Address Book</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'My Addresses'">My Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
@@ -72,6 +72,20 @@
             <font size="-1">
               <pre>
 {{ modalActivity }}
+              </pre>
+            </font>
+          </b-modal>
+
+          <!-- :MODALADDRESS -->
+          <b-modal id="modal-address" hide-footer size="xl">
+            <template #modal-title>
+              <font size="-1">
+                Address ({{ coinbase }})
+              </font>
+            </template>
+            <font size="-1">
+              <pre>
+{{ modalAddress }}
               </pre>
             </font>
           </b-modal>
@@ -458,7 +472,7 @@
 
               <!-- :ADDRESSES -->
               <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1"> -->
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
@@ -749,6 +763,9 @@
             name: null,
             stealthMetaAddressName: null,
             keys: {},
+          },
+          modalAddress: {
+            item: null,
           },
           modalRegistry: {
             item: null,
@@ -1301,6 +1318,15 @@
               this.modalActivity.item = item[0];
               this.$bvModal.show('modal-activity');
               this.$refs.activityTable.clearSelected();
+            }
+          },
+
+          addressesRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " addressesRowSelected: " + JSON.stringify(item));
+            if (item && item.length > 0) {
+              this.modalAddress.item = item[0];
+              this.$bvModal.show('modal-address');
+              this.$refs.addressesTable.clearSelected();
             }
           },
 
