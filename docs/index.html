@@ -1489,7 +1489,7 @@
             //   await this.syncAccounts(provider, devMode);
             // }
             // if (!devMode) {
-            //   await this.processData(provider);
+              await this.processData(provider);
             // }
             this.sync.section = null;
             this.sync.halt = false;
@@ -1832,9 +1832,29 @@
             }
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
           },
-
           async processData(provider) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
+            console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(this.events));
+            console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses));
+            const events = this.events[this.chainId] || {};
+            const addresses = this.addresses[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              for (const logIndex of Object.keys(events[blockNumber]).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                console.log(blockNumber + "." + logIndex + " " + eventData.stealthAddress + " " + eventData.ephemeralPubKey);
+                for (const [address, accountData] of Object.entries(addresses)) {
+                  for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
+                    console.log("  Checking " + address.substring(0, 20) + " " + stealthMetaAddress.substring(0, 30));
+                  }
+                }
+              }
+            }
+
+            console.log(moment().format("HH:mm:ss") + " processData END");
+          },
+
+          async processDataOld(provider) {
+            console.log(moment().format("HH:mm:ss") + " processDataOld BEGIN");
             const accounts = this.accounts;
             const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
@@ -1883,7 +1903,7 @@
                   }
                   Vue.set(this.accounts[this.chainId], contract, account);
                 } else {
-                  console.log(moment().format("HH:mm:ss") + " processData - account: " + contract + " not found");
+                  console.log(moment().format("HH:mm:ss") + " processDataOld - account: " + contract + " not found");
                 }
               }
             }
@@ -1922,7 +1942,7 @@
               Vue.set(this, 'accounts', accounts);
             }
             this.forceRefresh++; // UI refresh workaround
-            console.log(moment().format("HH:mm:ss") + " processData END");
+            console.log(moment().format("HH:mm:ss") + " processDataOld END");
           },
 
           customTypeUpdated(address, type) {
