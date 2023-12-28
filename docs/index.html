@@ -1303,7 +1303,6 @@
           },
 
           async transferEthToStealthMetaAddress() {
-            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
             function generateStealthAddress(stealthMetaAddress) {
                 const result = {};
                 result.stealthMetaAddress = stealthMetaAddress;
@@ -1321,6 +1320,7 @@
                 result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
                 return result;
             }
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
             const result = generateStealthAddress(this.settings.transfer.recipientStealthMetaAddress);
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
@@ -1833,6 +1833,9 @@
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
           },
           async processData(provider) {
+            function checkStealthAddress(stealthAddress, ephemeralPubKey, viewingPrivateKey, spendingPublicKey) {
+              console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPubKey: " + ephemeralPubKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+            }
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(this.events));
             console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses));
@@ -1845,6 +1848,14 @@
                 for (const [address, accountData] of Object.entries(addresses)) {
                   for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
                     console.log("  Checking " + address.substring(0, 20) + " " + stealthMetaAddress.substring(0, 30));
+                    console.log(JSON.stringify(stealthMetaAddressData));
+                    const stealthAddress = eventData.stealthAddress;
+                    const ephemeralPubKey = eventData.ephemeralPubKey;
+                    const viewingPrivateKey = stealthMetaAddressData.viewingPrivateKey;
+                    const spendingPublicKey = stealthMetaAddressData.spendingPublicKey;
+                    const status = checkStealthAddress(stealthAddress, ephemeralPubKey, viewingPrivateKey, spendingPublicKey);
+
+
                   }
                 }
               }
