@@ -455,7 +455,7 @@
                   </font>
                 </template>
                 <template #cell(sender)="data">
-                  <b-link @click="viewAccount(data.item.tx.from, 'sender')">
+                  <b-link v-if="data.item.tx && data.item.tx.from" @click="viewAccount(data.item.tx.from, 'sender')">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.tx.from)" class="px-0">{{ nameOrAddress(data.item.tx.from, 28) }}</b-badge>
                   </b-link>
                 </template>
@@ -792,6 +792,9 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
+            selectedAnnouncers: { "11155111": [ ERC5564ANNOUNCERADDRESS_SEPOLIA ] },
+            selectedRegistries: { "11155111": [ ERC5564REGISTRYADDRESS_SEPOLIA ] },
+            selectedHelpers: { "11155111": [ STEALTHCHADADDRESS_SEPOLIA ] },
             stealthMetaAddress: {
               message: "I want to login into my stealth wallet on Ethereum mainnet.",
               spendingPublicKey: null,
@@ -820,7 +823,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 18,
+            version: 19,
           },
           sync: {
             section: null,
@@ -1196,6 +1199,7 @@
 
             const announcersMap = {};
             const registriesMap = {};
+            const helpersMap = {};
             function processLogs(fromBlock, toBlock, logs) {
               // total = parseInt(total) + logs.length;
               console.log(moment().format("HH:mm:ss") + " searchForContracts.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length); // + " " + total);
@@ -1204,9 +1208,13 @@
                   // const logData = contract.interface.parseLog(event);
                   // console.log(event);
                   if (event.topics[0] == "0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7") {
-                    // console.log("Announcer: " + event.address)
+                    const caller = ethers.utils.getAddress("0x" + event.topics[3].substring(26, 66));
+                    console.log("Announcer: " + event.address + ", caller: " + caller);
                     if (!(event.address in announcersMap)) {
                       announcersMap[event.address] = true;
+                    }
+                    if (!(caller in helpersMap)) {
+                      helpersMap[caller] = true;
                     }
                   } else {
                     // console.log("Registry: " + event.address)
@@ -1260,6 +1268,8 @@
             await getLogs(startBlock, latestBlockNumber, processLogs);
             console.log("announcers: " + JSON.stringify(Object.keys(announcersMap)));
             console.log("registries: " + JSON.stringify(Object.keys(registriesMap)));
+            console.log("helpersMap: " + JSON.stringify(Object.keys(helpersMap)));
+            console.log("settings: " + JSON.stringify(this.settings));
           },
 
           newStealthMetaAddress() {
