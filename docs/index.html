@@ -59,6 +59,8 @@
           <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase || chainId != 11155111">
             <b-card-text>
               Please install the MetaMask extension and connect to the Ethereum Sepolia Testnet or an EVM compatible chain. Then refresh this page, and click the [Connect] button on the top right.
+              <br />
+              You can switch to the Ethereum Mainnet and click Sync your addresses with ENS names
             </b-card-text>
           </b-card>
 
@@ -1927,7 +1929,8 @@
             let result = null;
             const addresses = this.addresses[this.chainId] || {};
             if (address in addresses) {
-              result = addresses[address].customName || addresses[address].name || address;
+              console.log("address: " + JSON.stringify(addresses[address]));
+              result = addresses[address].ensName || addresses[address].name || address;
             } else {
               result = address;
             }
