@@ -1858,9 +1858,9 @@
               const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
               result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
               // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
-              result.stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber);
+              result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
               // console.log("      stealthPublicKey: ", result.stealthPublicKey.toHex(true));
-              result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
+              result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
               // console.log("      stealthAddress: ", result.stealthAddress);
               return result;
             }
@@ -1889,10 +1889,10 @@
                     // }
                     if (status && status.match) {
                       const computedStealthKey = computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
-                      console.log("computedStealthKey: " + computedStealthKey.stealthAddress + " vs stealthAddress: " + stealthAddress);
-                    //   // for (const [k, v] of Object.entries(status)) {
-                    //   //   console.log("    ", k, "=>", v);
-                    //   // }
+                      console.log("      computedStealthKey: " + computedStealthKey.stealthAddress + " vs stealthAddress: " + stealthAddress);
+                      // for (const [k, v] of Object.entries(computedStealthKey)) {
+                      //   console.log("    ", k, "=>", v);
+                      // }
                     }
                   }
                 }
