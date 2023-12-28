@@ -47,6 +47,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'My Addresses'">My Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -606,63 +607,137 @@
                 </b-card-body>
               </b-card>
 
+              <!-- :REGISTRY -->
+              <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
+                    </b-link>
+                  </font>
+                </template>
+                <template #cell(registrant)="data">
+                  <b-link @click="viewAccount(data.item.registrant, 'registrant')">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.registrant)" class="px-0">{{ nameOrAddress(data.item.registrant, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(schemeId)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.schemeId }}</b-badge>
+                </template>
+                <template #cell(stealthMetaAddress)="data">
+                  <font size="-1">
+                    <!-- <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0"> -->
+                      {{ data.item.stealthMetaAddress }}
+                    <!-- </b-badge> -->
+                  </font>
+                  <!-- <font size="-2">
+                    <pre>
+    {{ data.item }}
+                    </pre>
+                  </font> -->
+                </template>
+                <!-- <template #cell(contract)="data">
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
+                </template> -->
+                <!-- <template #cell(details)="data">
+                  <font size="-1">
+                    <pre>
+      {{ data.item }}
+                    </pre>
+                  </font>
+                </template> -->
+              </b-table>
+
+              <!-- :CONFIG -->
+              <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h5>Contracts</h5>
+                  <b-form-group label-cols-lg="2" label="Search" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <!-- <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your stealth meta-address with your web3 attached account. Save this information securely!">
+                      <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="settings.stealthMetaAddress.message" @input="saveSettings" class="w-50"></b-form-input>
+                    </b-form-group> -->
+                    <b-form-group label="" label-for="config-search" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="config-search" @click="searchForContracts()" variant="warning">Search</b-button>
+                    </b-form-group>
+                  </b-form-group>
+                  <!-- <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your stealth meta-address with your web3 attached account. Save this information securely!">
+                      <b-form-input type="text" size="sm" id="generate-keys-message" v-model.trim="settings.stealthMetaAddress.message" @input="saveSettings" class="w-50"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="" label-for="generate-keys-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="generate-keys-submit" @click="generateKeys()" variant="warning">Generate</b-button>
+                    </b-form-group>
+                  </b-form-group> -->
+                  <!-- <b-form-group label-cols-lg="2" label="Private Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="" label-for="display-private-keys" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-checkbox size="sm" v-model.trim="stealthMetaAddress.display">Display Private Keys</b-form-checkbox>
+                    </b-form-group>
+                    <b-form-group label="Spending Private Key:" label-for="spending-privatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-input type="text" readonly id="spending-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.spendingPrivateKey : (stealthMetaAddress.spendingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
+                        <b-input-group-append>
+                          <b-button :disabled="!stealthMetaAddress.spendingPrivateKey" @click="copyToClipboard(stealthMetaAddress.spendingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Viewing Private Key:" label-for="viewing-privatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-input type="text" readonly id="viewing-privatekey" :value="stealthMetaAddress.display ? stealthMetaAddress.viewingPrivateKey : (stealthMetaAddress.viewingPrivateKey ? '*'.repeat(66) : '')" class="w-75"></b-form-input>
+                        <b-input-group-append>
+                          <b-button :disabled="!stealthMetaAddress.viewingPrivateKey" @click="copyToClipboard(stealthMetaAddress.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-form-group> -->
+                  <!-- <b-form-group label-cols-lg="2" label="Public Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="Spending Public Key:" label-for="spending-publickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-input type="text" readonly id="spending-publickey" :value="settings.stealthMetaAddress.spendingPublicKey" class="w-75"></b-form-input>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.stealthMetaAddress.spendingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Viewing Public Key:" label-for="viewing-publickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-input type="text" readonly id="viewing-publickey" :value="settings.stealthMetaAddress.viewingPublicKey" class="w-75"></b-form-input>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.stealthMetaAddress.viewingPublicKey" @click="copyToClipboard(settings.stealthMetaAddress.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                    <b-form-group label="Stealth Meta Address:" label-for="stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-input-group size="sm" class="w-75">
+                        <b-form-textarea type="text" readonly id="stealth-meta-address" :value="settings.stealthMetaAddress.stealthMetaAddress"></b-form-textarea>
+                        <b-input-group-append>
+                          <b-button :disabled="!settings.stealthMetaAddress.stealthMetaAddress" @click="copyToClipboard(settings.stealthMetaAddress.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                        </b-input-group-append>
+                      </b-input-group>
+                    </b-form-group>
+                  </b-form-group> -->
+                  <!-- <b-form-group label-cols-lg="2" label="Register Stealth Meta Address" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                    <b-form-group label="" label-for="register-keys-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-button size="sm" id="register-keys-submit" @click="registerKey()" variant="warning">Register</b-button>
+                    </b-form-group>
+                  </b-form-group> -->
+                </b-card-body>
+              </b-card>
+
             </b-card-text>
           </b-card>
-
-          <!-- :REGISTRY -->
-          <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
-          <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
-            <template #cell(number)="data">
-              <font size="-1">
-                {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
-              </font>
-            </template>
-            <template #cell(timestamp)="data">
-              <font size="-1">
-                <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-                  <span v-if="data.item.timestamp">
-                    {{ formatTimestamp(data.item.timestamp) }}
-                  </span>
-                  <span v-else>
-                    {{ '#' + commify0(data.item.blockNumber) }}
-                  </span>
-                </b-link>
-              </font>
-            </template>
-            <template #cell(registrant)="data">
-              <b-link @click="viewAccount(data.item.registrant, 'registrant')">
-                <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.registrant)" class="px-0">{{ nameOrAddress(data.item.registrant, 28) }}</b-badge>
-              </b-link>
-            </template>
-            <template #cell(schemeId)="data">
-              <b-badge pill variant="transparent" class="px-0">{{ data.item.schemeId }}</b-badge>
-            </template>
-            <template #cell(stealthMetaAddress)="data">
-              <font size="-1">
-                <!-- <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0"> -->
-                  {{ data.item.stealthMetaAddress }}
-                <!-- </b-badge> -->
-              </font>
-              <!-- <font size="-2">
-                <pre>
-{{ data.item }}
-                </pre>
-              </font> -->
-            </template>
-            <!-- <template #cell(contract)="data">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
-                <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-              </b-link>
-            </template> -->
-            <!-- <template #cell(details)="data">
-              <font size="-1">
-                <pre>
-  {{ data.item }}
-                </pre>
-              </font>
-            </template> -->
-          </b-table>
-
         </b-card>
 
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
@@ -1110,6 +1185,83 @@
 
         // --- METHODS ---
         methods: {
+
+          async searchForContracts() {
+            // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
+            // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
+            // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
+            // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+            console.log(moment().format("HH:mm:ss") + " searchForContracts");
+
+            const announcersMap = {};
+            const registriesMap = {};
+            function processLogs(fromBlock, toBlock, logs) {
+              // total = parseInt(total) + logs.length;
+              console.log(moment().format("HH:mm:ss") + " searchForContracts.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length); // + " " + total);
+              for (const event of logs) {
+                if (!event.removed) {
+                  // const logData = contract.interface.parseLog(event);
+                  // console.log(event);
+                  if (event.topics[0] == "0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7") {
+                    // console.log("Announcer: " + event.address)
+                    if (!(event.address in announcersMap)) {
+                      announcersMap[event.address] = true;
+                    }
+                  } else {
+                    // console.log("Registry: " + event.address)
+                    if (!(event.address in registriesMap)) {
+                      registriesMap[event.address] = true;
+                    }
+                  }
+                }
+              }
+            }
+
+
+            // const t = this;
+            async function getLogs(fromBlock, toBlock, processLogs) {
+            //   if (!t.sync.halt) {
+                try {
+                  const filter = {
+                    address: null,
+                    fromBlock,
+                    toBlock,
+                    topics: [
+                      ['0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7', '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233'],
+                      null,
+                      null
+                    ]
+                  };
+                  const eventLogs = await provider.getLogs(filter);
+                  processLogs(fromBlock, toBlock, eventLogs);
+                  // console.log(fromBlock + " to " + toBlock + " " + JSON.stringify(eventLogs));
+            //       t.sync.section = section;
+            //       t.sync.completed = toBlock;
+                } catch (e) {
+                  const mid = parseInt((fromBlock + toBlock) / 2);
+                  await getLogs(fromBlock, mid, processLogs);
+                  await getLogs(parseInt(mid) + 1, toBlock, processLogs);
+                }
+            //   }
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            this.coinbase = await signer.getAddress();
+            localStorage.stealthChadCoinbase = this.coinbase;
+            const network = await provider.getNetwork();
+            localStorage.stealthChadChainId = network.chainId;
+            const block = await provider.getBlock();
+            const latestBlockNumber = block && block.number || null;
+            console.log(moment().format("HH:mm:ss") + " searchForContracts - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+
+            const startBlock = 0;
+            await getLogs(startBlock, latestBlockNumber, processLogs);
+            console.log("announcers: " + JSON.stringify(Object.keys(announcersMap)));
+            console.log("registries: " + JSON.stringify(Object.keys(registriesMap)));
+          },
+
           newStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " newStealthMetaAddress");
             this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
@@ -1545,6 +1697,7 @@
           },
 
           async syncRegistryEvents(provider, latestBlockNumber) {
+            // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
             // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
             // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
