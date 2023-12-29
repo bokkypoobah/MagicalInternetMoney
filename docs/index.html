@@ -1942,12 +1942,11 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncTransactions(provider);
             }
-            if (network.chainId == CHAINID_MAINNET) {
-              await this.syncENSNames(provider);
-            }
-            // if (!devMode) {
-            //   await this.syncAccounts(provider, devMode);
+            // TODO
+            // if (network.chainId == CHAINID_MAINNET) {
+            //   await this.syncENSNames(provider);
             // }
+
             if (!devMode) {
               await this.processData(provider);
             }
@@ -2507,124 +2506,6 @@
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
-          async syncAccounts(provider, devMode) {
-            console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
-            const accounts = devMode ? {} : this.accounts;
-            if (!(this.chainId in accounts)) {
-              accounts[this.chainId] = {};
-            }
-            const newAccountsMap = {};
-            const events = this.events[this.chainId] || {};
-            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
-              const blockNumberData = events[blockNumber];
-              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
-                const eventData = events[blockNumber][logIndex];
-                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.owner in newAccountsMap)) {
-                  newAccountsMap[eventData.owner] = { source: "owner" };
-                }
-                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.contract in newAccountsMap)) {
-                  newAccountsMap[eventData.contract] = { source: "contract" };
-                }
-                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.spender in newAccountsMap)) {
-                  newAccountsMap[eventData.spender] = { source: "spender" };
-                }
-              }
-            }
-            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            this.sync.completed = 0;
-            this.sync.total = Object.keys(newAccountsMap).length;
-            this.sync.section = 'Accounts';
-            const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
-
-            for (const [account, accountData] of Object.entries(newAccountsMap)) {
-              if ((account in CUSTOMNAMES)) {
-                accountData.type = CUSTOMNAMES[account][0];
-                accountData.symbol = CUSTOMNAMES[account][1];
-                accountData.name = CUSTOMNAMES[account][2];
-                accountData.decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
-              } else {
-                let accountType = null;
-                let symbol = undefined;
-                let name = undefined;
-                let decimals = undefined;
-                let totalSupply = undefined;
-                const code = await provider.getCode(account);
-                if (code.length == 2) {
-                  accountType = "eoa";
-                } else {
-                  const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
-                  if (!accountType) {
-                    try {
-                      const result = await erc165Contract.supportsInterface(ERC721_INTERFACE);
-                      if (result) {
-                        accountType = "erc721";
-                      }
-                    } catch (e1) {
-                    }
-                  }
-                  if (!accountType) {
-                    try {
-                      const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                      if (result) {
-                        accountType = "erc1155";
-                      }
-                    } catch (e1) {
-                    }
-                  }
-                  const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
-                  try {
-                    symbol = await erc20Contract.symbol();
-                  } catch (e1) {
-                  }
-                  try {
-                    name = await erc20Contract.name();
-                  } catch (e1) {
-                  }
-                  try {
-                    decimals = await erc20Contract.decimals();
-                  } catch (e1) {
-                  }
-                  try {
-                    totalSupply = await erc20Contract.totalSupply();
-                  } catch (e1) {
-                  }
-                }
-                console.log(moment().format("HH:mm:ss") + " syncAccounts " + account + " => code.length: " + code.length + ", accountType: " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
-                if (!accountType && decimals && totalSupply) {
-                  accountType = "erc20";
-                  accountData.decimals = parseInt(decimals);
-                  accountData.totalSupply = totalSupply.toString();
-                }
-                accountData.type = accountType || "unknown";
-                accountData.symbol = symbol;
-                accountData.name = name;
-              }
-              accounts[this.chainId][account] = accountData;
-              this.sync.completed++;
-              if (this.sync.halt) {
-                break;
-              }
-            }
-            // ETH Mainnet ENS
-            if (this.chainId == 1) {
-              for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-                const type = accountData.customType || accountData.type;
-                console.log(account + " " + type + " " + accountData.customType);
-                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(type)) && !(account in CUSTOMNAMES) && !this.sync.halt) {
-                  const allnames = await ensReverseRecordsContract.getNames([account]);
-                  if (allnames.length >= 0 && allnames[0].length > 0) {
-                    accounts[this.chainId][account].name = allnames[0];
-                  }
-                }
-              }
-            }
-            // console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
-            if (!this.sync.halt) {
-              localStorage.stealthChadAccounts = JSON.stringify(accounts);
-              Vue.set(this, 'accounts', accounts);
-            }
-            console.log(moment().format("HH:mm:ss") + " syncAccounts END");
-          },
           async processData(provider) {
             function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
               const result = {};
