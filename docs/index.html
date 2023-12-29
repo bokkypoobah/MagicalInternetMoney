@@ -303,10 +303,12 @@
                   </b-input-group-append>
                 </b-input-group>
               </b-form-group>
-              <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Read messages from contract" class="mx-0 my-1 p-0">
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Read event logs involving this contract" class="mx-0 my-1 p-0">
                 <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1"></b-form-checkbox>
               </b-form-group>
-              <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Write messages to supported contract" class="mx-0 my-1 p-0">
+              <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Send transactions to contract, where supported" class="mx-0 my-1 p-0">
                 <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1"></b-form-checkbox>
               </b-form-group>
             </b-form-group>
