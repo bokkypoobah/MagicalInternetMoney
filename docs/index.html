@@ -1160,14 +1160,14 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080c",
+            name: "stealthchaddata080d",
             version: 1,
             schemaDefinition: {
               cache: '&objectName',
-              syncStates: '&contract',
-              announcements: '[blockNumber+logIndex],[blockNumber+contract],contract',
-              registryEntries: '[blockNumber+logIndex],[blockNumber+contract],contract',
-              txs: '[blockNumber+txIndex],txHash',
+              // syncStates: '&contract',
+              announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
+              registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
+              // txs: '[blockNumber+txIndex],txHash',
             },
             updated: null,
           },
@@ -1918,15 +1918,15 @@
             const CHAINID_MAINNET = 1;
             const CHAINID_SEPOLIA = 11155111;
 
-            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
-            // }
-            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
-            // }
             if (devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
+              await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
             }
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
+            }
+            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
+            // }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
             }
@@ -1959,6 +1959,7 @@
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             let total = 0;
+            let t = this;
             async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
               total = parseInt(total) + logs.length;
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
@@ -1970,6 +1971,7 @@
                   const caller = logData.args[2];
                   if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
                     records.push( {
+                      chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
                       logIndex: parseInt(log.logIndex),
                       txIndex: parseInt(log.transactionIndex),
@@ -2048,6 +2050,7 @@
             // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
             const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
             let total = 0;
+            let t = this;
             async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
               total = parseInt(total) + logs.length;
               console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
@@ -2058,6 +2061,7 @@
                   const contract = log.address;
                   if (selectedContracts.includes(contract)) {
                     records.push( {
+                      chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
                       logIndex: parseInt(log.logIndex),
                       txIndex: parseInt(log.transactionIndex),
@@ -2132,11 +2136,61 @@
             let done = false;
             do {
               let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " processDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              rows = parseInt(rows) + BATCHSIZE;
+              console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              rows = parseInt(rows) + data.length;
               done = data.length < BATCHSIZE;
             } while (!done);
-
+            // let total = rows;
+            // console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - total: " + total);
+            this.sync.completed = 0;
+            this.sync.total = rows;
+            this.sync.section = 'Transaction Data';
+            rows = 0;
+            do {
+              let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              const records = [];
+              for (const item of data) {
+                console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew: " + JSON.stringify(item));
+                const block = await provider.getBlock(item.blockNumber);
+                item.timestamp = block.timestamp;
+                const tx = await provider.getTransaction(item.txHash);
+                const txReceipt = await provider.getTransactionReceipt(item.txHash);
+                item.tx = {
+                  hash: tx.hash,
+                  type: tx.type,
+                  blockHash: tx.blockHash,
+                  blockNumber: tx.blockNumber,
+                  transactionIndex: tx.transactionIndex,
+                  from: tx.from,
+                  gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+                  gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+                  to: tx.to,
+                  value: ethers.BigNumber.from(tx.value).toString(),
+                  nonce: tx.nonce,
+                  data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+                  chainId: tx.chainId,
+                  contractAddress: txReceipt.contractAddress,
+                  transactionIndex: txReceipt.transactionIndex,
+                  gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+                  blockHash: txReceipt.blockHash,
+                  logs: txReceipt.logs,
+                  blockNumber: txReceipt.blockNumber,
+                  cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+                  effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+                  status: txReceipt.status,
+                  type: txReceipt.type,
+                };
+                records.push(item);
+              }
+              await db.announcements.bulkPut(records).then (function() {
+              }).catch(function(error) {
+                console.log("syncAdditionalDataNew.bulkPut error: " + error);
+              });
+              rows = parseInt(rows) + data.length;
+              this.sync.completed = rows;
+              done = data.length < BATCHSIZE;
+            } while (!done);
           },
 
           async syncAnnouncementEvents(provider, latestBlockNumber) {
