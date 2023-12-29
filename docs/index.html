@@ -19,6 +19,7 @@
     <script src="js/bootstrap-vue-icons.min.js"></script>
     <script src="js/ethers-5.7.umd.min.js" type="application/javascript"></script>
     <script src="js/moment.min.js"></script>
+    <script src="js/dexie.js"></script>
     <script src="js/noble-curves.js"></script>
     <script src="globals.js"></script>
     <script src="customNames.js"></script>
@@ -1158,6 +1159,17 @@
             { value: 0, text: 'Local Time' },
             { value: 1, text: 'UTC Time' },
           ],
+          db: {
+            name: "stealthchaddata080a",
+            version: 1,
+            schemaDefinition: {
+              cache: '&objectName',
+              syncStates: '&contract',
+              events: '[blockNumber+logIndex],[blockNumber+contract],contract',
+              txs: '[blockNumber+txIndex],txHash',
+            },
+            updated: null,
+          },
         },
 
         // --- COMPUTED ---
@@ -1276,7 +1288,7 @@
             return results;
           },
           pagedFilteredSortedRegistryActivity() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
             return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
@@ -1807,7 +1819,7 @@
           },
 
           activityRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " activityRowSelected: " + JSON.stringify(item));
+            console.log(moment().format("HH:mm:ss") + " activityRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalActivity.item = item[0];
               this.$bvModal.show('modal-activity');
@@ -1816,7 +1828,7 @@
           },
 
           addressesRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " addressesRowSelected: " + JSON.stringify(item));
+            console.log(moment().format("HH:mm:ss") + " addressesRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalAddress.item = item[0];
               this.$bvModal.show('modal-address');
@@ -1825,7 +1837,7 @@
           },
 
           registryRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item));
+            console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalRegistry.item = item[0];
               this.$bvModal.show('modal-registry');
@@ -1834,7 +1846,7 @@
           },
 
           contractRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " contractRowSelected: " + JSON.stringify(item));
+            console.log(moment().format("HH:mm:ss") + " contractRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalContract.item = item[0];
               this.modalContract.name = item[0] && item[0].name || null;
@@ -1890,6 +1902,8 @@
           },
 
           async syncIt(devMode) {
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
@@ -1903,9 +1917,12 @@
             const CHAINID_MAINNET = 1;
             const CHAINID_SEPOLIA = 11155111;
 
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
+            }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
-            // }
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEvents(provider, latestBlockNumber);
             }
@@ -1927,13 +1944,14 @@
             this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
             this.sync.halt = false;
+            db.close();
           },
 
-          async syncAnnouncementEvents(provider, latestBlockNumber) {
+          async syncAnnouncementEventsNew(db, provider, latestBlockNumber) {
             // TODO: Lower priority - filter by selected callers
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
-            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew BEGIN");
             const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             this.sync.completed = 0;
             this.sync.total = 0;
@@ -1993,6 +2011,72 @@
               localStorage.stealthChadEvents = JSON.stringify(events);
               Vue.set(this, 'events', events);
             }
+            // console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew END");
+          },
+
+          async syncAnnouncementEvents(provider, latestBlockNumber) {
+            // TODO: Lower priority - filter by selected callers
+            // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
+            // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents BEGIN");
+            const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
+            this.sync.completed = 0;
+            this.sync.total = 0;
+            this.sync.section = 'Stealth Address Announcements';
+            const selectedContracts = [];
+            const selectedCallers = [];
+            for (const [contract, contractData] of Object.entries(this.contracts[this.chainId])) {
+              if (contractData.type == "announcer" && contractData.read) {
+                selectedContracts.push(contract);
+              }
+              if (contractData.type == "caller" && contractData.read) {
+                selectedCallers.push(contract);
+              }
+            }
+            console.log("selectedContracts: " + JSON.stringify(selectedContracts));
+            console.log("selectedCallers: " + JSON.stringify(selectedCallers));
+            if (selectedContracts.length > 0) {
+              const announcementLogs = await provider.getLogs({
+                address: null,
+                fromBlock: 0,
+                toBlock: latestBlockNumber,
+                topics: [
+                  '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+                  null,
+                  null
+                ],
+              });
+              this.sync.completed = announcementLogs.length;
+              const events = this.events;
+              if (!(this.chainId in events)) {
+                events[this.chainId] = {};
+              }
+              for (const log of announcementLogs) {
+                if (selectedContracts.includes(log.address)) {
+                  const logData = erc5564AnnouncerContract.interface.parseLog(log);
+                  if (!(log.blockNumber in events[this.chainId])) {
+                    events[this.chainId][log.blockNumber] = {};
+                  }
+                  if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                    events[this.chainId][log.blockNumber][log.logIndex] = {
+                      txIndex: log.transactionIndex,
+                      txHash: log.transactionHash,
+                      contract: log.address,
+                      name: logData.name,
+                      schemeId: parseInt(logData.args[0]),
+                      stealthAddress: logData.args[1],
+                      caller: logData.args[2],
+                      ephemeralPublicKey: logData.args[3],
+                      metadata: logData.args[4],
+                      latestBlockNumber,
+                    };
+                  }
+                }
+              }
+              localStorage.stealthChadEvents = JSON.stringify(events);
+              Vue.set(this, 'events', events);
+            }
             // console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents END");
           },
@@ -2007,11 +2091,9 @@
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Registry';
             const selectedContracts = [];
-            for (const [chainId, chainData] of Object.entries(this.contracts)) {
-              for (const [contract, contractData] of Object.entries(chainData)) {
-                if (contractData.type == "registry" && contractData.read) {
-                  selectedContracts.push(contract);
-                }
+            for (const [contract, contractData] of Object.entries(this.contracts[this.chainId])) {
+              if (contractData.type == "registry" && contractData.read) {
+                selectedContracts.push(contract);
               }
             }
             if (selectedContracts.length > 0) {
@@ -2368,17 +2450,29 @@
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
-          customTypeUpdated(address, type) {
-            Vue.set(this.accounts[this.chainId][address], 'customType', type);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-          },
-          customNameUpdated(address, name) {
-            Vue.set(this.accounts[this.chainId][address], 'customName', name);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-          },
-          customDecimalsUpdated(address, decimals) {
-            Vue.set(this.accounts[this.chainId][address], 'customDecimals', decimals);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+          async loadCurrentData() {
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN");
+            const db = new Dexie(this.db.name);
+            db.version(this.db.version).stores(this.db.schemaDefinition);
+            // for (const name of ['indexToAddress', 'indexToName', 'indexToTxHash', 'blockTimestamps', 'tokens', 'offers', 'v2Bids', 'txs', 'exchangeRates']) {
+            //   console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + name);
+            //   const dataItems = await db.cache.where("objectName").equals(this.chainId + "_" + name).toArray();
+            //   if (dataItems.length == 1) {
+            //     Vue.set(this, name, dataItems[0].object);
+            //   }
+            // }
+            // const addressToIndex = {};
+            // for (const [index, address] of this.indexToAddress.entries()) {
+            //   addressToIndex[address] = index;
+            // }
+            // Vue.set(this, 'addressToIndex', addressToIndex);
+            // const txHashToIndex = {};
+            // for (const [index, address] of this.indexToTxHash.entries()) {
+            //   txHashToIndex[address] = index;
+            // }
+            // Vue.set(this, 'txHashToIndex', txHashToIndex);
+            db.close();
+            console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
 
           saveSettings() {
@@ -2554,6 +2648,12 @@
               //   await this.newStealthMetaAddress();
               // })();
             }
+            (async() => {
+              const db = new Dexie(this.db.name);
+              db.version(this.db.version).stores(this.db.schemaDefinition);
+              await this.loadCurrentData(db);
+              db.close();
+            })();
           }
         },
       })
