@@ -890,6 +890,7 @@
         // --- DATA ---
         data: {
           CONFIRMATIONS: 100,
+          DBPROCESSINGBATCHSIZE: 3,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -982,6 +983,7 @@
 
           announcements: [],
           registryEntries: [],
+          accounts: {},
 
           events: {},
           registryEvents: {},
@@ -1895,6 +1897,9 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.collateAccounts(db, provider, latestBlockNumber);
+            // }
             // TODO
             // if (network.chainId == CHAINID_MAINNET) {
             //   await this.syncENSNames(provider);
@@ -2085,15 +2090,14 @@
           },
 
           async syncAnnouncementsData(db, provider, latestBlockNumber) {
-            const BATCHSIZE = 3;
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData BEGIN");
             let rows = 0;
             let done = false;
             do {
-              let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
-              done = data.length < BATCHSIZE;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
             } while (!done);
             // let total = rows;
             // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - total: " + total);
@@ -2102,7 +2106,7 @@
             this.sync.section = 'Announcements Tx Data';
             rows = 0;
             do {
-              let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
@@ -2144,20 +2148,19 @@
               }
               rows = parseInt(rows) + data.length;
               this.sync.completed = rows;
-              done = data.length < BATCHSIZE;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
             } while (!done);
           },
 
           async syncRegistryEventsData(db, provider, latestBlockNumber) {
-            const BATCHSIZE = 3;
             console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData BEGIN");
             let rows = 0;
             let done = false;
             do {
-              let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
+              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
-              done = data.length < BATCHSIZE;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
             } while (!done);
             // let total = rows;
             // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - total: " + total);
@@ -2166,7 +2169,7 @@
             this.sync.section = 'Registry Entries Tx Data';
             rows = 0;
             do {
-              let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
+              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
@@ -2208,8 +2211,13 @@
               }
               rows = parseInt(rows) + data.length;
               this.sync.completed = rows;
-              done = data.length < BATCHSIZE;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
             } while (!done);
+          },
+
+          async collateAccounts(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
+            console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
           async syncENSNames(provider) {
