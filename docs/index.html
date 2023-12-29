@@ -741,7 +741,7 @@
                     </template>
                     <template #cell(contract)="data">
                       <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
-                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract + '#code'" target="_blank">
                         <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
                       </b-link>
                     </template>
