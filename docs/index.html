@@ -279,9 +279,7 @@
           <!-- :MODALCONTRACT -->
           <b-modal id="modal-contract" hide-footer size="xl">
             <template #modal-title>
-              <font size="-1">
-                Contract ({{ coinbase }})
-              </font>
+              {{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }} {{ modalContract.item.contract }}
             </template>
             <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -307,18 +305,10 @@
               <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Read messages from contract" class="mx-0 my-1 p-0">
                 <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1"></b-form-checkbox>
               </b-form-group>
-              <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Write messages to contract (only supported)" class="mx-0 my-1 p-0">
+              <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Write messages to supported contract" class="mx-0 my-1 p-0">
                 <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1"></b-form-checkbox>
               </b-form-group>
-
             </b-form-group>
-            <br />
-
-            <font size="-1">
-              <pre>
-{{ modalContract }}
-              </pre>
-            </font>
           </b-modal>
 
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
@@ -1513,6 +1503,7 @@
               contracts[this.chainId][contract] = { type, name: customData.name || null, read: customData.read || false, write: customData.write || false, blockNumber, timestamp };
             }
             Vue.set(this, 'contracts', contracts);
+            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
           },
 
           saveModalContractName() {
