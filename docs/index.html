@@ -276,6 +276,20 @@
             </font>
           </b-modal>
 
+          <!-- :MODALCONTRACT -->
+          <b-modal id="modal-contract" hide-footer size="xl">
+            <template #modal-title>
+              <font size="-1">
+                Contract ({{ coinbase }})
+              </font>
+            </template>
+            <font size="-1">
+              <pre>
+{{ modalContract }}
+              </pre>
+            </font>
+          </b-modal>
+
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
@@ -693,13 +707,29 @@
                 </div>
 
                   <!-- <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
-                  <b-table ref="contractsTable" small fixed striped responsive hover :fields="contractsFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+                  <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='contractRowSelected' :fields="contractsFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                     <template #cell(number)="data">
                       <font size="-1">
                         {{ parseInt(data.index) + ((settings.contractsTable.currentPage - 1) * settings.contractsTable.pageSize) + 1 }}
                       </font>
                     </template>
-                    <template #cell(timestamp)="data">
+                    <template #cell(chainId)="data">
+                      <font size="-1">
+                        {{ chains.filter(e => e.value == data.item.chainId)[0] && chains.filter(e => e.value == data.item.chainId)[0].text || ("Id: " + data.item.chainId) }}
+                      </font>
+                    </template>
+                    <template #cell(contract)="data">
+                      <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
+                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                        <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                      </b-link>
+                    </template>
+                    <template #cell(name)="data">
+                      <font size="-1">
+                        {{ data.item.name }}
+                      </font>
+                    </template>
+                    <template #cell(firstEvent)="data">
                       <font size="-1">
                         <b-link :href="'https://sepolia.etherscan.io/block/' + data.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber)" target="_blank">
                           <span v-if="data.item.timestamp">
@@ -711,12 +741,22 @@
                         </b-link>
                       </font>
                     </template>
-                    <template #cell(contract)="data">
-                      <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
-                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
-                        <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-                      </b-link>
+                    <template #cell(type)="data">
+                      <font size="-1">
+                        {{ contractTypeOptions.filter(e => e.value == data.item.type)[0] && contractTypeOptions.filter(e => e.value == data.item.type)[0].text || ("Unknown: " + data.item.type) }}
+                      </font>
                     </template>
+                    <template #cell(read)="data">
+                      <font size="-1">
+                        <b-form-checkbox size="sm" value="1" :checked="data.item.read ? 1 : 0" @input="toggleContractRead(data.item)" class="mt-1"></b-form-checkbox>
+                      </font>
+                    </template>
+                    <template #cell(write)="data">
+                      <font size="-1">
+                        <b-form-checkbox size="sm" value="1" :checked="data.item.write ? 1 : 0" @input="toggleContractWrite(data.item)" class="mt-1"></b-form-checkbox>
+                      </font>
+                    </template>
+                    <!-- <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddress.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox> -->
                   </b-table>
 
                   <!-- <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
@@ -794,7 +834,7 @@
                   {{ coinbase.substring(0, 10) }}
                 </b-link> -->
                 <b-link v-if="chainId" :href="'https://sepolia.etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
-                  {{ chainId == '1' ? 'Mainnet' : (chainId == '11155111' ? 'Sepolia' : 'Unsupported') }}
+                  {{ chains.filter(e => e.value == chainId)[0] && chains.filter(e => e.value == chainId)[0].text || ("Chain Id: " + chainId) }}
                 </b-link>
                 <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
                   {{ '#' + commify0(blockNumber) }}
@@ -965,6 +1005,13 @@
           modalRegistry: {
             item: null,
           },
+          modalContract: {
+            item: null,
+          },
+          chains: [
+            { value: 1, text: 'Ethereum Mainnet' },
+            { value: 11155111, text: 'Sepolia Testnet' },
+          ],
           contractTypeOptions: [
             { value: null, text: '(select)' },
             { value: "announcer", text: 'ERC-5564 Announcer' },
@@ -1075,11 +1122,11 @@
           ],
           contractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'chainId', label: 'Chain Id', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'timestamp', label: 'First Event', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'chainId', label: 'Chain', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'read', label: 'Read', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'write', label: 'Write', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
@@ -1409,7 +1456,6 @@
                 await getLogs(parseInt(mid) + 1, toBlock, processLogs);
               }
             }
-
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
@@ -1434,6 +1480,18 @@
             }
             localStorage.stealthChadContracts = JSON.stringify(contracts);
             Vue.set(this, 'contracts', contracts);
+          },
+
+          toggleContractRead(item) {
+            console.log(moment().format("HH:mm:ss") + " toggleContractRead: " + JSON.stringify(item));
+            // console.log(moment().format("HH:mm:ss") + " this.contracts BEFORE: " + JSON.stringify(this.contracts, null, 2));
+            // Vue.set(this.contracts[item.chainId][item.contract], 'read', !this.contracts[item.chainId][item.contract].read);
+            // console.log(moment().format("HH:mm:ss") + " this.contracts AFTER: " + JSON.stringify(this.contracts, null, 2));
+          },
+
+          toggleContractWrite(item) {
+            console.log(moment().format("HH:mm:ss") + " toggleContractWrite: " + JSON.stringify(item));
+            // Vue.set(this.contracts[item.chainId][item.contract], 'write', !this.contracts[item.chainId][item.contract].write);
           },
 
           newStealthMetaAddress() {
@@ -1735,6 +1793,15 @@
               this.modalRegistry.item = item[0];
               this.$bvModal.show('modal-registry');
               this.$refs.registryTable.clearSelected();
+            }
+          },
+
+          contractRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " contractRowSelected: " + JSON.stringify(item));
+            if (item && item.length > 0) {
+              this.modalContract.item = item[0];
+              this.$bvModal.show('modal-contract');
+              this.$refs.contractsTable.clearSelected();
             }
           },
 
@@ -2506,6 +2573,21 @@
               //   await delay(1500);
               //   await this.newStealthMetaAddress();
               // })();
+              (async() => {
+                // TODO: TESTING
+                await delay(1500);
+                await this.contractRowSelected([{
+                  "chainId": "11155111",
+                  "contract": "0x4f58404F363f8a3282648E80440e075e5C1E28a1",
+                  "type": "announcer",
+                  "name": "ERC5564Announcer on Sepolia",
+                  "read": true,
+                  "write": false,
+                  "blockNumber": 4959070,
+                  "timestamp": 1703564424,
+                  "contractTypeSortIndex": 1
+                }]);
+              })();
             }
           }
         },
