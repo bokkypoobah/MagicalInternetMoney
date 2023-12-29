@@ -1924,6 +1924,9 @@
             if (devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
             }
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
             }
@@ -1995,7 +1998,7 @@
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-              console.log("getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -2031,9 +2034,8 @@
                 }
               }
             }
-            console.log("selectedContracts: " + JSON.stringify(selectedContracts));
-            console.log("selectedCallers: " + JSON.stringify(selectedCallers));
             if (selectedContracts.length > 0) {
+              // TODO: compute from last db entry
               const startBlock = 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
@@ -2081,7 +2083,7 @@
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-              console.log("getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -2113,12 +2115,17 @@
                 }
               }
             }
-            console.log("selectedContracts: " + JSON.stringify(selectedContracts));
+            // console.log("selectedContracts: " + JSON.stringify(selectedContracts));
             if (selectedContracts.length > 0) {
+              // TODO: compute from last db entry
               const startBlock = 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew END");
+          },
+
+          async syncAdditionalDataNew(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew BEGIN");
           },
 
           async syncAnnouncementEvents(provider, latestBlockNumber) {
