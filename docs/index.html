@@ -1925,7 +1925,10 @@
               await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
             }
             if (devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
+              await this.syncAnnouncementsExtraDataNew(db, provider, latestBlockNumber);
+            }
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncRegistryEventsExtraDataNew(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
@@ -1948,6 +1951,8 @@
             if (!devMode) {
               await this.processData(provider);
             }
+            await this.loadCurrentData();
+
             this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
             this.sync.halt = false;
@@ -2127,41 +2132,37 @@
             console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew END");
           },
 
-          async syncAdditionalDataNew(db, provider, latestBlockNumber) {
+          async syncAnnouncementsExtraDataNew(db, provider, latestBlockNumber) {
             const BATCHSIZE = 3;
-            const WRITESIZE = 2;
-            console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew BEGIN");
             let rows = 0;
             let done = false;
             do {
               let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
               done = data.length < BATCHSIZE;
             } while (!done);
             // let total = rows;
-            // console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - total: " + total);
+            // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - total: " + total);
             this.sync.completed = 0;
             this.sync.total = rows;
-            this.sync.section = 'Transaction Data';
+            this.sync.section = 'Announcements Tx Data';
             rows = 0;
             do {
               let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                // console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew: " + JSON.stringify(item));
+                // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew: " + JSON.stringify(item));
                 if (item.timestamp == null && item.chainId == this.chainId) {
                   const block = await provider.getBlock(item.blockNumber);
                   item.timestamp = block.timestamp;
                   const tx = await provider.getTransaction(item.txHash);
                   const txReceipt = await provider.getTransactionReceipt(item.txHash);
                   item.tx = {
-                    // hash: tx.hash,
                     type: tx.type,
                     blockHash: tx.blockHash,
-                    // blockNumber: tx.blockNumber,
-                    // transactionIndex: tx.transactionIndex,
                     from: tx.from,
                     gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
                     gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
@@ -2175,7 +2176,6 @@
                     gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
                     blockHash: txReceipt.blockHash,
                     logs: txReceipt.logs,
-                    blockNumber: txReceipt.blockNumber,
                     cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
                     effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
                     status: txReceipt.status,
@@ -2187,7 +2187,71 @@
               if (records.length > 0) {
                 await db.announcements.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncAdditionalDataNew.bulkPut error: " + error);
+                  console.log("syncAnnouncementsExtraDataNew.bulkPut error: " + error);
+                });
+              }
+              rows = parseInt(rows) + data.length;
+              this.sync.completed = rows;
+              done = data.length < BATCHSIZE;
+            } while (!done);
+          },
+
+          async syncRegistryEventsExtraDataNew(db, provider, latestBlockNumber) {
+            const BATCHSIZE = 3;
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew BEGIN");
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              rows = parseInt(rows) + data.length;
+              done = data.length < BATCHSIZE;
+            } while (!done);
+            // let total = rows;
+            // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - total: " + total);
+            this.sync.completed = 0;
+            this.sync.total = rows;
+            this.sync.section = 'Registry Entries Tx Data';
+            rows = 0;
+            do {
+              let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              const records = [];
+              for (const item of data) {
+                // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew: " + JSON.stringify(item));
+                if (item.timestamp == null && item.chainId == this.chainId) {
+                  const block = await provider.getBlock(item.blockNumber);
+                  item.timestamp = block.timestamp;
+                  const tx = await provider.getTransaction(item.txHash);
+                  const txReceipt = await provider.getTransactionReceipt(item.txHash);
+                  item.tx = {
+                    type: tx.type,
+                    blockHash: tx.blockHash,
+                    from: tx.from,
+                    gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+                    gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+                    to: tx.to,
+                    value: ethers.BigNumber.from(tx.value).toString(),
+                    nonce: tx.nonce,
+                    data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+                    chainId: tx.chainId,
+                    contractAddress: txReceipt.contractAddress,
+                    transactionIndex: txReceipt.transactionIndex,
+                    gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+                    blockHash: txReceipt.blockHash,
+                    logs: txReceipt.logs,
+                    cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+                    effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+                    status: txReceipt.status,
+                    type: txReceipt.type,
+                  };
+                  records.push(item);
+                }
+              }
+              if (records.length > 0) {
+                await db.registryEntries.bulkPut(records).then (function() {
+                }).catch(function(error) {
+                  console.log("syncRegistryEventsExtraDataNew.bulkPut error: " + error);
                 });
               }
               rows = parseInt(rows) + data.length;
@@ -2635,6 +2699,13 @@
             console.log(moment().format("HH:mm:ss") + " loadCurrentData BEGIN");
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
+
+            const announcements = await db.announcements.toArray();
+            console.log(moment().format("HH:mm:ss") + " announcements[0..2]: " + JSON.stringify(announcements.slice(0, 2), null, 2));
+
+            const registryEntries = await db.registryEntries.toArray();
+            console.log(moment().format("HH:mm:ss") + " registryEntries[0..2]: " + JSON.stringify(registryEntries.slice(0, 2), null, 2));
+
             // for (const name of ['indexToAddress', 'indexToName', 'indexToTxHash', 'blockTimestamps', 'tokens', 'offers', 'v2Bids', 'txs', 'exchangeRates']) {
             //   console.log(moment().format("HH:mm:ss") + " loadCurrentData: " + name);
             //   const dataItems = await db.cache.where("objectName").equals(this.chainId + "_" + name).toArray();
@@ -2830,10 +2901,10 @@
               // })();
             }
             (async() => {
-              const db = new Dexie(this.db.name);
-              db.version(this.db.version).stores(this.db.schemaDefinition);
-              await this.loadCurrentData(db);
-              db.close();
+              // const db = new Dexie(this.db.name);
+              // db.version(this.db.version).stores(this.db.schemaDefinition);
+              await this.loadCurrentData();
+              // db.close();
             })();
           }
         },
