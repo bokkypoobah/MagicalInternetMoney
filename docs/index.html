@@ -2000,7 +2000,7 @@
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.getLogs: " + fromBlock + " - " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -2087,7 +2087,7 @@
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.getLogs: " + fromBlock + " - " + toBlock);
               try {
                 const filter = {
                   address: null,
