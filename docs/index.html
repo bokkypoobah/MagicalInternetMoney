@@ -889,6 +889,7 @@
         el: '#app',
         // --- DATA ---
         data: {
+          CONFIRMATIONS: 100,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -1172,13 +1173,13 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080e",
+            name: "stealthchaddata080f",
             version: 1,
             schemaDefinition: {
               // cache: '&objectName',
               // syncStates: '&contract',
-              announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
-              registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
+              announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+              registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
               // txs: '[blockNumber+txIndex],txHash',
             },
             updated: null,
@@ -1937,7 +1938,7 @@
                       caller,
                       ephemeralPublicKey: logData.args[3],
                       metadata: logData.args[4],
-                      latestBlockNumber,
+                      confirmations: latestBlockNumber - log.blockNumber,
                       timestamp: null,
                       tx: null,
                       stealthMetaAddress: null,
@@ -1991,6 +1992,7 @@
               }
             }
             if (selectedContracts.length > 0) {
+              const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
@@ -2025,7 +2027,7 @@
                       registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
                       schemeId: parseInt(logData.args[1]),
                       stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                      latestBlockNumber,
+                      confirmations: latestBlockNumber - log.blockNumber,
                       timestamp: null,
                       tx: null,
                     });
@@ -2074,6 +2076,7 @@
               }
             }
             if (selectedContracts.length > 0) {
+              const deleteCall = await db.registryEntries.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.registryEntries.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
