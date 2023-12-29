@@ -1918,12 +1918,12 @@
             const CHAINID_MAINNET = 1;
             const CHAINID_SEPOLIA = 11155111;
 
-            if (devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
-            }
-            if (devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
-            }
+            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
+            // }
+            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
+            // }
             if (devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
             }
@@ -2125,7 +2125,18 @@
           },
 
           async syncAdditionalDataNew(db, provider, latestBlockNumber) {
+            const BATCHSIZE = 3;
+            const WRITESIZE = 2;
             console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew BEGIN");
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " processDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              rows = parseInt(rows) + BATCHSIZE;
+              done = data.length < BATCHSIZE;
+            } while (!done);
+
           },
 
           async syncAnnouncementEvents(provider, latestBlockNumber) {
