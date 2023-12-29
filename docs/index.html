@@ -1917,7 +1917,7 @@
             const CHAINID_MAINNET = 1;
             const CHAINID_SEPOLIA = 11155111;
 
-            if (devMode && network.chainId == CHAINID_MAINNET) {
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
@@ -1951,37 +1951,55 @@
             // TODO: Lower priority - filter by selected callers
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
-
+            const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             let total = 0;
-            function processLogs(fromBlock, toBlock, logs) {
+            async function processLogs(fromBlock, toBlock, logs) {
               total = parseInt(total) + logs.length;
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
-              for (const event of logs) {
-                if (!event.removed) {
-                  console.log(JSON.stringify(event));
+              const records = [];
+              for (const log of logs) {
+                if (!log.removed) {
+                  const logData = erc5564AnnouncerContract.interface.parseLog(log);
+                  records.push( {
+                    blockNumber: parseInt(log.blockNumber),
+                    logIndex: parseInt(log.logIndex),
+                    txIndex: parseInt(log.transactionIndex),
+                    txHash: log.transactionHash,
+                    contract: log.address,
+                    name: logData.name,
+                    schemeId: parseInt(logData.args[0]),
+                    stealthAddress: logData.args[1],
+                    caller: logData.args[2],
+                    ephemeralPublicKey: logData.args[3],
+                    metadata: logData.args[4],
+                    latestBlockNumber,
+                  });
                 }
               }
+              // console.log("records: " + JSON.stringify(records, null, 2));
+              if (records.length) {
+                await db.events.bulkPut(records).then (function() {
+                }).catch(function(error) {
+                  console.log("syncAnnouncementEventsNew.bulkPut error: " + error);
+                });
+              }
             }
-            // TODO: Remove - testing in prod with WETH contract
             async function getLogs(fromBlock, toBlock, processLogs) {
               console.log("getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
               try {
                 const filter = {
-                  address: WETHADDRESS_MAINNET,
+                  address: null,
                   fromBlock,
                   toBlock,
                   topics: [
-                    '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                    '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
                     null,
                     null
                   ]
                 };
                 const eventLogs = await provider.getLogs(filter);
-                console.log("DEBUG 1");
-                processLogs(fromBlock, toBlock, eventLogs);
-                console.log("DEBUG 2");
+                await processLogs(fromBlock, toBlock, eventLogs);
               } catch (e) {
-                console.log("DEBUG 3");
                 const mid = parseInt((fromBlock + toBlock) / 2);
                 await getLogs(fromBlock, mid, processLogs);
                 await getLogs(parseInt(mid) + 1, toBlock, processLogs);
@@ -1989,7 +2007,6 @@
             }
 
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew BEGIN");
-            const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Announcements';
