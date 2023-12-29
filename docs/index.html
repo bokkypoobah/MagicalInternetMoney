@@ -831,6 +831,13 @@
             completed: null,
             halt: false,
           },
+
+          config: {
+            announcers: {},
+            registries: {},
+            helpers: {},
+          },
+
           events: {},
           registryEvents: {},
           addresses: { // TODO: Add ENS field for production
@@ -1196,62 +1203,50 @@
             // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
             // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
             console.log(moment().format("HH:mm:ss") + " searchForContracts");
-
             const announcersMap = {};
             const registriesMap = {};
             const helpersMap = {};
+            let total = 0;
             function processLogs(fromBlock, toBlock, logs) {
-              // total = parseInt(total) + logs.length;
-              console.log(moment().format("HH:mm:ss") + " searchForContracts.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length); // + " " + total);
+              total = parseInt(total) + logs.length;
+              console.log(moment().format("HH:mm:ss") + " searchForContracts.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
               for (const event of logs) {
                 if (!event.removed) {
-                  // const logData = contract.interface.parseLog(event);
-                  // console.log(event);
                   if (event.topics[0] == "0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7") {
                     const caller = ethers.utils.getAddress("0x" + event.topics[3].substring(26, 66));
-                    console.log("Announcer: " + event.address + ", caller: " + caller);
                     if (!(event.address in announcersMap)) {
-                      announcersMap[event.address] = true;
+                      announcersMap[event.address] = event.blockNumber;
                     }
                     if (!(caller in helpersMap)) {
-                      helpersMap[caller] = true;
+                      helpersMap[caller] = event.blockNumber;
                     }
                   } else {
-                    // console.log("Registry: " + event.address)
                     if (!(event.address in registriesMap)) {
-                      registriesMap[event.address] = true;
+                      registriesMap[event.address] = event.blockNumber;
                     }
                   }
                 }
               }
             }
-
-
-            // const t = this;
             async function getLogs(fromBlock, toBlock, processLogs) {
-            //   if (!t.sync.halt) {
-                try {
-                  const filter = {
-                    address: null,
-                    fromBlock,
-                    toBlock,
-                    topics: [
-                      ['0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7', '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233'],
-                      null,
-                      null
-                    ]
-                  };
-                  const eventLogs = await provider.getLogs(filter);
-                  processLogs(fromBlock, toBlock, eventLogs);
-                  // console.log(fromBlock + " to " + toBlock + " " + JSON.stringify(eventLogs));
-            //       t.sync.section = section;
-            //       t.sync.completed = toBlock;
-                } catch (e) {
-                  const mid = parseInt((fromBlock + toBlock) / 2);
-                  await getLogs(fromBlock, mid, processLogs);
-                  await getLogs(parseInt(mid) + 1, toBlock, processLogs);
-                }
-            //   }
+              try {
+                const filter = {
+                  address: null,
+                  fromBlock,
+                  toBlock,
+                  topics: [
+                    ['0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7', '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233'],
+                    null,
+                    null
+                  ]
+                };
+                const eventLogs = await provider.getLogs(filter);
+                processLogs(fromBlock, toBlock, eventLogs);
+              } catch (e) {
+                const mid = parseInt((fromBlock + toBlock) / 2);
+                await getLogs(fromBlock, mid, processLogs);
+                await getLogs(parseInt(mid) + 1, toBlock, processLogs);
+              }
             }
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1263,13 +1258,21 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " searchForContracts - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-
             const startBlock = 0;
             await getLogs(startBlock, latestBlockNumber, processLogs);
-            console.log("announcers: " + JSON.stringify(Object.keys(announcersMap)));
-            console.log("registries: " + JSON.stringify(Object.keys(registriesMap)));
-            console.log("helpersMap: " + JSON.stringify(Object.keys(helpersMap)));
-            console.log("settings: " + JSON.stringify(this.settings));
+            for (const [announcer, blockNumber] of Object.entries(announcersMap)) {
+              const name = (announcer in CUSTOMNAMES) ? CUSTOMNAMES[announcer][1] : null;
+              console.log("announcer: " + announcer + " " + name + " " + blockNumber);
+            }
+            for (const [registry, blockNumber] of Object.entries(registriesMap)) {
+              const name = (registry in CUSTOMNAMES) ? CUSTOMNAMES[registry][1] : null;
+              console.log("registry: " + registry + " " + name + " " + blockNumber);
+            }
+            for (const [helper, blockNumber] of Object.entries(helpersMap)) {
+              const name = (helper in CUSTOMNAMES) ? CUSTOMNAMES[helper][1] : null;
+              console.log("helper: " + helper + " " + name + " " + blockNumber);
+            }
+            // console.log("settings: " + JSON.stringify(this.settings));
           },
 
           newStealthMetaAddress() {
