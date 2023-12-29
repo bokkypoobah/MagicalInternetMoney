@@ -1903,9 +1903,9 @@
             const CHAINID_MAINNET = 1;
             const CHAINID_SEPOLIA = 11155111;
 
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
-            }
+            // }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEvents(provider, latestBlockNumber);
             }
@@ -1921,14 +1921,16 @@
             // if (!devMode) {
             //   await this.syncAccounts(provider, devMode);
             // }
-            // if (!devMode) {
+            if (!devMode) {
               await this.processData(provider);
-            // }
+            }
+            this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
             this.sync.halt = false;
           },
 
           async syncAnnouncementEvents(provider, latestBlockNumber) {
+            // TODO: Lower priority - filter by selected callers
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents BEGIN");
@@ -1936,43 +1938,61 @@
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Announcements';
-            const announcementLogs = await provider.getLogs({
-              address: ERC5564ANNOUNCERADDRESS_SEPOLIA,
-              fromBlock: 0,
-              toBlock: latestBlockNumber,
-              topics: [
-                '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
-                null,
-                null
-              ],
-            });
-            this.sync.completed = announcementLogs.length;
-            const events = this.events;
-            if (!(this.chainId in events)) {
-              events[this.chainId] = {};
-            }
-            for (const log of announcementLogs) {
-              const logData = erc5564AnnouncerContract.interface.parseLog(log);
-              if (!(log.blockNumber in events[this.chainId])) {
-                events[this.chainId][log.blockNumber] = {};
-              }
-              if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
-                events[this.chainId][log.blockNumber][log.logIndex] = {
-                  txIndex: log.transactionIndex,
-                  txHash: log.transactionHash,
-                  contract: log.address,
-                  name: logData.name,
-                  schemeId: parseInt(logData.args[0]),
-                  stealthAddress: logData.args[1],
-                  caller: logData.args[2],
-                  ephemeralPublicKey: logData.args[3],
-                  metadata: logData.args[4],
-                  latestBlockNumber,
-                };
+            const selectedContracts = [];
+            const selectedCallers = [];
+            for (const [chainId, chainData] of Object.entries(this.contracts)) {
+              for (const [contract, contractData] of Object.entries(chainData)) {
+                if (contractData.type == "announcer" && contractData.read) {
+                  selectedContracts.push(contract);
+                }
+                if (contractData.type == "caller" && contractData.read) {
+                  selectedCallers.push(contract);
+                }
               }
             }
-            localStorage.stealthChadEvents = JSON.stringify(events);
-            Vue.set(this, 'events', events);
+            console.log("selectedContracts: " + JSON.stringify(selectedContracts));
+            console.log("selectedCallers: " + JSON.stringify(selectedCallers));
+            if (selectedContracts.length > 0) {
+              const announcementLogs = await provider.getLogs({
+                address: null,
+                fromBlock: 0,
+                toBlock: latestBlockNumber,
+                topics: [
+                  '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+                  null,
+                  null
+                ],
+              });
+              this.sync.completed = announcementLogs.length;
+              const events = this.events;
+              if (!(this.chainId in events)) {
+                events[this.chainId] = {};
+              }
+              for (const log of announcementLogs) {
+                if (selectedContracts.includes(log.address)) {
+                  const logData = erc5564AnnouncerContract.interface.parseLog(log);
+                  if (!(log.blockNumber in events[this.chainId])) {
+                    events[this.chainId][log.blockNumber] = {};
+                  }
+                  if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                    events[this.chainId][log.blockNumber][log.logIndex] = {
+                      txIndex: log.transactionIndex,
+                      txHash: log.transactionHash,
+                      contract: log.address,
+                      name: logData.name,
+                      schemeId: parseInt(logData.args[0]),
+                      stealthAddress: logData.args[1],
+                      caller: logData.args[2],
+                      ephemeralPublicKey: logData.args[3],
+                      metadata: logData.args[4],
+                      latestBlockNumber,
+                    };
+                  }
+                }
+              }
+              localStorage.stealthChadEvents = JSON.stringify(events);
+              Vue.set(this, 'events', events);
+            }
             // console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEvents END");
           },
@@ -1986,42 +2006,54 @@
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Registry';
-            const registryLogs = await provider.getLogs({
-              address: ERC5564REGISTRYADDRESS_SEPOLIA,
-              fromBlock: 0,
-              toBlock: latestBlockNumber,
-              topics: [
-                '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
-                null,
-                null
-              ],
-            });
-            this.sync.completed = registryLogs.length;
-            const registryEvents = this.registryEvents;
-            if (!(this.chainId in registryEvents)) {
-              registryEvents[this.chainId] = {};
-            }
-            for (const log of registryLogs) {
-              const logData = erc5564RegistryContract.interface.parseLog(log);
-              if (!(log.blockNumber in registryEvents[this.chainId])) {
-                registryEvents[this.chainId][log.blockNumber] = {};
-              }
-              // console.log(logData);
-              if (!(log.logIndex in registryEvents[this.chainId][log.blockNumber])) {
-                registryEvents[this.chainId][log.blockNumber][log.logIndex] = {
-                  txIndex: log.transactionIndex,
-                  txHash: log.transactionHash,
-                  contract: log.address,
-                  name: logData.name,
-                  registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
-                  schemeId: parseInt(logData.args[1]),
-                  stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                  latestBlockNumber,
-                };
+            const selectedContracts = [];
+            for (const [chainId, chainData] of Object.entries(this.contracts)) {
+              for (const [contract, contractData] of Object.entries(chainData)) {
+                if (contractData.type == "registry" && contractData.read) {
+                  selectedContracts.push(contract);
+                }
               }
             }
-            localStorage.stealthChadRegistryEvents = JSON.stringify(registryEvents);
-            Vue.set(this, 'registryEvents', registryEvents);
+            if (selectedContracts.length > 0) {
+              const registryLogs = await provider.getLogs({
+                address: null,
+                fromBlock: 0,
+                toBlock: latestBlockNumber,
+                topics: [
+                  '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
+                  null,
+                  null
+                ],
+              });
+              this.sync.completed = registryLogs.length;
+              const registryEvents = this.registryEvents;
+              if (!(this.chainId in registryEvents)) {
+                registryEvents[this.chainId] = {};
+              }
+              for (const log of registryLogs) {
+                if (selectedContracts.includes(log.address)) {
+                  const logData = erc5564RegistryContract.interface.parseLog(log);
+                  if (!(log.blockNumber in registryEvents[this.chainId])) {
+                    registryEvents[this.chainId][log.blockNumber] = {};
+                  }
+                  // console.log(logData);
+                  if (!(log.logIndex in registryEvents[this.chainId][log.blockNumber])) {
+                    registryEvents[this.chainId][log.blockNumber][log.logIndex] = {
+                      txIndex: log.transactionIndex,
+                      txHash: log.transactionHash,
+                      contract: log.address,
+                      name: logData.name,
+                      registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
+                      schemeId: parseInt(logData.args[1]),
+                      stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                      latestBlockNumber,
+                    };
+                  }
+                }
+              }
+              localStorage.stealthChadRegistryEvents = JSON.stringify(registryEvents);
+              Vue.set(this, 'registryEvents', registryEvents);
+            }
             // console.log(moment().format("HH:mm:ss") + " syncRegistryEvents - registryEvents: " + JSON.stringify(registryEvents, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
           },
@@ -2058,7 +2090,7 @@
               localStorage.stealthChadBlockTimestamps = JSON.stringify(blockTimestamps);
               Vue.set(this, 'blockTimestamps', blockTimestamps);
             }
-            this.forceRefresh++; // UI refresh workaround
+            // this.forceRefresh++; // UI refresh workaround
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
           },
 
@@ -2129,7 +2161,7 @@
               localStorage.stealthChadTxs = JSON.stringify(txs);
               Vue.set(this, 'txs', txs);
             }
-            this.forceRefresh++; // UI refresh workaround
+            // this.forceRefresh++; // UI refresh workaround
             // console.log(moment().format("HH:mm:ss") + " syncTransactions - txs: " + JSON.stringify(txs, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncTransactions END");
           },
@@ -2334,98 +2366,6 @@
             }
 
             console.log(moment().format("HH:mm:ss") + " processData END");
-          },
-
-          async processDataOld(provider) {
-            console.log(moment().format("HH:mm:ss") + " processDataOld BEGIN");
-            const accounts = this.accounts;
-            const events = this.events[this.chainId] || {};
-            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
-              const blockNumberData = events[blockNumber];
-              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
-                const eventData = events[blockNumber][logIndex];
-                const contract = eventData.contract;
-                const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
-                // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
-                if (account) {
-                  const type = account.customType || account.type;
-                  if (type == "erc20") {
-                    if (!('approvals' in account)) {
-                      account.approvals = {};
-                    }
-                    if (!(eventData.owner in account.approvals)) {
-                      account.approvals[eventData.owner] = {};
-                    }
-                    account.approvals[eventData.owner][eventData.spender] = eventData.value;
-                  } else if (type == "erc721") {
-                    if (eventData.eventName == "Approval") {
-                      if (!('approvals' in account)) {
-                        account.approvals = {};
-                      }
-                      if (!(eventData.owner in account.approvals)) {
-                        account.approvals[eventData.owner] = {};
-                      }
-                      account.approvals[eventData.owner][eventData.value] = eventData.spender;
-                    } else if (eventData.eventName == "ApprovalForAll") {
-                      if (!('approvalsForAll' in account)) {
-                        account.approvalsForAll = {};
-                      }
-                      if (!(eventData.owner in account.approvalsForAll)) {
-                        account.approvalsForAll[eventData.owner] = {};
-                      }
-                      account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
-                    }
-                  } else if (type == "erc1155") {
-                    if (!('approvalsForAll' in account)) {
-                      account.approvalsForAll = {};
-                    }
-                    if (!(eventData.owner in account.approvalsForAll)) {
-                      account.approvalsForAll[eventData.owner] = {};
-                    }
-                    account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
-                  }
-                  Vue.set(this.accounts[this.chainId], contract, account);
-                } else {
-                  console.log(moment().format("HH:mm:ss") + " processDataOld - account: " + contract + " not found");
-                }
-              }
-            }
-            // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
-            this.sync.total = 0;
-            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              const type = accountData.customType || accountData.type;
-              if (type == "erc20") {
-                for (const owner of this.accountsToSearch) {
-                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
-                  for (const [spender, approved] of Object.entries(approvals)) {
-                    this.sync.total++;
-                  }
-                }
-              }
-            }
-            this.sync.completed = 0;
-            this.sync.section = 'Latest ERC-20 Allowances';
-            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              const type = accountData.customType || accountData.type;
-              if (type == "erc20" && !this.sync.halt) {
-                for (const owner of this.accountsToSearch) {
-                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
-                  for (const [spender, approved] of Object.entries(approvals)) {
-                    const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
-                    const newValue = await erc20Contract.allowance(owner, spender);
-                    accountData.approvals[owner][spender] = newValue.toString();
-                    Vue.set(this.accounts[this.chainId], account, accountData);
-                    this.sync.completed++;
-                  }
-                }
-              }
-            }
-            if (!this.sync.halt) {
-              localStorage.stealthChadAccounts = JSON.stringify(accounts);
-              Vue.set(this, 'accounts', accounts);
-            }
-            this.forceRefresh++; // UI refresh workaround
-            console.log(moment().format("HH:mm:ss") + " processDataOld END");
           },
 
           customTypeUpdated(address, type) {
