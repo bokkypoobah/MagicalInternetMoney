@@ -33,3 +33,6 @@ const ERC5564REGISTRYABI_SEPOLIA = [{"anonymous":false,"inputs":[{"indexed":true
 
 const STEALTHCHADADDRESS_SEPOLIA = "0x3834bcA9093e375893D65975ad765179A149D017";
 const STEALTHCHADABI_SEPOLIA = [{"inputs":[{"internalType":"address payable","name":"_announcer","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"NoPointInSendingAZeroValue","type":"error"},{"inputs":[],"name":"TransferFailure","type":"error"},{"inputs":[{"internalType":"uint256","name":"schemeId","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"bytes","name":"ephemeralPubKey","type":"bytes"},{"internalType":"uint8","name":"viewTag","type":"uint8"}],"name":"transferEthAndAnnounce","outputs":[],"stateMutability":"payable","type":"function"}];
+
+
+const WETHADDRESS_MAINNET="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
