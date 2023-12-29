@@ -946,6 +946,12 @@
           modalRegistry: {
             item: null,
           },
+          contractTypeOptions: [
+            { value: null, text: '(select)' },
+            { value: "announcer", text: 'ERC-5564 Announcer' },
+            { value: "registry", text: 'ERC-6538 Registry' },
+            { value: "caller", text: 'ERC-5564 Caller' },
+          ],
           activitySortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
@@ -1262,35 +1268,53 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [chainId, chainData] of Object.entries(this.contracts)) {
               for (const [contract, contractData] of Object.entries(chainData)) {
-                results.push({ chainId, contract, ...contractData });
+                const contractTypeSortIndex = this.contractTypeOptions.findIndex(e => e.value == contractData.type);
+                results.push({ chainId, contract, ...contractData, contractTypeSortIndex });
               }
             }
             return results;
           },
           filteredSortedContracts() {
+            // TODO: Sort options 3 and 4 a bit buggy
             let results = this.filteredContracts;
-            if (this.settings.activityTable.sortOption == 'txorderasc') {
+            if (this.settings.contractsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
-                if (a.blockNumber == b.blockNumber) {
-                  if (a.txIndex == b.txIndex) {
-                    return a.logIndex - b.logIndex;
+                if (a.contractTypeSortIndex == b.contractTypeSortIndex) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.contract).localeCompare(b.contract);
                   } else {
-                    return a.txIndex - b.txIndex;
+                    return ('' + a.name).localeCompare(b.name);
                   }
                 } else {
-                  return a.blockNumber - b.blockNumber;
+                  return a.contractTypeSortIndex - b.contractTypeSortIndex;
                 }
               });
-            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+            } else if (this.settings.contractsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
-                if (a.blockNumber == b.blockNumber) {
-                  if (a.txIndex == b.txIndex) {
-                    return b.logIndex - a.logIndex;
+                if (a.contractTypeSortIndex == b.contractTypeSortIndex) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + b.contract).localeCompare(a.contract);
                   } else {
-                    return b.txIndex - a.txIndex;
+                    return ('' + b.name).localeCompare(a.name);
                   }
                 } else {
-                  return b.blockNumber - a.blockNumber;
+                  return b.contractTypeSortIndex - a.contractTypeSortIndex;
+                }
+              });
+            } else if (this.settings.contractsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + a.contract).localeCompare(b.contract);
+                } else {
+                  return ('' + a.name).localeCompare(b.name);
+                }
+              });
+            } else if (this.settings.contractsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + b.contract).localeCompare(a.contract);
+                } else {
+                  return ('' + b.name).localeCompare(a.name);
                 }
               });
             }
