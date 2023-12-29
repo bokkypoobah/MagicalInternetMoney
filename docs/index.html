@@ -283,6 +283,23 @@
                 Contract ({{ coinbase }})
               </font>
             </template>
+            <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="contract-address" :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalContract.item.contract }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group label="Name:" label-for="modalcontract-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-input-group size="sm" class="w-100">
+                  <b-form-input type="text" size="sm" id="modalcontract-name" v-model.trim="modalContract.name"></b-form-input>
+                  <b-input-group-append>
+                    <b-button :disabled="modalContract.name == (modalContract.item && modalContract.item.name)" @click="saveModalContractName();" variant="link" v-b-popover.hover.bottom="'Save changes'" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  </b-input-group-append>
+                </b-input-group>
+              </b-form-group>
+            </b-form-group>
+            <br />
+
             <font size="-1">
               <pre>
 {{ modalContract }}
@@ -1007,6 +1024,7 @@
           },
           modalContract: {
             item: null,
+            name: null,
           },
           chains: [
             { value: 1, text: 'Ethereum Mainnet' },
@@ -1478,10 +1496,16 @@
               const customData = CUSTOMNAMES[contract] || {};
               contracts[this.chainId][contract] = { type, name: customData.name || null, read: customData.read || false, write: customData.write || false, blockNumber, timestamp };
             }
-            localStorage.stealthChadContracts = JSON.stringify(contracts);
             Vue.set(this, 'contracts', contracts);
           },
 
+          saveModalContractName() {
+            console.log(moment().format("HH:mm:ss") + " saveModalContractName: " + JSON.stringify(this.modalContract));
+            this.modalContract.item.name = this.modalContract.name;
+            Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'name', this.modalContract.name);
+            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+            // console.log(moment().format("HH:mm:ss") + " saveModalContractName - contracts: " + JSON.stringify(this.contracts, null, 2));
+          },
           toggleContractRead(item) {
             console.log(moment().format("HH:mm:ss") + " toggleContractRead: " + JSON.stringify(item));
             // console.log(moment().format("HH:mm:ss") + " this.contracts BEFORE: " + JSON.stringify(this.contracts, null, 2));
@@ -1800,6 +1824,7 @@
             console.log(moment().format("HH:mm:ss") + " contractRowSelected: " + JSON.stringify(item));
             if (item && item.length > 0) {
               this.modalContract.item = item[0];
+              this.modalContract.name = item[0] && item[0].name || null;
               this.$bvModal.show('modal-contract');
               this.$refs.contractsTable.clearSelected();
             }
@@ -2551,7 +2576,7 @@
               // Restore other settings for the same version
               if ('stealthChadContracts' in localStorage) {
                 this.contracts = JSON.parse(localStorage.stealthChadContracts);
-                console.log(moment().format("HH:mm:ss") + " mounted - contracts: " + JSON.stringify(this.contracts));
+                // console.log(moment().format("HH:mm:ss") + " mounted - contracts: " + JSON.stringify(this.contracts));
               }
               if ('stealthChadEvents' in localStorage) {
                 this.events = JSON.parse(localStorage.stealthChadEvents);
@@ -2573,21 +2598,6 @@
               //   await delay(1500);
               //   await this.newStealthMetaAddress();
               // })();
-              (async() => {
-                // TODO: TESTING
-                await delay(1500);
-                await this.contractRowSelected([{
-                  "chainId": "11155111",
-                  "contract": "0x4f58404F363f8a3282648E80440e075e5C1E28a1",
-                  "type": "announcer",
-                  "name": "ERC5564Announcer on Sepolia",
-                  "read": true,
-                  "write": false,
-                  "blockNumber": 4959070,
-                  "timestamp": 1703564424,
-                  "contractTypeSortIndex": 1
-                }]);
-              })();
             }
           }
         },
