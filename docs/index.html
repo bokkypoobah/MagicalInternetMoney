@@ -706,86 +706,88 @@
               <!-- :CONFIG -->
               <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
-                  <h5>Configure Contracts</h5>
-                  <!-- <b-form-group label-cols-lg="2" label="Search" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-                    <b-form-group label="" label-for="config-search" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" id="config-search" @click="searchForContracts()" variant="warning">Search</b-button>
-                    </b-form-group>
-                  </b-form-group> -->
-                  <div class="d-flex flex-wrap m-0 p-0">
-                    <div class="mt-0 flex-grow-1">
+                  <b-card no-body no-header bg-variant="light" class="m-1 p-1">
+                    <h5>Configure Contracts</h5>
+                    <!-- <b-form-group label-cols-lg="2" label="Search" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                      <b-form-group label="" label-for="config-search" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                        <b-button size="sm" id="config-search" @click="searchForContracts()" variant="warning">Search</b-button>
+                      </b-form-group>
+                    </b-form-group> -->
+                    <div class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div v-if="!sync.section" class="mt-0 pr-1">
+                        <b-button size="sm" @click="saveSettings(); searchForContracts();" variant="primary" v-b-popover.hover.bottom="'Scan connected network for ERC-5564 and ERC-6538(with bytes32) events'">Scan</b-button>
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.contractsTable.sortOption" @change="saveSettings" :options="contractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <font size="-2" v-b-popover.hover.bottom="'# contracts'">{{ commify0(totalContracts) }}</font>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-pagination size="sm" v-model="settings.contractsTable.currentPage" @input="saveSettings" :total-rows="totalContracts" :per-page="settings.contractsTable.pageSize" style="height: 0;"></b-pagination>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.contractsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                      </div>
                     </div>
-                    <div v-if="!sync.section" class="mt-0 pr-1">
-                      <b-button size="sm" @click="saveSettings(); searchForContracts();" variant="primary" v-b-popover.hover.bottom="'Scan connected network for ERC-5564 and ERC-6538(with bytes32) events'">Scan</b-button>
-                    </div>
-                    <div class="mt-0 flex-grow-1">
-                    </div>
-                    <div class="mt-0 pl-1">
-                      <b-form-select size="sm" v-model="settings.contractsTable.sortOption" @change="saveSettings" :options="contractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                    </div>
-                    <div class="mt-0 pl-1">
-                      <font size="-2" v-b-popover.hover.bottom="'# contracts'">{{ commify0(totalContracts) }}</font>
-                    </div>
-                    <div class="mt-0 pl-1">
-                      <b-pagination size="sm" v-model="settings.contractsTable.currentPage" @input="saveSettings" :total-rows="totalContracts" :per-page="settings.contractsTable.pageSize" style="height: 0;"></b-pagination>
-                    </div>
-                    <div class="mt-0 pl-1">
-                      <b-form-select size="sm" v-model="settings.contractsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
-                    </div>
-                </div>
 
-                  <!-- <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
-                  <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='contractRowSelected' :fields="contractsFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
-                    <template #cell(number)="data">
-                      <font size="-1">
-                        {{ parseInt(data.index) + ((settings.contractsTable.currentPage - 1) * settings.contractsTable.pageSize) + 1 }}
-                      </font>
-                    </template>
-                    <template #cell(chainId)="data">
-                      <font size="-1">
-                        {{ chains.filter(e => e.value == data.item.chainId)[0] && chains.filter(e => e.value == data.item.chainId)[0].text || ("Id: " + data.item.chainId) }}
-                      </font>
-                    </template>
-                    <template #cell(contract)="data">
-                      <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
-                      <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract + '#code'" target="_blank">
-                        <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-                      </b-link>
-                    </template>
-                    <template #cell(type)="data">
-                      <font size="-1">
-                        {{ contractTypeOptions.filter(e => e.value == data.item.type)[0] && contractTypeOptions.filter(e => e.value == data.item.type)[0].text || ("Unknown: " + data.item.type) }}
-                      </font>
-                    </template>
-                    <template #cell(name)="data">
-                      <font size="-1">
-                        {{ data.item.name }}
-                      </font>
-                    </template>
-                    <template #cell(firstEvent)="data">
-                      <font size="-1">
-                        <b-link :href="'https://sepolia.etherscan.io/block/' + data.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber)" target="_blank">
-                          <span v-if="data.item.timestamp">
-                            {{ formatTimestamp(data.item.timestamp) }}
-                          </span>
-                          <span v-else>
-                            {{ '#' + commify0(data.item.blockNumber) }}
-                          </span>
+                    <!-- <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
+                    <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='contractRowSelected' :fields="contractsFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+                      <template #cell(number)="data">
+                        <font size="-1">
+                          {{ parseInt(data.index) + ((settings.contractsTable.currentPage - 1) * settings.contractsTable.pageSize) + 1 }}
+                        </font>
+                      </template>
+                      <template #cell(chainId)="data">
+                        <font size="-1">
+                          {{ chains.filter(e => e.value == data.item.chainId)[0] && chains.filter(e => e.value == data.item.chainId)[0].text || ("Id: " + data.item.chainId) }}
+                        </font>
+                      </template>
+                      <template #cell(contract)="data">
+                        <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
+                        <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract + '#code'" target="_blank">
+                          <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
                         </b-link>
-                      </font>
-                    </template>
-                    <template #cell(read)="data">
-                      <font size="-1">
-                        <b-form-checkbox size="sm" disabled value="1" :checked="data.item.read ? 1 : 0" class="mt-1"></b-form-checkbox>
-                      </font>
-                    </template>
-                    <template #cell(write)="data">
-                      <font size="-1">
-                        <b-form-checkbox size="sm" disabled value="1" :checked="data.item.write ? 1 : 0" @input="toggleContractWrite(data.item)" class="mt-1"></b-form-checkbox>
-                      </font>
-                    </template>
-                    <!-- <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddress.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox> -->
-                  </b-table>
+                      </template>
+                      <template #cell(type)="data">
+                        <font size="-1">
+                          {{ contractTypeOptions.filter(e => e.value == data.item.type)[0] && contractTypeOptions.filter(e => e.value == data.item.type)[0].text || ("Unknown: " + data.item.type) }}
+                        </font>
+                      </template>
+                      <template #cell(name)="data">
+                        <font size="-1">
+                          {{ data.item.name }}
+                        </font>
+                      </template>
+                      <template #cell(firstEvent)="data">
+                        <font size="-1">
+                          <b-link :href="'https://sepolia.etherscan.io/block/' + data.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber)" target="_blank">
+                            <span v-if="data.item.timestamp">
+                              {{ formatTimestamp(data.item.timestamp) }}
+                            </span>
+                            <span v-else>
+                              {{ '#' + commify0(data.item.blockNumber) }}
+                            </span>
+                          </b-link>
+                        </font>
+                      </template>
+                      <template #cell(read)="data">
+                        <font size="-1">
+                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.read ? 1 : 0" class="mt-1"></b-form-checkbox>
+                        </font>
+                      </template>
+                      <template #cell(write)="data">
+                        <font size="-1">
+                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.write ? 1 : 0" @input="toggleContractWrite(data.item)" class="mt-1"></b-form-checkbox>
+                        </font>
+                      </template>
+                      <!-- <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddress.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox> -->
+                    </b-table>
+                  </b-card>
 
                   <!-- <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
                     <b-form-group label="Message:" label-for="generate-keys-message" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact message is required to recover your stealth meta-address with your web3 attached account. Save this information securely!">
