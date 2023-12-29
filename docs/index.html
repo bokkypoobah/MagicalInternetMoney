@@ -721,7 +721,7 @@
                       <font size="-2" v-b-popover.hover.bottom="'# contracts'">{{ commify0(totalContracts) }}</font>
                     </div>
                     <div class="mt-0 pl-1">
-                      <b-pagination size="sm" v-model="settings.contractsTable.currentPage" @input="saveSettings" :total-rows="totalActivity" :per-page="settings.contractsTable.pageSize" style="height: 0;"></b-pagination>
+                      <b-pagination size="sm" v-model="settings.contractsTable.currentPage" @input="saveSettings" :total-rows="totalContracts" :per-page="settings.contractsTable.pageSize" style="height: 0;"></b-pagination>
                     </div>
                     <div class="mt-0 pl-1">
                       <b-form-select size="sm" v-model="settings.contractsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -1875,16 +1875,16 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAnnouncementEventsNew(db, provider, latestBlockNumber);
+              await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
+              await this.syncRegistryEvents(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAnnouncementsExtraDataNew(db, provider, latestBlockNumber);
+              await this.syncAnnouncementsData(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEventsExtraDataNew(db, provider, latestBlockNumber);
+              await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
             // TODO
             // if (network.chainId == CHAINID_MAINNET) {
@@ -1900,7 +1900,7 @@
             db.close();
           },
 
-          async syncAnnouncementEventsNew(db, provider, latestBlockNumber) {
+          async syncAnnouncements(db, provider, latestBlockNumber) {
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
             const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
@@ -1908,7 +1908,7 @@
             let t = this;
             async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
               total = parseInt(total) + logs.length;
-              console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
@@ -1941,12 +1941,12 @@
               if (records.length) {
                 await db.announcements.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncAnnouncementEventsNew.bulkPut error: " + error);
+                  console.log("syncAnnouncements.bulkPut error: " + error);
                 });
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew.getLogs: " + fromBlock + " - " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncements.getLogs: " + fromBlock + " - " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -1966,7 +1966,7 @@
                 await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
               }
             }
-            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncements BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Announcements';
@@ -1987,10 +1987,10 @@
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
-            console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew END");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
           },
 
-          async syncRegistryEventsNew(db, provider, latestBlockNumber) {
+          async syncRegistryEvents(db, provider, latestBlockNumber) {
             // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
             // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
             // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
@@ -1999,7 +1999,7 @@
             let t = this;
             async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
               total = parseInt(total) + logs.length;
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEvents.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
@@ -2028,12 +2028,12 @@
               if (records.length) {
                 await db.registryEntries.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncRegistryEventsNew.bulkPut error: " + error);
+                  console.log("syncRegistryEvents.bulkPut error: " + error);
                 });
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew.getLogs: " + fromBlock + " - " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEvents.getLogs: " + fromBlock + " - " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -2053,7 +2053,7 @@
                 await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
               }
             }
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Registry';
@@ -2070,32 +2070,32 @@
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
             }
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew END");
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
           },
 
-          async syncAnnouncementsExtraDataNew(db, provider, latestBlockNumber) {
+          async syncAnnouncementsData(db, provider, latestBlockNumber) {
             const BATCHSIZE = 3;
-            console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData BEGIN");
             let rows = 0;
             let done = false;
             do {
               let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
               done = data.length < BATCHSIZE;
             } while (!done);
             // let total = rows;
-            // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - total: " + total);
+            // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - total: " + total);
             this.sync.completed = 0;
             this.sync.total = rows;
             this.sync.section = 'Announcements Tx Data';
             rows = 0;
             do {
               let data = await db.announcements.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsExtraDataNew: " + JSON.stringify(item));
+                // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
                 if (item.timestamp == null && item.chainId == this.chainId) {
                   const block = await provider.getBlock(item.blockNumber);
                   item.timestamp = block.timestamp;
@@ -2128,7 +2128,7 @@
               if (records.length > 0) {
                 await db.announcements.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncAnnouncementsExtraDataNew.bulkPut error: " + error);
+                  console.log("syncAnnouncementsData.bulkPut error: " + error);
                 });
               }
               rows = parseInt(rows) + data.length;
@@ -2137,29 +2137,29 @@
             } while (!done);
           },
 
-          async syncRegistryEventsExtraDataNew(db, provider, latestBlockNumber) {
+          async syncRegistryEventsData(db, provider, latestBlockNumber) {
             const BATCHSIZE = 3;
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData BEGIN");
             let rows = 0;
             let done = false;
             do {
               let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
               done = data.length < BATCHSIZE;
             } while (!done);
             // let total = rows;
-            // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - total: " + total);
+            // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - total: " + total);
             this.sync.completed = 0;
             this.sync.total = rows;
             this.sync.section = 'Registry Entries Tx Data';
             rows = 0;
             do {
               let data = await db.registryEntries.offset(rows).limit(BATCHSIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsExtraDataNew: " + JSON.stringify(item));
+                // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData: " + JSON.stringify(item));
                 if (item.timestamp == null && item.chainId == this.chainId) {
                   const block = await provider.getBlock(item.blockNumber);
                   item.timestamp = block.timestamp;
@@ -2192,7 +2192,7 @@
               if (records.length > 0) {
                 await db.registryEntries.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncRegistryEventsExtraDataNew.bulkPut error: " + error);
+                  console.log("syncRegistryEventsData.bulkPut error: " + error);
                 });
               }
               rows = parseInt(rows) + data.length;
