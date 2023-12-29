@@ -1984,7 +1984,7 @@
                 });
               }
             }
-            async function getLogs(fromBlock, toBlock, processLogs) {
+            async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
               console.log("getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock);
               try {
                 const filter = {
@@ -2001,8 +2001,8 @@
                 await processLogs(fromBlock, toBlock, eventLogs);
               } catch (e) {
                 const mid = parseInt((fromBlock + toBlock) / 2);
-                await getLogs(fromBlock, mid, processLogs);
-                await getLogs(parseInt(mid) + 1, toBlock, processLogs);
+                await getLogs(fromBlock, mid, selectedContracts, selectedCallers, processLogs);
+                await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
               }
             }
 
@@ -2025,50 +2025,8 @@
             console.log("selectedContracts: " + JSON.stringify(selectedContracts));
             console.log("selectedCallers: " + JSON.stringify(selectedCallers));
             if (selectedContracts.length > 0) {
-              const startBlock = 4719568; // 0;
-              // const endBlock = 5719568; // 15000000;
-              await getLogs(startBlock, /*endBlock*/ latestBlockNumber, processLogs);
-              // const announcementLogs = await provider.getLogs({
-              //   address: null,
-              //   fromBlock: 0,
-              //   toBlock: latestBlockNumber,
-              //   topics: [
-              //     '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
-              //     null,
-              //     null
-              //   ],
-              // });
-              // this.sync.completed = announcementLogs.length;
-              // const events = this.events;
-              // if (!(this.chainId in events)) {
-              //   events[this.chainId] = {};
-              // }
-
-              // for (const log of announcementLogs) {
-              //   if (selectedContracts.includes(log.address)) {
-              //     const logData = erc5564AnnouncerContract.interface.parseLog(log);
-              //     if (!(log.blockNumber in events[this.chainId])) {
-              //       events[this.chainId][log.blockNumber] = {};
-              //     }
-              //     if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
-              //       events[this.chainId][log.blockNumber][log.logIndex] = {
-              //         txIndex: log.transactionIndex,
-              //         txHash: log.transactionHash,
-              //         contract: log.address,
-              //         name: logData.name,
-              //         schemeId: parseInt(logData.args[0]),
-              //         stealthAddress: logData.args[1],
-              //         caller: logData.args[2],
-              //         ephemeralPublicKey: logData.args[3],
-              //         metadata: logData.args[4],
-              //         latestBlockNumber,
-              //       };
-              //     }
-              //   }
-              // }
-
-              // localStorage.stealthChadEvents = JSON.stringify(events);
-              // Vue.set(this, 'events', events);
+              const startBlock = 0;
+              await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             // console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew - events: " + JSON.stringify(events, null, 2));
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew END");
