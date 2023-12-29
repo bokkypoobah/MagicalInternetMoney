@@ -282,36 +282,40 @@
             <template #modal-title>
               {{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }} {{ modalContract.item.contract }}
             </template>
-            <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" disabled variant="none" id="contract-chain">{{ chains.filter(e => e.value == modalContract.item.chainId)[0] && chains.filter(e => e.value == modalContract.item.chainId)[0].text || ("Id: " + modalContract.item.chainId) }}</b-button>
+            <b-card no-body no-header bg-variant="light" class="m-1 p-1">
+              <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-button size="sm" disabled variant="none" id="contract-chain">{{ chains.filter(e => e.value == modalContract.item.chainId)[0] && chains.filter(e => e.value == modalContract.item.chainId)[0].text || ("Id: " + modalContract.item.chainId) }}</b-button>
+                </b-form-group>
+                <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-button size="sm" variant="link" id="contract-address" :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalContract.item.contract }}</b-button>
+                </b-form-group>
+                <b-form-group v-if="modalContract.item && modalContract.item.type" label="Type:" label-for="contract-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-button size="sm" disabled variant="none" id="contract-type">{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</b-button>
+                </b-form-group>
+                <b-form-group v-if="modalContract.item && modalContract.item.timestamp" label="First Event:" label-for="contract-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-button size="sm" variant="link" id="contract-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)" target="_blank">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
+                </b-form-group>
+                <b-form-group label="Name:" label-for="modalcontract-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-input-group size="sm" class="w-100">
+                    <b-form-input type="text" size="sm" id="modalcontract-name" v-model.trim="modalContract.name"></b-form-input>
+                    <b-input-group-append>
+                      <b-button :disabled="modalContract.name == (modalContract.item && modalContract.item.name)" @click="saveModalContractName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                    </b-input-group-append>
+                  </b-input-group>
+                </b-form-group>
               </b-form-group>
-              <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" variant="link" id="contract-address" :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalContract.item.contract }}</b-button>
+            </b-card>
+            <b-card no-body no-header bg-variant="light" class="m-1 p-1">
+              <b-form-group label-cols-lg="2" label="Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+                <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Read event logs involving this contract" class="mx-0 my-1 p-0">
+                  <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1"></b-form-checkbox>
+                </b-form-group>
+                <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Send transactions to contract, where supported" class="mx-0 my-1 p-0">
+                  <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1"></b-form-checkbox>
+                </b-form-group>
               </b-form-group>
-              <b-form-group v-if="modalContract.item && modalContract.item.type" label="Type:" label-for="contract-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" disabled variant="none" id="contract-type">{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</b-button>
-              </b-form-group>
-              <b-form-group v-if="modalContract.item && modalContract.item.timestamp" label="First Event:" label-for="contract-timestamp" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" variant="link" id="contract-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)" target="_blank">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
-              </b-form-group>
-              <b-form-group label="Name:" label-for="modalcontract-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-input-group size="sm" class="w-100">
-                  <b-form-input type="text" size="sm" id="modalcontract-name" v-model.trim="modalContract.name"></b-form-input>
-                  <b-input-group-append>
-                    <b-button :disabled="modalContract.name == (modalContract.item && modalContract.item.name)" @click="saveModalContractName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
-                  </b-input-group-append>
-                </b-input-group>
-              </b-form-group>
-            </b-form-group>
-            <b-form-group label-cols-lg="2" label="Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Read event logs involving this contract" class="mx-0 my-1 p-0">
-                <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1"></b-form-checkbox>
-              </b-form-group>
-              <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Send transactions to contract, where supported" class="mx-0 my-1 p-0">
-                <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1"></b-form-checkbox>
-              </b-form-group>
-            </b-form-group>
+            </b-card>
           </b-modal>
 
           <b-card class="m-0 p-0 border-0" body-class="m-1 p-0">
