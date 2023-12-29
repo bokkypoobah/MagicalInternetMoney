@@ -934,7 +934,7 @@
             contractsTable: {
               filter: null,
               currentPage: 1,
-              pageSize: 100,
+              pageSize: 10,
               sortOption: 'typenameasc',
             },
             registryActivityTable: {
@@ -1522,17 +1522,22 @@
             localStorage.stealthChadContracts = JSON.stringify(this.contracts);
             // console.log(moment().format("HH:mm:ss") + " saveModalContractName - contracts: " + JSON.stringify(this.contracts, null, 2));
           },
+          // TODO: Low priority - toggleContractRead & toggleContractWrite do not update correctly for newly scanned contracts
           toggleContractRead(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
-            this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract].read = !this.modalContract.read;
-            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
-            // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
+            if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
+              Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'read', !this.modalContract.read);
+              localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+              // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
+            }
           },
           toggleContractWrite(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractWrite");
-            this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract].write = !this.modalContract.write;
-            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
-            // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
+            if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
+              Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'write', !this.modalContract.write);
+              localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+              // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
+            }
           },
 
           newStealthMetaAddress() {
