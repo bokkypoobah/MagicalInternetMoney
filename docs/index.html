@@ -48,7 +48,8 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'My Addresses'">My Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts (WIP)</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -342,10 +343,10 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex != 4 && !sync.section" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex != 5 && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
                 </div>
-                <div v-if="settings.tabIndex != 4 && !sync.section" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex != 5 && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
@@ -379,6 +380,9 @@
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
@@ -387,6 +391,10 @@
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryActivity.length) + '/' + commify0(registryEntries.length) }}</font>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <!-- TODO -->
+                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredAccounts.length) + '/' + commify0(totalAccounts) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
@@ -397,6 +405,10 @@
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryActivity.length" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <!-- TODO -->
+                  <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryActivity.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
@@ -405,6 +417,9 @@
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -703,8 +718,47 @@
                 </template> -->
               </b-table>
 
+              <!-- :ACCOUNTS -->
+              <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1"> -->
+              <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
+                  </font>
+                </template>
+                <!-- <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
+                    </b-link>
+                  </font>
+                </template> -->
+                <template #cell(address)="data">
+                  <b-link @click="viewAccount(data.item.address, 'address')">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ nameOrAddress(data.item.address, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(details)="data">
+                  <font size="-1">
+                    <pre>
+      {{ data.item }}
+                    </pre>
+                  </font>
+                </template>
+              </b-table>
+
               <!-- :CONFIG -->
-              <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+              <b-card v-if="settings.tabIndex == 5 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Configure Contracts</h5>
                   <b-card no-body no-header bg-variant="light" class="m-1 p-1">
@@ -944,7 +998,13 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 22,
+            accountsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'typenameasc',
+            },
+            version: 23,
           },
           contracts: {
             "11155111": {
@@ -1159,6 +1219,14 @@
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'schemeId', label: 'Scheme Id', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 55%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          accountsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'derived', label: 'Derived From', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           contractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1409,6 +1477,74 @@
             return this.filteredSortedContracts.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
+          totalAccounts() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              result++;
+            }
+            return result;
+          },
+          filteredAccounts() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              results.push({ address, ...accountData });
+            }
+            return results;
+          },
+          filteredSortedAccounts() {
+            let results = this.filteredAccounts;
+            // TODO
+            if (this.settings.accountsTable.sortOption == 'typenameasc') {
+              results.sort((a, b) => {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + namea).localeCompare(nameb);
+                } else {
+                  return sortIndexA - sortIndexB;
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
+              results.sort((a, b) => {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + nameb).localeCompare(namea);
+                } else {
+                  return sortIndexB - sortIndexA;
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                return ('' + a.name).localeCompare(b.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                return ('' + b.name).localeCompare(a.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.address).localeCompare(b.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.address).localeCompare(a.address);
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedAccounts() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
+            return this.filteredSortedAccounts.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
+          },
         },
 
         // --- METHODS ---
@@ -2217,6 +2353,57 @@
 
           async collateAccounts(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
+            const accounts = {}; // TODO: this.accounts, and from DB
+            const newAccounts = {};
+            if (!(this.coinbase in accounts) && !(this.coinbase in newAccounts)) {
+              newAccounts[this.coinbase] = { type: "account", source: "attached" };
+            }
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (!(item.contract in accounts) && !(item.contract in newAccounts)) {
+                  newAccounts[item.contract] = { type: "contract", source: "announcer", name: CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null };
+                }
+                if (!(item.stealthAddress in accounts) && !(item.stealthAddress in newAccounts)) {
+                  newAccounts[item.stealthAddress] = { type: "stealthAddress", source: "announcer", name: null };
+                }
+                if (!(item.caller in accounts) && !(item.caller in newAccounts)) {
+                  newAccounts[item.caller] = { type: "caller", source: "announcer", name: CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null  };
+                }
+                if (!(item.tx.from in accounts) && !(item.tx.from in newAccounts)) {
+                  newAccounts[item.tx.from] = { type: "sender", source: "announcer", name: null };
+                }
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
+            } while (!done);
+            rows = 0;
+
+            done = false;
+            do {
+              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (!(item.contract in accounts) && !(item.contract in newAccounts)) {
+                  newAccounts[item.contract] = { type: "contract", source: "registry" };
+                }
+                if (!(item.registrant in accounts) && !(item.registrant in newAccounts)) {
+                  newAccounts[item.registrant] = { type: "registrant", source: "registry" };
+                }
+                if (!(item.stealthMetaAddress in accounts) && !(item.stealthMetaAddress in newAccounts)) {
+                  newAccounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry", account: item.registrant };
+                }
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
+            } while (!done);
+
+            Vue.set(this, 'accounts', newAccounts);
+            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            console.log(moment().format("HH:mm:ss") + " collateAccounts - newAccounts: " + JSON.stringify(newAccounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
@@ -2480,6 +2667,10 @@
               // }
               if ('stealthChadAddresses' in localStorage) {
                 this.addresses = JSON.parse(localStorage.stealthChadAddresses);
+              }
+              if ('stealthChadAccounts' in localStorage) {
+                this.accounts = JSON.parse(localStorage.stealthChadAccounts);
+                console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts));
               }
               // if ('stealthChadBlockTimestamps' in localStorage) {
               //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
