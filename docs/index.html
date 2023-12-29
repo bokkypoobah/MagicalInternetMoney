@@ -1160,10 +1160,10 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080d",
+            name: "stealthchaddata080e",
             version: 1,
             schemaDefinition: {
-              cache: '&objectName',
+              // cache: '&objectName',
               // syncStates: '&contract',
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
               registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract',
@@ -1924,9 +1924,9 @@
             if (devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsNew(db, provider, latestBlockNumber);
             }
-            // if (devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
-            // }
+            if (devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncAdditionalDataNew(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementEvents(provider, latestBlockNumber);
             }
@@ -2037,8 +2037,8 @@
               }
             }
             if (selectedContracts.length > 0) {
-              // TODO: compute from last db entry
-              const startBlock = 0;
+              const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncAnnouncementEventsNew END");
@@ -2119,10 +2119,9 @@
                 }
               }
             }
-            // console.log("selectedContracts: " + JSON.stringify(selectedContracts));
             if (selectedContracts.length > 0) {
-              // TODO: compute from last db entry
-              const startBlock = 0;
+              const latest = await db.registryEntries.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncRegistryEventsNew END");
@@ -2151,42 +2150,46 @@
               console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew: " + JSON.stringify(item));
-                const block = await provider.getBlock(item.blockNumber);
-                item.timestamp = block.timestamp;
-                const tx = await provider.getTransaction(item.txHash);
-                const txReceipt = await provider.getTransactionReceipt(item.txHash);
-                item.tx = {
-                  hash: tx.hash,
-                  type: tx.type,
-                  blockHash: tx.blockHash,
-                  blockNumber: tx.blockNumber,
-                  transactionIndex: tx.transactionIndex,
-                  from: tx.from,
-                  gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-                  gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-                  to: tx.to,
-                  value: ethers.BigNumber.from(tx.value).toString(),
-                  nonce: tx.nonce,
-                  data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-                  chainId: tx.chainId,
-                  contractAddress: txReceipt.contractAddress,
-                  transactionIndex: txReceipt.transactionIndex,
-                  gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-                  blockHash: txReceipt.blockHash,
-                  logs: txReceipt.logs,
-                  blockNumber: txReceipt.blockNumber,
-                  cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-                  effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-                  status: txReceipt.status,
-                  type: txReceipt.type,
-                };
-                records.push(item);
+                // console.log(moment().format("HH:mm:ss") + " syncAdditionalDataNew: " + JSON.stringify(item));
+                if (item.timestamp == null && item.chainId == this.chainId) {
+                  const block = await provider.getBlock(item.blockNumber);
+                  item.timestamp = block.timestamp;
+                  const tx = await provider.getTransaction(item.txHash);
+                  const txReceipt = await provider.getTransactionReceipt(item.txHash);
+                  item.tx = {
+                    // hash: tx.hash,
+                    type: tx.type,
+                    blockHash: tx.blockHash,
+                    // blockNumber: tx.blockNumber,
+                    // transactionIndex: tx.transactionIndex,
+                    from: tx.from,
+                    gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+                    gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+                    to: tx.to,
+                    value: ethers.BigNumber.from(tx.value).toString(),
+                    nonce: tx.nonce,
+                    data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+                    chainId: tx.chainId,
+                    contractAddress: txReceipt.contractAddress,
+                    transactionIndex: txReceipt.transactionIndex,
+                    gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+                    blockHash: txReceipt.blockHash,
+                    logs: txReceipt.logs,
+                    blockNumber: txReceipt.blockNumber,
+                    cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+                    effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+                    status: txReceipt.status,
+                    type: txReceipt.type,
+                  };
+                  records.push(item);
+                }
               }
-              await db.announcements.bulkPut(records).then (function() {
-              }).catch(function(error) {
-                console.log("syncAdditionalDataNew.bulkPut error: " + error);
-              });
+              if (records.length > 0) {
+                await db.announcements.bulkPut(records).then (function() {
+                }).catch(function(error) {
+                  console.log("syncAdditionalDataNew.bulkPut error: " + error);
+                });
+              }
               rows = parseInt(rows) + data.length;
               this.sync.completed = rows;
               done = data.length < BATCHSIZE;
