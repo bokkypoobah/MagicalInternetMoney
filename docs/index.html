@@ -2079,8 +2079,11 @@
             // if (network.chainId == CHAINID_MAINNET) {
             //   await this.syncENSNames(provider);
             // }
-            if (!devMode) {
-              await this.processData(provider);
+            // if (!devMode) {
+            //   await this.processDataOld(provider);
+            // }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.processData(db, provider, latestBlockNumber);
             }
             await this.loadCurrentData();
             this.forceRefresh++; // UI refresh workaround
@@ -2456,6 +2459,68 @@
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
+          async processData(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " processData BEGIN");
+            const checkAccounts = [];
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              if (accountData.type == "stealthMetaAddress" /*&& mine */) {
+                checkAccounts.push({ address, ...accountData });
+              }
+            }
+            console.log(moment().format("HH:mm:ss") + " processData - checkAccounts: " + JSON.stringify(checkAccounts));
+
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + item.stealthAddress + ", ephemeralPublicKey: " + item.ephemeralPublicKey);
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DBPROCESSINGBATCHSIZE;
+            } while (!done);
+            rows = 0;
+
+            // done = false;
+            // do {
+            //   let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+            //   console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+            //   for (const item of data) {
+            //     if (!(item.contract in accounts)) {
+            //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+            //       accounts[item.contract] = { type: "account", source: "registry.contract", mine: false, name };
+            //     }
+            //     if (!(item.registrant in accounts)) {
+            //       accounts[item.registrant] = { type: "account", source: "registry.registrant", mine: null, name: null };
+            //     }
+            //     if (!(item.stealthMetaAddress in accounts)) {
+            //       accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant };
+            //     }
+            //   }
+            //   rows = parseInt(rows) + data.length;
+            //   done = data.length < this.DBPROCESSINGBATCHSIZE;
+            // } while (!done);
+
+            // for (const [address, accountData] of Object.entries(accounts)) {
+            //   if (accountData.type == "stealthMetaAddress") {
+            //     const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
+            //     // console.log(moment().format("HH:mm:ss") + " processData: " + address + " => " + JSON.stringify(accountData, null, 2));
+            //     // console.log(moment().format("HH:mm:ss") + "   => " + JSON.stringify(linkedToData, null, 2));
+            //     if (linkedToData && linkedToData.mine) {
+            //       accounts[address].mine = true;
+            //     }
+            //   }
+            // }
+
+            // Vue.set(this, 'accounts', accounts);
+            // localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+
+            // console.log(moment().format("HH:mm:ss") + " processData - accounts: " + JSON.stringify(accounts, null, 2));
+            console.log(moment().format("HH:mm:ss") + " processData END");
+          },
+
+
           async syncENSNames(provider) {
             console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
@@ -2470,10 +2535,10 @@
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
-          async processData(provider) {
+          async processDataOld(provider) {
             function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
               const result = {};
-              // console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+              // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
               // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
@@ -2486,7 +2551,7 @@
 
             function computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
               const result = {};
-              // console.log(moment().format("HH:mm:ss") + " processData - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+              // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
               // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey); //  + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPrivateKey: " + spendingPrivateKey);
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
@@ -2503,9 +2568,9 @@
               return result;
             }
 
-            console.log(moment().format("HH:mm:ss") + " processData BEGIN");
-            // console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(this.events));
-            // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses));
+            console.log(moment().format("HH:mm:ss") + " processDataOld BEGIN");
+            // console.log(moment().format("HH:mm:ss") + " processDataOld - events: " + JSON.stringify(this.events));
+            // console.log(moment().format("HH:mm:ss") + " processDataOld - addresses: " + JSON.stringify(this.addresses));
             const events = this.events[this.chainId] || {};
             const addresses = this.addresses[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
@@ -2536,7 +2601,7 @@
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData END");
+            console.log(moment().format("HH:mm:ss") + " processDataOld END");
           },
 
           async loadCurrentData() {
