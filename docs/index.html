@@ -151,6 +151,75 @@
             </font>
           </b-modal>
 
+          <!-- :MODALNEWSTEALTHMETAADDRESSNEW -->
+          <b-modal id="modal-newstealthmetaaddressnew" hide-footer size="xl">
+            <template #modal-title>
+              <font size="-1">
+                New Stealth Meta-Address New {{ coinbase }})
+              </font>
+            </template>
+            <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="newsma-attachedaccount" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ coinbase }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group label="Name:" label-for="newsma-attachedaccountname" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="newsma-attachedaccountname" v-model.trim="modalNewStealthMetaAddress.name" class="w-100"></b-form-input>
+              </b-form-group>
+              <!-- <b-form-group label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://sepolia.etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                </font>
+              </b-form-group> -->
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="Generate Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0" description="IMPORTANT: This exact phrase is required to recover your stealth meta-address with your web3 attached account. Save this information securely!">
+                <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase" class="w-100"></b-form-textarea>
+              </b-form-group>
+              <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddress()" variant="warning">Generate</b-button>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Generated Keys" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group label="Spending Private Key:" label-for="newsma-spendingprivatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-spendingprivatekey" :value="modalNewStealthMetaAddress.keys.spendingPrivateKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Viewing Private Key:" label-for="newsma-viewingprivatekey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-viewingprivatekey" :value="modalNewStealthMetaAddress.keys.viewingPrivateKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Spending Public Key:" label-for="newsma-spendingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-spendingpublickey" :value="modalNewStealthMetaAddress.keys.spendingPublicKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Viewing Public Key:" label-for="newsma-viewingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="newsma-viewingpublickey" :value="modalNewStealthMetaAddress.keys.viewingPublicKey" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="Stealth Meta-Address:" label-for="newsma-viewingpublickey" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" readonly id="newsma-viewingpublickey" :value="modalNewStealthMetaAddress.keys.stealthMetaAddress" class="w-100"></b-form-textarea>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Address Book" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <!-- <b-form-group label="In Address Book:" label-for="newsma-inaddressbook" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddress.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox>
+              </b-form-group> -->
+              <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.stealthMetaAddressName" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="modalNewStealthMetaAddress.keys.inAddressBook ? 'Already in Address Book' : 'Click to add to Address Book'" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="modalNewStealthMetaAddress.keys.inAddressBook || !modalNewStealthMetaAddress.stealthMetaAddressName" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBook()" variant="warning">Add To Address Book</b-button>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group v-if="Object.keys(modalNewStealthMetaAddress.keys).length > 0" label-cols-lg="2" label="Registry" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <!-- <b-form-group label="In Registry:" label-for="newsma-inregistry" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-checkbox size="sm" disabled id="newsma-inregistry" value="1" :checked="modalNewStealthMetaAddress.keys.inRegistry ? 1 : 0" class="mt-1"></b-form-checkbox>
+              </b-form-group> -->
+              <b-form-group label="" label-for="newsma-addtoregistry" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="modalNewStealthMetaAddress.keys.inRegistry ? 'Already in Registry' : 'Click to add to Registry'" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="modalNewStealthMetaAddress.keys.inRegistry" id="newsma-addtoregistry" @click="addStealthMetaAddressToRegistry()" variant="warning">Add To Registry</b-button>
+              </b-form-group>
+            </b-form-group>
+          </b-modal>
+
+
           <!-- :MODALNEWSTEALTHMETAADDRESS -->
           <b-modal id="modal-newstealthmetaaddress" hide-footer size="xl">
             <template #modal-title>
@@ -391,6 +460,9 @@
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Add new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <b-button size="sm" @click="newStealthMetaAddressNew" variant="link" v-b-popover.hover.bottom="'Add new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1119,6 +1191,12 @@
             tokenId: null, // ERC-721 Approval
             approved: false, // ERC-721 & ERC-1155 ApprovalForAll
           },
+          modalNewStealthMetaAddressNew: {
+            phrase: null,
+            name: null,
+            stealthMetaAddressName: null,
+            keys: {},
+          },
           modalNewStealthMetaAddress: {
             phrase: null,
             name: null,
@@ -1679,6 +1757,35 @@
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
               // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
+          },
+
+          newStealthMetaAddressNew() {
+            console.log(moment().format("HH:mm:ss") + " newStealthMetaAddressNew");
+            this.modalNewStealthMetaAddressNew.phrase = this.defaultPhrase;
+
+            this.modalNewStealthMetaAddressNew.name = null;
+            const addresses = this.addresses[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(addresses)) {
+              // console.log(address + " => " + JSON.stringify(accountData));
+              for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
+                // console.log({ address, accountName: accountData.name, stealthMetaAddress, ...stealthMetaAddressData })
+                if (address == this.coinbase && !this.modalNewStealthMetaAddressNew.name) {
+                  this.modalNewStealthMetaAddressNew.name = accountData.name;
+                }
+              }
+            }
+
+            // TODO: Testing
+            this.modalNewStealthMetaAddressNew.keys = {
+              // "spendingPrivateKey": "0x3795c0f4e8bda3b59b249eb3e64a8b3235ab29531fc83809a134b22d30c31cda",
+              // "viewingPrivateKey": "0xb8293d4764cb158b9e395e3aed255d588c8e3380e0798921446d8735eecced91",
+              // "spendingPublicKey": "0x037772573d8d959eaf076128f467c81083063d0f333ad77b59f04ab7d4a927d6b5",
+              // "viewingPublicKey": "0x03daab8862af2ba106420b20fdc62278281544fa20256d65f13ab19fc5d5d6bd44",
+              // "stealthMetaAddress": "st:eth:0x037772573d8d959eaf076128f467c81083063d0f333ad77b59f04ab7d4a927d6b503daab8862af2ba106420b20fdc62278281544fa20256d65f13ab19fc5d5d6bd44",
+              // "inAddressBook": false,
+              // "inRegistry": false,
+            };
+            this.$bvModal.show('modal-newstealthmetaaddressnew');
           },
 
           newStealthMetaAddress() {
