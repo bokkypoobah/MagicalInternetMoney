@@ -2395,7 +2395,7 @@
 
           async collateAccounts(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
-            const accounts = {}; // TODO: this.accounts, and from DB
+            const accounts = this.accounts;
             let rows = 0;
             let done = false;
             do {
@@ -2445,8 +2445,6 @@
             for (const [address, accountData] of Object.entries(accounts)) {
               if (accountData.type == "stealthMetaAddress") {
                 const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
-                // console.log(moment().format("HH:mm:ss") + " collateAccounts: " + address + " => " + JSON.stringify(accountData, null, 2));
-                // console.log(moment().format("HH:mm:ss") + "   => " + JSON.stringify(linkedToData, null, 2));
                 if (linkedToData && linkedToData.mine) {
                   accounts[address].mine = true;
                 }
@@ -2455,7 +2453,7 @@
 
             Vue.set(this, 'accounts', accounts);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            // console.log(moment().format("HH:mm:ss") + " collateAccounts - accounts: " + JSON.stringify(accounts, null, 2));
+            console.log(moment().format("HH:mm:ss") + " collateAccounts - accounts: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
@@ -2475,7 +2473,7 @@
               let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
-                console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + item.stealthAddress + ", ephemeralPublicKey: " + item.ephemeralPublicKey);
+                console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + item.stealthAddress + ", ephemeralPublicKey: " + item.ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
               }
               rows = parseInt(rows) + data.length;
               done = data.length < this.DBPROCESSINGBATCHSIZE;
