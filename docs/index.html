@@ -2394,9 +2394,9 @@
             console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
             const accounts = {}; // TODO: this.accounts, and from DB
             const newAccounts = {};
-            if (!(this.coinbase in accounts) && !(this.coinbase in newAccounts)) {
-              newAccounts[this.coinbase] = { type: "account", source: "attached", mine: true, name: "null" };
-            }
+            // if (!(this.coinbase in accounts) && !(this.coinbase in newAccounts)) {
+            //   newAccounts[this.coinbase] = { type: "account", source: "attached", mine: true, name: null };
+            // }
             let rows = 0;
             let done = false;
             do {
@@ -2415,7 +2415,7 @@
                   newAccounts[item.caller] = { type: "account", source: "announcer.caller", mine: null, name };
                 }
                 if (!(item.tx.from in accounts) && !(item.tx.from in newAccounts)) {
-                  newAccounts[item.tx.from] = { type: "account", source: "announcer.sender", mine: null, name: null };
+                  newAccounts[item.tx.from] = { type: "account", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -2443,9 +2443,20 @@
               done = data.length < this.DBPROCESSINGBATCHSIZE;
             } while (!done);
 
+            for (const [address, accountData] of Object.entries(newAccounts)) {
+              if (accountData.type == "stealthMetaAddress") {
+                const linkedToData = accountData.linkedTo && newAccounts[accountData.linkedTo] || null;
+                // console.log(moment().format("HH:mm:ss") + " collateAccounts: " + address + " => " + JSON.stringify(accountData, null, 2));
+                // console.log(moment().format("HH:mm:ss") + "   => " + JSON.stringify(linkedToData, null, 2));
+                if (linkedToData && linkedToData.mine) {
+                  newAccounts[address].mine = true;
+                }
+              }
+            }
+
             Vue.set(this, 'accounts', newAccounts);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            console.log(moment().format("HH:mm:ss") + " collateAccounts - newAccounts: " + JSON.stringify(newAccounts, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " collateAccounts - newAccounts: " + JSON.stringify(newAccounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
@@ -2712,7 +2723,7 @@
               }
               if ('stealthChadAccounts' in localStorage) {
                 this.accounts = JSON.parse(localStorage.stealthChadAccounts);
-                console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts));
+                // console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts));
               }
               // if ('stealthChadBlockTimestamps' in localStorage) {
               //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
