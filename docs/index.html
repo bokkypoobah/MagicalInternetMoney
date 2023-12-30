@@ -67,6 +67,34 @@
             </b-card-text>
           </b-card>
 
+          <!-- :MODALACCOUNTNEW -->
+          <b-modal id="modal-accountnew" hide-footer size="xl">
+            <template #modal-title>
+              {{ modalAccount.item.type }} {{ modalAccount.item.address }}
+            </template>
+            <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalAccount.item && modalAccount.item.address" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
+              </b-form-group>
+              <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
+                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
+              </b-form-group>
+            </b-form-group>
+            <!-- <b-form-group label-cols-lg="2" label="Stealth Meta-Addresses" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalAccount.item" label="Stealth Meta-Addresses:" label-for="account-stealthmetaaddresses" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea readonly size="sm" id="account-stealthmetaaddresses" :value="JSON.stringify(modalAccount.item.stealthMetaAddresses, null, 2)" class="w-100" rows="10"></b-form-textarea>
+              </b-form-group>
+            </b-form-group> -->
+          </b-modal>
+
           <!-- :MODALACCOUNT -->
           <b-modal id="modal-account" hide-footer size="xl">
             <template #modal-title>
@@ -739,7 +767,8 @@
                   </font>
                 </template> -->
                 <template #cell(address)="data">
-                  <b-link @click="viewAccount(data.item.address, 'address')">
+                  <!-- <b-link @click="viewAccount(data.item.address, 'address')"> -->
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address" target="_blank">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ nameOrAddress(data.item.address, 28) }}</b-badge>
                   </b-link>
                 </template>
@@ -1222,10 +1251,11 @@
           ],
           accountsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'derived', label: 'Derived From', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           contractsFields: [
@@ -1957,7 +1987,7 @@
             console.log(moment().format("HH:mm:ss") + " accountsRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalAccount.item = item[0];
-              this.$bvModal.show('modal-account');
+              this.$bvModal.show('modal-accountnew');
               this.$refs.accountsTable.clearSelected();
             }
           },
@@ -2042,9 +2072,9 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
-            // }
+            }
             // TODO
             // if (network.chainId == CHAINID_MAINNET) {
             //   await this.syncENSNames(provider);
@@ -2365,7 +2395,7 @@
             const accounts = {}; // TODO: this.accounts, and from DB
             const newAccounts = {};
             if (!(this.coinbase in accounts) && !(this.coinbase in newAccounts)) {
-              newAccounts[this.coinbase] = { type: "account", source: "attached" };
+              newAccounts[this.coinbase] = { type: "account", source: "attached", mine: true, name: "null" };
             }
             let rows = 0;
             let done = false;
@@ -2374,16 +2404,18 @@
               console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
                 if (!(item.contract in accounts) && !(item.contract in newAccounts)) {
-                  newAccounts[item.contract] = { type: "contract", source: "announcer", name: CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null };
+                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+                  newAccounts[item.contract] = { type: "account", source: "announcer.contract", mine: false, name };
                 }
                 if (!(item.stealthAddress in accounts) && !(item.stealthAddress in newAccounts)) {
-                  newAccounts[item.stealthAddress] = { type: "stealthAddress", source: "announcer", name: null };
+                  newAccounts[item.stealthAddress] = { type: "account", source: "announcer.stealthAddress", mine: null, name: null };
                 }
                 if (!(item.caller in accounts) && !(item.caller in newAccounts)) {
-                  newAccounts[item.caller] = { type: "caller", source: "announcer", name: CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null  };
+                  const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
+                  newAccounts[item.caller] = { type: "account", source: "announcer.caller", mine: null, name };
                 }
                 if (!(item.tx.from in accounts) && !(item.tx.from in newAccounts)) {
-                  newAccounts[item.tx.from] = { type: "sender", source: "announcer", name: null };
+                  newAccounts[item.tx.from] = { type: "account", source: "announcer.sender", mine: null, name: null };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -2397,13 +2429,14 @@
               console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
                 if (!(item.contract in accounts) && !(item.contract in newAccounts)) {
-                  newAccounts[item.contract] = { type: "contract", source: "registry" };
+                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+                  newAccounts[item.contract] = { type: "account", source: "registry.contract", mine: false, name };
                 }
                 if (!(item.registrant in accounts) && !(item.registrant in newAccounts)) {
-                  newAccounts[item.registrant] = { type: "registrant", source: "registry" };
+                  newAccounts[item.registrant] = { type: "account", source: "registry.registrant", mine: null, name: null };
                 }
                 if (!(item.stealthMetaAddress in accounts) && !(item.stealthMetaAddress in newAccounts)) {
-                  newAccounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry", account: item.registrant };
+                  newAccounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant };
                 }
               }
               rows = parseInt(rows) + data.length;
