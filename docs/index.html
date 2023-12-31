@@ -2816,12 +2816,12 @@
             return result;
           },
           addressDescription(address) {
-            const addresses = this.addresses[this.chainId] || {};
-            if (address in addresses) {
+            const account = this.accounts[address] || null;
+            if (account) {
               result = "address=" + address;
-              for (let key of ['type', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source']) {
-                if (key in addresses[address] && addresses[address][key]) {
-                  result = result + "; " + key + "=" + addresses[address][key];
+              for (let key of [ 'type', 'linkedTo', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source', 'stealthMetaAddress' ]) {
+                if (key in account) {
+                  result = result + "; " + key + "=" + account[key];
                 }
               }
             } else {
