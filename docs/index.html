@@ -117,6 +117,33 @@
               </b-input-group>
             </b-form-group>
 
+            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPrivateKey" label="Viewing Private Key:" label-for="account-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="account-viewingprivatekey" :value="modalAccount.item.viewingPrivateKey"></b-form-input>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalAccount.item && modalAccount.item.spendingPublicKey" label="Spending Public Key:" label-for="account-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="account-spendingpublickey" :value="modalAccount.item.spendingPublicKey"></b-form-input>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPublicKey" label="Spending Public Key:" label-for="account-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="account-viewingpublickey" :value="modalAccount.item.viewingPublicKey"></b-form-input>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
               <!-- <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
               </b-form-group> -->
