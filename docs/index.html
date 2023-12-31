@@ -2804,9 +2804,9 @@
           },
           nameOrAddress(address, length = 0) {
             let result = null;
-            const addresses = this.addresses[this.chainId] || {};
-            if (address in addresses) {
-              result = addresses[address].ensName || addresses[address].name || address;
+            const account = this.accounts[address];
+            if (account) {
+              result = account.ensName || account.name || address;
             } else {
               result = address;
             }
@@ -2816,7 +2816,7 @@
             return result;
           },
           addressDescription(address) {
-            const account = this.accounts[address] || null;
+            const account = this.accounts[address];
             if (account) {
               result = "address=" + address;
               for (let key of [ 'type', 'linkedTo', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source', 'stealthMetaAddress' ]) {
