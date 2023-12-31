@@ -117,7 +117,7 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item" label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAccount.item.type == 'account' ? null : 'Add new Stealth Meta-Address for your stealth keys to be generated and linked'" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAccount.item" label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAccount.item.type == 'account' ? null : 'NOTE: Create new Stealth Meta-Address for your stealth keys to be generated and linked'" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" id="account-mine" value="1" :checked="modalAccount.item.mine ? 1 : 0" @change="toggleModalAccountMine()" class="mt-1"></b-form-checkbox>
             </b-form-group>
 
@@ -1792,15 +1792,18 @@
             console.log(moment().format("HH:mm:ss") + " toggleModalAccountMine: " + JSON.stringify(this.modalAccount));
             this.modalAccount.item.mine = !this.modalAccount.item.mine;
             Vue.set(this.accounts[this.modalAccount.item.address], 'mine', this.modalAccount.item.mine);
+            // Force update
+            Vue.set(this.accounts, this.modalAccount.item.address, this.accounts[this.modalAccount.item.address]);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
             // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
-          // TODO: Low priority - toggleContractRead & toggleContractWrite do not update correctly for newly scanned contracts
           toggleContractRead(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'read', !this.modalContract.read);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
               // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
@@ -1809,6 +1812,7 @@
             // console.log(moment().format("HH:mm:ss") + " toggleContractWrite");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'write', !this.modalContract.write);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
               // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
@@ -2034,6 +2038,9 @@
                 source: "user.signed",
               });
             }
+            // Force update
+            Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddressNew.stealthMetaAddress]);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
@@ -2234,8 +2241,12 @@
           accountsRowSelected(item) {
             console.log(moment().format("HH:mm:ss") + " accountsRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
-              this.modalAccount.item = item[0];
-              this.modalAccount.name = item[0].name;
+              const address = item[0].address;
+              console.log("address: " + address);
+              const account = this.accounts[address];
+              console.log("account: " + JSON.stringify(account));
+              this.modalAccount.item = { address, ...account };
+              this.modalAccount.name = account.name;
               this.$bvModal.show('modal-accountnew');
               this.$refs.accountsTable.clearSelected();
             }
