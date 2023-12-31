@@ -183,8 +183,8 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.status == 'mine' ? 'Already in accounts' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalNewStealthMetaAddressNew.stealthMetaAddress || modalNewStealthMetaAddressNew.status == 'mine'" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">{{ modalNewStealthMetaAddressNew.status == 'mine' ? 'Update' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
+            <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.status == 'mine' ? 'Update account with stealth keys' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalNewStealthMetaAddressNew.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">{{ modalNewStealthMetaAddressNew.status == 'mine' ? 'Update' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
             </b-form-group>
           </b-modal>
 
