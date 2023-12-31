@@ -83,7 +83,7 @@
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" id="account-stealthmetaaddress" v-model.trim="modalAccount.item.address" rows="3"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="account-stealthmetaaddress" v-model.trim="modalAccount.item.address" rows="3"></b-form-textarea>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
@@ -101,7 +101,7 @@
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" id="account-phrase" v-model.trim="modalAccount.item.phrase" rows="3"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="account-phrase" v-model.trim="modalAccount.item.phrase" rows="3"></b-form-textarea>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalAccount.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
