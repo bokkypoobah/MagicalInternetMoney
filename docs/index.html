@@ -562,7 +562,6 @@
 
 
               <!-- :ACTIVITY -->
-              <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="activityTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -629,7 +628,6 @@
               </b-card>
 
               <!-- :ADDRESSES -->
-              <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -735,7 +733,6 @@
               </b-card>
 
               <!-- :REGISTRY -->
-              <!-- <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -789,7 +786,6 @@
               </b-table>
 
               <!-- :ACCOUNTS -->
-              <!-- <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" small fixed striped responsive hover :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -860,7 +856,6 @@
                       </div>
                     </div>
 
-                    <!-- <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
                     <b-table ref="contractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='contractRowSelected' :fields="contractsFields" :items="pagedFilteredSortedContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                       <template #cell(number)="data">
                         <font size="-1">
