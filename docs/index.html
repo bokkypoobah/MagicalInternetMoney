@@ -70,7 +70,7 @@
           <!-- :MODALACCOUNTNEW -->
           <b-modal id="modal-accountnew" hide-footer size="xl">
             <template #modal-title>
-              {{ modalAccount.item.type }} {{ modalAccount.item.address }}
+              {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }} Details
             </template>
             <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalAccount.item && modalAccount.item.address" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -157,9 +157,12 @@
               Generate New Stealth Meta-Address
             </template>
             <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <font size="-1">
+              <b-input-group size="sm" class="w-100">
                 <b-button size="sm" variant="link" id="newsma-attachedaccount" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ coinbase }}</b-button>
-              </font>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddressNew.name" class="w-50"></b-form-input>
@@ -1890,7 +1893,6 @@
               account.viewingPrivateKey = this.modalNewStealthMetaAddressNew.viewingPrivateKey;
               account.spendingPublicKey = this.modalNewStealthMetaAddressNew.spendingPublicKey;
               account.viewingPublicKey = this.modalNewStealthMetaAddressNew.viewingPublicKey;
-              account.stealthMetaAddress = this.modalNewStealthMetaAddressNew.stealthMetaAddress;
               account.mine = true;
               Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, account);
             } else {
@@ -1902,7 +1904,6 @@
                 viewingPrivateKey: this.modalNewStealthMetaAddressNew.viewingPrivateKey,
                 spendingPublicKey: this.modalNewStealthMetaAddressNew.spendingPublicKey,
                 viewingPublicKey: this.modalNewStealthMetaAddressNew.viewingPublicKey,
-                stealthMetaAddress: this.modalNewStealthMetaAddressNew.stealthMetaAddress,
                 mine: true,
                 source: "user.signed",
               });
