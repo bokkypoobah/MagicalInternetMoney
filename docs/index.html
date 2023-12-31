@@ -203,9 +203,17 @@
               <!-- <b-form-group label="In Address Book:" label-for="newsma-inaddressbook" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-form-checkbox size="sm" disabled id="newsma-inaddressbook" value="1" :checked="modalNewStealthMetaAddressNew.keys.inAddressBook ? 1 : 0" class="mt-1"></b-form-checkbox>
               </b-form-group> -->
-              <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.inAddressBook ? 'Already in Address Book' : 'Click to add to Address Book'" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="modalNewStealthMetaAddressNew.inAddressBook" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">Save</b-button>
+
+              <b-form-group label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.status == 'doesnotexist' ? 'New SMA' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'SMA to be claimed' : 'In Accounts')" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalNewStealthMetaAddressNew.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">{{ modalNewStealthMetaAddressNew.status == 'doesnotexist' ? 'Add To Accounts' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Claim As Mine' : 'Add To Accounts') }}</b-button>
               </b-form-group>
+              <!-- <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.inAddressBook ? 'Already in Address Book' : 'Click to add to Address Book'" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="modalNewStealthMetaAddressNew.inAddressBook" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">Save</b-button>
+              </b-form-group> -->
+
+              <!-- <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.inAddressBook ? 'Already in Address Book' : 'Click to add to Address Book'" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="modalNewStealthMetaAddressNew.inAddressBook" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">Save</b-button>
+              </b-form-group> -->
             <!-- </b-form-group> -->
             <!-- <b-form-group v-if="Object.keys(modalNewStealthMetaAddressNew.keys).length > 0" label-cols-lg="2" label="Registry" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0"> -->
               <!-- <b-form-group label="In Registry:" label-for="newsma-inregistry" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -1193,13 +1201,13 @@
           },
           modalNewStealthMetaAddressNew: {
             name: null,
+            linkedTo: null,
             phrase: null,
             viewingPrivateKey: null,
             spendingPublicKey: null,
             viewingPublicKey: null,
             stealthMetaAddress: null,
-            inAccounts: false,
-            inRegistry: false,
+            status: null,
           },
           modalNewStealthMetaAddress: {
             phrase: null,
@@ -1765,14 +1773,14 @@
 
           newStealthMetaAddressNew() {
             console.log(moment().format("HH:mm:ss") + " newStealthMetaAddressNew");
-            this.modalNewStealthMetaAddressNew.phrase = this.defaultPhrase;
             this.modalNewStealthMetaAddressNew.name = null;
+            this.modalNewStealthMetaAddressNew.linkedTo = this.coinbase;
+            this.modalNewStealthMetaAddressNew.phrase = this.defaultPhrase;
             this.modalNewStealthMetaAddressNew.viewingPrivateKey = "0xb8293d4764cb158b9e395e3aed255d588c8e3380e0798921446d8735eecced91";
             this.modalNewStealthMetaAddressNew.spendingPublicKey = "0x037772573d8d959eaf076128f467c81083063d0f333ad77b59f04ab7d4a927d6b5";
             this.modalNewStealthMetaAddressNew.viewingPublicKey = "0x03daab8862af2ba106420b20fdc62278281544fa20256d65f13ab19fc5d5d6bd44";
             this.modalNewStealthMetaAddressNew.stealthMetaAddress = "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96";
-            this.modalNewStealthMetaAddressNew.inAccounts = false;
-            this.modalNewStealthMetaAddressNew.inRegistry = false;
+            this.modalNewStealthMetaAddressNew.status = null;
             this.$bvModal.show('modal-newstealthmetaaddressnew');
           },
 
@@ -1832,37 +1840,15 @@
             Vue.set(this.modalNewStealthMetaAddressNew, 'spendingPublicKey', spendingPublicKey);
             Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPublicKey', viewingPublicKey);
             Vue.set(this.modalNewStealthMetaAddressNew, 'stealthMetaAddress', stealthMetaAddress);
-            let inAddressBook = false;
-            const addresses = this.addresses[this.chainId] || {};
-            for (const [address, accountData] of Object.entries(addresses)) {
-              console.log(address + " => " + JSON.stringify(accountData));
-              for (const [checkStealthMetaAddress, checkStealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
-                if (checkStealthMetaAddress == stealthMetaAddress) {
-                  inAddressBook = true;
-                  break;
-                }
-              }
-              if (inAddressBook) {
-                break;
-              }
+            Vue.set(this.modalNewStealthMetaAddressNew, 'linkedTo', this.coinbase);
+
+            let status;
+            if (stealthMetaAddress in this.accounts) {
+              status = this.accounts[stealthMetaAddress].mine ? "mine" : "notmine";
+            } else {
+              status = "doesnotexist";
             }
-            let inRegistry = false;
-            const registryEvents = this.registryEvents[this.chainId] || {};
-            for (const blockNumber of Object.keys(registryEvents).sort((a, b) => { return a - b })) {
-              const blockNumberData = registryEvents[blockNumber];
-              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
-                const eventData = registryEvents[blockNumber][logIndex];
-                if (eventData.stealthMetaAddress == stealthMetaAddress) {
-                  inRegistry = true;
-                  break;
-                }
-              }
-              if (inRegistry) {
-                break;
-              }
-            }
-            Vue.set(this.modalNewStealthMetaAddressNew, 'inAddressBook', inAddressBook);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'inRegistry', inRegistry);
+            Vue.set(this.modalNewStealthMetaAddressNew, 'status', status);
             console.log("this.modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
           },
 
@@ -1950,7 +1936,42 @@
 
           addStealthMetaAddressToAddressBookNew() {
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew");
-            console.log("modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew));
+            console.log("modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
+
+            const account = this.accounts[this.modalNewStealthMetaAddressNew.stealthMetaAddress];
+            if (account) {
+              console.log("account BEFORE: " + JSON.stringify(account, null, 2));
+              account.name = this.modalNewStealthMetaAddressNew.name;
+              account.linkedTo = this.modalNewStealthMetaAddressNew.linkedTo;
+              account.phrase = this.modalNewStealthMetaAddressNew.phrase;
+              account.viewingPrivateKey = this.modalNewStealthMetaAddressNew.viewingPrivateKey;
+              account.spendingPublicKey = this.modalNewStealthMetaAddressNew.spendingPublicKey;
+              account.viewingPublicKey = this.modalNewStealthMetaAddressNew.viewingPublicKey;
+              account.stealthMetaAddress = this.modalNewStealthMetaAddressNew.stealthMetaAddress;
+              account.mine = true;
+              // status = this.accounts[stealthMetaAddress].mine ? "mine" : "notmine";
+              if (account.mine) {
+                status = "mine";
+              } else {
+                status = "notmine";
+              }
+              Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, account);
+            } else {
+              status = "doesnotexist";
+              Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, {
+                name: this.modalNewStealthMetaAddressNew.name,
+                linkedTo: this.modalNewStealthMetaAddressNew.linkedTo,
+                phrase: this.modalNewStealthMetaAddressNew.phrase,
+                viewingPrivateKey: this.modalNewStealthMetaAddressNew.viewingPrivateKey,
+                spendingPublicKey: this.modalNewStealthMetaAddressNew.spendingPublicKey,
+                viewingPublicKey: this.modalNewStealthMetaAddressNew.viewingPublicKey,
+                stealthMetaAddress: this.modalNewStealthMetaAddressNew.stealthMetaAddress,
+                mine: true,
+              });
+            }
+            console.log("status: " + status);
+            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+
             // const addresses = this.addresses[this.chainId] || {};
             // if (!(this.chainId in this.addresses)) {
             //   Vue.set(this.addresses, this.chainId, {});
@@ -1971,7 +1992,7 @@
             //   viewingPublicKey: this.modalNewStealthMetaAddress.keys.viewingPublicKey,
             // });
             // localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            // console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew - addresses: " + JSON.stringify(this.addresses, null, 2));
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
           addStealthMetaAddressToAddressBook() {
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBook");
@@ -2966,7 +2987,7 @@
               }
               if ('stealthChadAccounts' in localStorage) {
                 this.accounts = JSON.parse(localStorage.stealthChadAccounts);
-                // console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts));
+                console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts, null, 2));
               }
               // if ('stealthChadBlockTimestamps' in localStorage) {
               //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
