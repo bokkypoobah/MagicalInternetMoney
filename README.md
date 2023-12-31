@@ -41,6 +41,34 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 ---
 
+### Sample Screens
+
+#### Config Sample Screens
+
+##### Config - Before Scan
+
+<kbd><img src="images/SampleScreen_Config_BeforeScan_20240101.png" /></kbd>
+
+##### Config - After Scan
+
+<kbd><img src="images/SampleScreen_Config_AfterScan_20240101.png" /></kbd>
+
+##### Config - Announcer
+
+<kbd><img src="images/SampleScreen_Config_Announcer_20240101.png" /></kbd>
+
+##### Config - Registry
+
+<kbd><img src="images/SampleScreen_Config_Registry_20240101.png" /></kbd>
+
+##### Config - StealthChad
+
+<kbd><img src="images/SampleScreen_Config_StealthChad_20240101.png" /></kbd>
+
+<br />
+
+---
+
 ## Notes
 
 npx hardhat
