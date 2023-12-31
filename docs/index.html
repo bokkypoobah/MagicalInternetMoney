@@ -46,9 +46,9 @@
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'My Addresses'">My Addresses</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'My Addresses'">My Addresses</b-nav-item> -->
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts (WIP)</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
@@ -117,12 +117,16 @@
               </b-input-group>
             </b-form-group>
 
+            <b-form-group v-if="modalAccount.item" label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAccount.item.type == 'account' ? null : 'Add new Stealth Meta-Address for your stealth keys to be generated and linked'" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" id="account-mine" value="1" :checked="modalAccount.item.mine ? 1 : 0" @change="toggleModalAccountMine()" class="mt-1"></b-form-checkbox>
+            </b-form-group>
+
             <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPrivateKey" label="Spending Private Key:" label-for="account-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-spendingprivatekey" :value="modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '●'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAccount.item.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="account-spendingprivatekey" :value="modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
                   <b-button v-if="!modalAccount.item.spendingPrivateKey" :disabled="modalAccount.item.linkedTo != coinbase" @click="revealModalAccountSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                  <b-button v-if="modalAccount.item.spendingPrivateKey" @click="copyToClipboard(modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '●'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button v-if="modalAccount.item.spendingPrivateKey" @click="copyToClipboard(modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -1784,6 +1788,14 @@
             // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
+          toggleModalAccountMine() {
+            console.log(moment().format("HH:mm:ss") + " toggleModalAccountMine: " + JSON.stringify(this.modalAccount));
+            this.modalAccount.item.mine = !this.modalAccount.item.mine;
+            Vue.set(this.accounts[this.modalAccount.item.address], 'mine', this.modalAccount.item.mine);
+            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
+          },
+
           // TODO: Low priority - toggleContractRead & toggleContractWrite do not update correctly for newly scanned contracts
           toggleContractRead(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
@@ -2644,11 +2656,11 @@
                   accounts[item.contract] = { type: "account", source: "announcer.contract", mine: false, name };
                 }
                 if (!(item.stealthAddress in accounts)) {
-                  accounts[item.stealthAddress] = { type: "account", source: "announcer.stealthAddress", mine: null, name: null };
+                  accounts[item.stealthAddress] = { type: "account", source: "announcer.stealthAddress", mine: false, name: null };
                 }
                 if (!(item.caller in accounts)) {
                   const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-                  accounts[item.caller] = { type: "account", source: "announcer.caller", mine: null, name };
+                  accounts[item.caller] = { type: "account", source: "announcer.caller", mine: false, name };
                 }
                 if (!(item.tx.from in accounts)) {
                   accounts[item.tx.from] = { type: "account", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
@@ -2669,10 +2681,10 @@
                   accounts[item.contract] = { type: "account", source: "registry.contract", mine: false, name };
                 }
                 if (!(item.registrant in accounts)) {
-                  accounts[item.registrant] = { type: "account", source: "registry.registrant", mine: null, name: null };
+                  accounts[item.registrant] = { type: "account", source: "registry.registrant", mine: false, name: null };
                 }
                 if (!(item.stealthMetaAddress in accounts)) {
-                  accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant };
+                  accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
                 }
               }
               rows = parseInt(rows) + data.length;
