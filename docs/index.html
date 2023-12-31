@@ -68,26 +68,44 @@
           </b-card>
 
           <!-- :MODALACCOUNTNEW -->
-          <b-modal id="modal-accountnew" hide-footer size="xl">
+          <b-modal id="modal-accountnew" hide-footer size="lg">
             <template #modal-title>
               {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }} Details
             </template>
-            <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="modalAccount.item && modalAccount.item.address" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
-                </font>
-              </b-form-group>
-              <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name" class="w-100"></b-form-input>
-              </b-form-group>
-              <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
-              </b-form-group>
-              <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
-                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
-              </b-form-group>
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
+
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-textarea size="sm" id="account-stealthmetaaddress" v-model.trim="modalAccount.item.address" rows="3"></b-form-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name"></b-form-input>
+                <b-input-group-append>
+                  <b-button :disabled="modalAccount.name == (modalAccount.item && modalAccount.item.name)" @click="saveModalAccountName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+              <!-- <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
+              </b-form-group> -->
+              <!-- <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
+                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
+              </b-form-group> -->
+
             <!-- <b-form-group label-cols-lg="2" label="Stealth Meta-Addresses" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalAccount.item" label="Stealth Meta-Addresses:" label-for="account-stealthmetaaddresses" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-form-textarea readonly size="sm" id="account-stealthmetaaddresses" :value="JSON.stringify(modalAccount.item.stealthMetaAddresses, null, 2)" class="w-100" rows="10"></b-form-textarea>
@@ -1701,6 +1719,15 @@
             localStorage.stealthChadContracts = JSON.stringify(this.contracts);
             // console.log(moment().format("HH:mm:ss") + " saveModalContractName - contracts: " + JSON.stringify(this.contracts, null, 2));
           },
+
+          saveModalAccountName() {
+            console.log(moment().format("HH:mm:ss") + " saveModalAccountName: " + JSON.stringify(this.modalAccount));
+            this.modalAccount.item.name = this.modalAccount.name;
+            Vue.set(this.accounts[this.modalAccount.item.address], 'name', this.modalAccount.name);
+            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
+          },
+
           // TODO: Low priority - toggleContractRead & toggleContractWrite do not update correctly for newly scanned contracts
           toggleContractRead(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
@@ -2109,6 +2136,7 @@
             console.log(moment().format("HH:mm:ss") + " accountsRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalAccount.item = item[0];
+              this.modalAccount.name = item[0].name;
               this.$bvModal.show('modal-accountnew');
               this.$refs.accountsTable.clearSelected();
             }
