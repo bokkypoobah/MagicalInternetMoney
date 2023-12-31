@@ -99,7 +99,7 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAccount.item && modalAccount.item.phrase" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" readonly id="account-phrase" v-model.trim="modalAccount.item.phrase" rows="3"></b-form-textarea>
                 <b-input-group-append>
@@ -113,6 +113,16 @@
                 <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name"></b-form-input>
                 <b-input-group-append>
                   <b-button :disabled="modalAccount.name == (modalAccount.item && modalAccount.item.name)" @click="saveModalAccountName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPrivateKey" label="Spending Private Key:" label-for="account-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="account-spendingprivatekey" :value="modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '●'.repeat(66)"></b-form-input>
+                <b-input-group-append>
+                  <b-button v-if="!modalAccount.item.spendingPrivateKey" :disabled="modalAccount.item.linkedTo != coinbase" @click="revealModalAccountSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalAccount.item.spendingPrivateKey" @click="copyToClipboard(modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '●'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -1211,6 +1221,7 @@
             source: null,
             item: null,
             name: null,
+            spendingPrivateKey: null,
           },
           modalActivity: {
             item: null,
@@ -1872,6 +1883,37 @@
             console.log("this.modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
           },
 
+
+          async revealModalAccountSpendingPrivateKey() {
+            console.log(moment().format("HH:mm:ss") + " revealModalAccountSpendingPrivateKey - phrase: " + this.modalAccount.item.phrase);
+            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAccount.item.phrase));
+            // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
+            const signature = await ethereum.request({
+                method: 'personal_sign',
+                params: [phraseInHex, this.coinbase],
+            });
+            const signature1 = signature.slice(2, 66);
+            const signature2 = signature.slice(66, 130);
+            // Hash "v" and "r" values using SHA-256
+            const hashedV = ethers.utils.sha256("0x" + signature1);
+            const hashedR = ethers.utils.sha256("0x" + signature2);
+            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            // Calculate the private keys by taking the hash values modulo the curve order
+            const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+            const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+            const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+            const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+            Vue.set(this.modalAccount.item, 'spendingPrivateKey', keyPair1.privateKey);
+            // Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPrivateKey', keyPair2.privateKey);
+            const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+            const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+            const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
+            // Vue.set(this.modalNewStealthMetaAddressNew, 'spendingPublicKey', spendingPublicKey);
+            // Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPublicKey', viewingPublicKey);
+            // Vue.set(this.modalNewStealthMetaAddressNew, 'stealthMetaAddress', stealthMetaAddress);
+            // Vue.set(this.modalNewStealthMetaAddressNew, 'linkedTo', this.coinbase);
+            // console.log("this.modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
+          },
 
           async generateNewStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " generateNewStealthMetaAddress - phrase: " + this.modalNewStealthMetaAddress.phrase);
