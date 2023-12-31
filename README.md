@@ -43,6 +43,38 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 ### Sample Screens
 
+#### Accounts Sample Screens
+
+##### Accounts - After Sync
+
+<kbd><img src="images/SampleScreen_Accounts_AfterSync_20240101.png" /></kbd>
+
+##### Accounts - Generate Stealth Meta-Address
+
+<kbd><img src="images/SampleScreen_Accounts_GenerateStealthMetaAddress_20240101.png" /></kbd>
+
+##### Accounts - Generate Stealth Meta-Address - Web3 Signing
+
+<kbd><img src="images/SampleScreen_Accounts_Signing_20240101.png" /></kbd>
+
+##### Accounts - Generate Stealth Meta-Address - After Web3 Signing
+
+<kbd><img src="images/SampleScreen_Accounts_AfterSigning_20240101.png" /></kbd>
+
+##### Accounts - View Stealth Meta-Address
+
+<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_20240101.png" /></kbd>
+
+##### Accounts - View Stealth Meta-Address - Sign To View Spending Private Key
+
+<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_SignToViewSpendingPrivateKey_20240101.png" /></kbd>
+
+##### Accounts - View Stealth Meta-Address - With Spending Private Key
+
+<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_WithSpendingPrivateKey_20240101.png" /></kbd>
+
+---
+
 #### Config Sample Screens
 
 ##### Config - Before Scan
