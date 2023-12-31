@@ -90,6 +90,24 @@
               </b-input-group>
             </b-form-group>
 
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-button size="sm" variant="link" id="account-linkedto" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.linkedTo" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.linkedTo }}</b-button>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-textarea size="sm" id="account-phrase" v-model.trim="modalAccount.item.phrase" rows="3"></b-form-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
             <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name"></b-form-input>
