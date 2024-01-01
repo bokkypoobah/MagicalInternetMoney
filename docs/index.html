@@ -1683,16 +1683,12 @@
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            // TODO
-            // if (network.chainId == CHAINID_MAINNET) {
-            //   await this.syncENSNames(provider);
-            // }
-            // if (!devMode) {
-            //   await this.processDataOld(provider);
-            // }
-            // if (network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_MAINNET) {
+              await this.syncENSNames(provider);
+            }
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
-            // }
+            }
             await this.loadCurrentData();
             this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
@@ -2068,14 +2064,19 @@
           async syncENSNames(provider) {
             console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            for (const [chainId, chainData] of Object.entries(this.addresses)) {
-              for (const [account, accountData] of Object.entries(chainData)) {
-                const allnames = await ensReverseRecordsContract.getNames([account]);
-                Vue.set(this.addresses[chainId][account], 'ensName', allnames.length >= 0 && allnames[0] || null);
-                console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
+            for (const [account, accountData] of Object.entries(this.accounts)) {
+              if (accountData.type == "account") {
+                try {
+                  const allnames = await ensReverseRecordsContract.getNames([account]);
+                  // TODO: https://github.com/adraffy/ens-normalize.js/
+                  Vue.set(this.accounts[account], 'ensName', allnames.length >= 0 && allnames[0] || null);
+                  // console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
+                } catch (e) {
+                  console.log("syncENSNames - ENS reverse lookup failed: " + e.toString());
+                }
               }
             }
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
