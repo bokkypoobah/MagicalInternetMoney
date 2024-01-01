@@ -79,6 +79,14 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account' && modalAccount.item.ensName" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="account-ensname" :value="modalAccount.item.ensName"></b-form-input>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalAccount.item.ensName);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -89,7 +97,7 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAccount.item.linkedTo)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-button size="sm" variant="link" id="account-linkedto" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.linkedTo" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.linkedTo }}</b-button>
                 <b-input-group-append>
@@ -2281,6 +2289,14 @@
             }
             if (result && length > 0) {
               result = result.substring(0, length);
+            }
+            return result;
+          },
+          nameOrNull(address) {
+            let result = null;
+            const account = this.accounts[address];
+            if (account) {
+              result = account.ensName || account.name || null;
             }
             return result;
           },
