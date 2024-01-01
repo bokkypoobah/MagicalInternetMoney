@@ -50,7 +50,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="nameOrAddress(coinbase, 100)">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
