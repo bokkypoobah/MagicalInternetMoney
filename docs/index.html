@@ -2068,9 +2068,8 @@
               if (accountData.type == "account") {
                 try {
                   const allnames = await ensReverseRecordsContract.getNames([account]);
-                  // TODO: https://github.com/adraffy/ens-normalize.js/
-                  Vue.set(this.accounts[account], 'ensName', allnames.length >= 0 && allnames[0] || null);
-                  // console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
+                  const name = allnames.length >= 0 && allnames[0] && ethers.utils.isValidName(allnames[0]) && allnames[0] || null;
+                  Vue.set(this.accounts[account], 'ensName', name);
                 } catch (e) {
                   console.log("syncENSNames - ENS reverse lookup failed: " + e.toString());
                 }
