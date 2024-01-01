@@ -1663,15 +1663,6 @@
             }
           },
 
-          addressesRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " addressesRowSelected: " + JSON.stringify(item, null, 2));
-            if (item && item.length > 0) {
-              this.modalAddress.item = item[0];
-              this.$bvModal.show('modal-address');
-              this.$refs.addressesTable.clearSelected();
-            }
-          },
-
           registryRowSelected(item) {
             console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
@@ -1702,50 +1693,6 @@
               this.modalContract.write = item[0] && item[0].write || false;
               this.$bvModal.show('modal-contract');
               this.$refs.contractsTable.clearSelected();
-            }
-          },
-
-          async updateApproval() {
-            console.log(moment().format("HH:mm:ss") + " updateApproval: " + JSON.stringify(this.modalApproval));
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const signer = provider.getSigner();
-            const item = this.modalApproval.item;
-            if (item.type == 'erc20') {
-              const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
-              const contractWithSigner = contract.connect(provider.getSigner());
-              try {
-                const tx = await contractWithSigner.approve(item.spender, ethers.utils.parseUnits(this.modalApproval.tokens, item.decimals));
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("updateApproval ERC-20.approve(...) error: " + JSON.stringify(e));
-              }
-            } else if (item.type == 'erc721' && item.approvalType == 'Approval') {
-              const contract = new ethers.Contract(item.contract, ERC721ABI, provider);
-              const contractWithSigner = contract.connect(provider.getSigner());
-              try {
-                const tx = await contractWithSigner.approve(this.modalApproval.spender, this.modalApproval.tokenId);
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("updateApproval ERC-721 approve(...) error: " + JSON.stringify(e));
-              }
-            } else if (item.type == 'erc721' && item.approvalType == 'ApprovalForAll') {
-              const contract = new ethers.Contract(item.contract, ERC721ABI, provider);
-              const contractWithSigner = contract.connect(provider.getSigner());
-              try {
-                const tx = await contractWithSigner.setApprovalForAll(item.spender, this.modalApproval.approved);
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("updateApproval ERC-721 setApprovalForAll(...) error: " + JSON.stringify(e));
-              }
-            } else if (item.type == 'erc1155' && item.approvalType == 'ApprovalForAll') {
-              const contract = new ethers.Contract(item.contract, ERC1155ABI, provider);
-              const contractWithSigner = contract.connect(provider.getSigner());
-              try {
-                const tx = await contractWithSigner.setApprovalForAll(this.modalApproval.item.spender, this.modalApproval.approved);
-                console.log("tx: " + JSON.stringify(tx));
-              } catch (e) {
-                console.log("updateApproval ERC-1155 setApprovalForAll(...) error: " + JSON.stringify(e));
-              }
             }
           },
 
@@ -1783,9 +1730,9 @@
             // if (!devMode) {
             //   await this.processDataOld(provider);
             // }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            // if (network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
-            }
+            // }
             await this.loadCurrentData();
             this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
