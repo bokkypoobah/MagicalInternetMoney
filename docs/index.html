@@ -1348,7 +1348,7 @@
             this.modalContract.item.name = this.modalContract.name;
             Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'name', this.modalContract.name);
             localStorage.stealthChadContracts = JSON.stringify(this.contracts);
-            // console.log(moment().format("HH:mm:ss") + " saveModalContractName - contracts: " + JSON.stringify(this.contracts, null, 2));
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
           saveModalAccountName() {
@@ -1356,25 +1356,23 @@
             this.modalAccount.item.name = this.modalAccount.name;
             Vue.set(this.accounts[this.modalAccount.item.address], 'name', this.modalAccount.name);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
           toggleModalAccountMine() {
             console.log(moment().format("HH:mm:ss") + " toggleModalAccountMine: " + JSON.stringify(this.modalAccount));
             this.modalAccount.item.mine = !this.modalAccount.item.mine;
             Vue.set(this.accounts[this.modalAccount.item.address], 'mine', this.modalAccount.item.mine);
-            // Force update
             Vue.set(this.accounts, this.modalAccount.item.address, this.accounts[this.modalAccount.item.address]);
-            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            // console.log(moment().format("HH:mm:ss") + " saveModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
           toggleContractRead(item) {
             // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'read', !this.modalContract.read);
-              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
               // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
@@ -1383,7 +1381,7 @@
             // console.log(moment().format("HH:mm:ss") + " toggleContractWrite");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'write', !this.modalContract.write);
-              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
               // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
@@ -1483,6 +1481,7 @@
             }
             Vue.set(this.modalAccount.item, 'name', this.modalAccount.name);
             localStorage.stealthChadAddresses = JSON.stringify(this.accounts);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             console.log(moment().format("HH:mm:ss") + " updateModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
@@ -1514,7 +1513,7 @@
             }
             // Force update
             Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress]);
-            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
