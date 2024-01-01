@@ -893,10 +893,6 @@
           registryEntries: [],
           accounts: {},
 
-          // events: {},
-          // registryEvents: {},
-          blockTimestamps: {},
-          // txs: {},
           modalAccount: {
             source: null,
             item: null,
@@ -2414,27 +2410,13 @@
               // Restore other settings for the same version
               if ('stealthChadContracts' in localStorage) {
                 this.contracts = JSON.parse(localStorage.stealthChadContracts);
-                // console.log(moment().format("HH:mm:ss") + " mounted - contracts: " + JSON.stringify(this.contracts));
               }
-              // if ('stealthChadEvents' in localStorage) {
-              //   this.events = JSON.parse(localStorage.stealthChadEvents);
-              // }
-              // if ('stealthChadRegistryEvents' in localStorage) {
-              //   this.registryEvents = JSON.parse(localStorage.stealthChadRegistryEvents);
-              // }
-              // if ('stealthChadTxs' in localStorage) {
-              //   this.txs = JSON.parse(localStorage.stealthChadTxs);
-              // }
               if ('stealthChadAddresses' in localStorage) {
                 this.addresses = JSON.parse(localStorage.stealthChadAddresses);
               }
               if ('stealthChadAccounts' in localStorage) {
                 this.accounts = JSON.parse(localStorage.stealthChadAccounts);
-                console.log(moment().format("HH:mm:ss") + " mounted - accounts: " + JSON.stringify(this.accounts, null, 2));
               }
-              // if ('stealthChadBlockTimestamps' in localStorage) {
-              //   this.blockTimestamps = JSON.parse(localStorage.stealthChadBlockTimestamps);
-              // }
               // (async() => {
               //   // TODO: TESTING
               //   await delay(1500);
