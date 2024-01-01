@@ -66,8 +66,8 @@
             </b-card-text>
           </b-card>
 
-          <!-- :MODALACCOUNTNEW -->
-          <b-modal id="modal-accountnew" hide-footer size="lg">
+          <!-- :MODALACCOUNT -->
+          <b-modal id="modal-account" hide-footer size="lg">
             <template #modal-title>
               {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }} Details
             </template>
@@ -171,34 +171,6 @@
             </b-form-group> -->
           </b-modal>
 
-          <!-- :MODALACCOUNT -->
-          <b-modal id="modal-account" hide-footer size="xl">
-            <template #modal-title>
-              {{ modalAccount.source }} {{ modalAccount.item.address }}
-            </template>
-            <b-form-group label-cols-lg="2" label="Account" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="modalAccount.item && modalAccount.item.address" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <font size="-1">
-                  <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
-                </font>
-              </b-form-group>
-              <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name" class="w-100"></b-form-input>
-              </b-form-group>
-              <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
-              </b-form-group>
-              <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
-                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
-              </b-form-group>
-            </b-form-group>
-            <b-form-group label-cols-lg="2" label="Stealth Meta-Addresses" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="modalAccount.item" label="Stealth Meta-Addresses:" label-for="account-stealthmetaaddresses" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-textarea readonly size="sm" id="account-stealthmetaaddresses" :value="JSON.stringify(modalAccount.item.stealthMetaAddresses, null, 2)" class="w-100" rows="10"></b-form-textarea>
-              </b-form-group>
-            </b-form-group>
-          </b-modal>
-
           <!-- :MODALACTIVITY -->
           <b-modal id="modal-activity" hide-footer size="xl">
             <template #modal-title>
@@ -227,8 +199,8 @@
             </font>
           </b-modal>
 
-          <!-- :MODALNEWSTEALTHMETAADDRESSNEW -->
-          <b-modal id="modal-newstealthmetaaddressnew" hide-footer size="lg">
+          <!-- :MODALNEWSTEALTHMETAADDRESS -->
+          <b-modal id="modal-newstealthmetaaddress" hide-footer size="lg">
             <template #modal-title>
               Generate New Stealth Meta-Address
             </template>
@@ -241,29 +213,29 @@
               </b-input-group>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddressNew.name" class="w-50"></b-form-input>
+              <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
             </b-form-group>
             <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Exact phrase with the attached account is required for recovery of your stealth keys!">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddressNew.phrase"></b-form-textarea>
+                <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalNewStealthMetaAddressNew.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalNewStealthMetaAddress.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
             <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click to sign the phrase above with your web3 attached account" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddressNew()" variant="warning">Generate</b-button>
+              <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddress()" variant="warning">Generate</b-button>
             </b-form-group>
-            <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="Stealth Meta-Address:" label-for="newsma-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="Stealth Meta-Address:" label-for="newsma-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" readonly id="newsma-stealthmetaaddress" :value="modalNewStealthMetaAddressNew.stealthMetaAddress" rows="3"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="newsma-stealthmetaaddress" :value="modalNewStealthMetaAddress.stealthMetaAddress" rows="3"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalNewStealthMetaAddressNew.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalNewStealthMetaAddress.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalNewStealthMetaAddressNew.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddressNew.status == 'mine' ? 'Update account with stealth keys' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalNewStealthMetaAddressNew.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddressBookNew()" variant="warning">{{ modalNewStealthMetaAddressNew.status == 'mine' ? 'Update' : (modalNewStealthMetaAddressNew.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
+            <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddress.status == 'mine' ? 'Update account with stealth keys' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAccounts()" variant="warning">{{ modalNewStealthMetaAddress.status == 'mine' ? 'Update' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
             </b-form-group>
           </b-modal>
 
@@ -365,7 +337,7 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
-                  <b-button size="sm" @click="newStealthMetaAddressNew" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+                  <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -862,18 +834,6 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            addressesTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 100,
-              sortOption: 'eoaasc',
-            },
-            contractsTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 10,
-              sortOption: 'typenameasc',
-            },
             registryActivityTable: {
               filter: null,
               currentPage: 1,
@@ -886,7 +846,13 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 23,
+            contractsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'typenameasc',
+            },
+            version: 24,
           },
           contracts: {
             "11155111": {
@@ -927,10 +893,10 @@
           registryEntries: [],
           accounts: {},
 
-          events: {},
-          registryEvents: {},
+          // events: {},
+          // registryEvents: {},
           blockTimestamps: {},
-          txs: {},
+          // txs: {},
           modalAccount: {
             source: null,
             item: null,
@@ -940,7 +906,7 @@
           modalActivity: {
             item: null,
           },
-          modalNewStealthMetaAddressNew: {
+          modalNewStealthMetaAddress: {
             name: null,
             linkedTo: null,
             phrase: null,
@@ -1173,6 +1139,63 @@
             return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
+          totalAccounts() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              result++;
+            }
+            return result;
+          },
+          filteredAccounts() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              results.push({ address, ...accountData });
+            }
+            return results;
+          },
+          filteredSortedAccounts() {
+            let results = this.filteredAccounts;
+            // TODO
+            if (this.settings.accountsTable.sortOption == 'typenameasc') {
+              results.sort((a, b) => {
+                if (('' + a.type).localeCompare(b.type) == 0) {
+                  return ('' + a.name).localeCompare(b.name);
+                } else {
+                  return ('' + b.type).localeCompare(a.type);
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
+              results.sort((a, b) => {
+                if (('' + a.type).localeCompare(b.type) == 0) {
+                  return ('' + b.name).localeCompare(a.name);
+                } else {
+                  return ('' + a.type).localeCompare(b.type);
+                }
+              });
+            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                return ('' + a.name).localeCompare(b.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                return ('' + b.name).localeCompare(a.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.address).localeCompare(b.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.address).localeCompare(a.address);
+              });
+            }
+            return results;
+          },
+          pagedFilteredSortedAccounts() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
+            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
+          },
+
           totalContracts() {
             let result = this.forceRefresh % 2 == 0 ? 0 : 0;
             for (const [chainId, chainData] of Object.entries(this.contracts)) {
@@ -1243,62 +1266,6 @@
             return this.filteredSortedContracts.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
-          totalAccounts() {
-            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
-            for (const [address, accountData] of Object.entries(this.accounts)) {
-              result++;
-            }
-            return result;
-          },
-          filteredAccounts() {
-            let results = this.forceRefresh % 2 == 0 ? [] : [];
-            for (const [address, accountData] of Object.entries(this.accounts)) {
-              results.push({ address, ...accountData });
-            }
-            return results;
-          },
-          filteredSortedAccounts() {
-            let results = this.filteredAccounts;
-            // TODO
-            if (this.settings.accountsTable.sortOption == 'typenameasc') {
-              results.sort((a, b) => {
-                if (('' + a.type).localeCompare(b.type) == 0) {
-                  return ('' + a.name).localeCompare(b.name);
-                } else {
-                  return ('' + b.type).localeCompare(a.type);
-                }
-              });
-            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
-              results.sort((a, b) => {
-                if (('' + a.type).localeCompare(b.type) == 0) {
-                  return ('' + b.name).localeCompare(a.name);
-                } else {
-                  return ('' + a.type).localeCompare(b.type);
-                }
-              });
-            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
-              results.sort((a, b) => {
-                return ('' + a.name).localeCompare(b.name);
-              });
-            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
-              results.sort((a, b) => {
-                return ('' + b.name).localeCompare(a.name);
-              });
-            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
-              results.sort((a, b) => {
-                return ('' + a.address).localeCompare(b.address);
-              });
-            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
-              results.sort((a, b) => {
-                return ('' + b.address).localeCompare(a.address);
-              });
-            }
-            return results;
-          },
-          pagedFilteredSortedAccounts() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
-            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
-          },
         },
 
         // --- METHODS ---
@@ -1426,22 +1393,22 @@
             }
           },
 
-          newStealthMetaAddressNew() {
-            console.log(moment().format("HH:mm:ss") + " newStealthMetaAddressNew");
-            this.modalNewStealthMetaAddressNew.name = null;
-            this.modalNewStealthMetaAddressNew.linkedTo = this.coinbase;
-            this.modalNewStealthMetaAddressNew.phrase = this.defaultPhrase;
-            this.modalNewStealthMetaAddressNew.viewingPrivateKey = null;
-            this.modalNewStealthMetaAddressNew.spendingPublicKey = null;
-            this.modalNewStealthMetaAddressNew.viewingPublicKey = null;
-            this.modalNewStealthMetaAddressNew.stealthMetaAddress = null;
-            this.modalNewStealthMetaAddressNew.status = null;
-            this.$bvModal.show('modal-newstealthmetaaddressnew');
+          newStealthMetaAddress() {
+            console.log(moment().format("HH:mm:ss") + " newStealthMetaAddress");
+            this.modalNewStealthMetaAddress.name = null;
+            this.modalNewStealthMetaAddress.linkedTo = this.coinbase;
+            this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
+            this.modalNewStealthMetaAddress.viewingPrivateKey = null;
+            this.modalNewStealthMetaAddress.spendingPublicKey = null;
+            this.modalNewStealthMetaAddress.viewingPublicKey = null;
+            this.modalNewStealthMetaAddress.stealthMetaAddress = null;
+            this.modalNewStealthMetaAddress.status = null;
+            this.$bvModal.show('modal-newstealthmetaaddress');
           },
 
-          async generateNewStealthMetaAddressNew() {
-            console.log(moment().format("HH:mm:ss") + " generateNewStealthMetaAddressNew - phrase: " + this.modalNewStealthMetaAddressNew.phrase);
-            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalNewStealthMetaAddressNew.phrase));
+          async generateNewStealthMetaAddress() {
+            console.log(moment().format("HH:mm:ss") + " generateNewStealthMetaAddress - phrase: " + this.modalNewStealthMetaAddress.phrase);
+            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalNewStealthMetaAddress.phrase));
             // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
                 method: 'personal_sign',
@@ -1459,14 +1426,14 @@
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
             // Vue.set(this.modalNewStealthMetaAddress.keys, 'spendingPrivateKey', keyPair1.privateKey);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPrivateKey', keyPair2.privateKey);
+            Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'spendingPublicKey', spendingPublicKey);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPublicKey', viewingPublicKey);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'stealthMetaAddress', stealthMetaAddress);
-            Vue.set(this.modalNewStealthMetaAddressNew, 'linkedTo', this.coinbase);
+            Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
+            Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
+            Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
+            Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
 
             let status;
             if (stealthMetaAddress in this.accounts) {
@@ -1474,8 +1441,8 @@
             } else {
               status = "doesnotexist";
             }
-            Vue.set(this.modalNewStealthMetaAddressNew, 'status', status);
-            console.log("this.modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
+            Vue.set(this.modalNewStealthMetaAddress, 'status', status);
+            console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
           },
 
 
@@ -1499,15 +1466,15 @@
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
             Vue.set(this.modalAccount.item, 'spendingPrivateKey', keyPair1.privateKey);
-            // Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPrivateKey', keyPair2.privateKey);
+            // Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-            // Vue.set(this.modalNewStealthMetaAddressNew, 'spendingPublicKey', spendingPublicKey);
-            // Vue.set(this.modalNewStealthMetaAddressNew, 'viewingPublicKey', viewingPublicKey);
-            // Vue.set(this.modalNewStealthMetaAddressNew, 'stealthMetaAddress', stealthMetaAddress);
-            // Vue.set(this.modalNewStealthMetaAddressNew, 'linkedTo', this.coinbase);
-            // console.log("this.modalNewStealthMetaAddressNew: " + JSON.stringify(this.modalNewStealthMetaAddressNew, null, 2));
+            // Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
+            // Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
+            // Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
+            // Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
+            // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
           },
 
           updateModalAccountName() {
@@ -1523,40 +1490,37 @@
             console.log(moment().format("HH:mm:ss") + " updateModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
-          addStealthMetaAddressToAddressBookNew() {
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew");
-            const account = this.accounts[this.modalNewStealthMetaAddressNew.stealthMetaAddress];
+          addStealthMetaAddressToAccounts() {
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts");
+            const account = this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress];
             if (account) {
               account.type = "stealthMetaAddress";
-              account.name = this.modalNewStealthMetaAddressNew.name;
-              account.linkedTo = this.modalNewStealthMetaAddressNew.linkedTo;
-              account.phrase = this.modalNewStealthMetaAddressNew.phrase;
-              account.viewingPrivateKey = this.modalNewStealthMetaAddressNew.viewingPrivateKey;
-              account.spendingPublicKey = this.modalNewStealthMetaAddressNew.spendingPublicKey;
-              account.viewingPublicKey = this.modalNewStealthMetaAddressNew.viewingPublicKey;
+              account.name = this.modalNewStealthMetaAddress.name;
+              account.linkedTo = this.modalNewStealthMetaAddress.linkedTo;
+              account.phrase = this.modalNewStealthMetaAddress.phrase;
+              account.viewingPrivateKey = this.modalNewStealthMetaAddress.viewingPrivateKey;
+              account.spendingPublicKey = this.modalNewStealthMetaAddress.spendingPublicKey;
+              account.viewingPublicKey = this.modalNewStealthMetaAddress.viewingPublicKey;
               account.mine = true;
-              Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, account);
+              Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, account);
             } else {
-              Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, {
+              Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, {
                 type: "stealthMetaAddress",
-                name: this.modalNewStealthMetaAddressNew.name,
-                linkedTo: this.modalNewStealthMetaAddressNew.linkedTo,
-                phrase: this.modalNewStealthMetaAddressNew.phrase,
-                viewingPrivateKey: this.modalNewStealthMetaAddressNew.viewingPrivateKey,
-                spendingPublicKey: this.modalNewStealthMetaAddressNew.spendingPublicKey,
-                viewingPublicKey: this.modalNewStealthMetaAddressNew.viewingPublicKey,
+                name: this.modalNewStealthMetaAddress.name,
+                linkedTo: this.modalNewStealthMetaAddress.linkedTo,
+                phrase: this.modalNewStealthMetaAddress.phrase,
+                viewingPrivateKey: this.modalNewStealthMetaAddress.viewingPrivateKey,
+                spendingPublicKey: this.modalNewStealthMetaAddress.spendingPublicKey,
+                viewingPublicKey: this.modalNewStealthMetaAddress.viewingPublicKey,
                 mine: true,
                 source: "user.signed",
               });
             }
             // Force update
-            Vue.set(this.accounts, this.modalNewStealthMetaAddressNew.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddressNew.stealthMetaAddress]);
+            Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh)+1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddressBookNew - accounts: " + JSON.stringify(this.accounts, null, 2));
-          },
-          addStealthMetaAddressToRegistry() {
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToRegistry");
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
           async generateKeys() {
             // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
@@ -1721,12 +1685,10 @@
             console.log(moment().format("HH:mm:ss") + " accountsRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               const address = item[0].address;
-              console.log("address: " + address);
               const account = this.accounts[address];
-              console.log("account: " + JSON.stringify(account));
               this.modalAccount.item = { address, ...account };
               this.modalAccount.name = account.name;
-              this.$bvModal.show('modal-accountnew');
+              this.$bvModal.show('modal-account');
               this.$refs.accountsTable.clearSelected();
             }
           },
