@@ -577,34 +577,35 @@
                     {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
                   </font>
                 </template>
-                <!-- <template #cell(timestamp)="data">
-                  <font size="-1">
-                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-                      <span v-if="data.item.timestamp">
-                        {{ formatTimestamp(data.item.timestamp) }}
-                      </span>
-                      <span v-else>
-                        {{ '#' + commify0(data.item.blockNumber) }}
-                      </span>
-                    </b-link>
-                  </font>
-                </template> -->
                 <template #cell(address)="data">
-                  <!-- <b-link @click="viewAccount(data.item.address, 'address')"> -->
-                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ nameOrAddress(data.item.address, 28) }}</b-badge>
-                  </b-link>
+                  <span v-if="data.item.address.substring(0, 2) == 'st'">
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.address)">{{ shortAddress(data.item.address) }}</font>
+                  </span>
+                  <span v-else>
+                    <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ shortAddress(data.item.address) }}</b-badge>
+                    </b-link>
+                  </span>
                 </template>
-                <template #cell(contract)="data">
-                  <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-                  </b-link>
+                <template #cell(linkedTo)="data">
+                  <span v-if="data.item.linkedTo && data.item.linkedTo.substring(0, 2) == 'st'">
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
+                  </span>
+                  <span v-else>
+                    <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.linkedTo" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.linkedTo)" class="px-0">{{ shortAddress(data.item.linkedTo) }}</b-badge>
+                    </b-link>
+                  </span>
                 </template>
-                <template #cell(details)="data">
+                <template #cell(name)="data">
+                  <font size="-1">{{ data.item.name }}</font>
+                </template>
+                <template #cell(mine)="data">
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+                </template>
+                <template #cell(source)="data">
                   <font size="-1">
-                    <pre>
-      {{ data.item }}
-                    </pre>
+                    {{ sourceOptions.filter(e => e.value == data.item.source)[0] && sourceOptions.filter(e => e.value == data.item.source)[0].text || ("Unknown: " + data.item.source) }}
                   </font>
                 </template>
               </b-table>
@@ -925,6 +926,17 @@
             { value: 1, text: 'Ethereum Mainnet' },
             { value: 11155111, text: 'Sepolia Testnet' },
           ],
+          sourceOptions: [
+            { value: null, text: '(select)' },
+            { value: "attached", text: 'Web3 attached account' },
+            { value: "announcer.contract", text: 'ERC-5564 Announcer contract' },
+            { value: "announcer.stealthAddress", text: 'ERC-5564 Announcer stealthAddress' },
+            { value: "announcer.caller", text: 'ERC-5564 Announcer caller' },
+            { value: "announcer.sender", text: 'ERC-5564 Announcer sender' },
+            { value: "registry.registrant", text: 'ERC-6538 Registry registrant' },
+            { value: "registry.contract", text: 'ERC-6538 Registry contract' },
+            { value: "registry.stealthMetaAddress", text: 'ERC-6538 Registry stealthMetaAddress' },
+          ],
           contractTypeOptions: [
             { value: null, text: '(select)' },
             { value: "announcer", text: 'ERC-5564 Announcer' },
@@ -1021,12 +1033,12 @@
           ],
           accountsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           contractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -2010,6 +2022,9 @@
           async collateAccounts(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
             const accounts = this.accounts;
+            if (!(this.coinbase in accounts)) {
+              accounts[this.coinbase] = { type: "account", source: "attached", mine: true, name: null };
+            }
             let rows = 0;
             let done = false;
             do {
@@ -2280,6 +2295,17 @@
             } else {
               return moment.unix(unixtime).fromNow();
             }
+          },
+          shortAddress(address) {
+            let result = null;
+            if (address) {
+              if (address.substring(0, 3) == "st:") {
+                result = address.substring(0, 17) + "..." + address.slice(-8);
+              } else {
+                result = address.substring(0, 10) + "..." + address.slice(-8);
+              }
+            }
+            return result;
           },
           nameOrAddress(address, length = 0) {
             let result = null;
