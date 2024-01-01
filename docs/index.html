@@ -156,19 +156,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
-              <!-- <b-form-group label="" label-for="account-updatename" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="!modalAccount.item || modalAccount.name == modalAccount.item.name" id="account-updatename" @click="updateModalAccountName()" variant="warning">Update</b-button>
-              </b-form-group> -->
-              <!-- <b-form-group v-if="modalAccount.item" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Switch to Ethereum Mainnet and Sync to update" class="mx-0 my-1 p-0">
-                <b-form-input type="text" readonly size="sm" id="account-ensname" v-model.trim="modalAccount.item.ensName" class="w-100"></b-form-input>
-              </b-form-group> -->
-
-            <!-- <b-form-group label-cols-lg="2" label="Stealth Meta-Addresses" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="modalAccount.item" label="Stealth Meta-Addresses:" label-for="account-stealthmetaaddresses" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-textarea readonly size="sm" id="account-stealthmetaaddresses" :value="JSON.stringify(modalAccount.item.stealthMetaAddresses, null, 2)" class="w-100" rows="10"></b-form-textarea>
-              </b-form-group>
-            </b-form-group> -->
           </b-modal>
 
           <!-- :MODALACTIVITY -->
@@ -1405,8 +1392,8 @@
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalNewStealthMetaAddress.phrase));
             // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
-                method: 'personal_sign',
-                params: [phraseInHex, this.coinbase],
+              method: 'personal_sign',
+              params: [phraseInHex, this.coinbase],
             });
             const signature1 = signature.slice(2, 66);
             const signature2 = signature.slice(66, 130);
@@ -1439,14 +1426,13 @@
             console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
           },
 
-
           async revealModalAccountSpendingPrivateKey() {
             console.log(moment().format("HH:mm:ss") + " revealModalAccountSpendingPrivateKey - phrase: " + this.modalAccount.item.phrase);
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAccount.item.phrase));
             // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
-                method: 'personal_sign',
-                params: [phraseInHex, this.coinbase],
+              method: 'personal_sign',
+              params: [phraseInHex, this.coinbase],
             });
             const signature1 = signature.slice(2, 66);
             const signature2 = signature.slice(66, 130);
@@ -1460,29 +1446,9 @@
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
             Vue.set(this.modalAccount.item, 'spendingPrivateKey', keyPair1.privateKey);
-            // Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-            // Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
-            // Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
-            // Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
-            // Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
-            // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
-          },
-
-          updateModalAccountName() {
-            // TODO: Test
-            console.log(moment().format("HH:mm:ss") + " updateModalAccountName from: " + (this.modalAccount.item && this.modalAccount.item.name || "(null)") + ", to: " + this.modalAccount.name);
-            if (!(this.modalAccount.item.address in this.addresses[this.chainId])) {
-              Vue.set(this.accounts[this.chainId], this.modalAccount.item.address, { name: this.modalAccount.name, ensName: null, source: this.modalAccount.source, stealthMetaAddresses: {} });
-            } else {
-              Vue.set(this.accounts[this.chainId][this.modalAccount.item.address], 'name', this.modalAccount.name);
-            }
-            Vue.set(this.modalAccount.item, 'name', this.modalAccount.name);
-            localStorage.stealthChadAddresses = JSON.stringify(this.accounts);
-            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            console.log(moment().format("HH:mm:ss") + " updateModalAccountName - accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
           addStealthMetaAddressToAccounts() {
@@ -1511,7 +1477,6 @@
                 source: "user.signed",
               });
             }
-            // Force update
             Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
@@ -1524,8 +1489,8 @@
             console.log(moment().format("HH:mm:ss") + " generateKeys - hexValue: " + hexValue);
 
             const signature = await ethereum.request({
-                method: 'personal_sign',
-                params: [hexValue, this.coinbase],
+              method: 'personal_sign',
+              params: [hexValue, this.coinbase],
             });
             console.log("signature: " + signature);
             const signature1 = signature.slice(2, 66);
@@ -2100,6 +2065,20 @@
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
+          async syncENSNames(provider) {
+            console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+            for (const [chainId, chainData] of Object.entries(this.addresses)) {
+              for (const [account, accountData] of Object.entries(chainData)) {
+                const allnames = await ensReverseRecordsContract.getNames([account]);
+                Vue.set(this.addresses[chainId][account], 'ensName', allnames.length >= 0 && allnames[0] || null);
+                console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
+              }
+            }
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
+          },
+
           async processData(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const checkAccounts = [];
@@ -2159,21 +2138,6 @@
 
             // console.log(moment().format("HH:mm:ss") + " processData - accounts: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
-          },
-
-
-          async syncENSNames(provider) {
-            console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
-            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            for (const [chainId, chainData] of Object.entries(this.addresses)) {
-              for (const [account, accountData] of Object.entries(chainData)) {
-                const allnames = await ensReverseRecordsContract.getNames([account]);
-                Vue.set(this.addresses[chainId][account], 'ensName', allnames.length >= 0 && allnames[0] || null);
-                console.log(moment().format("HH:mm:ss") + " syncENSNames: " + account + " => " + (allnames.length >= 0 && allnames[0] || null));
-              }
-            }
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
           async processDataOld(provider) {
