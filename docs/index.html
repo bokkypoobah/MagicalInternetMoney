@@ -73,8 +73,9 @@
             </template>
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-button size="sm" variant="link" id="account-address" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.address }}</b-button>
+                <b-form-input type="text" readonly size="sm" id="account-address" :value="modalAccount.item.address"></b-form-input>
                 <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
                   <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
@@ -99,8 +100,9 @@
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAccount.item.linkedTo)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-button size="sm" variant="link" id="account-linkedto" :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.linkedTo" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalAccount.item.linkedTo }}</b-button>
+                <b-form-input type="text" readonly size="sm" id="account-linkedto" :value="modalAccount.item.linkedTo"></b-form-input>
                 <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
                   <b-button @click="copyToClipboard(modalAccount.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
