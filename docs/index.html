@@ -1760,7 +1760,7 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
@@ -1778,7 +1778,7 @@
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
             }
             await this.loadCurrentData();
@@ -1804,6 +1804,18 @@
                   const contract = log.address;
                   const caller = logData.args[2];
                   if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
+                    const metadata = logData.args[4];
+                    // const metadata = "0x64aaaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee90000000000000000000000000000000000000000000000000470de4df820009";
+                    console.log(log.transactionHash.substring(0, 10) + " " + metadata);
+                    const functionSelector = metadata.substring(4, 12);
+                    console.log("functionSelector: " + functionSelector);
+                    const tokenContractAddress = metadata.substring(12, 52);
+                    console.log("tokenContractAddress: " + tokenContractAddress);
+                    const tokensString = metadata.substring(52, 116)
+                    console.log("tokensString: " + tokensString);
+                    const tokens = ethers.BigNumber.from("0x" + tokensString).toString();
+                    console.log("tokens: " + tokens);
+
                     records.push( {
                       chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
@@ -1877,7 +1889,8 @@
             if (selectedContracts.length > 0) {
               const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              // TODO: Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              const startBlock = 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
