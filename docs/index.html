@@ -141,7 +141,7 @@
             </b-form-group>
 
             <b-form-group v-if="modalActivity.item" label="Mine:" label-for="activity-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" readonly id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+              <b-form-checkbox size="sm" disabled id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
             </b-form-group>
 
             <b-form-group v-if="modalActivity.item" label="Scheme Id:" label-for="activity-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -1463,7 +1463,7 @@
             // Hash "v" and "r" values using SHA-256
             const hashedV = ethers.utils.sha256("0x" + signature1);
             const hashedR = ethers.utils.sha256("0x" + signature2);
-            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            const n = ethers.BigNumber.from(SECP256K1_N);
             // Calculate the private keys by taking the hash values modulo the curve order
             const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
@@ -1499,7 +1499,7 @@
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
               // console.log("hashedSharedSecret: " + result.hashedSharedSecret);
               // console.log("spendingPrivateKey: " + spendingPrivateKey);
-              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141");
+              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
               const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
               result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
               // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
@@ -1524,7 +1524,7 @@
             // Hash "v" and "r" values using SHA-256
             const hashedV = ethers.utils.sha256("0x" + signature1);
             const hashedR = ethers.utils.sha256("0x" + signature2);
-            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            const n = ethers.BigNumber.from(SECP256K1_N);
             // Calculate the private keys by taking the hash values modulo the curve order
             const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
@@ -1559,7 +1559,7 @@
             // Hash "v" and "r" values using SHA-256
             const hashedV = ethers.utils.sha256("0x" + signature1);
             const hashedR = ethers.utils.sha256("0x" + signature2);
-            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            const n = ethers.BigNumber.from(SECP256K1_N);
             // Calculate the private keys by taking the hash values modulo the curve order
             const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
@@ -2300,7 +2300,7 @@
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
               // console.log("hashedSharedSecret: " + result.hashedSharedSecret);
               // console.log("spendingPrivateKey: " + spendingPrivateKey);
-              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141");
+              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
               const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
               result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
               // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
