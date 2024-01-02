@@ -229,9 +229,9 @@
               Generate New Stealth Meta-Address
             </template>
 
-            <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
+            <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="newsma-attachedaccount" :value="coinbase"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="newsma-attachedaddress" :value="coinbase"></b-form-input>
                 <b-input-group-append>
                   <b-button :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
                   <b-button @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -239,13 +239,13 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group label="" label-for="newsma-attachedaccountimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="coinbase != ensNameOrAddress(coinbase)" id="newsma-attachedaccountimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="coinbase != ensNameOrAddress(coinbase)" id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="This exact phrase with the attached account is required for the recovery of your stealth keys!">
+            <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="This exact phrase with the attached address is required for the recovery of your stealth keys!">
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase"></b-form-textarea>
                 <b-input-group-append>
@@ -253,7 +253,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign the phrase above with your web3 attached account" class="mx-0 my-1 p-0">
+            <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign the phrase above with your web3 attached address" class="mx-0 my-1 p-0">
               <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddress()" variant="warning">Generate</b-button>
             </b-form-group>
             <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="Stealth Meta-Address:" label-for="newsma-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -264,8 +264,8 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddress.status == 'mine' ? 'Update account with stealth keys' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAccounts()" variant="warning">{{ modalNewStealthMetaAddress.status == 'mine' ? 'Update' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
+            <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddress.status == 'mine' ? 'Update address with stealth keys' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Already in addresses, to be claimed' : 'Add new to addresses')" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddresses()" variant="warning">{{ modalNewStealthMetaAddress.status == 'mine' ? 'Update' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
             </b-form-group>
           </b-modal>
 
@@ -1494,8 +1494,8 @@
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
           },
 
-          addStealthMetaAddressToAccounts() {
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts");
+          addStealthMetaAddressToAddresses() {
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses");
             const account = this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress];
             if (account) {
               account.type = "stealthMetaAddress";
@@ -1523,7 +1523,7 @@
             Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts - addresses: " + JSON.stringify(this.addresses, null, 2));
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
           },
           async generateKeys() {
             // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
