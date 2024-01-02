@@ -109,7 +109,6 @@
             <b-form-group v-if="modalRegistry.item && modalRegistry.item.registrant && (modalRegistry.item.registrant != ensNameOrAddress(modalRegistry.item.registrant))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalRegistry.item.registrant, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-
             <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="registry-schemeid" :value="modalRegistry.item.schemeId" class="w-25"></b-form-input>
             </b-form-group>
@@ -140,7 +139,6 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address' && modalAddress.item.ensName" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar v-if="modalAddress.item.address != ensNameOrAddress(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" readonly id="address-stealthmetaaddress" v-model.trim="modalAddress.item.address" rows="3"></b-form-textarea>
@@ -149,7 +147,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="address-linkedto" :value="modalAddress.item.linkedTo"></b-form-input>
@@ -162,7 +159,6 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar v-if="modalAddress.item.linkedTo != ensNameOrAddress(modalAddress.item.linkedTo)" id="address-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" readonly id="address-phrase" v-model.trim="modalAddress.item.phrase" rows="3"></b-form-textarea>
@@ -171,7 +167,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item" label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" size="sm" id="address-name" v-model.trim="modalAddress.name"></b-form-input>
@@ -180,11 +175,9 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1"></b-form-checkbox>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalAddress.item.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="address-spendingprivatekey" :value="modalAddress.item.spendingPrivateKey ? modalAddress.item.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
@@ -194,7 +187,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="address-viewingprivatekey" :value="modalAddress.item.viewingPrivateKey"></b-form-input>
@@ -203,7 +195,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="address-spendingpublickey" :value="modalAddress.item.spendingPublicKey"></b-form-input>
@@ -212,7 +203,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Spending Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="address-viewingpublickey" :value="modalAddress.item.viewingPublicKey"></b-form-input>
@@ -228,7 +218,6 @@
             <template #modal-title>
               Generate New Stealth Meta-Address
             </template>
-
             <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="newsma-attachedaddress" :value="coinbase"></b-form-input>
@@ -238,7 +227,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-
             <b-form-group label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar v-if="coinbase != ensNameOrAddress(coinbase)" id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
