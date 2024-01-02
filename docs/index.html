@@ -1160,11 +1160,12 @@
           },
           filteredSortedAccounts() {
             let results = this.filteredAccounts;
-            // TODO
             if (this.settings.accountsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
-                  return ('' + a.name).localeCompare(b.name);
+                  const aname = (a.ensName || '') + (a.name || 'zzz');
+                  const bname = (b.ensName || '') + (b.name || 'zzz');
+                  return ('' + aname).localeCompare(bname);
                 } else {
                   return ('' + b.type).localeCompare(a.type);
                 }
@@ -1172,18 +1173,24 @@
             } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
-                  return ('' + b.name).localeCompare(a.name);
+                  const aname = (a.ensName || '') + (a.name || 'zzz');
+                  const bname = (b.ensName || '') + (b.name || 'zzz');
+                  return ('' + bname).localeCompare(aname);
                 } else {
                   return ('' + a.type).localeCompare(b.type);
                 }
               });
             } else if (this.settings.accountsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
-                return ('' + a.name).localeCompare(b.name);
+                const aname = (a.ensName || '') + (a.name || 'zzz');
+                const bname = (b.ensName || '') + (b.name || 'zzz');
+                return ('' + aname).localeCompare(bname);
               });
             } else if (this.settings.accountsTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
-                return ('' + b.name).localeCompare(a.name);
+                const aname = (a.ensName || '') + (a.name || 'zzz');
+                const bname = (b.ensName || '') + (b.name || 'zzz');
+                return ('' + bname).localeCompare(aname);
               });
             } else if (this.settings.accountsTable.sortOption == 'addressasc') {
               results.sort((a, b) => {
