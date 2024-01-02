@@ -491,7 +491,7 @@
                 </template>
                 <template #cell(sender)="data">
                   <b-link v-if="data.item.tx && data.item.tx.from" @click="viewAddress(data.item.tx.from)">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.tx.from)" class="px-0">{{ nameOrAddress(data.item.tx.from, 28) }}</b-badge>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ nameOrAddress(data.item.tx.from, 28) }}</font>
                   </b-link>
                 </template>
                 <template #cell(receiver)="data">
