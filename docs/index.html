@@ -106,6 +106,10 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalRegistry.item && modalRegistry.item.registrant && (modalRegistry.item.registrant != ensNameOrAddress(modalRegistry.item.registrant))" label="" label-for="account-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalRegistry.item.registrant, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
+
             <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" readonly size="sm" id="registry-schemeid" :value="modalRegistry.item.schemeId" class="w-25"></b-form-input>
             </b-form-group>
@@ -164,7 +168,7 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAccount.item && modalAccount.item.linkedTo" label="" label-for="account-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="modalAccount.item.linkedTo != ensNameOrAddress(modalAccount.item.linkedTo)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+              <b-avatar v-if="modalAccount.item.linkedTo != ensNameOrAddress(modalAccount.item.linkedTo)" id="account-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.phrase" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -232,18 +236,24 @@
             <template #modal-title>
               Generate New Stealth Meta-Address
             </template>
-            <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+
+            <b-form-group label="Attached Account:" label-for="newsma-attachedaccount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-button size="sm" variant="link" id="newsma-attachedaccount" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ coinbase }}</b-button>
+                <b-form-input type="text" readonly size="sm" id="newsma-attachedaccount" :value="coinbase"></b-form-input>
                 <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
                   <b-button @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+
+            <b-form-group label="" label-for="newsma-attachedaccountimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="coinbase != ensNameOrAddress(coinbase)" id="newsma-attachedaccountimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Exact phrase with the attached account is required for recovery of your stealth keys!">
+            <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="This exact phrase with the attached account is required for the recovery of your stealth keys!">
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase"></b-form-textarea>
                 <b-input-group-append>
@@ -251,7 +261,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click to sign the phrase above with your web3 attached account" class="mx-0 my-1 p-0">
+            <b-form-group label="" label-for="newsma-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign the phrase above with your web3 attached account" class="mx-0 my-1 p-0">
               <b-button size="sm" id="newsma-generate" @click="generateNewStealthMetaAddress()" variant="warning">Generate</b-button>
             </b-form-group>
             <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="Stealth Meta-Address:" label-for="newsma-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
