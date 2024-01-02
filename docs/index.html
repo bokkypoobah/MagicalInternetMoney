@@ -157,6 +157,23 @@
               </b-input-group>
             </b-form-group>
 
+            <b-form-group v-if="modalActivity.item && modalActivity.item.caller" label="Caller:" label-for="activity-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.caller)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-caller" :value="modalActivity.item.caller"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.transfers" label="Transfers:" label-for="activity-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <font size="-1">
+                <b-table :items="modalActivity.item.transfers">
+                </b-table>
+              </font>
+            </b-form-group>
+
             <font size="-1">
               <pre>
 {{ modalActivity }}
@@ -2205,7 +2222,7 @@
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const checkAccounts = [];
             for (const [address, accountData] of Object.entries(this.addresses)) {
-              if (accountData.type == "stealthMetaAddress" && accountData.mine) {
+              if (accountData.type == "stealthMetaAddress" && accountData.mine && accountData.viewingPrivateKey) {
                 checkAccounts.push({ address, ...accountData });
               }
             }
@@ -2222,20 +2239,18 @@
                 const ephemeralPublicKey = item.ephemeralPublicKey;
                 for (const account of checkAccounts) {
                   const viewingPrivateKey = account.viewingPrivateKey;
-                  if (viewingPrivateKey) {
-                    const viewingPublicKey = account.viewingPublicKey;
-                    const spendingPublicKey = account.spendingPublicKey;
-                    const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-                    if (status && status.match) {
-                      // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
-                      // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
-                      // console.log("item: " + JSON.stringify(item, null, 2));
-                      // console.log("account: " + JSON.stringify(account, null, 2));
-                      item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedTo };
-                      item.mine = true;
-                      writeRecords.push(item);
-                      break;
-                    }                    
+                  const viewingPublicKey = account.viewingPublicKey;
+                  const spendingPublicKey = account.spendingPublicKey;
+                  const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
+                  if (status && status.match) {
+                    // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
+                    // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
+                    // console.log("item: " + JSON.stringify(item, null, 2));
+                    // console.log("account: " + JSON.stringify(account, null, 2));
+                    item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedTo };
+                    item.mine = true;
+                    writeRecords.push(item);
+                    break;
                   }
                 }
               }
