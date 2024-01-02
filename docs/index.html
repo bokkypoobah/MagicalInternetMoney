@@ -237,17 +237,42 @@
           </b-modal>
 
           <!-- :MODALREGISTRY -->
-          <b-modal id="modal-registry" hide-footer size="xl">
+          <b-modal id="modal-registry" hide-footer size="lg">
             <template #modal-title>
-              <font size="-1">
-                Registry ({{ coinbase }})
-              </font>
+              Registry Entry Details
             </template>
-            <font size="-1">
-              <pre>
-{{ modalRegistry }}
-              </pre>
-            </font>
+            <b-form-group v-if="modalRegistry.item" label="Linked To:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="registry-txhash" :value="modalRegistry.item.txHash"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="registry-timestamp" :value="formatTimestamp(modalRegistry.item.timestamp)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="registry-registrant" :value="modalRegistry.item.registrant"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="registry-schemeid" :value="modalRegistry.item.schemeId" class="w-25"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-textarea readonly id="registry-stealthmetaaddress" :value="modalRegistry.item.stealthMetaAddress" rows="3"></b-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
           </b-modal>
 
           <!-- :MODALCONTRACT -->
@@ -356,7 +381,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryActivity.length) + '/' + commify0(registryEntries.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryEntries.length) + '/' + commify0(registryEntries.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <!-- TODO -->
@@ -366,7 +391,7 @@
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryActivity.length" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryEntries.length" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <!-- TODO -->
@@ -518,7 +543,7 @@
               </b-card>
 
               <!-- :REGISTRY -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryActivityFields" :items="pagedFilteredSortedRegistryActivity" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryEntriesFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
@@ -538,23 +563,16 @@
                 </template>
                 <template #cell(registrant)="data">
                   <b-link @click="viewAccount(data.item.registrant, 'registrant')">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.registrant)" class="px-0">{{ nameOrAddress(data.item.registrant, 28) }}</b-badge>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ nameOrAddress(data.item.registrant, 28) }}</font>
                   </b-link>
                 </template>
                 <template #cell(schemeId)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ data.item.schemeId }}</b-badge>
+                  <font size="-1">{{ data.item.schemeId }}</font>
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <font size="-1">
-                    <!-- <b-badge pill variant="transparent" v-b-popover.hover="data.item.stealthMetaAddress" class="px-0"> -->
-                      {{ data.item.stealthMetaAddress }}
-                    <!-- </b-badge> -->
+                    {{ nameOrAddress(data.item.stealthMetaAddress) }}
                   </font>
-                  <!-- <font size="-2">
-                    <pre>
-    {{ data.item }}
-                    </pre>
-                  </font> -->
                 </template>
                 <!-- <template #cell(contract)="data">
                   <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
@@ -1024,7 +1042,7 @@
             // { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
-          registryActivityFields: [
+          registryEntriesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1107,11 +1125,11 @@
             return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
           },
 
-          filteredRegistryActivity() {
+          filteredRegistryEntries() {
             return this.registryEntries.filter(e => e.chainId == this.chainId);
           },
-          filteredSortedRegistryActivity() {
-            let results = this.filteredRegistryActivity;
+          filteredSortedRegistryEntries() {
+            let results = this.filteredRegistryEntries;
             if (this.settings.registryActivityTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
@@ -1139,9 +1157,9 @@
             }
             return results;
           },
-          pagedFilteredSortedRegistryActivity() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryActivity - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryActivity.slice(0, 10), null, 2));
-            return this.filteredSortedRegistryActivity.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
+          pagedFilteredSortedRegistryEntries() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryEntries - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 10), null, 2));
+            return this.filteredSortedRegistryEntries.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
           },
 
           totalAccounts() {
