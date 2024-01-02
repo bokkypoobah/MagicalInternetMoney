@@ -870,7 +870,7 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 25,
+            version: 26,
           },
           contracts: {
             "11155111": {
@@ -1074,7 +1074,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080f",
+            name: "stealthchaddata080g",
             version: 1,
             schemaDefinition: {
               // cache: '&objectName',
@@ -1804,18 +1804,14 @@
                   const contract = log.address;
                   const caller = logData.args[2];
                   if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
+                    const transfers = [];
                     const metadata = logData.args[4];
-                    // const metadata = "0x64aaaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee90000000000000000000000000000000000000000000000000470de4df820009";
-                    console.log(log.transactionHash.substring(0, 10) + " " + metadata);
                     const functionSelector = metadata.substring(4, 12);
-                    console.log("functionSelector: " + functionSelector);
                     const tokenContractAddress = metadata.substring(12, 52);
-                    console.log("tokenContractAddress: " + tokenContractAddress);
                     const tokensString = metadata.substring(52, 116)
-                    console.log("tokensString: " + tokensString);
                     const tokens = ethers.BigNumber.from("0x" + tokensString).toString();
-                    console.log("tokens: " + tokens);
-
+                    // TODO: Handle ERC-20 & ERC-721 transfers
+                    transfers.push({ functionSelector, tokenContractAddress, tokens });
                     records.push( {
                       chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
@@ -1834,6 +1830,7 @@
                       caller,
                       ephemeralPublicKey: logData.args[3],
                       metadata: logData.args[4],
+                      transfers,
                       confirmations: latestBlockNumber - log.blockNumber,
                       timestamp: null,
                       tx: null,
@@ -1889,8 +1886,7 @@
             if (selectedContracts.length > 0) {
               const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-              // TODO: Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-              const startBlock = 0;
+              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
@@ -2226,18 +2222,20 @@
                 const ephemeralPublicKey = item.ephemeralPublicKey;
                 for (const account of checkAccounts) {
                   const viewingPrivateKey = account.viewingPrivateKey;
-                  const viewingPublicKey = account.viewingPublicKey;
-                  const spendingPublicKey = account.spendingPublicKey;
-                  const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-                  if (status && status.match) {
-                    // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
-                    // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
-                    // console.log("item: " + JSON.stringify(item, null, 2));
-                    // console.log("account: " + JSON.stringify(account, null, 2));
-                    item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedTo };
-                    item.mine = true;
-                    writeRecords.push(item);
-                    break;
+                  if (viewingPrivateKey) {
+                    const viewingPublicKey = account.viewingPublicKey;
+                    const spendingPublicKey = account.spendingPublicKey;
+                    const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
+                    if (status && status.match) {
+                      // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
+                      // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
+                      // console.log("item: " + JSON.stringify(item, null, 2));
+                      // console.log("account: " + JSON.stringify(account, null, 2));
+                      item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedTo };
+                      item.mine = true;
+                      writeRecords.push(item);
+                      break;
+                    }                    
                   }
                 }
               }
