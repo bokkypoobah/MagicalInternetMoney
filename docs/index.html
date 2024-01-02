@@ -67,12 +67,86 @@
           </b-card>
 
           <!-- :MODALACTIVITY -->
-          <b-modal id="modal-activity" hide-footer size="xl">
+          <b-modal id="modal-activity" hide-footer size="lg">
             <template #modal-title>
-              <font size="-1">
-                Activity ({{ coinbase }})
-              </font>
+              Activity
             </template>
+            <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-txhash" :value="modalActivity.item.txHash"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalActivity.item" label="Timestamp:" label-for="activity-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="activity-timestamp" :value="formatTimestamp(modalActivity.item.timestamp)" class="w-50"></b-form-input>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-sender" :value="modalActivity.item.tx.from"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalActivity.item && modalActivity.item.tx.from && (modalActivity.item.tx.from != ensNameOrAddress(modalActivity.item.tx.from))" label="" label-for="activity-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="activity-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-receiver" :value="modalActivity.item.stealthAddress"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="activity-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-textarea readonly id="activity-stealthmetaaddress" :value="modalActivity.item.linkedTo.stealthMetaAddress" rows="3"></b-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalActivity.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.address" label="and Address:" label-for="activity-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.linkedTo.address)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-owner" :value="modalActivity.item.linkedTo.address"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && (modalActivity.item.linkedTo.address != ensNameOrAddress(modalActivity.item.linkedTo.address))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item" label="Mine:" label-for="activity-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" readonly id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item" label="Scheme Id:" label-for="activity-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="activity-schemeid" :value="modalActivity.item.schemeId" class="w-25"></b-form-input>
+            </b-form-group>
+
+            <b-form-group v-if="modalActivity.item && modalActivity.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="activity-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="activity-ephemeralpublickey" :value="modalActivity.item.ephemeralPublicKey"></b-form-input>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalActivity.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
             <font size="-1">
               <pre>
 {{ modalActivity }}
@@ -484,6 +558,9 @@
                   <b-link @click="viewAddress(data.item.stealthAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ nameOrAddress(data.item.stealthAddress, 28) }}</font>
                   </b-link>
+                </template>
+                <template #cell(mine)="data">
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
                 </template>
                 <template #cell(details)="data">
                   <font size="-2">
