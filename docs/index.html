@@ -107,6 +107,16 @@
               </b-input-group>
             </b-form-group>
 
+            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="Private Key:" label-for="activity-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal private key" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input :type="modalActivity.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="activity-spendingprivatekey" :value="modalActivity.spendingPrivateKey ? modalActivity.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-input-group-append>
+                  <b-button v-if="!modalActivity.spendingPrivateKey" :disabled="modalActivity.item.linkedTo.address != coinbase" @click="revealModalActivitySpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalActivity.spendingPrivateKey" @click="copyToClipboard(modalActivity.spendingPrivateKey ? modalActivity.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="activity-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-textarea readonly id="activity-stealthmetaaddress" :value="modalActivity.item.linkedTo.stealthMetaAddress" rows="3"></b-textarea>
@@ -909,6 +919,7 @@
           },
           modalActivity: {
             item: null,
+            spendingPrivateKey: null,
           },
           modalNewStealthMetaAddress: {
             name: null,
@@ -1476,6 +1487,34 @@
             }
             Vue.set(this.modalNewStealthMetaAddress, 'status', status);
             console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
+          },
+
+          async revealModalActivitySpendingPrivateKey() {
+            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - modalActivity: " + JSON.stringify(this.modalActivity.item.linkedTo, null, 2));
+            const stealthMetaAddressData = this.addresses[this.modalActivity.item.linkedTo.stealthMetaAddress];
+            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
+            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
+            const signature = await ethereum.request({
+              method: 'personal_sign',
+              params: [phraseInHex, this.coinbase],
+            });
+            const signature1 = signature.slice(2, 66);
+            const signature2 = signature.slice(66, 130);
+            // Hash "v" and "r" values using SHA-256
+            const hashedV = ethers.utils.sha256("0x" + signature1);
+            const hashedR = ethers.utils.sha256("0x" + signature2);
+            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+            // Calculate the private keys by taking the hash values modulo the curve order
+            const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+            const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+            const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+            const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+            // Vue.set(this.modalAddress.item, 'spendingPrivateKey', keyPair1.privateKey);
+            const spendingPrivateKey = keyPair1.privateKey;
+            const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+            const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+            // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
+            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
           },
 
           async revealModalAddressSpendingPrivateKey() {
