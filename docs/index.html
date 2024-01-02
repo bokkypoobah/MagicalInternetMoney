@@ -83,7 +83,7 @@
           <!-- :MODALREGISTRY -->
           <b-modal id="modal-registry" hide-footer size="lg">
             <template #modal-title>
-              Registry Entry Details
+              Registry Entry
             </template>
             <b-form-group v-if="modalRegistry.item" label="Linked To:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -126,7 +126,7 @@
           <!-- :MODALACCOUNT -->
           <b-modal id="modal-account" hide-footer size="lg">
             <template #modal-title>
-              {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }} Details
+              {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }}
             </template>
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
