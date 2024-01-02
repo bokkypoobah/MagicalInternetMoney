@@ -49,8 +49,8 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
-            <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="nameOrAddress(coinbase, 100)">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="ensNameOrAddress(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -65,6 +65,59 @@
               You can switch to the Ethereum Mainnet and click Sync your addresses with ENS names
             </b-card-text>
           </b-card>
+
+          <!-- :MODALACTIVITY -->
+          <b-modal id="modal-activity" hide-footer size="xl">
+            <template #modal-title>
+              <font size="-1">
+                Activity ({{ coinbase }})
+              </font>
+            </template>
+            <font size="-1">
+              <pre>
+{{ modalActivity }}
+              </pre>
+            </font>
+          </b-modal>
+
+          <!-- :MODALREGISTRY -->
+          <b-modal id="modal-registry" hide-footer size="lg">
+            <template #modal-title>
+              Registry Entry Details
+            </template>
+            <b-form-group v-if="modalRegistry.item" label="Linked To:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="registry-txhash" :value="modalRegistry.item.txHash"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="registry-timestamp" :value="formatTimestamp(modalRegistry.item.timestamp)" class="w-50"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" readonly size="sm" id="registry-registrant" :value="modalRegistry.item.registrant"></b-form-input>
+                <b-input-group-append>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" readonly size="sm" id="registry-schemeid" :value="modalRegistry.item.schemeId" class="w-25"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-textarea readonly id="registry-stealthmetaaddress" :value="modalRegistry.item.stealthMetaAddress" rows="3"></b-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+          </b-modal>
 
           <!-- :MODALACCOUNT -->
           <b-modal id="modal-account" hide-footer size="lg">
@@ -88,6 +141,9 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account' && modalAccount.item.ensName" label="" label-for="account-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="modalAccount.item.address != ensNameOrAddress(modalAccount.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -98,7 +154,7 @@
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAccount.item.linkedTo)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAccount.item && modalAccount.item.linkedTo" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAccount.item.linkedTo)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="account-linkedto" :value="modalAccount.item.linkedTo"></b-form-input>
                 <b-input-group-append>
@@ -106,6 +162,9 @@
                   <b-button @click="copyToClipboard(modalAccount.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalAccount.item && modalAccount.item.linkedTo" label="" label-for="account-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="modalAccount.item.linkedTo != ensNameOrAddress(modalAccount.item.linkedTo)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
 
             <b-form-group v-if="modalAccount.item && modalAccount.item.phrase" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -168,34 +227,6 @@
             </b-form-group>
           </b-modal>
 
-          <!-- :MODALACTIVITY -->
-          <b-modal id="modal-activity" hide-footer size="xl">
-            <template #modal-title>
-              <font size="-1">
-                Activity ({{ coinbase }})
-              </font>
-            </template>
-            <font size="-1">
-              <pre>
-{{ modalActivity }}
-              </pre>
-            </font>
-          </b-modal>
-
-          <!-- :MODALADDRESS -->
-          <b-modal id="modal-address" hide-footer size="xl">
-            <template #modal-title>
-              <font size="-1">
-                Address ({{ coinbase }})
-              </font>
-            </template>
-            <font size="-1">
-              <pre>
-{{ modalAddress }}
-              </pre>
-            </font>
-          </b-modal>
-
           <!-- :MODALNEWSTEALTHMETAADDRESS -->
           <b-modal id="modal-newstealthmetaaddress" hide-footer size="lg">
             <template #modal-title>
@@ -233,45 +264,6 @@
             </b-form-group>
             <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddress.status == 'mine' ? 'Update account with stealth keys' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Already in accounts, to be claimed' : 'Add new to accounts')" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAccounts()" variant="warning">{{ modalNewStealthMetaAddress.status == 'mine' ? 'Update' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
-            </b-form-group>
-          </b-modal>
-
-          <!-- :MODALREGISTRY -->
-          <b-modal id="modal-registry" hide-footer size="lg">
-            <template #modal-title>
-              Registry Entry Details
-            </template>
-            <b-form-group v-if="modalRegistry.item" label="Linked To:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="registry-txhash" :value="modalRegistry.item.txHash"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="registry-timestamp" :value="formatTimestamp(modalRegistry.item.timestamp)" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="registry-registrant" :value="modalRegistry.item.registrant"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="registry-schemeid" :value="modalRegistry.item.schemeId" class="w-25"></b-form-input>
-            </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-textarea readonly id="registry-stealthmetaaddress" :value="modalRegistry.item.stealthMetaAddress" rows="3"></b-textarea>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
             </b-form-group>
           </b-modal>
 
@@ -563,7 +555,7 @@
                 </template>
                 <template #cell(registrant)="data">
                   <b-link @click="viewAccount(data.item.registrant, 'registrant')">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ nameOrAddress(data.item.registrant, 28) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ nameOrAddress(data.item.registrant) }}</font>
                   </b-link>
                 </template>
                 <template #cell(schemeId)="data">
@@ -571,6 +563,7 @@
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <font size="-1">
+                    <!-- {{ data.item.stealthMetaAddress }} -->
                     {{ nameOrAddress(data.item.stealthMetaAddress) }}
                   </font>
                 </template>
@@ -611,12 +604,13 @@
                   </span>
                   <span v-else>
                     <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.linkedTo" target="_blank">
-                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ nameOrAddress(data.item.linkedTo) }}</font>
                     </b-link>
                   </span>
                 </template>
                 <template #cell(name)="data">
-                  <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font>
+                  <!-- <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font> -->
+                  <font size="-1">{{ nameOrNull(data.item.address) }}</font>
                 </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
@@ -1045,9 +1039,9 @@
           registryEntriesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'schemeId', label: 'Scheme Id', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 55%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           accountsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -2333,11 +2327,40 @@
             }
             return result;
           },
+          ensNameOrAddress(address, length = 0) {
+            let result = null;
+            const account = this.accounts[address];
+            if (account) {
+              if (account.ensName) {
+                result = account.ensName;
+              } else {
+                result = address;
+              }
+            } else {
+              result = address;
+            }
+            if (result && length > 0) {
+              result = result.substring(0, length);
+            }
+            return result;
+          },
           nameOrAddress(address, length = 0) {
             let result = null;
             const account = this.accounts[address];
             if (account) {
-              result = account.ensName || account.name || address;
+              if (account.ensName) {
+                if (account.name) {
+                  result = account.name + '; ' + account.ensName;
+                } else {
+                  result = account.ensName;
+                }
+              } else {
+                if (account.name) {
+                  result = account.name;
+                } else {
+                  result = address;
+                }
+              }
             } else {
               result = address;
             }
@@ -2350,7 +2373,15 @@
             let result = null;
             const account = this.accounts[address];
             if (account) {
-              result = account.ensName || account.name || null;
+              if (account.ensName) {
+                if (account.name) {
+                  result = account.name + '; ' + account.ensName;
+                } else {
+                  result = account.ensName;
+                }
+              } else {
+                result = account.name || null;
+              }
             }
             return result;
           },
