@@ -583,7 +583,7 @@
                   </span>
                   <span v-else>
                     <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ shortAddress(data.item.address) }}</b-badge>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.address)">{{ shortAddress(data.item.address) }}</font>
                     </b-link>
                   </span>
                 </template>
@@ -593,12 +593,12 @@
                   </span>
                   <span v-else>
                     <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.linkedTo" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.linkedTo)" class="px-0">{{ shortAddress(data.item.linkedTo) }}</b-badge>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
                     </b-link>
                   </span>
                 </template>
                 <template #cell(name)="data">
-                  <font size="-1">{{ data.item.name }}</font>
+                  <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font>
                 </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
@@ -1033,9 +1033,9 @@
           ],
           accountsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -2300,9 +2300,10 @@
             let result = null;
             if (address) {
               if (address.substring(0, 3) == "st:") {
-                result = address.substring(0, 17) + "..." + address.slice(-8);
+                result = address.substring(0, (9+16)) + "..." + address.slice(-16);
               } else {
-                result = address.substring(0, 10) + "..." + address.slice(-8);
+                // result = address.substring(0, 10) + "..." + address.slice(-8);
+                result = address;
               }
             }
             return result;
