@@ -1095,7 +1095,11 @@
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   const aname = (a.ensName || '') + (a.name || 'zzz');
                   const bname = (b.ensName || '') + (b.name || 'zzz');
-                  return ('' + aname).localeCompare(bname);
+                  if (('' + aname).localeCompare(bname) == 0) {
+                    return ('' + a.address).localeCompare(b.address);
+                  } else {
+                    return ('' + aname).localeCompare(bname);
+                  }
                 } else {
                   return ('' + b.type).localeCompare(a.type);
                 }
@@ -1105,7 +1109,11 @@
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   const aname = (a.ensName || '') + (a.name || 'zzz');
                   const bname = (b.ensName || '') + (b.name || 'zzz');
-                  return ('' + bname).localeCompare(aname);
+                  if (('' + aname).localeCompare(bname) == 0) {
+                    return ('' + b.address).localeCompare(a.address);
+                  } else {
+                    return ('' + bname).localeCompare(aname);
+                  }
                 } else {
                   return ('' + a.type).localeCompare(b.type);
                 }
@@ -1114,13 +1122,21 @@
               results.sort((a, b) => {
                 const aname = (a.ensName || '') + (a.name || 'zzz');
                 const bname = (b.ensName || '') + (b.name || 'zzz');
-                return ('' + aname).localeCompare(bname);
+                if (('' + aname).localeCompare(bname) == 0) {
+                  return ('' + a.address).localeCompare(b.address);
+                } else {
+                  return ('' + aname).localeCompare(bname);
+                }
               });
             } else if (this.settings.addressesTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
                 const aname = (a.ensName || '') + (a.name || 'zzz');
                 const bname = (b.ensName || '') + (b.name || 'zzz');
-                return ('' + bname).localeCompare(aname);
+                if (('' + aname).localeCompare(bname) == 0) {
+                  return ('' + b.address).localeCompare(a.address);
+                } else {
+                  return ('' + bname).localeCompare(aname);
+                }
               });
             } else if (this.settings.addressesTable.sortOption == 'addressasc') {
               results.sort((a, b) => {
@@ -1349,7 +1365,6 @@
           async generateNewStealthMetaAddress() {
             console.log(moment().format("HH:mm:ss") + " generateNewStealthMetaAddress - phrase: " + this.modalNewStealthMetaAddress.phrase);
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalNewStealthMetaAddress.phrase));
-            // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
               method: 'personal_sign',
               params: [phraseInHex, this.coinbase],
@@ -1388,7 +1403,6 @@
           async revealModalAddressSpendingPrivateKey() {
             console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.modalAddress.item.phrase);
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAddress.item.phrase));
-            // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
               method: 'personal_sign',
               params: [phraseInHex, this.coinbase],
@@ -1440,46 +1454,6 @@
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
-          },
-          async generateKeys() {
-            // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
-            console.log(moment().format("HH:mm:ss") + " generateKeys - message: " + this.settings.stealthMetaAddress.message);
-            const hexValue = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.message));
-            console.log(moment().format("HH:mm:ss") + " generateKeys - hexValue: " + hexValue);
-
-            const signature = await ethereum.request({
-              method: 'personal_sign',
-              params: [hexValue, this.coinbase],
-            });
-            console.log("signature: " + signature);
-            const signature1 = signature.slice(2, 66);
-            const signature2 = signature.slice(66, 130);
-            console.log("signature1: " + signature1);
-            console.log("signature2: " + signature2);
-
-            // Hash "v" and "r" values using SHA-256
-            const hashedV = ethers.utils.sha256("0x" + signature1);
-            const hashedR = ethers.utils.sha256("0x" + signature2);
-            const n = ethers.BigNumber.from('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-            console.log("hashedV: " + hashedV);
-            console.log("hashedR: " + hashedR);
-
-            // // Calculate the private keys by taking the hash values modulo the curve order
-            const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
-            const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-            const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
-            const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            this.stealthMetaAddress.spendingPrivateKey = keyPair1.privateKey;
-            this.stealthMetaAddress.viewingPrivateKey = keyPair2.privateKey;
-
-            console.log("this.stealthMetaAddress.spendingPrivateKey: " + this.stealthMetaAddress.spendingPrivateKey);
-            console.log("this.stealthMetaAddress.viewingPrivateKey: " + this.stealthMetaAddress.viewingPrivateKey);
-
-            this.settings.stealthMetaAddress.spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-            this.settings.stealthMetaAddress.viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
-
-            this.settings.stealthMetaAddress.stealthMetaAddress = "st:eth:" + this.settings.stealthMetaAddress.spendingPublicKey + this.settings.stealthMetaAddress.viewingPublicKey.substring(2);
-            this.saveSettings();
           },
 
           async registerKey() {
@@ -1693,13 +1667,17 @@
                       name: logData.name,
                       schemeId: parseInt(logData.args[0]),
                       stealthAddress: logData.args[1],
+                      linkedTo: {
+                        stealthMetaAddress: null,
+                        address: null,
+                      },
+                      mine: false,
                       caller,
                       ephemeralPublicKey: logData.args[3],
                       metadata: logData.args[4],
                       confirmations: latestBlockNumber - log.blockNumber,
                       timestamp: null,
                       tx: null,
-                      stealthMetaAddress: null,
                     });
                   }
                 }
@@ -1785,6 +1763,7 @@
                       registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
                       schemeId: parseInt(logData.args[1]),
                       stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                      mine: false,
                       confirmations: latestBlockNumber - log.blockNumber,
                       timestamp: null,
                       tx: null,
