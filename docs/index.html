@@ -47,7 +47,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'New Accounts'">Accounts</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
@@ -126,98 +126,98 @@
           <!-- :MODALACCOUNT -->
           <b-modal id="modal-account" hide-footer size="lg">
             <template #modal-title>
-              {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }}
+              {{ modalAddress.item.type == "account" ? "Account" : "Stealth Meta-Address" }}
             </template>
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-address" :value="modalAccount.item.address"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="account-address" :value="modalAddress.item.address"></b-form-input>
                 <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account' && modalAccount.item.ensName" label="" label-for="account-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="modalAccount.item.address != ensNameOrAddress(modalAccount.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'account' && modalAddress.item.ensName" label="" label-for="account-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="modalAddress.item.address != ensNameOrAddress(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="account-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" readonly id="account-stealthmetaaddress" v-model.trim="modalAccount.item.address" rows="3"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="account-stealthmetaaddress" v-model.trim="modalAddress.item.address" rows="3"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.linkedTo" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAccount.item.linkedTo)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="account-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-linkedto" :value="modalAccount.item.linkedTo"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="account-linkedto" :value="modalAddress.item.linkedTo"></b-form-input>
                 <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalAccount.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAccount.item && modalAccount.item.linkedTo" label="" label-for="account-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="modalAccount.item.linkedTo != ensNameOrAddress(modalAccount.item.linkedTo)" id="account-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAccount.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="account-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar v-if="modalAddress.item.linkedTo != ensNameOrAddress(modalAddress.item.linkedTo)" id="account-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.phrase" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="account-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" readonly id="account-phrase" v-model.trim="modalAccount.item.phrase" rows="3"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="account-phrase" v-model.trim="modalAddress.item.phrase" rows="3"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
             <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAccount.name"></b-form-input>
+                <b-form-input type="text" size="sm" id="account-name" v-model.trim="modalAddress.name"></b-form-input>
                 <b-input-group-append>
-                  <b-button :disabled="modalAccount.name == (modalAccount.item && modalAccount.item.name)" @click="saveModalAccountName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button :disabled="modalAddress.name == (modalAddress.item && modalAddress.item.name)" @click="saveModalAccountName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item" label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAccount.item.type == 'account' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="account-mine" value="1" :checked="modalAccount.item.mine ? 1 : 0" @change="toggleModalAccountMine()" class="mt-1"></b-form-checkbox>
+            <b-form-group v-if="modalAddress.item" label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAddress.item.type == 'account' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" id="account-mine" value="1" :checked="modalAddress.item.mine ? 1 : 0" @change="toggleModalAccountMine()" class="mt-1"></b-form-checkbox>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPrivateKey" label="Spending Private Key:" label-for="account-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="account-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalAccount.item.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="account-spendingprivatekey" :value="modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAddress.item.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="account-spendingprivatekey" :value="modalAddress.item.spendingPrivateKey ? modalAddress.item.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
-                  <b-button v-if="!modalAccount.item.spendingPrivateKey" :disabled="modalAccount.item.linkedTo != coinbase" @click="revealModalAccountSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                  <b-button v-if="modalAccount.item.spendingPrivateKey" @click="copyToClipboard(modalAccount.item.spendingPrivateKey ? modalAccount.item.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button v-if="!modalAddress.item.spendingPrivateKey" :disabled="modalAddress.item.linkedTo != coinbase" @click="revealModalAccountSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalAddress.item.spendingPrivateKey" @click="copyToClipboard(modalAddress.item.spendingPrivateKey ? modalAddress.item.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPrivateKey" label="Viewing Private Key:" label-for="account-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="account-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-viewingprivatekey" :value="modalAccount.item.viewingPrivateKey"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="account-viewingprivatekey" :value="modalAddress.item.viewingPrivateKey"></b-form-input>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.spendingPublicKey" label="Spending Public Key:" label-for="account-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="account-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-spendingpublickey" :value="modalAccount.item.spendingPublicKey"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="account-spendingpublickey" :value="modalAddress.item.spendingPublicKey"></b-form-input>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
 
-            <b-form-group v-if="modalAccount.item && modalAccount.item.viewingPublicKey" label="Spending Public Key:" label-for="account-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Spending Public Key:" label-for="account-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-viewingpublickey" :value="modalAccount.item.viewingPublicKey"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="account-viewingpublickey" :value="modalAddress.item.viewingPublicKey"></b-form-input>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -369,7 +369,7 @@
                   <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
@@ -389,7 +389,7 @@
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <!-- TODO -->
-                  <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredAccounts.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="filteredAccounts.length" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -398,7 +398,7 @@
                   <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -584,10 +584,10 @@
               </b-table>
 
               <!-- :ACCOUNTS -->
-              <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(address)="data">
@@ -852,7 +852,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            accountsTable: {
+            addressesTable: {
               filter: null,
               currentPage: 1,
               pageSize: 10,
@@ -864,7 +864,7 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 24,
+            version: 25,
           },
           contracts: {
             "11155111": {
@@ -903,9 +903,9 @@
 
           announcements: [],
           registryEntries: [],
-          accounts: {},
+          addresses: {},
 
-          modalAccount: {
+          modalAddress: {
             source: null,
             item: null,
             name: null,
@@ -1160,21 +1160,21 @@
 
           totalAccounts() {
             let result = this.forceRefresh % 2 == 0 ? 0 : 0;
-            for (const [address, accountData] of Object.entries(this.accounts)) {
+            for (const [address, accountData] of Object.entries(this.addresses)) {
               result++;
             }
             return result;
           },
           filteredAccounts() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            for (const [address, accountData] of Object.entries(this.accounts)) {
+            for (const [address, accountData] of Object.entries(this.addresses)) {
               results.push({ address, ...accountData });
             }
             return results;
           },
           filteredSortedAccounts() {
             let results = this.filteredAccounts;
-            if (this.settings.accountsTable.sortOption == 'typenameasc') {
+            if (this.settings.addressesTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   const aname = (a.ensName || '') + (a.name || 'zzz');
@@ -1184,7 +1184,7 @@
                   return ('' + b.type).localeCompare(a.type);
                 }
               });
-            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
+            } else if (this.settings.addressesTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   const aname = (a.ensName || '') + (a.name || 'zzz');
@@ -1194,23 +1194,23 @@
                   return ('' + a.type).localeCompare(b.type);
                 }
               });
-            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+            } else if (this.settings.addressesTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
                 const aname = (a.ensName || '') + (a.name || 'zzz');
                 const bname = (b.ensName || '') + (b.name || 'zzz');
                 return ('' + aname).localeCompare(bname);
               });
-            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+            } else if (this.settings.addressesTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
                 const aname = (a.ensName || '') + (a.name || 'zzz');
                 const bname = (b.ensName || '') + (b.name || 'zzz');
                 return ('' + bname).localeCompare(aname);
               });
-            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+            } else if (this.settings.addressesTable.sortOption == 'addressasc') {
               results.sort((a, b) => {
                 return ('' + a.address).localeCompare(b.address);
               });
-            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+            } else if (this.settings.addressesTable.sortOption == 'addressdsc') {
               results.sort((a, b) => {
                 return ('' + b.address).localeCompare(a.address);
               });
@@ -1219,7 +1219,7 @@
           },
           pagedFilteredSortedAccounts() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
-            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
+            return this.filteredSortedAccounts.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
           totalContracts() {
@@ -1382,20 +1382,20 @@
           },
 
           saveModalAccountName() {
-            console.log(moment().format("HH:mm:ss") + " saveModalAccountName: " + JSON.stringify(this.modalAccount));
-            this.modalAccount.item.name = this.modalAccount.name;
-            Vue.set(this.accounts[this.modalAccount.item.address], 'name', this.modalAccount.name);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            console.log(moment().format("HH:mm:ss") + " saveModalAccountName: " + JSON.stringify(this.modalAddress));
+            this.modalAddress.item.name = this.modalAddress.name;
+            Vue.set(this.addresses[this.modalAddress.item.address], 'name', this.modalAddress.name);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
           toggleModalAccountMine() {
-            console.log(moment().format("HH:mm:ss") + " toggleModalAccountMine: " + JSON.stringify(this.modalAccount));
-            this.modalAccount.item.mine = !this.modalAccount.item.mine;
-            Vue.set(this.accounts[this.modalAccount.item.address], 'mine', this.modalAccount.item.mine);
-            Vue.set(this.accounts, this.modalAccount.item.address, this.accounts[this.modalAccount.item.address]);
+            console.log(moment().format("HH:mm:ss") + " toggleModalAccountMine: " + JSON.stringify(this.modalAddress));
+            this.modalAddress.item.mine = !this.modalAddress.item.mine;
+            Vue.set(this.addresses[this.modalAddress.item.address], 'mine', this.modalAddress.item.mine);
+            Vue.set(this.addresses, this.modalAddress.item.address, this.addresses[this.modalAddress.item.address]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
           },
 
           toggleContractRead(item) {
@@ -1460,8 +1460,8 @@
             Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
 
             let status;
-            if (stealthMetaAddress in this.accounts) {
-              status = this.accounts[stealthMetaAddress].mine ? "mine" : "notmine";
+            if (stealthMetaAddress in this.addresses) {
+              status = this.addresses[stealthMetaAddress].mine ? "mine" : "notmine";
             } else {
               status = "doesnotexist";
             }
@@ -1470,8 +1470,8 @@
           },
 
           async revealModalAccountSpendingPrivateKey() {
-            console.log(moment().format("HH:mm:ss") + " revealModalAccountSpendingPrivateKey - phrase: " + this.modalAccount.item.phrase);
-            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAccount.item.phrase));
+            console.log(moment().format("HH:mm:ss") + " revealModalAccountSpendingPrivateKey - phrase: " + this.modalAddress.item.phrase);
+            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAddress.item.phrase));
             // console.log(moment().format("HH:mm:ss") + " generateKeys - phraseInHex: " + phraseInHex);
             const signature = await ethereum.request({
               method: 'personal_sign',
@@ -1488,7 +1488,7 @@
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            Vue.set(this.modalAccount.item, 'spendingPrivateKey', keyPair1.privateKey);
+            Vue.set(this.modalAddress.item, 'spendingPrivateKey', keyPair1.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
@@ -1496,7 +1496,7 @@
 
           addStealthMetaAddressToAccounts() {
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts");
-            const account = this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress];
+            const account = this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress];
             if (account) {
               account.type = "stealthMetaAddress";
               account.name = this.modalNewStealthMetaAddress.name;
@@ -1506,9 +1506,9 @@
               account.spendingPublicKey = this.modalNewStealthMetaAddress.spendingPublicKey;
               account.viewingPublicKey = this.modalNewStealthMetaAddress.viewingPublicKey;
               account.mine = true;
-              Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, account);
+              Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, account);
             } else {
-              Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, {
+              Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, {
                 type: "stealthMetaAddress",
                 name: this.modalNewStealthMetaAddress.name,
                 linkedTo: this.modalNewStealthMetaAddress.linkedTo,
@@ -1520,10 +1520,10 @@
                 source: "user.signed",
               });
             }
-            Vue.set(this.accounts, this.modalNewStealthMetaAddress.stealthMetaAddress, this.accounts[this.modalNewStealthMetaAddress.stealthMetaAddress]);
+            Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts - accounts: " + JSON.stringify(this.accounts, null, 2));
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAccounts - addresses: " + JSON.stringify(this.addresses, null, 2));
           },
           async generateKeys() {
             // https://github.com/nerolation/stealth-wallet/blob/main/scripts/website_logic.js#L230
@@ -1679,11 +1679,11 @@
             console.log(moment().format("HH:mm:ss") + " accountsRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               const address = item[0].address;
-              const account = this.accounts[address];
-              this.modalAccount.item = { address, ...account };
-              this.modalAccount.name = account.name;
+              const account = this.addresses[address];
+              this.modalAddress.item = { address, ...account };
+              this.modalAddress.name = account.name;
               this.$bvModal.show('modal-account');
-              this.$refs.accountsTable.clearSelected();
+              this.$refs.addressesTable.clearSelected();
             }
           },
 
@@ -2042,7 +2042,7 @@
 
           async collateAccounts(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
-            const accounts = this.accounts;
+            const accounts = this.addresses;
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "account", source: "attached", mine: true, name: null };
             }
@@ -2102,33 +2102,33 @@
             }
 
             Vue.set(this, 'accounts', accounts);
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
-            console.log(moment().format("HH:mm:ss") + " collateAccounts - accounts: " + JSON.stringify(accounts, null, 2));
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " collateAccounts - addresses: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateAccounts END");
           },
 
           async syncENSNames(provider) {
             console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            for (const [account, accountData] of Object.entries(this.accounts)) {
+            for (const [account, accountData] of Object.entries(this.addresses)) {
               if (accountData.type == "account") {
                 try {
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   const name = allnames.length >= 0 && allnames[0] && ethers.utils.isValidName(allnames[0]) && allnames[0] || null;
-                  Vue.set(this.accounts[account], 'ensName', name);
+                  Vue.set(this.addresses[account], 'ensName', name);
                 } catch (e) {
                   console.log("syncENSNames - ENS reverse lookup failed: " + e.toString());
                 }
               }
             }
-            localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
           async processData(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const checkAccounts = [];
-            for (const [address, accountData] of Object.entries(this.accounts)) {
+            for (const [address, accountData] of Object.entries(this.addresses)) {
               if (accountData.type == "stealthMetaAddress" /*&& mine */) {
                 checkAccounts.push({ address, ...accountData });
               }
@@ -2180,9 +2180,9 @@
             // }
 
             // Vue.set(this, 'accounts', accounts);
-            // localStorage.stealthChadAccounts = JSON.stringify(this.accounts);
+            // localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
 
-            // console.log(moment().format("HH:mm:ss") + " processData - accounts: " + JSON.stringify(accounts, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
@@ -2331,7 +2331,7 @@
           },
           ensNameOrAddress(address, length = 0) {
             let result = null;
-            const account = this.accounts[address];
+            const account = this.addresses[address];
             if (account) {
               if (account.ensName) {
                 result = account.ensName;
@@ -2348,7 +2348,7 @@
           },
           nameOrAddress(address, length = 0) {
             let result = null;
-            const account = this.accounts[address];
+            const account = this.addresses[address];
             if (account) {
               if (account.ensName) {
                 if (account.name) {
@@ -2373,7 +2373,7 @@
           },
           nameOrNull(address) {
             let result = null;
-            const account = this.accounts[address];
+            const account = this.addresses[address];
             if (account) {
               if (account.ensName) {
                 if (account.name) {
@@ -2388,7 +2388,7 @@
             return result;
           },
           addressDescription(address) {
-            const account = this.accounts[address];
+            const account = this.addresses[address];
             if (account) {
               result = "address=" + address;
               for (let key of [ 'type', 'linkedTo', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source', 'stealthMetaAddress' ]) {
@@ -2480,9 +2480,6 @@
               if ('stealthChadAddresses' in localStorage) {
                 this.addresses = JSON.parse(localStorage.stealthChadAddresses);
               }
-              if ('stealthChadAccounts' in localStorage) {
-                this.accounts = JSON.parse(localStorage.stealthChadAccounts);
-              }
               // (async() => {
               //   // TODO: TESTING
               //   await delay(1500);
@@ -2490,10 +2487,7 @@
               // })();
             }
             (async() => {
-              // const db = new Dexie(this.db.name);
-              // db.version(this.db.version).stores(this.db.schemaDefinition);
               await this.loadCurrentData();
-              // db.close();
             })();
           }
         },
