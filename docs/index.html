@@ -95,7 +95,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx.from && (modalActivity.item.tx.from != ensNameOrAddress(modalActivity.item.tx.from))" label="" label-for="activity-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar id="activity-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="activity-receiver" :value="modalActivity.item.stealthAddress"></b-form-input>
                 <b-input-group-append>
@@ -104,7 +104,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="activity-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal private key" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="activity-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalActivity.stealthPrivateKey ? 'text' : 'password'" readonly size="sm" id="activity-spendingprivatekey" :value="modalActivity.stealthPrivateKey ? modalActivity.stealthPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
