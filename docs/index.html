@@ -128,20 +128,12 @@
             <template #modal-title>
               {{ modalAccount.item.type == "account" ? "Account" : "Stealth Meta-Address" }} Details
             </template>
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account'" label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="account-address" :value="modalAccount.item.address"></b-form-input>
                 <b-input-group-append>
                   <b-button :href="'https://sepolia.etherscan.io/address/' + modalAccount.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
                   <b-button @click="copyToClipboard(modalAccount.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalAccount.item && modalAccount.item.type == 'account' && modalAccount.item.ensName" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="account-ensname" :value="modalAccount.item.ensName"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAccount.item.ensName);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
