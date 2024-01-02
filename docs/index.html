@@ -2083,6 +2083,10 @@
               }
               if (writeRecords.length > 0) {
                 console.log("Writing: " + JSON.stringify(writeRecords.map(e => e.txHash)));
+                await db.announcements.bulkPut(writeRecords).then (function() {
+                }).catch(function(error) {
+                  console.log("processData.bulkPut error: " + error);
+                });
               }
               rows = parseInt(rows) + data.length;
               done = data.length < this.DBPROCESSINGBATCHSIZE;
