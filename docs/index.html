@@ -788,7 +788,7 @@
             addressesTable: {
               filter: null,
               currentPage: 1,
-              pageSize: 10,
+              pageSize: 25,
               sortOption: 'typenameasc',
             },
             contractsTable: {
@@ -1665,10 +1665,10 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_MAINNET) {
+            if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
             if (network.chainId == CHAINID_SEPOLIA) {
@@ -2071,7 +2071,7 @@
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const checkAccounts = [];
             for (const [address, accountData] of Object.entries(this.addresses)) {
-              if (accountData.type == "stealthMetaAddress" /*&& mine */) {
+              if (accountData.type == "stealthMetaAddress" && accountData.mine) {
                 checkAccounts.push({ address, ...accountData });
               }
             }
