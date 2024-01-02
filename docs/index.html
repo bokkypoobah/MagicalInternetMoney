@@ -85,7 +85,7 @@
             <template #modal-title>
               Registry Entry
             </template>
-            <b-form-group v-if="modalRegistry.item" label="Linked To:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" readonly size="sm" id="registry-txhash" :value="modalRegistry.item.txHash"></b-form-input>
                 <b-input-group-append>
