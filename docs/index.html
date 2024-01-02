@@ -274,10 +274,10 @@
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalAddress.item.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="address-spendingprivatekey" :value="modalAddress.item.spendingPrivateKey ? modalAddress.item.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
-                  <b-button v-if="!modalAddress.item.spendingPrivateKey" :disabled="modalAddress.item.linkedTo != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                  <b-button v-if="modalAddress.item.spendingPrivateKey" @click="copyToClipboard(modalAddress.item.spendingPrivateKey ? modalAddress.item.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button v-if="!modalAddress.spendingPrivateKey" :disabled="modalAddress.item.linkedTo != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -922,7 +922,6 @@
           addresses: {},
 
           modalAddress: {
-            source: null,
             item: null,
             name: null,
             spendingPrivateKey: null,
@@ -1579,7 +1578,7 @@
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            Vue.set(this.modalAddress.item, 'spendingPrivateKey', keyPair1.privateKey);
+            Vue.set(this.modalAddress, 'spendingPrivateKey', keyPair1.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
@@ -1735,6 +1734,7 @@
               const addressData = this.addresses[address];
               this.modalAddress.item = { address, ...addressData };
               this.modalAddress.name = addressData.name;
+              this.modalAddress.spendingPrivateKey = null;
               // console.log(moment().format("HH:mm:ss") + " addressesRowSelected - modalAddress: " + JSON.stringify(this.modalAddress, null, 2));
               this.$bvModal.show('modal-address');
               this.$refs.addressesTable.clearSelected();
