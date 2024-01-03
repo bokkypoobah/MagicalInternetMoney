@@ -23,7 +23,7 @@ Compiled 1 Solidity file successfully (evm target: paris).
             '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000001b69b4bacd05f15'
           ]
         }
-      ✔ Test Announcer - ETH Transfer (816ms)
+      ✔ Test Announcer - ETH Transfer (857ms)
       owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       registerKeysReceipt_1:
         LogDescription {
@@ -46,5 +46,5 @@ Compiled 1 Solidity file successfully (evm target: paris).
       ✔ Test Registry
 
 
-  2 passing (826ms)
+  2 passing (867ms)
 

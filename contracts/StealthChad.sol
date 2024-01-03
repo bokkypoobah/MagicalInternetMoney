@@ -52,7 +52,7 @@ interface IERC5564Announcer {
 }
 
 
-interface TransferFrom {
+interface ITransferFrom {
     // ERC-20 function transferFrom(address from, address to, uint tokens) external returns (bool success);
     // ERC-721 function transferFrom(address from, address to, uint256 tokenId) external;
     function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
@@ -129,9 +129,9 @@ contract StealthChad {
         }
 
         for (i = 0; i < tokens.length; i = onePlus(i)) {
-            TransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
+            ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
         }
-        // interface TransferFrom {
+        // interface ITransferFrom {
         //     // ERC-20 function transferFrom(address from, address to, uint tokens) external returns (bool success);
         //     // ERC-721 function transferFrom(address from, address to, uint256 tokenId) external;
         //     function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
