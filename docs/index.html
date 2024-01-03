@@ -85,7 +85,6 @@
               <b-button size="sm" variant="link" id="activity-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalActivity.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalActivity.item.blockNumber)" target="_blank">{{ formatTimestamp(modalActivity.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
-
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="activity-registrant" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
@@ -99,13 +98,14 @@
               <b-avatar id="activity-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-receiver" :value="modalActivity.item.stealthAddress"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="activity-receiver" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="activity-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -125,13 +125,14 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.address" label="and Address:" label-for="activity-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.linkedTo.address)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-owner" :value="modalActivity.item.linkedTo.address"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="activity-owner" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && (modalActivity.item.linkedTo.address != ensNameOrAddress(modalActivity.item.linkedTo.address))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
@@ -141,7 +142,11 @@
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.transfers" label="Transfers:" label-for="activity-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
-                <b-table small fixed striped responsive hover :fields="transfersFields" :items="modalActivity.item.transfers" head-variant="light" class="mx-0 my-1">
+                <b-table small fixed striped responsive hover :fields="transfersFields" :items="modalActivity.item.transfers" head-variant="light" class="mx-0 my-1" thead-class="hidden_header">
+                  <template #cell(tokens)="data">
+                    <!-- TODO: Handle ERC-20/ERC-721 -->
+                    {{ formatETH(data.item.tokens, 0) }}
+                  </template>
                   <template #cell(tokenContractAddress)="data">
                     <!-- TODO: Handle ERC-20/ERC-721 -->
                     <!-- <b-link v-if="data.item.tx && data.item.tx.from" @click="viewAddress(data.item.tx.from)"> -->
@@ -149,15 +154,11 @@
                     <!-- </b-link> -->
                     ETH
                   </template>
-                  <template #cell(tokens)="data">
-                    <!-- TODO: Handle ERC-20/ERC-721 -->
-                    {{ formatETH(data.item.tokens, 0) }}
-                  </template>
                 </b-table>
               </font>
             </b-form-group>
             <b-form-group v-if="modalActivity.item" label="Scheme Id:" label-for="activity-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="activity-schemeid" :value="modalActivity.item.schemeId" class="w-25"></b-form-input>
+              <b-button size="sm" variant="transparent" id="activity-schemeid">{{ modalActivity.item.schemeId }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="activity-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -168,13 +169,14 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.caller" label="Caller:" label-for="activity-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.caller)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-caller" :value="modalActivity.item.caller"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="activity-caller" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
           </b-modal>
 
@@ -1054,7 +1056,7 @@
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           transfersFields: [
-            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 50%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokenContractAddress', label: 'Token', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           registryEntriesFields: [
