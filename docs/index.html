@@ -74,7 +74,7 @@
             <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, 30) + '...' + modalActivity.item.txHash.slice(-28) }}</b-button>
+                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASHLENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASHLENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -188,7 +188,7 @@
             <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, 30) + '...' + modalRegistry.item.txHash.slice(-28) }}</b-button>
+                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASHLENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASHLENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -215,12 +215,22 @@
               <b-button size="sm" variant="transparent" id="registry-schemeid">{{ modalRegistry.item.schemeId }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESSLENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESSLENGTH/2) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+<!--
+
               <b-input-group size="sm" class="w-100">
                 <b-textarea readonly id="registry-stealthmetaaddress" :value="modalRegistry.item.stealthMetaAddress" rows="3"></b-textarea>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
-              </b-input-group>
+              </b-input-group> -->
             </b-form-group>
           </b-modal>
 
@@ -850,6 +860,8 @@
         data: {
           CONFIRMATIONS: 100,
           DBPROCESSINGBATCHSIZE: 3,
+          TXHASHLENGTH: 50,
+          STEALTHMETAADDRESSLENGTH: 59,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
