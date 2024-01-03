@@ -49,6 +49,38 @@ Click on the [eye] button to sign with your web3 wallet to view the Spending Pri
 
 <kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddressSpendingPrivateKey_20240203.png" /></kbd>
 
+<br />
+
+---
+
+#### Activity Sample Screens
+
+##### Activity - After Sync With Generated Keys
+
+Note: Duplicated stealth payments to the same receivers for testing
+
+<kbd><img src="images/SampleScreen_Activity_AfterSyncWithGeneratedKeys_20240203.png" /></kbd>
+
+##### Activity - Sample Stealth Payment
+
+Item 4.
+
+<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_20240203.png" /></kbd>
+
+##### Activity - Sample Stealth Payment - Sign To View Receiver's Stealth Address Private Key
+
+Item 4.
+
+<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_Sign_20240203.png" /></kbd>
+
+##### Activity - Sample Stealth Payment - Receiver's Stealth Address Private Key
+
+<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_SpendingPrivateKey_20240203.png" /></kbd>
+
+##### Activity - Receiver's Stealth Address Private Key In Web3 Wallet
+
+<kbd><img src="images/SampleScreen_Activity_ReceiversStealthAddressPrivateKeyInWeb3Wallet_20240203.png" /></kbd>
+
 
 <br />
 
