@@ -18,6 +18,15 @@ describe("StealthChad", function () {
     const erc20Token = await ERC20Token.deploy("ERC-20", "ERC-20 Token", 18, 1000000000000000000000000n);
     const erc721Token = await ERC721Token.deploy();
 
+    const ownerBalance = await erc20Token.balanceOf(owner);
+    console.log("ownerBalance: " + ownerBalance);
+
+    const approveTx_1 = await erc20Token.approve(stealthChad, 123456789123456789n);
+    const approveReceipt_1 = await approveTx_1.wait();
+
+    const ownerAllowanceToStealthChad = await erc20Token.allowance(owner, stealthChad);
+    console.log("ownerAllowanceToStealthChad: " + ownerAllowanceToStealthChad);
+
     // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
     // const ONE_GWEI = 1_000_000_000;
     // const lockedAmount = ONE_GWEI;
@@ -45,20 +54,26 @@ describe("StealthChad", function () {
     });
 
     it("Test Announcer - ETH & Tokens Transfer", async function () {
-      const { erc5564Announcer, erc5564Registry, stealthChad, owner, otherAccount } = await loadFixture(deployContractsFixture);
+      const { erc5564Announcer, erc5564Registry, stealthChad, erc20Token, owner, otherAccount } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
       const schemeId = 0;
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
       const viewTag = 0xff;
-      const tokens = [otherAccount.address];
+      const tokens = [erc20Token.target];
+      // const tokens = [];
       const values = [123];
+      // const values = [];
       console.log("      tokens: " + JSON.stringify(tokens));
       console.log("      values: " + JSON.stringify(values));
       const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokens, values, { value: 123n });
       const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
       transferAndAnnounceReceipt_1.logs.forEach((log) => {
-        console.log("      transferAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
+        if (log.address == erc5564Announcer.target) {
+          console.log("      transferAndAnnounceReceipt_1 Announcer:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
+        } else {
+          console.log("      transferAndAnnounceReceipt_1 ERC-20:\n" + util.inspect(erc20Token.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
+        }
       });
     });
 

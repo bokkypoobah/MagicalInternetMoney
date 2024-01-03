@@ -66,7 +66,7 @@ contract StealthChad {
 
     IERC5564Announcer announcer;
 
-    error NoPointSendingZeroValue();
+    error WhyEvenTry();
     error TransferFailure();
     error TokenAndValueArraysLengthMismatch();
 
@@ -81,7 +81,7 @@ contract StealthChad {
     /// @param viewTag The view tag derived from the shared secret.
     function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag) external payable {
         if (msg.value == 0) {
-            revert NoPointSendingZeroValue();
+            revert WhyEvenTry();
         }
         bytes memory metadata = new bytes(57);
         uint i;
@@ -112,8 +112,10 @@ contract StealthChad {
         if (tokens.length != values.length) {
             revert TokenAndValueArraysLengthMismatch();
         }
-        bool sendingEth = msg.value > 0;
-        bytes memory metadata = new bytes(1 + (56 * (tokens.length + (sendingEth ? 1 : 0))));
+        if (tokens.length == 0 && msg.value == 0) {
+            revert WhyEvenTry();
+        }
+        bytes memory metadata = new bytes(1 + (56 * (tokens.length + (msg.value > 0 ? 1 : 0))));
         uint i;
         uint j;
         metadata[j++] = bytes1(viewTag);
@@ -140,7 +142,7 @@ contract StealthChad {
             for (k = 0; k < 32; k = onePlus(k)) {
                 metadata[j++] = valueInBytes[k];
             }
-            // ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
+            ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
         }
         announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
     }

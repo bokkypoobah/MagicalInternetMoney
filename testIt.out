@@ -3,10 +3,29 @@
   StealthChad
     Deployment
       - Test Announcer - ETH Transfer
+ownerBalance: 1000000000000000000000000
+ownerAllowanceToStealthChad: 123456789123456789
       owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-      tokens: ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]
+      tokens: ["0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"]
       values: [123]
-      transferAndAnnounceReceipt_1:
+      transferAndAnnounceReceipt_1 ERC-20:
+        LogDescription {
+          fragment: EventFragment {
+            type: 'event',
+            inputs: [ [ParamType], [ParamType], [ParamType] ],
+            name: 'Transfer',
+            anonymous: false
+          },
+          name: 'Transfer',
+          signature: 'Transfer(address,address,uint256)',
+          topic: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          args: Result(3) [
+            '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+            '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+            123n
+          ]
+        }
+      transferAndAnnounceReceipt_1 Announcer:
         LogDescription {
           fragment: EventFragment {
             type: 'event',
@@ -22,13 +41,13 @@
             '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
             '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
             '0x1234',
-            '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000000000000000007b23b872dd70997970c51812dc3a010c7d01b50e0d17dc79c8000000000000000000000000000000000000000000000000000000000000007b'
+            '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000000000000000007b23b872ddcf7ed3acca5a467e9e704c703e8d87f634fb0fc9000000000000000000000000000000000000000000000000000000000000007b'
           ]
         }
-      ✔ Test Announcer - ETH & Tokens Transfer (908ms)
+      ✔ Test Announcer - ETH & Tokens Transfer (911ms)
       - Test Registry
 
 
-  1 passing (910ms)
+  1 passing (913ms)
   2 pending
 
