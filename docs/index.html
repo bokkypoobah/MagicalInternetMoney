@@ -361,13 +361,10 @@
               <b-button size="sm" disabled variant="none" id="contract-chain">{{ chains.filter(e => e.value == modalContract.item.chainId)[0] && chains.filter(e => e.value == modalContract.item.chainId)[0].text || ("Id: " + modalContract.item.chainId) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="contract-address" :value="modalContract.item.contract"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div class="mt-1"><b-link :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank"><font size="-1">{{ modalContract.item.contract }}</font></b-link></div>
+                <div><b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button></div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.type" label="Type:" label-for="contract-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" disabled variant="none" id="contract-type">{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</b-button>
