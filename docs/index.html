@@ -496,7 +496,7 @@
                     <li>Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens</li>
                     <li>Bob generates a <i>Stealth Meta-Address</i> and provides this to Alice</li>
                     <li>Alice uses Bob's <i>Stealth Meta-Address</i> to compute a random <i>Stealth Address</i> that can be accessed only by Bob</li>
-                    <li>Alice transfers the tokens this to this address and announces the transfers to the <i>ERC-5564: Stealth Address Announcer</i> contract</li>
+                    <li>Alice transfers the tokens to this address and announces the transfers in the <i>ERC-5564: Stealth Address Announcer</i> contract</li>
                     <li>Bob can access the private keys to their computed <i>Stealth Addresses</i>, using information included in the announcements</li>
                     <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows any account to publish their associated <i>Stealth Meta-Addresses</i></li>
                   </ul>
@@ -505,9 +505,10 @@
                   This dapp:
                   <ul>
                     <li>Allows Bob's web3 attached account to generate a unique <i>Stealth Meta-Address</i> for each unique associated <i>phrase</i></li>
+                    <li>Allows Bob to publish one or more <i>Stealth Meta-Addresses</i> associated with thier web3 attached accounts and unique <i>phrase</i></li>
                     <li>Allows Alice to compute a random <i>Stealth Address</i> using Bob's <i>Stealth Meta-Address</i></li>
                     <li>Allows Alice to then execute the transfer to Bob's <i>Stealth Address</i> and announce the transfer to the <i>Announcer</i></li>
-                    <li>Retrieve all event logs published to the <i>Announcer</i></li>
+                    <li>Retrieve all event logs published to the <i>Announcer</i>. Alice's transfer to Bob will appear in this data</li>
                     <li>Retrieves all event logs published to the <i>Registry</i></li>
                   </ul>
 

@@ -11,7 +11,7 @@ Test it at [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.gith
 * Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens
 * Bob generates a *Stealth Meta-Address* and provides this to Alice
 * Alice uses Bob's *Stealth Meta-Address* to compute a random *Stealth Address* that can be accessed only by Bob
-Alice transfers the tokens this to this address and announces the transfers to the *ERC-5564: Stealth Address Announcer* contract
+* Alice transfers the tokens to this address and announces the transfers in the *ERC-5564: Stealth Address Announcer* contract
 * Bob can access the private keys to their computed *Stealth Addresses*, using information included in the announcements
 * The *ERC-6538: Stealth Meta-Address Registry* allows any account to publish their associated *Stealth Meta-Addresses*
 
