@@ -225,13 +225,15 @@
               {{ modalAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
             </template>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.address)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="address-address" :value="modalAddress.item.address"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address' && modalAddress.item.ensName" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar v-if="modalAddress.item.address != ensNameOrAddress(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
@@ -245,13 +247,14 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="address-linkedto" :value="modalAddress.item.linkedTo"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto" :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar v-if="modalAddress.item.linkedTo != ensNameOrAddress(modalAddress.item.linkedTo)" id="address-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
