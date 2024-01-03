@@ -60,7 +60,7 @@ interface IERC5564Announcer {
 contract StealthChad {
     IERC5564Announcer announcer;
 
-    error NoPointInSendingAZeroValue();
+    error NoPointSendingZeroValue();
     error TransferFailure();
 
     constructor(address payable _announcer) {
@@ -74,7 +74,7 @@ contract StealthChad {
     /// @param viewTag The view tag derived from the shared secret.
     function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag) external payable {
         if (msg.value == 0) {
-            revert NoPointInSendingAZeroValue();
+            revert NoPointSendingZeroValue();
         }
         bytes memory metadata = new bytes(57);
         uint i;
@@ -94,4 +94,33 @@ contract StealthChad {
         }
     }
 
+    /// @dev Transfer ETH/ERC-20/ERC-721 and announce
+    /// @param schemeId The integer specifying the applied stealth address scheme.
+    /// @param recipient The computed stealth address for the recipient.
+    /// @param ephemeralPubKey Ephemeral public key used by the sender.
+    /// @param viewTag The view tag derived from the shared secret.
+    /// @param tokens Array of ERC-20/ERC-721 addresses to transfer
+    /// @param values Array of ERC-20 tokens or ERC-721 tokenId to transfer
+    function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, address[] calldata tokens, uint256[] calldata values) external payable {
+        // TODO: Handle ERC-20/ERC-721
+        // if (msg.value == 0) {
+        //     revert NoPointSendingZeroValue();
+        // }
+        bytes memory metadata = new bytes(57);
+        uint i;
+        uint j;
+        metadata[j++] = bytes1(viewTag);
+        for (; i < 24; i = onePlus(i)) {
+            metadata[j++] = 0xee;
+        }
+        bytes32 msgValueInBytes = bytes32(msg.value);
+        for (i = 0; i < 32; i = onePlus(i)) {
+            metadata[j++] = msgValueInBytes[i];
+        }
+        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
+        (bool sent, ) = recipient.call{value: msg.value}("");
+        if (!sent) {
+            revert TransferFailure();
+        }
+    }
 }

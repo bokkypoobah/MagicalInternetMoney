@@ -1,12 +1,49 @@
-Compiled 1 Solidity file successfully (evm target: paris).
 
 
   StealthChad
     Deployment
-owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-registrant: 0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266
-      ✔ Do Something (748ms)
+      owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      transferEthAndAnnounceReceipt_1:
+        LogDescription {
+          fragment: EventFragment {
+            type: 'event',
+            inputs: [ [ParamType], [ParamType], [ParamType], [ParamType], [ParamType] ],
+            name: 'Announcement',
+            anonymous: false
+          },
+          name: 'Announcement',
+          signature: 'Announcement(uint256,address,address,bytes,bytes)',
+          topic: '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+          args: Result(5) [
+            0n,
+            '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+            '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
+            '0x1234',
+            '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000001b69b4bacd05f15'
+          ]
+        }
+      ✔ Test Announcer - ETH Transfer (765ms)
+      owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      registerKeysReceipt_1:
+        LogDescription {
+          fragment: EventFragment {
+            type: 'event',
+            inputs: [ [ParamType], [ParamType], [ParamType] ],
+            name: 'StealthMetaAddressSet',
+            anonymous: false
+          },
+          name: 'StealthMetaAddressSet',
+          signature: 'StealthMetaAddressSet(bytes32,uint256,bytes)',
+          topic: '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
+          args: Result(3) [
+            '0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266',
+            0n,
+            '0x73743a6574683a3078303339343431643838326430636633333536356464613963373532393130663962623133313836353535343935633038316539643333653339313531383435366334303365613862616162303438366137623462363035366437376533356138663062353533343535306664666535336136393138303838356561313066626563623936'
+          ]
+        }
+      registrant: 0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266
+      ✔ Test Registry
 
 
-  1 passing (749ms)
+  2 passing (778ms)
 
