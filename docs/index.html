@@ -148,7 +148,7 @@
                   </template>
                   <template #cell(tokens)="data">
                     <!-- TODO: Handle ERC-20/ERC-721 -->
-                    {{ formatETH(data.item.tokens) }}
+                    {{ formatETH(data.item.tokens, 0) }}
                   </template>
                 </b-table>
               </font>
@@ -598,7 +598,7 @@
                 <template #cell(tokens)="data">
                   <!-- TODO: Handle ERC-20/ERC-721 -->
                   <font size="-1">
-                    {{ formatETH(data.item.transfers[0].tokens) }}
+                    {{ formatETH(data.item.transfers[0].tokens, 0) }}
                   </font>
                 </template>
                 <template #cell(token)="data">
