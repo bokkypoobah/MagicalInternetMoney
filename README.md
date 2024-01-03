@@ -3,6 +3,10 @@ Stealth Chad - Exploring [ERC-5564: Stealth Addresses](https://eips.ethereum.org
 
 URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/StealthChad/) on Sepolia testnet - WIP
 
+#### TODO
+
+* New Transfer modal screen
+
 <br />
 
 ---

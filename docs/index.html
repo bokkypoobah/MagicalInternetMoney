@@ -1648,9 +1648,9 @@
                 result.stealthMetaAddress = stealthMetaAddress;
                 result.receiverSpendingPublicKey = stealthMetaAddress.slice(9, 75);
                 result.receiverViewingPublicKey = stealthMetaAddress.slice(75);
-                // result.ephemeralPrivateKey = nobleCurves.secp256k1.utils.randomPrivateKey();
-                // TODO: Remove after testing
-                result.ephemeralPrivateKey = 26997109008263982877621605952415166666118239613620770339187915977330619367704n;
+                result.ephemeralPrivateKey = nobleCurves.secp256k1.utils.randomPrivateKey();
+                // // TODO: Remove after testing
+                // result.ephemeralPrivateKey = 26997109008263982877621605952415166666118239613620770339187915977330619367704n;
                 result.ephemeralPublicKey = nobleCurves.secp256k1.getPublicKey(result.ephemeralPrivateKey, isCompressed=true);
                 result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(result.ephemeralPrivateKey, result.receiverViewingPublicKey, false);
                 result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
