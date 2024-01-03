@@ -1,19 +1,15 @@
-/**
- *Submitted for verification at Etherscan.io on 2023-12-26
-*/
-
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
-// StealthChad v0.8.0 - Experiments in ERC-5564: Stealth Addresses
+// StealthChad v0.8.1 - Experiments in ERC-5564: Stealth Addresses
 //
-// Deployed to Sepolia 0x3834bcA9093e375893D65975ad765179A149D017
+// Deployed to Sepolia 
 //
 // https://github.com/bokkypoobah/StealthChad
 //
 // SPDX-License-Identifier: MIT
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2024
 // ----------------------------------------------------------------------------
 
 // import "hardhat/console.sol";

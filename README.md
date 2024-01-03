@@ -16,7 +16,7 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
   * https://nerolation.github.io/stealth-utils/ from https://github.com/nerolation/stealth-utils
   * [StealthTransactionHelper on Sepolia](https://sepolia.etherscan.io/address/0x054Aa0E0b4C92142a583fDfa9369FF3558F8dea4#code)
 * https://github.com/kassandraoftroy/erc5564-contracts
-* [An incomplete guide to stealth addresses](https://vitalik.eth.limo/general/2023/01/20/stealth.html)
+* [An incomplete guide to stealth addresses](https://vitalik.eth.limo/general/2024/01/20/stealth.html)
 * [ERC-5564 Stealth Addresses](https://ethereum-magicians.org/t/erc-5564-stealth-addresses/10614)
 * [EIP-5564: Improving Privacy on Ethereum through Stealth Address Wallets](https://medium.com/@toni_w/eip-5564-improving-privacy-on-ethereum-through-stealth-address-wallets-fdf3250e81a1)
 * [Ethereum stealth addresses (ERC-5564) library](https://github.com/jsign/zig-stealth-addresses)
@@ -70,3 +70,11 @@ npx hardhat
 > 2.19.3
 
 npm install --save-dev @nomicfoundation/hardhat-ethers ethers
+
+<br />
+
+<br />
+
+Enjoy!
+
+(c) BokkyPooBah / Bok Consulting Pty Ltd 2024. The MIT Licence.

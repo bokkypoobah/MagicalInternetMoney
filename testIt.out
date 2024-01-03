@@ -1,4 +1,4 @@
-Compiled 2 Solidity files successfully (evm target: paris).
+Compiled 4 Solidity files successfully (evm target: paris).
 
 
   StealthChad
@@ -23,7 +23,7 @@ Compiled 2 Solidity files successfully (evm target: paris).
             '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000001b69b4bacd05f15'
           ]
         }
-      ✔ Test Announcer - ETH Transfer (841ms)
+      ✔ Test Announcer - ETH Transfer (850ms)
       owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       registerKeysReceipt_1:
         LogDescription {
@@ -46,5 +46,5 @@ Compiled 2 Solidity files successfully (evm target: paris).
       ✔ Test Registry
 
 
-  2 passing (850ms)
+  2 passing (859ms)
 

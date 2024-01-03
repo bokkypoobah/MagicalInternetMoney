@@ -7,7 +7,7 @@ pragma solidity ^0.8.0;
 //
 // SPDX-License-Identifier: MIT
 //
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2023. The MIT Licence.
+// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2024. The MIT Licence.
 // ----------------------------------------------------------------------------
 
 import "./openzeppelin/token/ERC721/ERC721.sol";
