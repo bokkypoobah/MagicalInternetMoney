@@ -39,59 +39,26 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 ### Sample Screens
 
-#### Accounts Sample Screens
+#### Addresses Sample Screens
 
-##### Accounts - After Sync
+##### Addresses - After Sync
 
-<kbd><img src="images/SampleScreen_Accounts_AfterSync_20240101.png" /></kbd>
+<kbd><img src="images/SampleScreen_Addresses_AfterSync_20240203.png" /></kbd>
 
-##### Accounts - Generate Stealth Meta-Address
+##### Addresses - Generate New Stealth Meta-Address
 
-<kbd><img src="images/SampleScreen_Accounts_GenerateStealthMetaAddress_20240101.png" /></kbd>
+<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_20240203.png" /></kbd>
 
-##### Accounts - Generate Stealth Meta-Address - Web3 Signing
+##### Addresses - Generate New Stealth Meta-Address - Sign With Web3 Wallet
 
-<kbd><img src="images/SampleScreen_Accounts_Signing_20240101.png" /></kbd>
+<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_Sign_20240203.png" /></kbd>
 
-##### Accounts - Generate Stealth Meta-Address - After Web3 Signing
+##### Addresses - Generate New Stealth Meta-Address - After Signing
 
-<kbd><img src="images/SampleScreen_Accounts_AfterSigning_20240101.png" /></kbd>
+Click [Update] to update.
 
-##### Accounts - View Stealth Meta-Address
+<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_AfterSigning_20240203.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_20240101.png" /></kbd>
-
-##### Accounts - View Stealth Meta-Address - Sign To View Spending Private Key
-
-<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_SignToViewSpendingPrivateKey_20240101.png" /></kbd>
-
-##### Accounts - View Stealth Meta-Address - With Spending Private Key
-
-<kbd><img src="images/SampleScreen_Accounts_ViewStealthMetaAddress_WithSpendingPrivateKey_20240101.png" /></kbd>
-
----
-
-#### Config Sample Screens
-
-##### Config - Before Scan
-
-<kbd><img src="images/SampleScreen_Config_BeforeScan_20240101.png" /></kbd>
-
-##### Config - After Scan
-
-<kbd><img src="images/SampleScreen_Config_AfterScan_20240101.png" /></kbd>
-
-##### Config - Announcer
-
-<kbd><img src="images/SampleScreen_Config_Announcer_20240101.png" /></kbd>
-
-##### Config - Registry
-
-<kbd><img src="images/SampleScreen_Config_Registry_20240101.png" /></kbd>
-
-##### Config - StealthChad
-
-<kbd><img src="images/SampleScreen_Config_StealthChad_20240101.png" /></kbd>
 
 <br />
 
