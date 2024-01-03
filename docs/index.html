@@ -595,18 +595,6 @@
                     ETH
                   </font>
                 </template>
-                <template #cell(details)="data">
-                  <font size="-2">
-                    schemeId: {{ data.item.schemeId }}, ephemeralPublicKey: {{ data.item.ephemeralPublicKey }}, metadata: {{ data.item.metadata }}
-                  </font>
-                  <!-- <br />
-                  <font size="-1">
-                    <pre>
-{{ data.item }}
-                    </pre>
-                  </font> -->
-                  <!-- <b-badge pill variant="transparent" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge> -->
-                </template>
               </b-table>
 
               <!-- :TRANSFERS -->
@@ -859,12 +847,6 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            stealthMetaAddress: {
-              message: "I want to login into my stealth wallet on Ethereum mainnet.",
-              spendingPublicKey: null,
-              viewingPublicKey: null,
-              stealthMetaAddress: null,
-            },
             transfer: {
               recipientStealthMetaAddress: null,
               amount: 0.01,
@@ -893,7 +875,7 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 26,
+            version: 27,
           },
           contracts: {
             "11155111": {
@@ -934,14 +916,17 @@
           registryEntries: [],
           addresses: {},
 
+          modalActivity: {
+            item: null,
+            stealthPrivateKey: null,
+          },
+          modalRegistry: {
+            item: null,
+          },
           modalAddress: {
             item: null,
             name: null,
             spendingPrivateKey: null,
-          },
-          modalActivity: {
-            item: null,
-            stealthPrivateKey: null,
           },
           modalNewStealthMetaAddress: {
             name: null,
@@ -952,9 +937,6 @@
             viewingPublicKey: null,
             stealthMetaAddress: null,
             status: null,
-          },
-          modalRegistry: {
-            item: null,
           },
           modalContract: {
             item: null,
@@ -1019,16 +1001,6 @@
           falseTrueOptions: [
             { value: false, text: 'false' },
             { value: true, text: 'true' },
-          ],
-          accountTypeOptions: [
-            { value: null, text: '(use default)' },
-            { value: "eoa", text: 'EOA' },
-            { value: "erc20", text: 'ERC-20' },
-            { value: "erc721", text: 'ERC-721' },
-            { value: "erc1155", text: 'ERC-1155' },
-            { value: "ftexchange", text: 'FTExchange' },
-            { value: "nftexchange", text: 'NFTExchange' },
-            { value: "unknown", text: '(Unknown)' },
           ],
           decimalsOptions: [
             { value: null, text: '(use default)' },
@@ -1099,11 +1071,8 @@
             name: "stealthchaddata080g",
             version: 1,
             schemaDefinition: {
-              // cache: '&objectName',
-              // syncStates: '&contract',
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
               registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
-              // txs: '[blockNumber+txIndex],txHash',
             },
             updated: null,
           },
@@ -1442,21 +1411,17 @@
           },
 
           toggleContractRead(item) {
-            // console.log(moment().format("HH:mm:ss") + " toggleContractRead");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'read', !this.modalContract.read);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
-              // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
           },
           toggleContractWrite(item) {
-            // console.log(moment().format("HH:mm:ss") + " toggleContractWrite");
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'write', !this.modalContract.write);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
-              // console.log(moment().format("HH:mm:ss") + " AFTER: " + JSON.stringify(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], null, 2));
             }
           },
 
@@ -1491,7 +1456,6 @@
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            // Vue.set(this.modalNewStealthMetaAddress.keys, 'spendingPrivateKey', keyPair1.privateKey);
             Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
@@ -1500,7 +1464,6 @@
             Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
             Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
             Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
-
             let status;
             if (stealthMetaAddress in this.addresses) {
               status = this.addresses[stealthMetaAddress].mine ? "mine" : "notmine";
@@ -1512,26 +1475,17 @@
           },
 
           async revealModalActivitySpendingPrivateKey() {
-
             function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
               const result = {};
-              // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-              // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey); //  + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPrivateKey: " + spendingPrivateKey);
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
               result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-              // console.log("hashedSharedSecret: " + result.hashedSharedSecret);
-              // console.log("spendingPrivateKey: " + spendingPrivateKey);
               const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
               const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
               result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
-              // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
               result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
-              // console.log("      stealthPublicKey: ", result.stealthPublicKey.toHex(true));
               result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
-              // console.log("      stealthAddress: ", result.stealthAddress);
               return result;
             }
-
 
             console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - modalActivity: " + JSON.stringify(this.modalActivity, null, 2));
             const stealthMetaAddressData = this.addresses[this.modalActivity.item.linkedTo.stealthMetaAddress];
@@ -1552,21 +1506,16 @@
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            // Vue.set(this.modalAddress.item, 'spendingPrivateKey', keyPair1.privateKey);
             const spendingPrivateKey = keyPair1.privateKey;
             const viewingPrivateKey = keyPair2.privateKey;
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
             console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
-
-            // function computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
             const computedStealthKey = computeStealthKey(this.modalActivity.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
             const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
             Vue.set(this.modalActivity, 'stealthPrivateKey', stealthPrivateKey);
             console.log("this.modalActivity: " + JSON.stringify(this.modalActivity, null, 2));
-            // console.log("      computedStealthKey: " + computedStealthKey.stealthAddress + " vs stealthAddress: " + stealthAddress);
-
           },
 
           async revealModalAddressSpendingPrivateKey() {
@@ -1625,22 +1574,22 @@
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
           },
 
-          async registerKey() {
-            // TODO: Register keys
-            console.log(moment().format("HH:mm:ss") + " registerKey BEGIN");
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const contract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
-            const contractWithSigner = contract.connect(provider.getSigner());
-            const schemeId = 0;
-            try {
-              const stealthMetaAddress = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.stealthMetaAddress));
-              const tx = await contractWithSigner.registerKeys(schemeId, stealthMetaAddress);
-              console.log("tx: " + JSON.stringify(tx));
-            } catch (e) {
-              console.log("registerKey ERC5564Registry.registerKeys(...) error: " + JSON.stringify(e));
-            }
-            console.log(moment().format("HH:mm:ss") + " registerKey END");
-          },
+          // async registerKey() {
+          //   // TODO: Register keys
+          //   console.log(moment().format("HH:mm:ss") + " registerKey BEGIN");
+          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+          //   const contract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+          //   const contractWithSigner = contract.connect(provider.getSigner());
+          //   const schemeId = 0;
+          //   try {
+          //     const stealthMetaAddress = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.stealthMetaAddress));
+          //     const tx = await contractWithSigner.registerKeys(schemeId, stealthMetaAddress);
+          //     console.log("tx: " + JSON.stringify(tx));
+          //   } catch (e) {
+          //     console.log("registerKey ERC5564Registry.registerKeys(...) error: " + JSON.stringify(e));
+          //   }
+          //   console.log(moment().format("HH:mm:ss") + " registerKey END");
+          // },
 
           async transferEthToStealthMetaAddress() {
             function generateStealthAddress(stealthMetaAddress) {
@@ -1665,43 +1614,6 @@
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
             }
-
-            // // const receiverSpendingPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(this.settings.transfer.recipientStealthMetaAddress.slice(9, 75));
-            // const receiverSpendingPublicKey = this.settings.transfer.recipientStealthMetaAddress.slice(9, 75);
-            // console.log("receiverSpendingPublicKey: " + receiverSpendingPublicKey.toString());
-            // // const receiverViewingPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(this.settings.transfer.recipientStealthMetaAddress.slice(75));
-            // const receiverViewingPublicKey = this.settings.transfer.recipientStealthMetaAddress.slice(75);
-            // console.log("receiverViewingPublicKey: " + receiverViewingPublicKey.toString());
-            //
-            // // const ephemeralPrivateKey = nobleCurves.secp256k1.utils.randomPrivateKey();
-            // // TODO: Remove after testing
-            // const ephemeralPrivateKey = 26997109008263982877621605952415166666118239613620770339187915977330619367704n;
-            // console.log("ephemeralPrivateKey: " + ephemeralPrivateKey.toString());
-            //
-            // const ephemeralPublicKey = nobleCurves.secp256k1.getPublicKey(ephemeralPrivateKey, isCompressed=true);
-            // console.log("ephemeralPublicKey: " + ephemeralPublicKey.toString());
-            //
-            // const sharedSecret = nobleCurves.secp256k1.getSharedSecret(ephemeralPrivateKey, receiverViewingPublicKey, false);
-            // console.log('sharedSecret: ', sharedSecret.toString());
-            // console.log('sharedSecret.length: ', sharedSecret.length);
-            // const hashedSharedSecret = ethers.utils.keccak256(sharedSecret.slice(1));
-            // console.log('hashedSharedSecret: ', hashedSharedSecret.toString());
-            // console.log('hashedSharedSecret.length: ', hashedSharedSecret.length);
-            //
-            // const viewTag = "0x" + hashedSharedSecret.substring(2, 4);
-            // console.log('viewTag:', viewTag);
-            //
-            // const hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(hashedSharedSecret.substring(2));
-            // console.log('hashedSharedSecretPoint:', hashedSharedSecretPoint);
-            // console.log('nobleCurves.secp256k1.ProjectivePoint.fromHex(receiverSpendingPublicKey):', nobleCurves.secp256k1.ProjectivePoint.fromHex(receiverSpendingPublicKey));
-            // console.log('nobleCurves.secp256k1.ProjectivePoint.fromHex(receiverSpendingPublicKey).toHex():', nobleCurves.secp256k1.ProjectivePoint.fromHex(receiverSpendingPublicKey).toHex());
-            //
-            // const stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(receiverSpendingPublicKey).add(hashedSharedSecretPoint);
-            // console.log('stealthPublicKey:', stealthPublicKey);
-            // console.log('stealthPublicKey.toHex():', stealthPublicKey.toHex(false));
-            //
-            // const stealthAddress = ethers.utils.computeAddress("0x" + stealthPublicKey.toHex(false));
-            // console.log('stealthAddress:', stealthAddress);
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const contract = new ethers.Contract(STEALTHCHADADDRESS_SEPOLIA, STEALTHCHADABI_SEPOLIA, provider);
@@ -2262,7 +2174,6 @@
                 }
               }
               if (writeRecords.length > 0) {
-                // console.log("Writing: " + JSON.stringify(writeRecords.map(e => e.txHash)));
                 await db.announcements.bulkPut(writeRecords).then (function() {
                 }).catch(function(error) {
                   console.log("processData.bulkPut error: " + error);
@@ -2273,111 +2184,8 @@
             } while (!done);
             rows = 0;
 
-            // done = false;
-            // do {
-            //   let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
-            //   console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-            //   for (const item of data) {
-            //     if (!(item.contract in accounts)) {
-            //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-            //       accounts[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
-            //     }
-            //     if (!(item.registrant in accounts)) {
-            //       accounts[item.registrant] = { type: "address", source: "registry.registrant", mine: null, name: null };
-            //     }
-            //     if (!(item.stealthMetaAddress in accounts)) {
-            //       accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant };
-            //     }
-            //   }
-            //   rows = parseInt(rows) + data.length;
-            //   done = data.length < this.DBPROCESSINGBATCHSIZE;
-            // } while (!done);
-
-            // for (const [address, accountData] of Object.entries(accounts)) {
-            //   if (accountData.type == "stealthMetaAddress") {
-            //     const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
-            //     // console.log(moment().format("HH:mm:ss") + " processData: " + address + " => " + JSON.stringify(accountData, null, 2));
-            //     // console.log(moment().format("HH:mm:ss") + "   => " + JSON.stringify(linkedToData, null, 2));
-            //     if (linkedToData && linkedToData.mine) {
-            //       accounts[address].mine = true;
-            //     }
-            //   }
-            // }
-
-            // Vue.set(this, 'accounts', accounts);
-            // localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-
             // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
-          },
-
-          async processDataOld(provider) {
-            function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
-              const result = {};
-              // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-              // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-              result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
-              result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-              result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
-              result.stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(spendingPublicKey.substring(2)).add(result.hashedSharedSecretPoint);
-              result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
-              result.match = result.stealthAddress == stealthAddress;
-              return result;
-            }
-
-            function computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
-              const result = {};
-              // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-              // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey); //  + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPrivateKey: " + spendingPrivateKey);
-              result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
-              result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-              // console.log("hashedSharedSecret: " + result.hashedSharedSecret);
-              // console.log("spendingPrivateKey: " + spendingPrivateKey);
-              const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
-              const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
-              result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
-              // console.log("      stealthPrivateKey: ", result.stealthPrivateKey);
-              result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
-              // console.log("      stealthPublicKey: ", result.stealthPublicKey.toHex(true));
-              result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
-              // console.log("      stealthAddress: ", result.stealthAddress);
-              return result;
-            }
-
-            console.log(moment().format("HH:mm:ss") + " processDataOld BEGIN");
-            // console.log(moment().format("HH:mm:ss") + " processDataOld - events: " + JSON.stringify(this.events));
-            // console.log(moment().format("HH:mm:ss") + " processDataOld - addresses: " + JSON.stringify(this.addresses));
-            const events = this.events[this.chainId] || {};
-            const addresses = this.addresses[this.chainId] || {};
-            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
-              for (const logIndex of Object.keys(events[blockNumber]).sort((a, b) => { return a - b })) {
-                const eventData = events[blockNumber][logIndex];
-                console.log(blockNumber + "." + logIndex + " " + eventData.stealthAddress + " " + eventData.ephemeralPublicKey);
-                for (const [address, accountData] of Object.entries(addresses)) {
-                  for (const [stealthMetaAddress, stealthMetaAddressData] of Object.entries(accountData.stealthMetaAddresses)) {
-                    // console.log("  Checking " + address.substring(0, 20) + " " + stealthMetaAddress.substring(0, 30));
-                    const stealthAddress = eventData.stealthAddress;
-                    const ephemeralPublicKey = eventData.ephemeralPublicKey;
-                    const viewingPrivateKey = stealthMetaAddressData.viewingPrivateKey;
-                    const spendingPrivateKey = stealthMetaAddressData.spendingPrivateKey;
-                    const spendingPublicKey = stealthMetaAddressData.spendingPublicKey;
-                    const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-                    console.log("    checkStealthAddress: " + (status && status.match));
-                    // for (const [k, v] of Object.entries(status)) {
-                    //   console.log("    ", k, "=>", v);
-                    // }
-                    if (status && status.match) {
-                      const computedStealthKey = computeStealthKey(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
-                      console.log("      computedStealthKey: " + computedStealthKey.stealthAddress + " vs stealthAddress: " + stealthAddress);
-                      // for (const [k, v] of Object.entries(computedStealthKey)) {
-                      //   console.log("    ", k, "=>", v);
-                      // }
-                    }
-                  }
-                }
-              }
-            }
-            console.log(moment().format("HH:mm:ss") + " processDataOld END");
           },
 
           async loadCurrentData() {
@@ -2386,10 +2194,8 @@
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const announcements = await db.announcements.toArray();
             Vue.set(this, 'announcements', announcements);
-            // console.log(moment().format("HH:mm:ss") + " announcements[0..2]: " + JSON.stringify(this.announcements.slice(0, 2), null, 2));
             const registryEntries = await db.registryEntries.toArray();
             Vue.set(this, 'registryEntries', registryEntries);
-            // console.log(moment().format("HH:mm:ss") + " registryEntries[0..2]: " + JSON.stringify(this.registryEntries.slice(0, 2), null, 2));
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
