@@ -31,6 +31,24 @@ Click [Update] to update the Stealth Meta-Address keys.
 
 <kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_AfterSigning_20240203.png" /></kbd>
 
+##### Addresses - After New Generated Stealth Meta-Address Updated
+
+<kbd><img src="images/SampleScreen_Addresses_AfterNewGeneratedStealthMetaAddressUpdated_20240203.png" /></kbd>
+
+##### Addresses - View Newly Generated Stealth Meta-Address
+
+<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddress_20240203.png" /></kbd>
+
+##### Addresses - View Newly Generated Stealth Meta-Address - Spending Private Key - Sign
+
+Click on the [eye] button to sign with your web3 wallet to view the Spending Private Key.
+
+<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddressSpendingPrivateKey_Sign_20240203.png" /></kbd>
+
+##### Addresses - View Newly Generated Stealth Meta-Address - Spending Private Key
+
+<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddressSpendingPrivateKey_20240203.png" /></kbd>
+
 
 <br />
 
