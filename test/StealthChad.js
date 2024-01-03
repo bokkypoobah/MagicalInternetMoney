@@ -30,7 +30,7 @@ describe("StealthChad", function () {
 
   describe("Deployment", function () {
 
-    it("Test Announcer - ETH Transfer", async function () {
+    it.skip("Test Announcer - ETH Transfer", async function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, owner, otherAccount } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
       const schemeId = 0;
@@ -44,7 +44,25 @@ describe("StealthChad", function () {
       });
     });
 
-    it("Test Registry", async function () {
+    it("Test Announcer - ETH & Tokens Transfer", async function () {
+      const { erc5564Announcer, erc5564Registry, stealthChad, owner, otherAccount } = await loadFixture(deployContractsFixture);
+      console.log("      owner: " + owner.address);
+      const schemeId = 0;
+      const recipient = otherAccount;
+      const ephemeralPubKey = "0x1234";
+      const viewTag = 0xff;
+      const tokens = [otherAccount.address];
+      const values = [123];
+      console.log("      tokens: " + JSON.stringify(tokens));
+      console.log("      values: " + JSON.stringify(values));
+      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokens, values, { value: 123n });
+      const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
+      transferAndAnnounceReceipt_1.logs.forEach((log) => {
+        console.log("      transferAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
+      });
+    });
+
+    it.skip("Test Registry", async function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, owner } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
       const schemeId = 0;

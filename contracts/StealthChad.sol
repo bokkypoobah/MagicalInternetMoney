@@ -61,6 +61,9 @@ interface ITransferFrom {
 
 /// @notice Stealth Chad things
 contract StealthChad {
+    // 0x23b872dd transferFrom(address,address,uint256)
+    bytes4 private constant TRANSFERFROM = 0x23b872dd;
+
     IERC5564Announcer announcer;
 
     error NoPointSendingZeroValue();
@@ -106,37 +109,39 @@ contract StealthChad {
     /// @param tokens Array of ERC-20/ERC-721 addresses to transfer
     /// @param values Array of ERC-20 tokens or ERC-721 tokenId to transfer
     function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, address[] calldata tokens, uint256[] calldata values) external payable {
-        // TODO: Handle ERC-20/ERC-721
         if (tokens.length != values.length) {
             revert TokenAndValueArraysLengthMismatch();
         }
-        bytes memory metadata = new bytes(57);
+        bool sendingEth = msg.value > 0;
+        bytes memory metadata = new bytes(1 + (56 * (tokens.length + (sendingEth ? 1 : 0))));
         uint i;
         uint j;
         metadata[j++] = bytes1(viewTag);
-        for (; i < 24; i = onePlus(i)) {
-            metadata[j++] = 0xee;
-        }
-        bytes32 msgValueInBytes = bytes32(msg.value);
-        for (i = 0; i < 32; i = onePlus(i)) {
-            metadata[j++] = msgValueInBytes[i];
-        }
         if (msg.value > 0) {
+            for (; i < 24; i = onePlus(i)) {
+                metadata[j++] = 0xee;
+            }
+            bytes32 msgValueInBytes = bytes32(msg.value);
+            for (i = 0; i < 32; i = onePlus(i)) {
+                metadata[j++] = msgValueInBytes[i];
+            }
             (bool sent, ) = recipient.call{value: msg.value}("");
             if (!sent) {
                 revert TransferFailure();
             }
         }
-
         for (i = 0; i < tokens.length; i = onePlus(i)) {
-            ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
+            bytes memory tokenInBytes = abi.encodePacked(TRANSFERFROM, tokens[i]);
+            uint k;
+            for (k = 0; k < 24; k = onePlus(k)) {
+                metadata[j++] = tokenInBytes[k];
+            }
+            bytes32 valueInBytes = bytes32(values[i]);
+            for (k = 0; k < 32; k = onePlus(k)) {
+                metadata[j++] = valueInBytes[k];
+            }
+            // ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
         }
-        // interface ITransferFrom {
-        //     // ERC-20 function transferFrom(address from, address to, uint tokens) external returns (bool success);
-        //     // ERC-721 function transferFrom(address from, address to, uint256 tokenId) external;
-        //     function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
-        // }
-
         announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
     }
 }
