@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
 // ----------------------------------------------------------------------------
-// BokkyPooBah's ERC20 Token
+// BokkyPooBah's ERC-20 Token
 //
 // https://github.com/bokkypoobah/StealthChad
 //

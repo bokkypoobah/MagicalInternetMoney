@@ -11,10 +11,12 @@ describe("StealthChad", function () {
     const ERC5564Registry = await ethers.getContractFactory("ERC5564Registry");
     const StealthChad = await ethers.getContractFactory("StealthChad");
     const ERC20Token = await ethers.getContractFactory("ERC20Token");
+    const ERC721Token = await ethers.getContractFactory("ERC721Token");
     const erc5564Announcer = await ERC5564Announcer.deploy();
     const erc5564Registry = await ERC5564Registry.deploy();
     const stealthChad = await StealthChad.deploy(erc5564Announcer);
     const erc20Token = await ERC20Token.deploy("ERC-20", "ERC-20 Token", 18, 1000000000000000000000000n);
+    const erc721Token = await ERC721Token.deploy();
 
     // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
     // const ONE_GWEI = 1_000_000_000;
@@ -23,7 +25,7 @@ describe("StealthChad", function () {
     // const Lock = await ethers.getContractFactory("Lock");
     // const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
 
-    return { erc5564Announcer, erc5564Registry, stealthChad, erc20Token, /*lock, unlockTime, lockedAmount,*/ owner, otherAccount };
+    return { erc5564Announcer, erc5564Registry, stealthChad, erc20Token, erc721Token, owner, otherAccount };
   }
 
   describe("Deployment", function () {
