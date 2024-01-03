@@ -72,25 +72,28 @@
               Activity
             </template>
             <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-txhash" :value="modalActivity.item.txHash"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, 30) + '...' + modalActivity.item.txHash.slice(-28) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalActivity.item" label="Timestamp:" label-for="activity-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" readonly size="sm" id="activity-timestamp" :value="formatTimestamp(modalActivity.item.timestamp)" class="w-50"></b-form-input>
+              <b-button size="sm" variant="link" id="activity-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalActivity.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalActivity.item.blockNumber)" target="_blank">{{ formatTimestamp(modalActivity.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-sender" :value="modalActivity.item.tx.from"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="activity-registrant" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx.from && (modalActivity.item.tx.from != ensNameOrAddress(modalActivity.item.tx.from))" label="" label-for="activity-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar id="activity-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
@@ -183,7 +186,7 @@
             <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.txHash }}</b-button>
+                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, 30) + '...' + modalRegistry.item.txHash.slice(-28) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -191,12 +194,12 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="registry-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistry.item.blockNumber)">{{ formatTimestamp(modalRegistry.item.timestamp) }}</b-button>
+              <b-button size="sm" variant="link" id="registry-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalRegistry.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistry.item.blockNumber)" target="_blank">{{ formatTimestamp(modalRegistry.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
+                  <b-button size="sm" id="registry-registrant" :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -225,7 +228,6 @@
               {{ modalAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
             </template>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.address)" class="mx-0 my-1 p-0">
-
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
@@ -379,7 +381,7 @@
               <b-button size="sm" variant="transparent" id="contract-type">{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.timestamp" label="First Event:" label-for="contract-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="link" id="contract-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
+              <b-button size="sm" variant="link" id="contract-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)" target="_blank">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group label="Name:" label-for="modalcontract-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
