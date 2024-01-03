@@ -134,7 +134,7 @@
               <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalActivity.item" label="Mine:" label-for="activity-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" disabled id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+              <b-form-checkbox size="sm" disabled id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.transfers" label="Transfers:" label-for="activity-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
@@ -271,7 +271,7 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1"></b-form-checkbox>
+              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -362,8 +362,12 @@
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
-                <div class="mt-1"><b-link :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank"><font size="-1">{{ modalContract.item.contract }}</font></b-link></div>
-                <div><b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button></div>
+                <div class="mt-1">
+                  <b-link :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank"><font size="-1">{{ modalContract.item.contract }}</font></b-link>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
               </div>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.type" label="Type:" label-for="contract-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -381,10 +385,10 @@
               </b-input-group>
             </b-form-group>
             <b-form-group label="Read:" label-for="contract-read" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Read event logs involving this contract" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1"></b-form-checkbox>
+              <b-form-checkbox size="sm" id="contract-read" value="1" :checked="modalContract.read ? 1 : 0" @change="toggleContractRead()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
             <b-form-group label="Write:" label-for="contract-write" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Send transactions to contract, where supported" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1"></b-form-checkbox>
+              <b-form-checkbox size="sm" id="contract-write" value="1" :checked="modalContract.write ? 1 : 0" @change="toggleContractWrite()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
           </b-modal>
 
@@ -590,7 +594,7 @@
                   </b-link>
                 </template>
                 <template #cell(mine)="data">
-                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(tokens)="data">
                   <!-- TODO: Handle ERC-20/ERC-721 -->
@@ -703,7 +707,7 @@
                   <font size="-1">{{ nameOrNull(data.item.address) }}</font>
                 </template>
                 <template #cell(mine)="data">
-                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1"></b-form-checkbox>
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(source)="data">
                   <font size="-1">
@@ -785,12 +789,12 @@
                       </template>
                       <template #cell(read)="data">
                         <font size="-1">
-                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.read ? 1 : 0" class="mt-1"></b-form-checkbox>
+                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.read ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                         </font>
                       </template>
                       <template #cell(write)="data">
                         <font size="-1">
-                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.write ? 1 : 0" @input="toggleContractWrite(data.item)" class="mt-1"></b-form-checkbox>
+                          <b-form-checkbox size="sm" disabled value="1" :checked="data.item.write ? 1 : 0" @input="toggleContractWrite(data.item)" class="mt-1 ml-2"></b-form-checkbox>
                         </font>
                       </template>
                     </b-table>
