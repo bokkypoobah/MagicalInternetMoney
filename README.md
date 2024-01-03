@@ -19,11 +19,13 @@ Alice transfers the tokens this to this address and announces the transfers to t
 
 ### How This Dapp Works
 
-* This dapp allows Bob's web3 attached account to generate a unique Stealth Meta-Address for each unique associated phrase
-* This dapp allows Alice to compute a random Stealth Address using Bob's Stealth Meta-Address
-* This dapp allows Alice to then execute the transfer to Bob's Stealth Address and announce the transfer to the Announcer
-* This dapp retrieve all event logs published to the Announcer
-* This dapp retrieves all event logs published to the Registry
+This dapp:
+
+* Allows Bob's web3 attached account to generate a unique Stealth Meta-Address for each unique associated phrase
+* Allows Alice to compute a random Stealth Address using Bob's Stealth Meta-Address
+* Allows Alice to then execute the transfer to Bob's Stealth Address and announce the transfer to the Announcer
+* Retrieve all event logs published to the Announcer
+* Retrieves all event logs published to the Registry
 
 <br />
 
