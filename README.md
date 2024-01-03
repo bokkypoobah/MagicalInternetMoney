@@ -17,6 +17,8 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 ##### Addresses - Generate New Stealth Meta-Address
 
+Click [+] in the Addresses screen to generate a new Stealth Meta-Address.
+
 <kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_20240203.png" /></kbd>
 
 ##### Addresses - Generate New Stealth Meta-Address - Sign With Web3 Wallet
@@ -25,7 +27,7 @@ URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/
 
 ##### Addresses - Generate New Stealth Meta-Address - After Signing
 
-Click [Update] to update.
+Click [Update] to update the Stealth Meta-Address keys.
 
 <kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_AfterSigning_20240203.png" /></kbd>
 
