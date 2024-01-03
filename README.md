@@ -6,8 +6,6 @@ Test it at [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.gith
 
 <br />
 
----
-
 ### How The ERC-5564: Stealth Addresses Protocol Works
 
 * Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens
