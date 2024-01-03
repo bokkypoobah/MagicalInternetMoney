@@ -496,9 +496,18 @@
                     <li>Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens</li>
                     <li>Bob generates a <i>Stealth Meta-Address</i> and provides this to Alice</li>
                     <li>Alice uses Bob's <i>Stealth Meta-Address</i> to compute a random <i>Stealth Address</i> that can be accessed only by Bob</li>
-                    <li>Alice transfers the tokens this to this address and announces the transfers to the <i>ERC-5564: Stealth Address</i> <i>Announcer</i> contract</li>
+                    <li>Alice transfers the tokens this to this address and announces the transfers to the <i>ERC-5564: Stealth Address Announcer</i> contract</li>
                     <li>Bob can access the private keys to their computed <i>Stealth Addresses</i>, using information included in the announcements</li>
                     <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows any account to publish their associated <i>Stealth Meta-Addresses</i></li>
+                  </ul>
+
+                  <h5 class="mt-4">How This Dapp Works</h5>
+                  <ul>
+                    <li>This dapp allows Bob's web3 attached account to generate a unique <i>Stealth Meta-Address</i> for each unique associated <i>phrase</i></li>
+                    <li>This dapp allows Alice to compute a random <i>Stealth Address</i> using Bob's <i>Stealth Meta-Address</i></li>
+                    <li>This dapp allows Alice to then execute the transfer to Bob's <i>Stealth Address</i> and announce the transfer to the <i>Announcer</i></li>
+                    <li>This dapp retrieve all event logs published to the <i>Announcer</i></li>
+                    <li>This dapp retrieves all event logs published to the <i>Registry</i></li>
                   </ul>
 
                   <!-- <h5 class="mt-3">Requirements</h5>

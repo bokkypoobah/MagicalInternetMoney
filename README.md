@@ -15,6 +15,15 @@ Alice transfers the tokens this to this address and announces the transfers to t
 * Bob can access the private keys to their computed *Stealth Addresses*, using information included in the announcements
 * The *ERC-6538: Stealth Meta-Address Registry* allows any account to publish their associated *Stealth Meta-Addresses*
 
+<br />
+
+### How This Dapp Works
+
+* This dapp allows Bob's web3 attached account to generate a unique Stealth Meta-Address for each unique associated phrase
+* This dapp allows Alice to compute a random Stealth Address using Bob's Stealth Meta-Address
+* This dapp allows Alice to then execute the transfer to Bob's Stealth Address and announce the transfer to the Announcer
+* This dapp retrieve all event logs published to the Announcer
+* This dapp retrieves all event logs published to the Registry
 
 <br />
 
