@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 // ----------------------------------------------------------------------------
 // StealthChad v0.8.1 - Experiments in ERC-5564: Stealth Addresses
 //
-// Deployed to Sepolia 
+// Deployed to Sepolia
 //
 // https://github.com/bokkypoobah/StealthChad
 //
@@ -52,12 +52,20 @@ interface IERC5564Announcer {
 }
 
 
+interface TransferFrom {
+    // ERC-20 function transferFrom(address from, address to, uint tokens) external returns (bool success);
+    // ERC-721 function transferFrom(address from, address to, uint256 tokenId) external;
+    function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
+}
+
+
 /// @notice Stealth Chad things
 contract StealthChad {
     IERC5564Announcer announcer;
 
     error NoPointSendingZeroValue();
     error TransferFailure();
+    error TokenAndValueArraysLengthMismatch();
 
     constructor(address payable _announcer) {
         announcer = IERC5564Announcer(_announcer);
@@ -83,11 +91,11 @@ contract StealthChad {
         for (i = 0; i < 32; i = onePlus(i)) {
             metadata[j++] = msgValueInBytes[i];
         }
-        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
         (bool sent, ) = recipient.call{value: msg.value}("");
         if (!sent) {
             revert TransferFailure();
         }
+        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
     }
 
     /// @dev Transfer ETH/ERC-20/ERC-721 and announce
@@ -99,9 +107,9 @@ contract StealthChad {
     /// @param values Array of ERC-20 tokens or ERC-721 tokenId to transfer
     function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, address[] calldata tokens, uint256[] calldata values) external payable {
         // TODO: Handle ERC-20/ERC-721
-        // if (msg.value == 0) {
-        //     revert NoPointSendingZeroValue();
-        // }
+        if (tokens.length != values.length) {
+            revert TokenAndValueArraysLengthMismatch();
+        }
         bytes memory metadata = new bytes(57);
         uint i;
         uint j;
@@ -113,10 +121,22 @@ contract StealthChad {
         for (i = 0; i < 32; i = onePlus(i)) {
             metadata[j++] = msgValueInBytes[i];
         }
-        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
-        (bool sent, ) = recipient.call{value: msg.value}("");
-        if (!sent) {
-            revert TransferFailure();
+        if (msg.value > 0) {
+            (bool sent, ) = recipient.call{value: msg.value}("");
+            if (!sent) {
+                revert TransferFailure();
+            }
         }
+
+        for (i = 0; i < tokens.length; i = onePlus(i)) {
+            TransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
+        }
+        // interface TransferFrom {
+        //     // ERC-20 function transferFrom(address from, address to, uint tokens) external returns (bool success);
+        //     // ERC-721 function transferFrom(address from, address to, uint256 tokenId) external;
+        //     function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
+        // }
+
+        announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
     }
 }
