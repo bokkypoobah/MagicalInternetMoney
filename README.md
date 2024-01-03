@@ -1,11 +1,22 @@
 # Stealth Chad
-Stealth Chad - Exploring [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564)
 
-URL: [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/StealthChad/) on Sepolia testnet - WIP
+An implementation of [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538) (using `bytes32` instead of `bytes`).
 
-#### TODO
+Test it at [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/StealthChad/) (WIP) connected to the Ethereum Sepolia testnet.
 
-* New Transfer modal screen
+<br />
+
+---
+
+### How The ERC-5564: Stealth Addresses Protocol Works
+
+* Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens
+* Bob generates a *Stealth Meta-Address* and provides this to Alice
+* Alice uses Bob's *Stealth Meta-Address* to compute a random *Stealth Address* that can be accessed only by Bob
+Alice transfers the tokens this to this address and announces the transfers to the *ERC-5564: Stealth Address Announcer* contract
+* Bob can access the private keys to their computed *Stealth Addresses*, using information included in the announcements
+* The *ERC-6538: Stealth Meta-Address Registry* allows any account to publish their associated *Stealth Meta-Addresses*
+
 
 <br />
 

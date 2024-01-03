@@ -489,16 +489,17 @@
               <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h4>Welcome</h4>
-                  Stealth Chad - Exploring <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link>
+                  Stealth Chad is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>bytes32</i> instead of <i>bytes</i>).
 
-                  <!-- A lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts on Ethereum-Virtual-Machine compatible chains. -->
-
-                  <!-- <h5 class="mt-4">How This Works</h5>
+                  <h5 class="mt-4">How The ERC-5564: Stealth Addresses Protocol Works</h5>
                   <ul>
-                    <li>This tool scans for <b-link href="https://eips.ethereum.org/EIPS/eip-20#events" target="_blank">ERC-20</b-link>, <b-link href="https://eips.ethereum.org/EIPS/eip-721#specification" target="_blank">ERC-721</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-1155#specification" target="_blank">ERC-1155</b-link> <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b-link href="https://docs.ethers.org/v5/api/providers/provider/#Provider-getLogs" target="_blank">getLogs(filter)</b-link> web3 call</li>
-                    <li>These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts</li>
-                    <li>The latest ERC-20 approval amounts are retrieved using the ERC-20 <b>allowance(...)</b> function</li>
-                  </ul> -->
+                    <li>Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens</li>
+                    <li>Bob generates a <i>Stealth Meta-Address</i> and provides this to Alice</li>
+                    <li>Alice uses Bob's <i>Stealth Meta-Address</i> to compute a random <i>Stealth Address</i> that can be accessed only by Bob</li>
+                    <li>Alice transfers the tokens this to this address and announces the transfers to the <i>ERC-5564: Stealth Address</i> <i>Announcer</i> contract</li>
+                    <li>Bob can access the private keys to their computed <i>Stealth Addresses</i>, using information included in the announcements</li>
+                    <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows any account to publish their associated <i>Stealth Meta-Addresses</i></li>
+                  </ul>
 
                   <!-- <h5 class="mt-3">Requirements</h5>
                   <ul>
