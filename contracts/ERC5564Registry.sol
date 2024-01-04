@@ -19,20 +19,20 @@ pragma solidity ^0.8.19;
 /// @notice Registry to map an address or other identifier to its stealth meta-address.
 contract ERC5564Registry {
   /// @dev Emitted when a registrant updates their stealth meta-address.
-  event StealthMetaAddressSet(bytes32 indexed registrant, uint256 indexed scheme, bytes stealthMetaAddress);
+  event StealthMetaAddressSet(address indexed registrant, uint256 indexed scheme, bytes stealthMetaAddress);
 
   /// @notice Maps a registrant's identifier to the scheme to the stealth meta-address.
   /// @dev Registrant may be a 160 bit address or other recipient identifier, such as an ENS name.
   /// @dev Scheme is an integer identifier for the stealth address scheme.
   /// @dev MUST return zero if a registrant has not registered keys for the given inputs.
-  mapping(bytes32 => mapping(uint256 => bytes)) public stealthMetaAddressOf;
+  mapping(address => mapping(uint256 => bytes)) public stealthMetaAddressOf;
 
   /// @notice Sets the caller's stealth meta-address for the given stealth address scheme.
   /// @param scheme An integer identifier for the stealth address scheme.
   /// @param stealthMetaAddress The stealth meta-address to register.
   function registerKeys(uint256 scheme, bytes memory stealthMetaAddress) external {
-    stealthMetaAddressOf[bytes32(uint256(uint160(msg.sender)))][scheme] = stealthMetaAddress;
-    emit StealthMetaAddressSet(bytes32(uint256(uint160(msg.sender))), scheme, stealthMetaAddress);
+    stealthMetaAddressOf[msg.sender][scheme] = stealthMetaAddress;
+    emit StealthMetaAddressSet(msg.sender, scheme, stealthMetaAddress);
   }
 
 

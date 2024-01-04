@@ -77,7 +77,7 @@ describe("StealthChad", function () {
       });
     });
 
-    it.skip("Test Registry", async function () {
+    it("Test Registry", async function () {
       const { erc5564Announcer, erc5564Registry, stealthChad, owner } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
       const schemeId = 0;

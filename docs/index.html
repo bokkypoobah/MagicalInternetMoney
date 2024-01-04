@@ -2492,6 +2492,7 @@
           },
 
           async collateTokens(db, provider, latestBlockNumber) {
+            // TODO: Handle low confirmation events
             console.log(moment().format("HH:mm:ss") + " collateTokens BEGIN");
 
             const selectedAddressesMap = {};
