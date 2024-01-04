@@ -1352,36 +1352,51 @@
 
 
           filteredTokenEvents() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+
+            for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId])) {
+              // console.log(contract + " => " + JSON.stringify(contractData));
+              results.push({
+                contract,
+                symbol: contractData.symbol,
+                name: contractData.name,
+                type: contractData.type,
+                decimals: contractData.decimals || undefined,
+                totalSupply: contractData.totalSupply || undefined,
+              });
+            }
+
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
-            return this.tokenEvents.filter(e => e.chainId == this.chainId);
+            // return this.tokenEvents.filter(e => e.chainId == this.chainId);
+            return results;
           },
           filteredSortedTokenEvents() {
             let results = this.filteredTokenEvents;
-            if (this.settings.activityTable.sortOption == 'txorderasc') {
-              results.sort((a, b) => {
-                if (a.blockNumber == b.blockNumber) {
-                  if (a.txIndex == b.txIndex) {
-                    return a.logIndex - b.logIndex;
-                  } else {
-                    return a.txIndex - b.txIndex;
-                  }
-                } else {
-                  return a.blockNumber - b.blockNumber;
-                }
-              });
-            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
-              results.sort((a, b) => {
-                if (a.blockNumber == b.blockNumber) {
-                  if (a.txIndex == b.txIndex) {
-                    return b.logIndex - a.logIndex;
-                  } else {
-                    return b.txIndex - a.txIndex;
-                  }
-                } else {
-                  return b.blockNumber - a.blockNumber;
-                }
-              });
-            }
+            // if (this.settings.activityTable.sortOption == 'txorderasc') {
+            //   results.sort((a, b) => {
+            //     if (a.blockNumber == b.blockNumber) {
+            //       if (a.txIndex == b.txIndex) {
+            //         return a.logIndex - b.logIndex;
+            //       } else {
+            //         return a.txIndex - b.txIndex;
+            //       }
+            //     } else {
+            //       return a.blockNumber - b.blockNumber;
+            //     }
+            //   });
+            // } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+            //   results.sort((a, b) => {
+            //     if (a.blockNumber == b.blockNumber) {
+            //       if (a.txIndex == b.txIndex) {
+            //         return b.logIndex - a.logIndex;
+            //       } else {
+            //         return b.txIndex - a.txIndex;
+            //       }
+            //     } else {
+            //       return b.blockNumber - a.blockNumber;
+            //     }
+            //   });
+            // }
             return results;
           },
           pagedFilteredSortedTokenEvents() {
