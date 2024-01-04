@@ -69,7 +69,7 @@
           <!-- :MODALTRANSFER -->
           <b-modal id="modal-transfertostealthmetaaddress" hide-footer size="lg">
             <template #modal-title>
-              Transfer To Stealth Meta Address
+              Transfer To Stealth Meta-Address
             </template>
 
             <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
@@ -86,15 +86,23 @@
               <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
 
-            <b-form-group v-if="modalTransfer.address" label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.address)" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
+            <b-form-group v-if="modalTransfer.stealthMetaAddress" label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress)" class="mx-0 my-1 p-0">
+
+              <b-input-group size="sm" class="w-100">
+                <b-form-textarea type="text" id="transfer-stealthmetaaddress" v-model.trim="modalTransfer.stealthMetaAddress" @input="saveSettings" rows="3"></b-form-textarea>
+                <b-input-group-append>
+                  <b-button @click="copyToClipboard(modalTransfer.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+
+              <!-- <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="transfer-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalTransfer.address" >{{ modalTransfer.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalTransfer.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="transfer-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalTransfer.stealthMetaAddress" >{{ modalTransfer.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalTransfer.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalTransfer.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
-              </div>
+              </div> -->
             </b-form-group>
 
             <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -261,7 +269,7 @@
                   <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="transferToStealthMetaAddress(modalRegistry.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="transfer(modalRegistry.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right-fill shift-v="+1" font-scale="1.1"></b-icon-caret-right-fill></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -292,7 +300,7 @@
                   <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ modalAddress.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalAddress.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="transferToStealthMetaAddress(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right-fill shift-v="+1" font-scale="1.1"></b-icon-caret-right-fill></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -370,16 +378,18 @@
               Generate New Stealth Meta-Address
             </template>
             <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="newsma-attachedaddress" :value="coinbase"></b-form-input>
-                <b-input-group-append>
-                  <b-button :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank"><b-icon-link shift-v="-2" font-scale="1.1"></b-icon-link></b-button>
-                  <b-button @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="newsma-attachedaddress" :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
-            <b-form-group label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="coinbase != ensNameOrAddress(coinbase)" id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="coinbase != ensNameOrAddress(coinbase)" label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
@@ -717,7 +727,7 @@
                   <font size="-1">{{ data.item.schemeId }}</font>
                 </template>
                 <template #cell(transfer)="data">
-                  <b-button size="sm" @click="transferToStealthMetaAddress(data.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="transfer(data.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right-fill shift-v="+1" font-scale="1.1"></b-icon-caret-right-fill></b-button>
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
@@ -752,7 +762,7 @@
                 </template>
                 <template #cell(transfer)="data">
                   <div v-if="data.item.address.substring(0, 2) == 'st'">
-                    <b-button size="sm" @click="transferToStealthMetaAddress(data.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                    <b-button size="sm" @click="transfer(data.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right-fill shift-v="+1" font-scale="1.1"></b-icon-caret-right-fill></b-button>
                   </div>
                 </template>
                 <template #cell(linkedTo)="data">
@@ -996,7 +1006,7 @@
           addresses: {},
 
           modalTransfer: {
-            address: null,
+            stealthMetaAddress: null,
             amount: null,
           },
           modalActivity: {
@@ -1510,9 +1520,9 @@
             }
           },
 
-          transferToStealthMetaAddress(address) {
-            console.log(moment().format("HH:mm:ss") + " transferToStealthMetaAddress: " + address);
-            this.modalTransfer.address = address;
+          transfer(stealthMetaAddress) {
+            console.log(moment().format("HH:mm:ss") + " transfer: " + stealthMetaAddress);
+            this.modalTransfer.stealthMetaAddress = stealthMetaAddress;
             this.modalTransfer.amount = null;
             this.$bvModal.show('modal-transfertostealthmetaaddress');
           },
@@ -1702,7 +1712,7 @@
                 return result;
             }
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
-            const result = generateStealthAddress(this.modalTransfer.address);
+            const result = generateStealthAddress(this.modalTransfer.stealthMetaAddress);
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
             }
