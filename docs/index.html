@@ -2560,6 +2560,7 @@
                   }
                   if (!(item.logIndex in events[item.blockNumber].logIndexes)) {
                     events[item.blockNumber].logIndexes[item.logIndex] = {
+                      txHash: item.txHash,
                       type: item.type,
                       eventType: item.eventType,
                       from: item.from || undefined,
