@@ -2492,16 +2492,68 @@
 
           async collateTokens(db, provider, latestBlockNumber) {
             console.log(moment().format("HH:mm:ss") + " collateTokens BEGIN");
-            // const accounts = this.addresses;
-            // if (!(this.coinbase in accounts)) {
-            //   accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
-            // }
-            // let rows = 0;
-            // let done = false;
-            // do {
-            //   let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-            //   console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-            //   for (const item of data) {
+
+            const selectedAddressesMap = {};
+            for (const [address, addressData] of Object.entries(this.addresses)) {
+              if (address.substring(0, 2) == "0x" && addressData.mine) {
+                selectedAddressesMap[address] = true;
+              }
+            }
+            console.log(moment().format("HH:mm:ss") + " collateTokens - selectedAddressesMap: " + JSON.stringify(Object.keys(selectedAddressesMap)));
+
+            const accounts = this.addresses;
+            if (!(this.coinbase in accounts)) {
+              accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
+            }
+            const tokenContracts = {};
+            if (!(this.chainId in tokenContracts)) {
+              tokenContracts[this.chainId] = {};
+            }
+            this.sync.completed = 0;
+            this.sync.total = 0;
+            this.sync.section = 'Tokens';
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (item.chainId == this.chainId) {
+                  if (!(item.contract in tokenContracts[item.chainId])) {
+                    const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
+                    let symbol = null;
+                    try {
+                      symbol = await contract.symbol();
+                    } catch (e) {
+                    }
+                    let name = null;
+                    try {
+                      name = await contract.name();
+                    } catch (e) {
+                    }
+                    let decimals = null;
+                    if (item.eventType == "erc20") {
+                      try {
+                        decimals = await contract.decimals();
+                      } catch (e) {
+                      }
+                    }
+                    let totalSupply = null;
+                    try {
+                      totalSupply = await contract.totalSupply();
+                    } catch (e) {
+                    }
+                    if (item.eventType == "erc20") {
+                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", events: {} };
+                    } else {
+                      tokenContracts[item.chainId][item.contract] = { symbol, name, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc721", events: {} };
+                    }
+                    this.sync.completed++;
+                  }
+                  const tokenContract = tokenContracts[item.chainId][item.contract];
+                  console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
+                }
+
             //     if (!(item.contract in accounts)) {
             //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
             //       accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
@@ -2516,11 +2568,12 @@
             //     if (!(item.tx.from in accounts)) {
             //       accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
             //     }
-            //   }
-            //   rows = parseInt(rows) + data.length;
-            //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            // } while (!done);
-            // rows = 0;
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
+            rows = 0;
+            console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
 
             // done = false;
             // do {
