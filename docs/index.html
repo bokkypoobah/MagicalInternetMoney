@@ -2120,36 +2120,36 @@
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
-                  console.log(logData);
-                  // const logData = erc5564RegistryContract.interface.parseLog(log);
-                  // const contract = log.address;
-                  // if (selectedContracts.includes(contract)) {
-                  //   records.push( {
-                  //     chainId: t.chainId,
-                  //     blockNumber: parseInt(log.blockNumber),
-                  //     logIndex: parseInt(log.logIndex),
-                  //     txIndex: parseInt(log.transactionIndex),
-                  //     txHash: log.transactionHash,
-                  //     contract,
-                  //     name: logData.name,
-                  //     registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
-                  //     schemeId: parseInt(logData.args[1]),
-                  //     stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                  //     mine: false,
-                  //     confirmations: latestBlockNumber - log.blockNumber,
-                  //     timestamp: null,
-                  //     tx: null,
-                  //   });
-                  // }
+                  console.log(log);
+              //     // const logData = erc5564RegistryContract.interface.parseLog(log);
+                  const contract = log.address;
+              //     // if (selectedContracts.includes(contract)) {
+                    records.push( {
+                      chainId: t.chainId,
+                      blockNumber: parseInt(log.blockNumber),
+                      logIndex: parseInt(log.logIndex),
+                      txIndex: parseInt(log.transactionIndex),
+                      txHash: log.transactionHash,
+                      contract,
+              //     //     name: logData.name,
+              //     //     registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
+              //     //     schemeId: parseInt(logData.args[1]),
+              //     //     stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+              //     //     mine: false,
+                      confirmations: latestBlockNumber - log.blockNumber,
+                      timestamp: null,
+                      tx: null,
+                    });
+              //     // }
                 }
               }
-              // console.log("records: " + JSON.stringify(records, null, 2));
-              if (records.length) {
-                await db.registryEntries.bulkPut(records).then (function() {
-                }).catch(function(error) {
-                  console.log("syncTokenEvents.bulkPut error: " + error);
-                });
-              }
+              console.log("records: " + JSON.stringify(records, null, 2));
+              // if (records.length) {
+              //   await db.registryEntries.bulkPut(records).then (function() {
+              //   }).catch(function(error) {
+              //     console.log("syncTokenEvents.bulkPut error: " + error);
+              //   });
+              // }
             }
             async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
               // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
@@ -2177,8 +2177,8 @@
                   toBlock,
                   topics,
                 });
-                console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs - logs " + section + ": " + JSON.stringify(logs, null, 2));
-                // await processLogs(fromBlock, toBlock, section, eventLogs);
+                // console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs - logs " + section + ": " + JSON.stringify(logs, null, 2));
+                await processLogs(fromBlock, toBlock, section, logs);
               } catch (e) {
                 const mid = parseInt((fromBlock + toBlock) / 2);
                 await getLogs(fromBlock, mid, section, selectedAddresses, processLogs);
