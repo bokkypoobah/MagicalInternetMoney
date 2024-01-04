@@ -45,9 +45,9 @@
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item> -->
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
@@ -486,7 +486,7 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
                 <div class="mt-0 pl-1">
@@ -502,39 +502,39 @@
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryEntries.length) + '/' + commify0(registryEntries.length) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
                   <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryEntries.length" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
                   <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="filteredAddresses.length" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
@@ -665,31 +665,8 @@
                 </template>
               </b-table>
 
-              <!-- :TRANSFERS -->
-              <b-card v-if="settings.tabIndex == 1 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
-                <b-card-body class="mt-1 p-1">
-                  <h5>Transfer ETH From EOA To Stealth Meta-Address</h5>
-                  <b-form-group label-cols-lg="2" label="Transfer Details" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-                    <b-form-group label="Recipient Stealth Meta Address:" label-for="recipient-stealth-meta-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-input-group size="sm" class="w-75">
-                        <b-form-textarea type="text" id="recipient-stealth-meta-address" v-model.trim="settings.transfer.recipientStealthMetaAddress" @input="saveSettings"></b-form-textarea>
-                        <b-input-group-append>
-                          <b-button :disabled="!settings.transfer.recipientStealthMetaAddress" @click="copyToClipboard(settings.transfer.recipientStealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                        </b-input-group-append>
-                      </b-input-group>
-                    </b-form-group>
-                    <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="Amount in ETH">
-                      <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="settings.transfer.amount" @input="saveSettings" class="w-50"></b-form-input>
-                    </b-form-group>
-                    <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                      <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
-                    </b-form-group>
-                  </b-form-group>
-                </b-card-body>
-              </b-card>
-
               <!-- :REGISTRY -->
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryEntriesFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryEntriesFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
@@ -738,7 +715,7 @@
               </b-table>
 
               <!-- :ADDRESSES -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
@@ -925,10 +902,6 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            transfer: {
-              recipientStealthMetaAddress: null,
-              amount: 0.01,
-            },
             activityTable: {
               filter: null,
               currentPage: 1,
@@ -953,7 +926,7 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 27,
+            version: 28,
           },
           contracts: {
             "11155111": {
