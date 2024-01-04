@@ -44,11 +44,11 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">StealthChad</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Activity</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry Activity'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens (WIP)</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
           </b-navbar-nav>
