@@ -45,7 +45,7 @@
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Activity'">Activity</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item>
+            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Transfers'">Transfers</b-nav-item> -->
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Registry'">Registry</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Addresses'">Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Config'">Config</b-nav-item>
@@ -71,6 +71,40 @@
             <template #modal-title>
               Transfer To Stealth Meta Address
             </template>
+
+            <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="transfer-sender" :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="coinbase != ensNameOrAddress(coinbase)" label="" label-for="transfer-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </b-form-group>
+
+            <b-form-group v-if="modalTransfer.address" label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.address)" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="transfer-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalTransfer.address" >{{ modalTransfer.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalTransfer.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+
+            <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="w-50"></b-form-input>
+            </b-form-group>
+
+            <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+            </b-form-group>
+
           </b-modal>
 
           <!-- :MODALACTIVITY -->
@@ -1668,7 +1702,7 @@
                 return result;
             }
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
-            const result = generateStealthAddress(this.settings.transfer.recipientStealthMetaAddress);
+            const result = generateStealthAddress(this.modalTransfer.address);
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
             }
@@ -1677,7 +1711,7 @@
             const contract = new ethers.Contract(STEALTHCHADADDRESS_SEPOLIA, STEALTHCHADABI_SEPOLIA, provider);
             const contractWithSigner = contract.connect(provider.getSigner());
             const schemeId = 0;
-            const value = ethers.utils.parseEther(this.settings.transfer.amount);
+            const value = ethers.utils.parseEther(this.modalTransfer.amount);
             try {
               const tx = await contractWithSigner.transferEthAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, { value });
               console.log("tx: " + JSON.stringify(tx));
