@@ -2151,9 +2151,10 @@
                 });
               }
             }
-            async function getLogs(fromBlock, toBlock, section, processLogs) {
+            async function getLogs(fromBlock, toBlock, section, selectedAddressesAsBytes32, processLogs) {
               console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock + " " + section);
               try {
+
                 if (section == 123) {
                   const topicsList = [
                     // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
@@ -2188,10 +2189,11 @@
                   const eventLogs = await provider.getLogs(filter);
                   await processLogs(fromBlock, toBlock, section, eventLogs);
                 }
+
               } catch (e) {
                 const mid = parseInt((fromBlock + toBlock) / 2);
-                await getLogs(fromBlock, mid, section, processLogs);
-                await getLogs(parseInt(mid) + 1, toBlock, section, processLogs);
+                await getLogs(fromBlock, mid, section, selectedAddressesAsBytes32, processLogs);
+                await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddressesAsBytes32, processLogs);
               }
             }
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents BEGIN");
@@ -2201,7 +2203,14 @@
             const selectedAddresses = [];
             for (const [address, addressData] of Object.entries(this.addresses)) {
               console.log(address, addressData);
+              if (address.substring(0, 2) == "0x" && addressData.mine) {
+                selectedAddresses.push(address);
+              }
             }
+            console.log(moment().format("HH:mm:ss") + " syncTokenEvents - selectedAddresses: " + JSON.stringify(selectedAddresses));
+            const selectedAddressesAsBytes32 = selectedAddresses.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
+            console.log(moment().format("HH:mm:ss") + " syncTokenEvents - selectedAddressesAsBytes32: " + JSON.stringify(selectedAddressesAsBytes32));
+
             // for (const [chainId, chainData] of Object.entries(this.contracts)) {
             //   for (const [contract, contractData] of Object.entries(chainData)) {
             //     if (contractData.type == "registry" && contractData.read) {
@@ -2214,7 +2223,7 @@
               const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               for (let section = 0; section < 2; section++) {
-                await getLogs(startBlock, latestBlockNumber, section, processLogs);
+                await getLogs(startBlock, latestBlockNumber, section, selectedAddressesAsBytes32, processLogs);
               }
             // }
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents END");
