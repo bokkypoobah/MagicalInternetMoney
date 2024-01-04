@@ -2114,32 +2114,33 @@
             const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
             let total = 0;
             let t = this;
-            async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
+            async function processLogs(fromBlock, toBlock, section, logs) {
               total = parseInt(total) + logs.length;
-              console.log(moment().format("HH:mm:ss") + " syncTokenEvents.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+              console.log(moment().format("HH:mm:ss") + " syncTokenEvents.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
-                  const logData = erc5564RegistryContract.interface.parseLog(log);
-                  const contract = log.address;
-                  if (selectedContracts.includes(contract)) {
-                    records.push( {
-                      chainId: t.chainId,
-                      blockNumber: parseInt(log.blockNumber),
-                      logIndex: parseInt(log.logIndex),
-                      txIndex: parseInt(log.transactionIndex),
-                      txHash: log.transactionHash,
-                      contract,
-                      name: logData.name,
-                      registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
-                      schemeId: parseInt(logData.args[1]),
-                      stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                      mine: false,
-                      confirmations: latestBlockNumber - log.blockNumber,
-                      timestamp: null,
-                      tx: null,
-                    });
-                  }
+                  console.log(logData);
+                  // const logData = erc5564RegistryContract.interface.parseLog(log);
+                  // const contract = log.address;
+                  // if (selectedContracts.includes(contract)) {
+                  //   records.push( {
+                  //     chainId: t.chainId,
+                  //     blockNumber: parseInt(log.blockNumber),
+                  //     logIndex: parseInt(log.logIndex),
+                  //     txIndex: parseInt(log.transactionIndex),
+                  //     txHash: log.transactionHash,
+                  //     contract,
+                  //     name: logData.name,
+                  //     registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
+                  //     schemeId: parseInt(logData.args[1]),
+                  //     stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                  //     mine: false,
+                  //     confirmations: latestBlockNumber - log.blockNumber,
+                  //     timestamp: null,
+                  //     tx: null,
+                  //   });
+                  // }
                 }
               }
               // console.log("records: " + JSON.stringify(records, null, 2));
@@ -2150,66 +2151,71 @@
                 });
               }
             }
-            async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock);
+            async function getLogs(fromBlock, toBlock, section, processLogs) {
+              console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock + " " + section);
               try {
+                if (section == 123) {
+                  const topicsList = [
+                    // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
+                    [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
+                    [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
+                    // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+                    // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+                    // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+                    // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+                    // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+                    // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+                    // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
+                    // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
 
-                const topicsList = [
-                  // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
-                  [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
-                  [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
-                  // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
-                  // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-                  // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
-                  // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-                  // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
-                  // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
-                  // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
-                  // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
-
-                  // // ERC-1155 TransferSingle (index_topic_1 address _operator, index_topic_2 address _from, index_topic_3 address _to, uint256 _id, uint256 _value)
-                  // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
-                  // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
-                  // // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
-                  // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, accountAs32Bytes, null ],
-                  // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, null, accountAs32Bytes ],
-                ];
-
-                const filter = {
-                  address: null,
-                  fromBlock,
-                  toBlock,
-                  topics: [
-                    '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
-                    null,
-                    null
-                  ]
-                };
-                const eventLogs = await provider.getLogs(filter);
-                await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
+                    // // ERC-1155 TransferSingle (index_topic_1 address _operator, index_topic_2 address _from, index_topic_3 address _to, uint256 _id, uint256 _value)
+                    // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
+                    // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
+                    // // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+                    // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, accountAs32Bytes, null ],
+                    // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, null, accountAs32Bytes ],
+                  ];
+                  const filter = {
+                    address: null,
+                    fromBlock,
+                    toBlock,
+                    topics: [
+                      '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
+                      null,
+                      null
+                    ]
+                  };
+                  const eventLogs = await provider.getLogs(filter);
+                  await processLogs(fromBlock, toBlock, section, eventLogs);
+                }
               } catch (e) {
                 const mid = parseInt((fromBlock + toBlock) / 2);
-                await getLogs(fromBlock, mid, selectedContracts, processLogs);
-                await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
+                await getLogs(fromBlock, mid, section, processLogs);
+                await getLogs(parseInt(mid) + 1, toBlock, section, processLogs);
               }
             }
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'ERC-20 & ERC-721 Tokens';
-            // const selectedContracts = [];
+            const selectedAddresses = [];
+            for (const [address, addressData] of Object.entries(this.addresses)) {
+              console.log(address, addressData);
+            }
             // for (const [chainId, chainData] of Object.entries(this.contracts)) {
             //   for (const [contract, contractData] of Object.entries(chainData)) {
             //     if (contractData.type == "registry" && contractData.read) {
-            //       selectedContracts.push(contract);
+            //       selectedAddresses.push(contract);
             //     }
             //   }
             // }
             // if (selectedContracts.length > 0) {
-            //   const deleteCall = await db.registryEntries.where("confirmations").below(this.CONFIRMATIONS).delete();
-            //   const latest = await db.registryEntries.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-            //   const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-            //   await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
+              const deleteCall = await db.tokenEvents.where("confirmations").below(this.CONFIRMATIONS).delete();
+              const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              for (let section = 0; section < 2; section++) {
+                await getLogs(startBlock, latestBlockNumber, section, processLogs);
+              }
             // }
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents END");
           },
