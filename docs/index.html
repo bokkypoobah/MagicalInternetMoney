@@ -227,6 +227,7 @@
                   <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
+                  <b-button size="sm" @click="transferToStealthMetaAddress(modalRegistry.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -712,6 +713,11 @@
                     <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) : data.item.address }}</font>
                   </b-link>
                 </template>
+                <template #cell(transfer)="data">
+                  <div v-if="data.item.address.substring(0, 2) == 'st'">
+                    <b-button size="sm" @click="transferToStealthMetaAddress(data.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  </div>
+                </template>
                 <template #cell(linkedTo)="data">
                   <span v-if="data.item.linkedTo && data.item.linkedTo.substring(0, 2) == 'st'">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
@@ -952,6 +958,10 @@
           registryEntries: [],
           addresses: {},
 
+          modalTransfer: {
+            address: null,
+            amount: null,
+          },
           modalActivity: {
             item: null,
             stealthPrivateKey: null,
@@ -1083,10 +1093,11 @@
           addressesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           contractsFields: [
@@ -1461,16 +1472,10 @@
             }
           },
 
-          transferToStealthMetaAddress() {
-            console.log(moment().format("HH:mm:ss") + " transferToStealthMetaAddress");
-            // this.modalNewStealthMetaAddress.name = null;
-            // this.modalNewStealthMetaAddress.linkedTo = this.coinbase;
-            // this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
-            // this.modalNewStealthMetaAddress.viewingPrivateKey = null;
-            // this.modalNewStealthMetaAddress.spendingPublicKey = null;
-            // this.modalNewStealthMetaAddress.viewingPublicKey = null;
-            // this.modalNewStealthMetaAddress.stealthMetaAddress = null;
-            // this.modalNewStealthMetaAddress.status = null;
+          transferToStealthMetaAddress(address) {
+            console.log(moment().format("HH:mm:ss") + " transferToStealthMetaAddress: " + address);
+            this.modalTransfer.address = address;
+            this.modalTransfer.amount = null;
             this.$bvModal.show('modal-transfertostealthmetaaddress');
           },
 
