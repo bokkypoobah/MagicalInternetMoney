@@ -2108,10 +2108,17 @@
           },
 
           async syncTokenEvents(db, provider, latestBlockNumber) {
-            // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
-            // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-            // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
-            const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+            // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
+            // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
+            // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
+            // // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+            // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+            // // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+            // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+            // // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+            // // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+            // // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
+            // // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
             let total = 0;
             let t = this;
             async function processLogs(fromBlock, toBlock, section, logs) {
@@ -2120,49 +2127,57 @@
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
-                  console.log(log);
-              //     // const logData = erc5564RegistryContract.interface.parseLog(log);
                   const contract = log.address;
-              //     // if (selectedContracts.includes(contract)) {
-                    records.push( {
-                      chainId: t.chainId,
-                      blockNumber: parseInt(log.blockNumber),
-                      logIndex: parseInt(log.logIndex),
-                      txIndex: parseInt(log.transactionIndex),
-                      txHash: log.transactionHash,
-                      contract,
-              //     //     name: logData.name,
-              //     //     registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
-              //     //     schemeId: parseInt(logData.args[1]),
-              //     //     stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-              //     //     mine: false,
-                      confirmations: latestBlockNumber - log.blockNumber,
-                      timestamp: null,
-                      tx: null,
-                    });
-              //     // }
+                  let eventRecord = null;
+                  if (log.topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
+                    let from = null;
+                    let to = null;
+                    let tokensOrTokenId = null;
+                    if (log.topics.length == 4) {
+                      from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                      to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                      tokensOrTokenId = ethers.BigNumber.from(log.topics[3]).toString();
+                    } else if (log.topics.length == 3) {
+                      from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                      to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                      tokensOrTokenId = ethers.BigNumber.from(log.data).toString();
+                    // TODO: Handle 2
+                    } else if (log.topics.length == 1) {
+                      from = ethers.utils.getAddress('0x' + log.data.substring(26, 66));
+                      to = ethers.utils.getAddress('0x' + log.data.substring(90, 130));
+                      tokensOrTokenId = ethers.BigNumber.from('0x' + log.data.substring(130, 193)).toString();
+                    }
+                    if (from) {
+                      if (log.topics.length == 4) {
+                        eventRecord = { type: "Transfer", from, to, tokenId: tokensOrTokenId, tokenType: "erc721" };
+                      } else {
+                        eventRecord = { type: "Transfer", from, to, tokens: tokensOrTokenId, tokenType: "erc20" };
+                      }
+                      records.push( {
+                        chainId: t.chainId,
+                        blockNumber: parseInt(log.blockNumber),
+                        logIndex: parseInt(log.logIndex),
+                        txIndex: parseInt(log.transactionIndex),
+                        txHash: log.transactionHash,
+                        contract,
+                        ...eventRecord,
+                        confirmations: latestBlockNumber - log.blockNumber,
+                        timestamp: null,
+                        tx: null,
+                      });
+                    }
+                  }
                 }
               }
-              console.log("records: " + JSON.stringify(records, null, 2));
-              // if (records.length) {
-              //   await db.registryEntries.bulkPut(records).then (function() {
-              //   }).catch(function(error) {
-              //     console.log("syncTokenEvents.bulkPut error: " + error);
-              //   });
-              // }
+              // console.log("records: " + JSON.stringify(records, null, 2));
+              if (records.length) {
+                await db.tokenEvents.bulkPut(records).then (function() {
+                }).catch(function(error) {
+                  console.log("syncTokenEvents.bulkPut error: " + error);
+                });
+              }
             }
             async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
-              // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
-              // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
-              // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
-              // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
-              // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-              // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
-              // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-              // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
-              // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
-              // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
-              // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
               console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock + " " + section);
               try {
                 let topics = null;
@@ -2177,7 +2192,6 @@
                   toBlock,
                   topics,
                 });
-                // console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs - logs " + section + ": " + JSON.stringify(logs, null, 2));
                 await processLogs(fromBlock, toBlock, section, logs);
               } catch (e) {
                 const mid = parseInt((fromBlock + toBlock) / 2);
@@ -2195,7 +2209,6 @@
                 selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
               }
             }
-
             if (selectedAddresses.length > 0) {
               const deleteCall = await db.tokenEvents.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
