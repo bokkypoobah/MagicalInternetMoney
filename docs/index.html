@@ -1869,15 +1869,18 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
-            // if (network.chainId == CHAINID_SEPOLIA) {
-              await this.syncTokenEvents(db, provider, latestBlockNumber);
-            // }
-            // if (network.chainId == CHAINID_SEPOLIA) {
-              await this.syncTokenEventsData(db, provider, latestBlockNumber);
-            // }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncTokenEvents(db, provider, latestBlockNumber);
+            }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncTokenEventsData(db, provider, latestBlockNumber);
+            }
+            // if (network.chainId == CHAINID_SEPOLIA) {
+              await this.collateTokens(db, provider, latestBlockNumber);
+            // }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -2204,6 +2207,73 @@
             } while (!done);
           },
 
+          async collateAccounts(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
+            const accounts = this.addresses;
+            if (!(this.coinbase in accounts)) {
+              accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
+            }
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (!(item.contract in accounts)) {
+                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+                  accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
+                }
+                if (!(item.stealthAddress in accounts)) {
+                  accounts[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
+                }
+                if (!(item.caller in accounts)) {
+                  const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
+                  accounts[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
+                }
+                if (!(item.tx.from in accounts)) {
+                  accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
+                }
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
+            rows = 0;
+
+            done = false;
+            do {
+              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (!(item.contract in accounts)) {
+                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+                  accounts[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
+                }
+                if (!(item.registrant in accounts)) {
+                  accounts[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
+                }
+                if (!(item.stealthMetaAddress in accounts)) {
+                  accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
+                }
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
+
+            for (const [address, accountData] of Object.entries(accounts)) {
+              if (accountData.type == "stealthMetaAddress") {
+                const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
+                if (linkedToData && linkedToData.mine) {
+                  accounts[address].mine = true;
+                }
+              }
+            }
+
+            Vue.set(this, 'accounts', accounts);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " collateAccounts - addresses: " + JSON.stringify(accounts, null, 2));
+            console.log(moment().format("HH:mm:ss") + " collateAccounts END");
+          },
+
           async syncTokenEvents(db, provider, latestBlockNumber) {
             // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
             // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
@@ -2403,9 +2473,12 @@
                     type: txReceipt.type,
                   };
                   records.push(item);
+                } else {
+                  // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: TIMESTAMP <> NULL" + JSON.stringify(item));
                 }
               }
               if (records.length > 0) {
+                console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - records: " + JSON.stringify(records));
                 await db.tokenEvents.bulkPut(records).then (function() {
                 }).catch(function(error) {
                   console.log("syncTokenEventsData.bulkPut error: " + error);
@@ -2417,71 +2490,71 @@
             } while (!done);
           },
 
-          async collateAccounts(db, provider, latestBlockNumber) {
-            console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
-            const accounts = this.addresses;
-            if (!(this.coinbase in accounts)) {
-              accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
-            }
-            let rows = 0;
-            let done = false;
-            do {
-              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              for (const item of data) {
-                if (!(item.contract in accounts)) {
-                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
-                }
-                if (!(item.stealthAddress in accounts)) {
-                  accounts[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
-                }
-                if (!(item.caller in accounts)) {
-                  const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-                  accounts[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
-                }
-                if (!(item.tx.from in accounts)) {
-                  accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
-                }
-              }
-              rows = parseInt(rows) + data.length;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-            rows = 0;
+          async collateTokens(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " collateTokens BEGIN");
+            // const accounts = this.addresses;
+            // if (!(this.coinbase in accounts)) {
+            //   accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
+            // }
+            // let rows = 0;
+            // let done = false;
+            // do {
+            //   let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+            //   console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+            //   for (const item of data) {
+            //     if (!(item.contract in accounts)) {
+            //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+            //       accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
+            //     }
+            //     if (!(item.stealthAddress in accounts)) {
+            //       accounts[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
+            //     }
+            //     if (!(item.caller in accounts)) {
+            //       const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
+            //       accounts[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
+            //     }
+            //     if (!(item.tx.from in accounts)) {
+            //       accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
+            //     }
+            //   }
+            //   rows = parseInt(rows) + data.length;
+            //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            // } while (!done);
+            // rows = 0;
 
-            done = false;
-            do {
-              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              for (const item of data) {
-                if (!(item.contract in accounts)) {
-                  const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  accounts[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
-                }
-                if (!(item.registrant in accounts)) {
-                  accounts[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
-                }
-                if (!(item.stealthMetaAddress in accounts)) {
-                  accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
-                }
-              }
-              rows = parseInt(rows) + data.length;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-
-            for (const [address, accountData] of Object.entries(accounts)) {
-              if (accountData.type == "stealthMetaAddress") {
-                const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
-                if (linkedToData && linkedToData.mine) {
-                  accounts[address].mine = true;
-                }
-              }
-            }
-
-            Vue.set(this, 'accounts', accounts);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            console.log(moment().format("HH:mm:ss") + " collateAccounts - addresses: " + JSON.stringify(accounts, null, 2));
-            console.log(moment().format("HH:mm:ss") + " collateAccounts END");
+            // done = false;
+            // do {
+            //   let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+            //   console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+            //   for (const item of data) {
+            //     if (!(item.contract in accounts)) {
+            //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
+            //       accounts[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
+            //     }
+            //     if (!(item.registrant in accounts)) {
+            //       accounts[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
+            //     }
+            //     if (!(item.stealthMetaAddress in accounts)) {
+            //       accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
+            //     }
+            //   }
+            //   rows = parseInt(rows) + data.length;
+            //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            // } while (!done);
+            //
+            // for (const [address, accountData] of Object.entries(accounts)) {
+            //   if (accountData.type == "stealthMetaAddress") {
+            //     const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
+            //     if (linkedToData && linkedToData.mine) {
+            //       accounts[address].mine = true;
+            //     }
+            //   }
+            // }
+            //
+            // Vue.set(this, 'accounts', accounts);
+            // localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            // console.log(moment().format("HH:mm:ss") + " collateTokens - addresses: " + JSON.stringify(accounts, null, 2));
+            console.log(moment().format("HH:mm:ss") + " collateTokens END");
           },
 
           async syncENSNames(provider) {
