@@ -74,7 +74,7 @@
             <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASHLENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASHLENGTH/2) }}</b-button>
+                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -188,7 +188,7 @@
             <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASHLENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASHLENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -217,20 +217,12 @@
             <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESSLENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESSLENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-<!--
-
-              <b-input-group size="sm" class="w-100">
-                <b-textarea readonly id="registry-stealthmetaaddress" :value="modalRegistry.item.stealthMetaAddress" rows="3"></b-textarea>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group> -->
             </b-form-group>
           </b-modal>
 
@@ -253,12 +245,14 @@
               <b-avatar v-if="modalAddress.item.address != ensNameOrAddress(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" readonly id="address-stealthmetaaddress" v-model.trim="modalAddress.item.address" rows="3"></b-form-textarea>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ modalAddress.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalAddress.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -681,9 +675,8 @@
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ shortAddress(data.item.stealthMetaAddress) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ data.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + data.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</font>
                   </b-link>
-
                 </template>
                 <!-- <template #cell(contract)="data">
                   <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
@@ -707,8 +700,8 @@
                   </font>
                 </template>
                 <template #cell(address)="data">
-                  <b-link @click="viewAddress(data.item.address)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.address)">{{ shortAddress(data.item.address) }}</font>
+                  <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
+                    <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) : data.item.address }}</font>
                   </b-link>
                 </template>
                 <template #cell(linkedTo)="data">
@@ -859,9 +852,9 @@
         // --- DATA ---
         data: {
           CONFIRMATIONS: 100,
-          DBPROCESSINGBATCHSIZE: 3,
-          TXHASHLENGTH: 50,
-          STEALTHMETAADDRESSLENGTH: 59,
+          DB_PROCESSING_BATCH_SIZE: 3,
+          TXHASH_DISPLAY_LENGTH: 50,
+          STEALTHMETAADDRESS_DISPLAY_LENGTH: 59,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -1952,10 +1945,10 @@
             let rows = 0;
             let done = false;
             do {
-              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             // let total = rows;
             // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - total: " + total);
@@ -1964,7 +1957,7 @@
             this.sync.section = 'Announcements Tx Data';
             rows = 0;
             do {
-              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
@@ -2006,7 +1999,7 @@
               }
               rows = parseInt(rows) + data.length;
               this.sync.completed = rows;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
           },
 
@@ -2015,10 +2008,10 @@
             let rows = 0;
             let done = false;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             // let total = rows;
             // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - total: " + total);
@@ -2027,7 +2020,7 @@
             this.sync.section = 'Registry Entries Tx Data';
             rows = 0;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
@@ -2069,7 +2062,7 @@
               }
               rows = parseInt(rows) + data.length;
               this.sync.completed = rows;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
           },
 
@@ -2082,7 +2075,7 @@
             let rows = 0;
             let done = false;
             do {
-              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
                 if (!(item.contract in accounts)) {
@@ -2101,13 +2094,13 @@
                 }
               }
               rows = parseInt(rows) + data.length;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             rows = 0;
 
             done = false;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
                 if (!(item.contract in accounts)) {
@@ -2122,7 +2115,7 @@
                 }
               }
               rows = parseInt(rows) + data.length;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
 
             for (const [address, accountData] of Object.entries(accounts)) {
@@ -2184,7 +2177,7 @@
             let rows = 0;
             let done = false;
             do {
-              let data = await db.announcements.offset(rows).limit(this.DBPROCESSINGBATCHSIZE).toArray();
+              let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const writeRecords = [];
               for (const item of data) {
@@ -2214,7 +2207,7 @@
                 });
               }
               rows = parseInt(rows) + data.length;
-              done = data.length < this.DBPROCESSINGBATCHSIZE;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             rows = 0;
 
