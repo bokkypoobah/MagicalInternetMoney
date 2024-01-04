@@ -682,6 +682,9 @@
                 <template #cell(schemeId)="data">
                   <font size="-1">{{ data.item.schemeId }}</font>
                 </template>
+                <template #cell(transfer)="data">
+                  <b-button size="sm" @click="transferToStealthMetaAddress(data.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ data.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) }}</font>
@@ -1088,16 +1091,17 @@
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'schemeId', label: 'Scheme Id', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 38%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           addressesFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
+            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           contractsFields: [
