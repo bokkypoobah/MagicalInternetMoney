@@ -675,7 +675,7 @@
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ data.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + data.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ data.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) }}</font>
                   </b-link>
                 </template>
                 <!-- <template #cell(contract)="data">
@@ -701,7 +701,7 @@
                 </template>
                 <template #cell(address)="data">
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
-                    <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) : data.item.address }}</font>
+                    <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) : data.item.address }}</font>
                   </b-link>
                 </template>
                 <template #cell(linkedTo)="data">
@@ -854,6 +854,7 @@
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 3,
           TXHASH_DISPLAY_LENGTH: 50,
+          STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH: 39,
           STEALTHMETAADDRESS_DISPLAY_LENGTH: 59,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
@@ -2348,8 +2349,8 @@
           addressDescription(address) {
             const account = this.addresses[address];
             if (account) {
-              result = "address=" + address;
-              for (let key of [ 'type', 'linkedTo', 'customType', 'symbol', 'ensName', 'name', 'decimals', 'customDecimals', 'source', 'stealthMetaAddress' ]) {
+              result = address;
+              for (let key of [ 'linkedTo', 'ensName', 'name', 'source', 'stealthMetaAddress' ]) {
                 if (key in account) {
                   result = result + "; " + key + "=" + account[key];
                 }
