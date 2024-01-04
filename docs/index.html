@@ -66,6 +66,13 @@
             </b-card-text>
           </b-card>
 
+          <!-- :MODALTRANSFER -->
+          <b-modal id="modal-transfertostealthmetaaddress" hide-footer size="lg">
+            <template #modal-title>
+              Transfer To Stealth Meta Address
+            </template>
+          </b-modal>
+
           <!-- :MODALACTIVITY -->
           <b-modal id="modal-activity" hide-footer size="lg">
             <template #modal-title>
@@ -250,6 +257,7 @@
                   <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ modalAddress.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalAddress.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
+                  <b-button size="sm" @click="transferToStealthMetaAddress(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -1451,6 +1459,19 @@
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
             }
+          },
+
+          transferToStealthMetaAddress() {
+            console.log(moment().format("HH:mm:ss") + " transferToStealthMetaAddress");
+            // this.modalNewStealthMetaAddress.name = null;
+            // this.modalNewStealthMetaAddress.linkedTo = this.coinbase;
+            // this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
+            // this.modalNewStealthMetaAddress.viewingPrivateKey = null;
+            // this.modalNewStealthMetaAddress.spendingPublicKey = null;
+            // this.modalNewStealthMetaAddress.viewingPublicKey = null;
+            // this.modalNewStealthMetaAddress.stealthMetaAddress = null;
+            // this.modalNewStealthMetaAddress.status = null;
+            this.$bvModal.show('modal-transfertostealthmetaaddress');
           },
 
           newStealthMetaAddress() {
