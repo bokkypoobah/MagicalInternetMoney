@@ -2152,6 +2152,28 @@
             async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
               console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock);
               try {
+
+                const topicsList = [
+                  // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
+                  [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
+                  [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
+                  // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+                  // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+                  // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+                  // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+                  // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+                  // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+                  // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
+                  // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+
+                  // // ERC-1155 TransferSingle (index_topic_1 address _operator, index_topic_2 address _from, index_topic_3 address _to, uint256 _id, uint256 _value)
+                  // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
+                  // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
+                  // // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+                  // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, accountAs32Bytes, null ],
+                  // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, null, accountAs32Bytes ],
+                ];
+
                 const filter = {
                   address: null,
                   fromBlock,
