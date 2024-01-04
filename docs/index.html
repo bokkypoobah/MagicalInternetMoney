@@ -537,6 +537,9 @@
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.tokenEventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
               </div>
             </b-card-text>
 
@@ -2372,8 +2375,8 @@
               console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
                 if (item.timestamp == null && item.chainId == this.chainId) {
+                  console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
                   const block = await provider.getBlock(item.blockNumber);
                   item.timestamp = block.timestamp;
                   const tx = await provider.getTransaction(item.txHash);
