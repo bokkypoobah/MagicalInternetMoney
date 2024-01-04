@@ -1777,6 +1777,9 @@
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
             }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.syncTokenEventsData(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
@@ -2219,6 +2222,69 @@
               }
             }
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents END");
+          },
+
+          async syncTokenEventsData(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " syncTokenEventsData BEGIN");
+            let rows = 0;
+            let done = false;
+            do {
+              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
+            // let total = rows;
+            // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - total: " + total);
+            this.sync.completed = 0;
+            this.sync.total = rows;
+            this.sync.section = 'Token Events Tx Data';
+            rows = 0;
+            // do {
+            //   let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+            //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+            //   const records = [];
+            //   for (const item of data) {
+            //     // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
+            //     if (item.timestamp == null && item.chainId == this.chainId) {
+            //       const block = await provider.getBlock(item.blockNumber);
+            //       item.timestamp = block.timestamp;
+            //       const tx = await provider.getTransaction(item.txHash);
+            //       const txReceipt = await provider.getTransactionReceipt(item.txHash);
+            //       item.tx = {
+            //         type: tx.type,
+            //         blockHash: tx.blockHash,
+            //         from: tx.from,
+            //         gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+            //         gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+            //         to: tx.to,
+            //         value: ethers.BigNumber.from(tx.value).toString(),
+            //         nonce: tx.nonce,
+            //         data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+            //         chainId: tx.chainId,
+            //         contractAddress: txReceipt.contractAddress,
+            //         transactionIndex: txReceipt.transactionIndex,
+            //         gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+            //         blockHash: txReceipt.blockHash,
+            //         logs: txReceipt.logs,
+            //         cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+            //         effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+            //         status: txReceipt.status,
+            //         type: txReceipt.type,
+            //       };
+            //       records.push(item);
+            //     }
+            //   }
+            //   if (records.length > 0) {
+            //     await db.registryEntries.bulkPut(records).then (function() {
+            //     }).catch(function(error) {
+            //       console.log("syncTokenEventsData.bulkPut error: " + error);
+            //     });
+            //   }
+            //   rows = parseInt(rows) + data.length;
+            //   this.sync.completed = rows;
+            //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            // } while (!done);
           },
 
           async collateAccounts(db, provider, latestBlockNumber) {
