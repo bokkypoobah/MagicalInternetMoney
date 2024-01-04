@@ -965,6 +965,7 @@
 
           announcements: [],
           registryEntries: [],
+          tokenEvents: [],
           addresses: {},
 
           modalTransfer: {
@@ -2377,6 +2378,9 @@
             Vue.set(this, 'announcements', announcements);
             const registryEntries = await db.registryEntries.toArray();
             Vue.set(this, 'registryEntries', registryEntries);
+            const tokenEvents = await db.tokenEvents.toArray();
+            Vue.set(this, 'tokenEvents', tokenEvents);
+            console.log("tokenEvents: " + JSON.stringify(tokenEvents));
             db.close();
             console.log(moment().format("HH:mm:ss") + " loadCurrentData END");
           },
