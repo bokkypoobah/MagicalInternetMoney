@@ -1353,7 +1353,6 @@
 
           filteredTokenEvents() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId])) {
               // console.log(contract + " => " + JSON.stringify(contractData));
               results.push({
@@ -1365,9 +1364,7 @@
                 totalSupply: contractData.totalSupply || undefined,
               });
             }
-
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
-            // return this.tokenEvents.filter(e => e.chainId == this.chainId);
             return results;
           },
           filteredSortedTokenEvents() {
