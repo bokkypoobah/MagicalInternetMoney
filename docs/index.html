@@ -1023,6 +1023,7 @@
           registryEntries: [],
           tokenEvents: [],
           addresses: {},
+          tokenContracts: {},
 
           modalTransfer: {
             stealthMetaAddress: null,
@@ -2505,7 +2506,8 @@
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-            const tokenContracts = {};
+
+            const tokenContracts = this.tokenContracts;
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
             }
@@ -2551,29 +2553,30 @@
                     this.sync.completed++;
                   }
                   const tokenContract = tokenContracts[item.chainId][item.contract];
-                  console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
+                  const events = tokenContracts[item.chainId][item.contract].events;
+                  if (!(item.blockNumber in events)) {
+                    events[item.blockNumber] = { timestamp: item.timestamp, logIndexes: {} };
+                  }
+                  if (!(item.logIndex in events[item.blockNumber].logIndexes)) {
+                    events[item.blockNumber].logIndexes[item.logIndex] = {
+                      type: item.type,
+                      eventType: item.eventType,
+                      from: item.from || undefined,
+                      to: item.to || undefined,
+                      tokens: item.tokens || undefined,
+                      tokenId: item.tokenId || undefined,
+                      owner: item.owner || undefined,
+                      operator: item.operator || undefined,
+                      approved: item.approved || undefined,
+                    };
+                  }
+                  // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
                 }
-
-            //     if (!(item.contract in accounts)) {
-            //       const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-            //       accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
-            //     }
-            //     if (!(item.stealthAddress in accounts)) {
-            //       accounts[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
-            //     }
-            //     if (!(item.caller in accounts)) {
-            //       const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-            //       accounts[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
-            //     }
-            //     if (!(item.tx.from in accounts)) {
-            //       accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
-            //     }
               }
               rows = parseInt(rows) + data.length;
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             rows = 0;
-            console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
 
             // done = false;
             // do {
@@ -2604,9 +2607,9 @@
             //   }
             // }
             //
-            // Vue.set(this, 'accounts', accounts);
-            // localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            // console.log(moment().format("HH:mm:ss") + " collateTokens - addresses: " + JSON.stringify(accounts, null, 2));
+            Vue.set(this, 'tokenContracts', tokenContracts);
+            localStorage.stealthChadTokenContracts = JSON.stringify(this.tokenContracts);
+            console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateTokens END");
           },
 
@@ -2917,6 +2920,10 @@
               }
               if ('stealthChadAddresses' in localStorage) {
                 this.addresses = JSON.parse(localStorage.stealthChadAddresses);
+              }
+              if ('stealthChadTokenContracts' in localStorage) {
+                this.tokenContracts = JSON.parse(localStorage.stealthChadTokenContracts);
+                console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
               // (async() => {
               //   // TODO: TESTING
