@@ -716,7 +716,7 @@
                   <font size="-1">{{ data.item.schemeId }}</font>
                 </template>
                 <template #cell(transfer)="data">
-                  <b-button size="sm" @click="transfer(data.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="transfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
