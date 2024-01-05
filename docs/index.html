@@ -448,6 +448,11 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.tokenEventsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">
+                    Active Only
+                  </b-form-checkbox>
+                </div>
                 <!-- <div v-if="false && (settings.tabIndex == 0 || settings.tabIndex == 1)" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
                     Attached
@@ -792,17 +797,17 @@
                 <template #cell(active)="data">
                   <font size="-1"><b-form-checkbox size="sm" value="1" :checked="data.item.active ? 1 : 0" @change="toggleTokenContractActive(data.item)" class="mt-1 ml-2"></b-form-checkbox></font>
                 </template>
-                <template #cell(firstEvent)="data">
+                <template #cell(firstEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
                 </template>
-                <template #cell(lastEvent)="data">
+                <template #cell(lastEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font>
                 </template>
                 <template #cell(decimals)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
                 </template>
                 <template #cell(balance)="data">
-                  <font size="-1">{{ data.item.balance }}</font>
+                  <font size="-1">{{ (data.item.balances[coinbase] && data.item.type == "erc20") ? formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) : "" }}</font>
                 </template>
                 <template #cell(totalSupply)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
@@ -1010,6 +1015,7 @@
               sortOption: 'typenameasc',
             },
             tokenEventsTable: {
+              activeOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 25,
@@ -1047,7 +1053,7 @@
                 explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
               },
             },
-            version: 31,
+            version: 32,
           },
           contracts: {
             "11155111": {
@@ -1243,8 +1249,8 @@
             { key: 'active', label: 'Active', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'lastEvent', label: 'Last Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'firstEventBlockNumber', label: 'First Event #', sortable: false, thStyle: 'width: 13%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'lastEventBlockNumber', label: 'Last Event #', sortable: false, thStyle: 'width: 13%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1448,18 +1454,26 @@
           filteredTokenEvents() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-              // console.log(contract + " => " + JSON.stringify(contractData));
-              results.push({
-                contract,
-                active: contractData.active,
-                symbol: contractData.symbol,
-                name: contractData.name,
-                type: contractData.type,
-                decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
-                totalSupply: contractData.totalSupply || undefined,
-                firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
-                lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
-              });
+              let include = true;
+              if (this.settings.tokenEventsTable.activeOnly) {
+                if (!contractData.active) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push({
+                  contract,
+                  active: contractData.active,
+                  symbol: contractData.symbol,
+                  name: contractData.name,
+                  type: contractData.type,
+                  decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
+                  balances: contractData.balances || undefined,
+                  totalSupply: contractData.totalSupply || undefined,
+                  firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
+                  lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
+                });
+              }
             }
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
             return results;
