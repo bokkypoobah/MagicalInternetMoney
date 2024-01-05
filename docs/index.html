@@ -675,6 +675,11 @@
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ nameOrAddress(data.item.stealthAddress, 28) }}</font>
                   </b-link>
                 </template>
+                <template #cell(linkedTo)="data">
+                  <b-link @click="viewAddress(data.item.linkedTo.address)">
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                  </b-link>
+                </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
@@ -1230,6 +1235,7 @@
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
