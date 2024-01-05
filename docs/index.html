@@ -982,7 +982,21 @@
               pageSize: 10,
               sortOption: 'typenameasc',
             },
-            version: 29,
+            chains: {
+              "1": {
+                name: "Ethereum Mainnet",
+                explorerAddress: "https://etherscan.io/address/%s",
+                explorerContract: "https://etherscan.io/address/%s#code",
+                explorerTx: "https://etherscan.io/tx/%s",
+              },
+              "11155111": {
+                name: "Sepolia Testnet",
+                explorerAddress: "https://sepolia.etherscan.io/address/%s",
+                explorerContract: "https://sepolia.etherscan.io/address/%s#code",
+                explorerTx: "https://sepolia.etherscan.io/tx/%s",
+              },
+            },
+            version: 30,
           },
           contracts: {
             "11155111": {
@@ -1885,18 +1899,19 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            // if (!devMode) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
-            // }
+            }
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEventsData(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_MAINNET) {
+            if (false && network.chainId == CHAINID_MAINNET) {
+              // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
               await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             }
-            // // if (network.chainId == CHAINID_SEPOLIA) {
-            //   await this.collateTokens(db, provider, latestBlockNumber);
-            // // }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.collateTokens(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -2640,7 +2655,7 @@
             }
             this.sync.completed = 0;
             this.sync.total = 0;
-            this.sync.section = 'Tokens';
+            this.sync.section = 'Token Contracts';
             let rows = 0;
             let done = false;
             do {
