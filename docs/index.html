@@ -765,12 +765,28 @@
               </b-table>
 
               <!-- :TOKENEVENTS -->
-              <!-- <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="activityTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.tokenEventsTable.currentPage - 1) * settings.tokenEventsTable.pageSize) + 1 }}
                   </font>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="chainInfo.explorerAddressPrefix + data.item.contract + '#code'" target="_blank">
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.contract)">{{ ensNameOrAddress(data.item.contract, 28) }}</font>
+                  </b-link>
+                </template>
+                <template #cell(type)="data">
+                  {{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}
+                </template>
+                <template #cell(decimals)="data">
+                  {{ parseInt(data.item.decimals) }}
+                </template>
+                <template #cell(balance)="data">
+                  {{ data.item.balance }}
+                </template>
+                <template #cell(totalSupply)="data">
+                  {{ data.item.totalSupply }}
                 </template>
                 <!-- <template #cell(timestamp)="data">
                   <font size="-1">
@@ -1196,10 +1212,12 @@
           tokenEventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           contractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1397,7 +1415,6 @@
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
-
           filteredTokenEvents() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
@@ -1407,7 +1424,7 @@
                 symbol: contractData.symbol,
                 name: contractData.name,
                 type: contractData.type,
-                decimals: contractData.decimals || undefined,
+                decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
                 totalSupply: contractData.totalSupply || undefined,
               });
             }
@@ -2721,7 +2738,7 @@
                     } catch (e) {
                     }
                     if (item.eventType == "erc20") {
-                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", events: {} };
+                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals: parseInt(decimals || 0), totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", events: {} };
                     } else {
                       tokenContracts[item.chainId][item.contract] = { symbol, name, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc721", events: {} };
                     }
