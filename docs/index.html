@@ -777,7 +777,7 @@
                 </template>
                 <template #cell(contract)="data">
                   <b-link :href="chainInfo.explorerAddressPrefix + data.item.contract + '#code'" target="_blank">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.contract)">{{ ensNameOrAddress(data.item.contract, 28) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.contract)">{{ ensNameOrAddress(data.item.contract, 21) }}</font>
                   </b-link>
                 </template>
                 <template #cell(type)="data">
@@ -788,6 +788,9 @@
                 </template>
                 <template #cell(name)="data">
                   <font size="-1">{{ data.item.name }}</font>
+                </template>
+                <template #cell(active)="data">
+                  <font size="-1"><b-form-checkbox size="sm" value="1" :checked="data.item.active ? 1 : 0" @change="toggleTokenContractActive(data.item)" class="mt-1 ml-2"></b-form-checkbox></font>
                 </template>
                 <template #cell(firstEvent)="data">
                   <font size="-1">{{ formatTimestamp(data.item.firstEvent.timestamp) }}</font>
@@ -1237,7 +1240,8 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 12%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'active', label: 'Active', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'lastEvent', label: 'Last Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1447,6 +1451,7 @@
               // console.log(contract + " => " + JSON.stringify(contractData));
               results.push({
                 contract,
+                active: contractData.active,
                 symbol: contractData.symbol,
                 name: contractData.name,
                 type: contractData.type,
@@ -1708,7 +1713,13 @@
               localStorage.stealthChadContracts = JSON.stringify(this.contracts);
             }
           },
-
+          toggleTokenContractActive(item) {
+            if (item && item.contract) {
+              Vue.set(this.tokenContracts[this.chainId][item.contract], 'active', !this.tokenContracts[this.chainId][item.contract].active);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+              localStorage.stealthChadTokenContracts = JSON.stringify(this.tokenContracts);
+            }
+          },
           transfer(stealthMetaAddress) {
             console.log(moment().format("HH:mm:ss") + " transfer: " + stealthMetaAddress);
             this.modalTransfer.stealthMetaAddress = stealthMetaAddress;
@@ -2792,6 +2803,7 @@
                     }
                     if (item.eventType == "erc20") {
                       tokenContracts[item.chainId][item.contract] = {
+                        active: false,
                         symbol: symbol.trim(),
                         name: name.trim(),
                         decimals: parseInt(decimals || 0),
