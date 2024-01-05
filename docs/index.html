@@ -2500,6 +2500,7 @@
                   } else {
                     console.log("NOT HANDLED: " + JSON.stringify(log));
                   }
+                  // if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
                   if (eventRecord) {
                     records.push( {
                       chainId: t.chainId,
@@ -2760,7 +2761,8 @@
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-            const tokenContracts = this.tokenContracts;
+            // TODO: Dev const tokenContracts = this.tokenContracts;
+            const tokenContracts = {};
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
             }
@@ -2837,8 +2839,28 @@
                     blockNumber: item.blockNumber,
                     timestamp: item.timestamp
                   };
+                  // console.log("item: " + JSON.stringify(item));
+                  if (item.eventType == "erc20" && item.type == "Transfer") {
+                    const balances = tokenContracts[item.chainId][item.contract].balances;
+                    if (item.from in selectedAddressesMap) {
+                      // console.log("from included: " + item.from);
+                      if (!(item.from in balances)) {
+                        balances[item.from] = "0";
+                      }
+                      balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
+                    }
+                    if (item.to in selectedAddressesMap) {
+                      // console.log("to included: " + item.to);
+                      if (!(item.to in balances)) {
+                        balances[item.to] = "0";
+                      }
+                      balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
+                    }
+                    tokenContracts[item.chainId][item.contract].balances = balances;
+                    // console.log("tokenContracts[item.chainId][item.contract]: " + JSON.stringify(tokenContracts[item.chainId][item.contract]));
+                  }
                   const tokenContract = tokenContracts[item.chainId][item.contract];
-                  console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
+                  // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
                   const events = tokenContracts[item.chainId][item.contract].events;
                   if (!(item.blockNumber in events)) {
                     events[item.blockNumber] = { timestamp: item.timestamp, logIndexes: {} };
