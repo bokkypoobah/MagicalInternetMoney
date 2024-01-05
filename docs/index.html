@@ -780,6 +780,15 @@
                 <template #cell(type)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
                 </template>
+                <template #cell(symbol)="data">
+                  <font size="-1">{{ data.item.symbol }}</font>
+                </template>
+                <template #cell(name)="data">
+                  <font size="-1">{{ data.item.name }}</font>
+                </template>
+                <template #cell(firstEvent)="data">
+                  <font size="-1">{{ formatTimestamp(data.item.firstEvent.timestamp) }}</font>
+                </template>
                 <template #cell(decimals)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
                 </template>
@@ -1212,11 +1221,12 @@
           ],
           tokenEventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 12%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
@@ -1427,6 +1437,7 @@
                 type: contractData.type,
                 decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
                 totalSupply: contractData.totalSupply || undefined,
+                firstEvent: contractData.firstEvent || undefined,
               });
             }
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
@@ -2739,9 +2750,9 @@
                     } catch (e) {
                     }
                     if (item.eventType == "erc20") {
-                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals: parseInt(decimals || 0), totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", events: {} };
+                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals: parseInt(decimals || 0), totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", firstEvent: { blockNumber: item.blockNumber, timestamp: item.timestamp }, events: {} };
                     } else {
-                      tokenContracts[item.chainId][item.contract] = { symbol, name, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc721", events: {} };
+                      tokenContracts[item.chainId][item.contract] = { symbol, name, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc721", firstEvent: { blockNumber: item.blockNumber, timestamp: item.timestamp }, events: {} };
                     }
                     this.sync.completed++;
                   }
