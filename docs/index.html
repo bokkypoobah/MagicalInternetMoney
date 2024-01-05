@@ -2749,7 +2749,6 @@
           async collateTokens(db, provider, latestBlockNumber) {
             // TODO: Handle low confirmation events
             console.log(moment().format("HH:mm:ss") + " collateTokens BEGIN");
-
             const selectedAddressesMap = {};
             for (const [address, addressData] of Object.entries(this.addresses)) {
               if (address.substring(0, 2) == "0x" && addressData.mine) {
@@ -2757,12 +2756,10 @@
               }
             }
             console.log(moment().format("HH:mm:ss") + " collateTokens - selectedAddressesMap: " + JSON.stringify(Object.keys(selectedAddressesMap)));
-
             const accounts = this.addresses;
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-
             const tokenContracts = this.tokenContracts;
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
@@ -2813,10 +2810,7 @@
                           blockNumber: item.blockNumber,
                           timestamp: item.timestamp
                         },
-                        lastEvent: {
-                          blockNumber: item.blockNumber,
-                          timestamp: item.timestamp
-                        },
+                        lastEvent: {},
                         events: {},
                         balances: {},
                         tokenIds: {},
@@ -2831,23 +2825,20 @@
                           blockNumber: item.blockNumber,
                           timestamp: item.timestamp,
                         },
-                        lastEvent: {
-                          blockNumber: item.blockNumber,
-                          timestamp: item.timestamp
-                        },
+                        lastEvent: {},
                         events: {},
                         balances: {},
                         tokenIds: {},
                       };
                     }
                     this.sync.completed++;
-                  } else {
-                    tokenContracts[item.chainId][item.contract].lastEvent = {
-                      blockNumber: item.blockNumber,
-                      timestamp: item.timestamp
-                    };
                   }
+                  tokenContracts[item.chainId][item.contract].lastEvent = {
+                    blockNumber: item.blockNumber,
+                    timestamp: item.timestamp
+                  };
                   const tokenContract = tokenContracts[item.chainId][item.contract];
+                  console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
                   const events = tokenContracts[item.chainId][item.contract].events;
                   if (!(item.blockNumber in events)) {
                     events[item.blockNumber] = { timestamp: item.timestamp, logIndexes: {} };
@@ -2866,7 +2857,9 @@
                       approved: item.approved || undefined,
                     };
                   }
-                  // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
+                  // if (item.active) {
+                  //   console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
+                  // }
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -3230,7 +3223,7 @@
               }
               if ('stealthChadTokenContracts' in localStorage) {
                 this.tokenContracts = JSON.parse(localStorage.stealthChadTokenContracts);
-                console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
+                // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
               // (async() => {
               //   // TODO: TESTING
