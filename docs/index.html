@@ -410,7 +410,7 @@
               {{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}
             </template>
             <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="contract-chain">{{ chains.filter(e => e.value == modalContract.item.chainId)[0] && chains.filter(e => e.value == modalContract.item.chainId)[0].text || ("Id: " + modalContract.item.chainId) }}</b-button>
+              <b-button size="sm" variant="transparent" id="contract-chain">{{ settings.chains[modalContract.item.chainId] && settings.chains[modalContract.item.chainId].name || ("Unconfigured ChainId: " + modalContract.item.chainId) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -851,7 +851,7 @@
                       </template>
                       <template #cell(chainId)="data">
                         <font size="-1">
-                          {{ chains.filter(e => e.value == data.item.chainId)[0] && chains.filter(e => e.value == data.item.chainId)[0].text || ("Id: " + data.item.chainId) }}
+                          {{ settings.chains[data.item.chainId] && settings.chains[data.item.chainId].name || ("Unconfigured ChainId: " + data.item.chainId) }}
                         </font>
                       </template>
                       <template #cell(contract)="data">
