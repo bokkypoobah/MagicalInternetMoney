@@ -206,7 +206,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.caller" label="Caller:" label-for="activity-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.caller)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-caller" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
+                  <b-button size="sm" id="activity-caller" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.caller) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -236,7 +236,7 @@
             <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-registrant" :href="'https://sepolia.etherscan.io/address/' + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
+                  <b-button size="sm" id="registry-registrant" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalRegistry.item.registrant) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -270,7 +270,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.address)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                  <b-button size="sm" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalAddress.item.address) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -294,7 +294,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-linkedto" :href="'https://sepolia.etherscan.io/address/' + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
+                  <b-button size="sm" id="address-linkedto" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalAddress.item.linkedTo) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -367,7 +367,7 @@
 
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="newsma-attachedaddress" :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="newsma-attachedaddress" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + coinbase) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -415,7 +415,7 @@
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalContract.item.contract }}</b-button>
+                  <b-button size="sm" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalContract.item.contract) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalContract.item.contract }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -849,8 +849,7 @@
                         </font>
                       </template>
                       <template #cell(contract)="data">
-                        <!-- <b-link @click="viewContract(data.item.contract, 'contract')"> -->
-                        <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract + '#code'" target="_blank">
+                        <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + data.item.contract + '#code') || '(unsupported)'" target="_blank">
                           <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
                         </b-link>
                       </template>
