@@ -2564,13 +2564,14 @@
             // this.sync.completed = 0;
             // this.sync.total = rows;
             // this.sync.section = 'Token Events Tx Data';
-            // rows = 0;
-            // do {
-            //   let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-            //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-            //   const records = [];
-            //   for (const item of data) {
-            //     if (item.timestamp == null && item.chainId == this.chainId) {
+            rows = 0;
+            do {
+              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              const records = [];
+              for (const item of data) {
+                if (item.timestamp == null && item.chainId == this.chainId) {
+                  item.timestamp = blockTimestamps[item.blockNumber];
             //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: " + JSON.stringify(item));
             //       const block = await provider.getBlock(item.blockNumber);
             //       item.timestamp = block.timestamp;
@@ -2597,22 +2598,22 @@
             //       //   status: txReceipt.status,
             //       //   type: txReceipt.type,
             //       // };
-            //       records.push(item);
+                  records.push(item);
             //     } else {
             //       // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: TIMESTAMP <> NULL" + JSON.stringify(item));
-            //     }
-            //   }
-            //   if (records.length > 0) {
-            //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - records: " + JSON.stringify(records));
-            //     await db.tokenEvents.bulkPut(records).then (function() {
-            //     }).catch(function(error) {
-            //       console.log("syncTokenEventsDataMainnet.bulkPut error: " + error);
-            //     });
-            //   }
-            //   rows = parseInt(rows) + data.length;
-            //   this.sync.completed = rows;
-            //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            // } while (!done);
+                }
+              }
+              if (records.length > 0) {
+                console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - records: " + JSON.stringify(records));
+                await db.tokenEvents.bulkPut(records).then (function() {
+                }).catch(function(error) {
+                  console.log("syncTokenEventsDataMainnet.bulkPut error: " + error);
+                });
+              }
+              rows = parseInt(rows) + data.length;
+              // this.sync.completed = rows;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
             console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet END");
           },
 
