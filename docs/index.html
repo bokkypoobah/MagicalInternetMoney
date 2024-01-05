@@ -109,7 +109,7 @@
             <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="activity-txhash" :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + modalActivity.item.txHash) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -223,7 +223,7 @@
             <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-txhash" :href="'https://sepolia.etherscan.io/tx/' + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registry-txhash" :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + modalRegistry.item.txHash) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -631,7 +631,7 @@
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
-                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                    <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + data.item.txHash) || '(unsupported)'" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       <span v-if="data.item.timestamp">
                         {{ formatTimestamp(data.item.timestamp) }}
                       </span>
@@ -677,7 +677,7 @@
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
-                    <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                    <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + data.item.txHash) || '(unsupported)'" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       <span v-if="data.item.timestamp">
                         {{ formatTimestamp(data.item.timestamp) }}
                       </span>
@@ -903,7 +903,7 @@
                   {{ coinbase.substring(0, 10) }}
                 </b-link> -->
                 <b-link v-if="chainId" :href="'https://sepolia.etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
-                  {{ chains.filter(e => e.value == chainId)[0] && chains.filter(e => e.value == chainId)[0].text || ("Chain Id: " + chainId) }}
+                  {{ settings.chains[chainId] && settings.chains[chainId].name || ("Chain Id: " + chainId) }}
                 </b-link>
                 <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
                   {{ '#' + commify0(blockNumber) }}
@@ -1071,6 +1071,7 @@
             read: false,
             write: false,
           },
+          // TODO: Delete
           chains: [
             { value: 1, text: 'Ethereum Mainnet' },
             { value: 11155111, text: 'Sepolia Testnet' },
