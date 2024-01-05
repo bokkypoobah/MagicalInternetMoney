@@ -122,7 +122,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-registrant" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
+                  <b-button size="sm" id="activity-registrant" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.tx.from) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -135,7 +135,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-receiver" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
+                  <b-button size="sm" id="activity-receiver" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.stealthAddress) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -162,7 +162,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.address" label="and Address:" label-for="activity-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.linkedTo.address)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-owner" :href="'https://sepolia.etherscan.io/address/' + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
+                  <b-button size="sm" id="activity-owner" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.linkedTo.address) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
