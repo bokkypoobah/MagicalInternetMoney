@@ -47,7 +47,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Activity</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry Activity'">Registry</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens (WIP)</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
@@ -448,6 +448,16 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.activityTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
+                    Mine Only
+                  </b-form-checkbox>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
+                    Mine Only
+                  </b-form-checkbox>
+                </div>
                 <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.tokenEventsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">
                     Active Only
@@ -997,6 +1007,7 @@
             showInfo: false,
             reportingDateTime: 0,
             activityTable: {
+              mineOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 100,
@@ -1009,6 +1020,7 @@
               sortOption: 'txorderdsc',
             },
             addressesTable: {
+              mineOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 25,
@@ -1053,7 +1065,7 @@
                 explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
               },
             },
-            version: 32,
+            version: 33,
           },
           contracts: {
             "11155111": {
@@ -1214,10 +1226,10 @@
           ],
           activityFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
@@ -1235,11 +1247,11 @@
           ],
           addressesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           tokenEventsFields: [
@@ -1298,7 +1310,21 @@
             }
           },
           filteredActivity() {
-            return this.announcements.filter(e => e.chainId == this.chainId);
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            for (const announcement of this.announcements) {
+              if (announcement.chainId == this.chainId) {
+                let include = true;
+                if (this.settings.activityTable.mineOnly) {
+                  if (!announcement.mine) {
+                    include = false;
+                  }
+                }
+                if (include) {
+                  results.push(announcement);
+                }
+              }
+            }
+            return results;
           },
           filteredSortedActivity() {
             let results = this.filteredActivity;
@@ -1381,7 +1407,15 @@
           filteredAddresses() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [address, data] of Object.entries(this.addresses)) {
-              results.push({ address, ...data });
+              let include = true;
+              if (this.settings.addressesTable.mineOnly) {
+                if (!data.mine) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push({ address, ...data });
+              }
             }
             return results;
           },
@@ -2773,8 +2807,8 @@
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-            // TODO: Dev const tokenContracts = this.tokenContracts;
-            const tokenContracts = {};
+            const tokenContracts = this.tokenContracts;
+            // TODO: Dev const tokenContracts = {};
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
             }
