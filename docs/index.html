@@ -75,7 +75,7 @@
             <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="transfer-sender" :href="'https://sepolia.etherscan.io/address/' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="transfer-sender" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + coinbase) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -988,12 +988,21 @@
                 explorerAddressPrefix: "https://etherscan.io/address/",
                 explorerTokenPrefix: "https://etherscan.io/token/",
                 explorerTxPrefix: "https://etherscan.io/tx/",
+                explorerBlockPrefix: "https://etherscan.io/block/",
+              },
+              "5": {
+                name: "Goerli Testnet",
+                explorerAddressPrefix: "https://goerli.etherscan.io/address/",
+                explorerTokenPrefix: "https://goerli.etherscan.io/token/",
+                explorerTxPrefix: "https://goerli.etherscan.io/tx/",
+                explorerBlockPrefix: "https://goerli.etherscan.io/block/",
               },
               "11155111": {
                 name: "Sepolia Testnet",
                 explorerAddressPrefix: "https://sepolia.etherscan.io/address/",
                 explorerTokenPrefix: "https://sepolia.etherscan.io/token/",
                 explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
+                explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
               },
             },
             version: 30,
