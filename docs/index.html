@@ -117,7 +117,7 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalActivity.item" label="Timestamp:" label-for="activity-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="link" id="activity-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalActivity.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalActivity.item.blockNumber)" target="_blank">{{ formatTimestamp(modalActivity.item.timestamp) }}</b-button>
+              <b-button size="sm" variant="transparent" id="activity-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalActivity.item.blockNumber)">{{ formatTimestamp(modalActivity.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -231,7 +231,7 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="link" id="registry-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalRegistry.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistry.item.blockNumber)" target="_blank">{{ formatTimestamp(modalRegistry.item.timestamp) }}</b-button>
+              <b-button size="sm" variant="transparent" id="registry-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistry.item.blockNumber)">{{ formatTimestamp(modalRegistry.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
