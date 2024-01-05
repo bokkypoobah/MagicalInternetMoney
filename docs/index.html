@@ -793,10 +793,10 @@
                   <font size="-1"><b-form-checkbox size="sm" value="1" :checked="data.item.active ? 1 : 0" @change="toggleTokenContractActive(data.item)" class="mt-1 ml-2"></b-form-checkbox></font>
                 </template>
                 <template #cell(firstEvent)="data">
-                  <font size="-1">{{ formatTimestamp(data.item.firstEvent.timestamp) }}</font>
+                  <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
                 </template>
                 <template #cell(lastEvent)="data">
-                  <font size="-1">{{ formatTimestamp(data.item.lastEvent.timestamp) }}</font>
+                  <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font>
                 </template>
                 <template #cell(decimals)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
@@ -1457,8 +1457,8 @@
                 type: contractData.type,
                 decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
                 totalSupply: contractData.totalSupply || undefined,
-                firstEvent: contractData.firstEvent || undefined,
-                lastEvent: contractData.lastEvent || undefined,
+                firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
+                lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
               });
             }
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
@@ -2016,13 +2016,13 @@
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
-              await this.syncTokenEventsData(db, provider, latestBlockNumber);
-            }
-            if (false && network.chainId == CHAINID_MAINNET) {
-              // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
-              await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
-            }
+            // if (network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
+            // }
+            // if (false && network.chainId == CHAINID_MAINNET) {
+            //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
+            //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
+            // }
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
             }
@@ -2511,8 +2511,6 @@
                       contract,
                       ...eventRecord,
                       confirmations: latestBlockNumber - log.blockNumber,
-                      timestamp: null,
-                      tx: null,
                     });
                   }
                 }
@@ -2571,181 +2569,181 @@
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents END");
           },
 
-          async syncTokenEventsData(db, provider, latestBlockNumber) {
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsData BEGIN");
-            let rows = 0;
-            let done = false;
-            do {
-              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              rows = parseInt(rows) + data.length;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-            // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - total: " + total);
-            this.sync.completed = 0;
-            this.sync.total = rows;
-            this.sync.section = 'Token Events Tx Data';
-            rows = 0;
-            do {
-              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              const records = [];
-              for (const item of data) {
-                if (item.timestamp == null && item.chainId == this.chainId) {
-                  console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
-                  const block = await provider.getBlock(item.blockNumber);
-                  item.timestamp = block.timestamp;
-                  // const tx = await provider.getTransaction(item.txHash);
-                  // const txReceipt = await provider.getTransactionReceipt(item.txHash);
-                  // item.tx = {
-                  //   type: tx.type,
-                  //   blockHash: tx.blockHash,
-                  //   from: tx.from,
-                  //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-                  //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-                  //   to: tx.to,
-                  //   value: ethers.BigNumber.from(tx.value).toString(),
-                  //   nonce: tx.nonce,
-                  //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-                  //   chainId: tx.chainId,
-                  //   contractAddress: txReceipt.contractAddress,
-                  //   transactionIndex: txReceipt.transactionIndex,
-                  //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-                  //   blockHash: txReceipt.blockHash,
-                  //   logs: txReceipt.logs,
-                  //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-                  //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-                  //   status: txReceipt.status,
-                  //   type: txReceipt.type,
-                  // };
-                  records.push(item);
-                } else {
-                  // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: TIMESTAMP <> NULL" + JSON.stringify(item));
-                }
-              }
-              if (records.length > 0) {
-                console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - records: " + JSON.stringify(records));
-                await db.tokenEvents.bulkPut(records).then (function() {
-                }).catch(function(error) {
-                  console.log("syncTokenEventsData.bulkPut error: " + error);
-                });
-              }
-              rows = parseInt(rows) + data.length;
-              this.sync.completed = rows;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsData END");
-          },
+          // async syncTokenEventsData(db, provider, latestBlockNumber) {
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsData BEGIN");
+          //   let rows = 0;
+          //   let done = false;
+          //   do {
+          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+          //     rows = parseInt(rows) + data.length;
+          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+          //   } while (!done);
+          //   // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - total: " + total);
+          //   this.sync.completed = 0;
+          //   this.sync.total = rows;
+          //   this.sync.section = 'Token Events Tx Data';
+          //   rows = 0;
+          //   do {
+          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+          //     const records = [];
+          //     for (const item of data) {
+          //       if (item.timestamp == null && item.chainId == this.chainId) {
+          //         console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
+          //         const block = await provider.getBlock(item.blockNumber);
+          //         item.timestamp = block.timestamp;
+          //         // const tx = await provider.getTransaction(item.txHash);
+          //         // const txReceipt = await provider.getTransactionReceipt(item.txHash);
+          //         // item.tx = {
+          //         //   type: tx.type,
+          //         //   blockHash: tx.blockHash,
+          //         //   from: tx.from,
+          //         //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+          //         //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+          //         //   to: tx.to,
+          //         //   value: ethers.BigNumber.from(tx.value).toString(),
+          //         //   nonce: tx.nonce,
+          //         //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+          //         //   chainId: tx.chainId,
+          //         //   contractAddress: txReceipt.contractAddress,
+          //         //   transactionIndex: txReceipt.transactionIndex,
+          //         //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+          //         //   blockHash: txReceipt.blockHash,
+          //         //   logs: txReceipt.logs,
+          //         //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+          //         //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+          //         //   status: txReceipt.status,
+          //         //   type: txReceipt.type,
+          //         // };
+          //         records.push(item);
+          //       } else {
+          //         // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: TIMESTAMP <> NULL" + JSON.stringify(item));
+          //       }
+          //     }
+          //     if (records.length > 0) {
+          //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - records: " + JSON.stringify(records));
+          //       await db.tokenEvents.bulkPut(records).then (function() {
+          //       }).catch(function(error) {
+          //         console.log("syncTokenEventsData.bulkPut error: " + error);
+          //       });
+          //     }
+          //     rows = parseInt(rows) + data.length;
+          //     this.sync.completed = rows;
+          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+          //   } while (!done);
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsData END");
+          // },
 
-          async syncTokenEventsDataMainnet(db, provider, latestBlockNumber) {
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet BEGIN");
-            let rows = 0;
-            let done = false;
-
-            const blocksWithNullTimestampsMap = {};
-            do {
-              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              for (const item of data) {
-                if (item.timestamp == null) {
-                  if (!(item.blockNumber in blocksWithNullTimestampsMap)) {
-                    blocksWithNullTimestampsMap[item.blockNumber] = true;
-                  }
-                }
-              }
-              rows = parseInt(rows) + data.length;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - rows: " + rows);
-            const blocksWithNullTimestamps = Object.keys(blocksWithNullTimestampsMap);
-            // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blocksWithNullTimestamps: " + JSON.stringify(blocksWithNullTimestamps));
-
-            const blockTimestamps = {};
-            const BATCHSIZE = 1000;
-            for (let i = 0; i < blocksWithNullTimestamps.length; i += BATCHSIZE) {
-              const batch = blocksWithNullTimestamps.slice(i, parseInt(i) + BATCHSIZE);
-              // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - batch[0]: " + batch[0] + ", batch[-1]: " + batch.slice(-1));
-              const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                  query: BLOCKTIMESTAMPINQUERY,
-                  variables: { blockNumbers: batch.map(e => parseInt(e)) },
-                })
-              }).then(response => response.json())
-                .catch(function(e) {
-                  console.log("error: " + e);
-                });
-              const timestamps = data.data && data.data.blocks || [];
-              // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - timestamps: " + JSON.stringify(timestamps));
-              for (const timestampItem of timestamps) {
-                blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
-              //   Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
-              }
-              this.sync.completed += batch.length;
-              console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet " + this.sync.completed + " of " + blocksWithNullTimestamps.length);
-            }
-
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blockTimestamps: " + JSON.stringify(blockTimestamps));
-
-            // this.sync.completed = 0;
-            // this.sync.total = rows;
-            // this.sync.section = 'Token Events Tx Data';
-            rows = 0;
-            do {
-              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-              const records = [];
-              for (const item of data) {
-                if (item.timestamp == null && item.chainId == this.chainId) {
-                  item.timestamp = blockTimestamps[item.blockNumber];
-            //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: " + JSON.stringify(item));
-            //       const block = await provider.getBlock(item.blockNumber);
-            //       item.timestamp = block.timestamp;
-            //       // const tx = await provider.getTransaction(item.txHash);
-            //       // const txReceipt = await provider.getTransactionReceipt(item.txHash);
-            //       // item.tx = {
-            //       //   type: tx.type,
-            //       //   blockHash: tx.blockHash,
-            //       //   from: tx.from,
-            //       //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-            //       //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-            //       //   to: tx.to,
-            //       //   value: ethers.BigNumber.from(tx.value).toString(),
-            //       //   nonce: tx.nonce,
-            //       //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-            //       //   chainId: tx.chainId,
-            //       //   contractAddress: txReceipt.contractAddress,
-            //       //   transactionIndex: txReceipt.transactionIndex,
-            //       //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-            //       //   blockHash: txReceipt.blockHash,
-            //       //   logs: txReceipt.logs,
-            //       //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-            //       //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-            //       //   status: txReceipt.status,
-            //       //   type: txReceipt.type,
-            //       // };
-                  records.push(item);
-            //     } else {
-            //       // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: TIMESTAMP <> NULL" + JSON.stringify(item));
-                }
-              }
-              if (records.length > 0) {
-                console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - records: " + JSON.stringify(records));
-                await db.tokenEvents.bulkPut(records).then (function() {
-                }).catch(function(error) {
-                  console.log("syncTokenEventsDataMainnet.bulkPut error: " + error);
-                });
-              }
-              rows = parseInt(rows) + data.length;
-              // this.sync.completed = rows;
-              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-            } while (!done);
-            console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet END");
-          },
+          // async syncTokenEventsDataMainnet(db, provider, latestBlockNumber) {
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet BEGIN");
+          //   let rows = 0;
+          //   let done = false;
+          //
+          //   const blocksWithNullTimestampsMap = {};
+          //   do {
+          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+          //     for (const item of data) {
+          //       if (item.timestamp == null) {
+          //         if (!(item.blockNumber in blocksWithNullTimestampsMap)) {
+          //           blocksWithNullTimestampsMap[item.blockNumber] = true;
+          //         }
+          //       }
+          //     }
+          //     rows = parseInt(rows) + data.length;
+          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+          //   } while (!done);
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - rows: " + rows);
+          //   const blocksWithNullTimestamps = Object.keys(blocksWithNullTimestampsMap);
+          //   // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blocksWithNullTimestamps: " + JSON.stringify(blocksWithNullTimestamps));
+          //
+          //   const blockTimestamps = {};
+          //   const BATCHSIZE = 1000;
+          //   for (let i = 0; i < blocksWithNullTimestamps.length; i += BATCHSIZE) {
+          //     const batch = blocksWithNullTimestamps.slice(i, parseInt(i) + BATCHSIZE);
+          //     // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - batch[0]: " + batch[0] + ", batch[-1]: " + batch.slice(-1));
+          //     const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
+          //       method: 'POST',
+          //       headers: {
+          //         'Content-Type': 'application/json',
+          //         'Accept': 'application/json',
+          //       },
+          //       body: JSON.stringify({
+          //         query: BLOCKTIMESTAMPINQUERY,
+          //         variables: { blockNumbers: batch.map(e => parseInt(e)) },
+          //       })
+          //     }).then(response => response.json())
+          //       .catch(function(e) {
+          //         console.log("error: " + e);
+          //       });
+          //     const timestamps = data.data && data.data.blocks || [];
+          //     // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - timestamps: " + JSON.stringify(timestamps));
+          //     for (const timestampItem of timestamps) {
+          //       blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
+          //     //   Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
+          //     }
+          //     this.sync.completed += batch.length;
+          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet " + this.sync.completed + " of " + blocksWithNullTimestamps.length);
+          //   }
+          //
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blockTimestamps: " + JSON.stringify(blockTimestamps));
+          //
+          //   // this.sync.completed = 0;
+          //   // this.sync.total = rows;
+          //   // this.sync.section = 'Token Events Tx Data';
+          //   rows = 0;
+          //   do {
+          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+          //     const records = [];
+          //     for (const item of data) {
+          //       if (item.timestamp == null && item.chainId == this.chainId) {
+          //         item.timestamp = blockTimestamps[item.blockNumber];
+          //   //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: " + JSON.stringify(item));
+          //   //       const block = await provider.getBlock(item.blockNumber);
+          //   //       item.timestamp = block.timestamp;
+          //   //       // const tx = await provider.getTransaction(item.txHash);
+          //   //       // const txReceipt = await provider.getTransactionReceipt(item.txHash);
+          //   //       // item.tx = {
+          //   //       //   type: tx.type,
+          //   //       //   blockHash: tx.blockHash,
+          //   //       //   from: tx.from,
+          //   //       //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+          //   //       //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+          //   //       //   to: tx.to,
+          //   //       //   value: ethers.BigNumber.from(tx.value).toString(),
+          //   //       //   nonce: tx.nonce,
+          //   //       //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+          //   //       //   chainId: tx.chainId,
+          //   //       //   contractAddress: txReceipt.contractAddress,
+          //   //       //   transactionIndex: txReceipt.transactionIndex,
+          //   //       //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+          //   //       //   blockHash: txReceipt.blockHash,
+          //   //       //   logs: txReceipt.logs,
+          //   //       //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+          //   //       //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+          //   //       //   status: txReceipt.status,
+          //   //       //   type: txReceipt.type,
+          //   //       // };
+          //         records.push(item);
+          //   //     } else {
+          //   //       // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: TIMESTAMP <> NULL" + JSON.stringify(item));
+          //       }
+          //     }
+          //     if (records.length > 0) {
+          //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - records: " + JSON.stringify(records));
+          //       await db.tokenEvents.bulkPut(records).then (function() {
+          //       }).catch(function(error) {
+          //         console.log("syncTokenEventsDataMainnet.bulkPut error: " + error);
+          //       });
+          //     }
+          //     rows = parseInt(rows) + data.length;
+          //     // this.sync.completed = rows;
+          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+          //   } while (!done);
+          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet END");
+          // },
 
           async collateTokens(db, provider, latestBlockNumber) {
             // TODO: Handle low confirmation events
@@ -2808,11 +2806,8 @@
                         decimals: parseInt(decimals || 0),
                         totalSupply: totalSupply && totalSupply.toString() || null,
                         type: "erc20",
-                        firstEvent: {
-                          blockNumber: item.blockNumber,
-                          timestamp: item.timestamp
-                        },
-                        lastEvent: {},
+                        firstEventBlockNumber: item.blockNumber,
+                        lastEventBlockNumber: item.blockNumber,
                         events: {},
                         balances: {},
                         tokenIds: {},
@@ -2823,11 +2818,8 @@
                         name,
                         totalSupply: totalSupply && totalSupply.toString() || null,
                         type: "erc721",
-                        firstEvent: {
-                          blockNumber: item.blockNumber,
-                          timestamp: item.timestamp,
-                        },
-                        lastEvent: {},
+                        firstEventBlockNumber: item.blockNumber,
+                        lastEventBlockNumber: item.blockNumber,
                         events: {},
                         balances: {},
                         tokenIds: {},
@@ -2835,10 +2827,7 @@
                     }
                     this.sync.completed++;
                   }
-                  tokenContracts[item.chainId][item.contract].lastEvent = {
-                    blockNumber: item.blockNumber,
-                    timestamp: item.timestamp
-                  };
+                  tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
                   // console.log("item: " + JSON.stringify(item));
                   if (item.eventType == "erc20" && item.type == "Transfer") {
                     const balances = tokenContracts[item.chainId][item.contract].balances;
