@@ -508,6 +508,9 @@
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.tokenEventsTable.sortOption" @change="saveSettings" :options="tokenEventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
@@ -789,6 +792,9 @@
                 <template #cell(firstEvent)="data">
                   <font size="-1">{{ formatTimestamp(data.item.firstEvent.timestamp) }}</font>
                 </template>
+                <template #cell(lastEvent)="data">
+                  <font size="-1">{{ formatTimestamp(data.item.lastEvent.timestamp) }}</font>
+                </template>
                 <template #cell(decimals)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
                 </template>
@@ -1004,7 +1010,7 @@
               filter: null,
               currentPage: 1,
               pageSize: 25,
-              sortOption: 'txorderdsc',
+              sortOption: 'typenameasc',
             },
             contractsTable: {
               filter: null,
@@ -1038,7 +1044,7 @@
                 explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
               },
             },
-            version: 30,
+            version: 31,
           },
           contracts: {
             "11155111": {
@@ -1152,6 +1158,14 @@
             { value: 'addressasc', text: '▲ Address' },
             { value: 'addressdsc', text: '▼ Address' },
           ],
+          tokenEventsSortOptions: [
+            { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
+            { value: 'addressasc', text: '▲ Address' },
+            { value: 'addressdsc', text: '▼ Address' },
+          ],
           pageSizes: [
             { value: 5, text: '5' },
             { value: 10, text: '10' },
@@ -1226,6 +1240,7 @@
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 12%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'lastEvent', label: 'Last Event', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 7%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1438,38 +1453,64 @@
                 decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
                 totalSupply: contractData.totalSupply || undefined,
                 firstEvent: contractData.firstEvent || undefined,
+                lastEvent: contractData.lastEvent || undefined,
               });
             }
             // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
             return results;
           },
+
           filteredSortedTokenEvents() {
             let results = this.filteredTokenEvents;
-            // if (this.settings.activityTable.sortOption == 'txorderasc') {
-            //   results.sort((a, b) => {
-            //     if (a.blockNumber == b.blockNumber) {
-            //       if (a.txIndex == b.txIndex) {
-            //         return a.logIndex - b.logIndex;
-            //       } else {
-            //         return a.txIndex - b.txIndex;
-            //       }
-            //     } else {
-            //       return a.blockNumber - b.blockNumber;
-            //     }
-            //   });
-            // } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
-            //   results.sort((a, b) => {
-            //     if (a.blockNumber == b.blockNumber) {
-            //       if (a.txIndex == b.txIndex) {
-            //         return b.logIndex - a.logIndex;
-            //       } else {
-            //         return b.txIndex - a.txIndex;
-            //       }
-            //     } else {
-            //       return b.blockNumber - a.blockNumber;
-            //     }
-            //   });
-            // }
+            if (this.settings.tokenEventsTable.sortOption == 'typenameasc') {
+              results.sort((a, b) => {
+                if (('' + a.type).localeCompare(b.type) == 0) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.address).localeCompare(b.address);
+                  } else {
+                    return ('' + a.name).localeCompare(b.name);
+                  }
+                } else {
+                  return ('' + a.type).localeCompare(b.type);
+                }
+              });
+            } else if (this.settings.tokenEventsTable.sortOption == 'typenamedsc') {
+              results.sort((a, b) => {
+                if (('' + a.type).localeCompare(b.type) == 0) {
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + b.address).localeCompare(a.address);
+                  } else {
+                    return ('' + b.name).localeCompare(a.name);
+                  }
+                } else {
+                  return ('' + b.type).localeCompare(a.type);
+                }
+              });
+            } else if (this.settings.tokenEventsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + a.address).localeCompare(b.address);
+                } else {
+                  return ('' + a.name).localeCompare(b.name);
+                }
+              });
+            } else if (this.settings.tokenEventsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + b.address).localeCompare(a.address);
+                } else {
+                  return ('' + b.name).localeCompare(a.name);
+                }
+              });
+            } else if (this.settings.tokenEventsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.contract).localeCompare(b.contract);
+              });
+            } else if (this.settings.tokenEventsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.contract).localeCompare(a.contract);
+              });
+            }
             return results;
           },
           pagedFilteredSortedTokenEvents() {
@@ -2750,11 +2791,49 @@
                     } catch (e) {
                     }
                     if (item.eventType == "erc20") {
-                      tokenContracts[item.chainId][item.contract] = { symbol, name, decimals: parseInt(decimals || 0), totalSupply: totalSupply && totalSupply.toString() || null, type: "erc20", firstEvent: { blockNumber: item.blockNumber, timestamp: item.timestamp }, events: {} };
+                      tokenContracts[item.chainId][item.contract] = {
+                        symbol: symbol.trim(),
+                        name: name.trim(),
+                        decimals: parseInt(decimals || 0),
+                        totalSupply: totalSupply && totalSupply.toString() || null,
+                        type: "erc20",
+                        firstEvent: {
+                          blockNumber: item.blockNumber,
+                          timestamp: item.timestamp
+                        },
+                        lastEvent: {
+                          blockNumber: item.blockNumber,
+                          timestamp: item.timestamp
+                        },
+                        events: {},
+                        balances: {},
+                        tokenIds: {},
+                      };
                     } else {
-                      tokenContracts[item.chainId][item.contract] = { symbol, name, totalSupply: totalSupply && totalSupply.toString() || null, type: "erc721", firstEvent: { blockNumber: item.blockNumber, timestamp: item.timestamp }, events: {} };
+                      tokenContracts[item.chainId][item.contract] = {
+                        symbol,
+                        name,
+                        totalSupply: totalSupply && totalSupply.toString() || null,
+                        type: "erc721",
+                        firstEvent: {
+                          blockNumber: item.blockNumber,
+                          timestamp: item.timestamp,
+                        },
+                        lastEvent: {
+                          blockNumber: item.blockNumber,
+                          timestamp: item.timestamp
+                        },
+                        events: {},
+                        balances: {},
+                        tokenIds: {},
+                      };
                     }
                     this.sync.completed++;
+                  } else {
+                    tokenContracts[item.chainId][item.contract].lastEvent = {
+                      blockNumber: item.blockNumber,
+                      timestamp: item.timestamp
+                    };
                   }
                   const tokenContract = tokenContracts[item.chainId][item.contract];
                   const events = tokenContracts[item.chainId][item.contract].events;
