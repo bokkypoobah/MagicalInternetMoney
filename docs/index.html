@@ -75,7 +75,7 @@
             <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="transfer-sender" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + coinbase) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="transfer-sender" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -109,7 +109,7 @@
             <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-txhash" :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + modalActivity.item.txHash) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="activity-txhash" :href="chainInfo.explorerTxPrefix + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -122,7 +122,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-registrant" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.tx.from) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
+                  <b-button size="sm" id="activity-registrant" :href="chainInfo.explorerAddressPrefix + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -135,7 +135,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-receiver" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.stealthAddress) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
+                  <b-button size="sm" id="activity-receiver" :href="chainInfo.explorerAddressPrefix + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -162,7 +162,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.address" label="and Address:" label-for="activity-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.linkedTo.address)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-owner" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.linkedTo.address) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
+                  <b-button size="sm" id="activity-owner" :href="chainInfo.explorerAddressPrefix + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -206,7 +206,7 @@
             <b-form-group v-if="modalActivity.item && modalActivity.item.caller" label="Caller:" label-for="activity-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.caller)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-caller" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalActivity.item.caller) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
+                  <b-button size="sm" id="activity-caller" :href="chainInfo.explorerAddressPrefix + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -223,7 +223,7 @@
             <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-txhash" :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + modalRegistry.item.txHash) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registry-txhash" :href="chainInfo.explorerTxPrefix + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -236,7 +236,7 @@
             <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-registrant" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalRegistry.item.registrant) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
+                  <b-button size="sm" id="registry-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -270,7 +270,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.address)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalAddress.item.address) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -294,7 +294,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-linkedto" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalAddress.item.linkedTo) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
+                  <b-button size="sm" id="address-linkedto" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -367,7 +367,7 @@
 
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="newsma-attachedaddress" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + coinbase) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="newsma-attachedaddress" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -415,7 +415,7 @@
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + modalContract.item.contract) || '(unsupported)'" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalContract.item.contract }}</b-button>
+                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalContract.item.contract }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -426,7 +426,7 @@
               <b-button size="sm" variant="transparent" id="contract-type">{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalContract.item && modalContract.item.timestamp" label="First Event:" label-for="contract-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="link" id="contract-timestamp" :href="'https://sepolia.etherscan.io/block/' + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)" target="_blank">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
+              <b-button size="sm" variant="link" id="contract-timestamp" :href="chainInfo.explorerBlockPrefix + modalContract.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(modalContract.item.blockNumber)" target="_blank">{{ formatTimestamp(modalContract.item.timestamp) }}</b-button>
             </b-form-group>
             <b-form-group label="Name:" label-for="modalcontract-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -631,7 +631,7 @@
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
-                    <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + data.item.txHash) || '(unsupported)'" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                    <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       <span v-if="data.item.timestamp">
                         {{ formatTimestamp(data.item.timestamp) }}
                       </span>
@@ -677,7 +677,7 @@
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
-                    <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerTxPrefix + data.item.txHash) || '(unsupported)'" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                    <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       <span v-if="data.item.timestamp">
                         {{ formatTimestamp(data.item.timestamp) }}
                       </span>
@@ -849,7 +849,7 @@
                         </font>
                       </template>
                       <template #cell(contract)="data">
-                        <b-link :href="settings.chains[chainId] && (settings.chains[chainId].explorerAddressPrefix + data.item.contract + '#code') || '(unsupported)'" target="_blank">
+                        <b-link :href="chainInfo.explorerAddressPrefix + data.item.contract + '#code'" target="_blank">
                           <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
                         </b-link>
                       </template>
@@ -865,7 +865,7 @@
                       </template>
                       <template #cell(firstEvent)="data">
                         <font size="-1">
-                          <b-link :href="'https://sepolia.etherscan.io/block/' + data.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber)" target="_blank">
+                          <b-link :href="chainInfo.explorerBlockPrefix + data.item.blockNumber" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber)" target="_blank">
                             <span v-if="data.item.timestamp">
                               {{ formatTimestamp(data.item.timestamp) }}
                             </span>
@@ -898,18 +898,17 @@
           <div class="d-flex flex-wrap m-0 p-0">
             <div class="ml-0 mt-1 pl-1">
               <font v-if="connected" size="-2">
-                <!-- <b-link v-if="coinbase" :href="'https://sepolia.etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
-                  {{ coinbase.substring(0, 10) }}
-                </b-link> -->
-                <b-link v-if="chainId" :href="'https://sepolia.etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
-                  {{ settings.chains[chainId] && settings.chains[chainId].name || ("Chain Id: " + chainId) }}
+                <b-link v-if="coinbase" :href="chainInfo.explorerAddressPrefix + coinbase" v-b-popover.hover.bottom="coinbase" target="_blank">
+                  {{ ensNameOrAddress(coinbase, 30) }}
                 </b-link>
-                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
+                @
+                <b-link v-if="chainId" :href="chainInfo.explorerPrefix" v-b-popover.hover.bottom="'Network ChainId: ' + chainId" target="_blank">
+                  {{ chainInfo.name }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="chainInfo.explorerBlockPrefix + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
                   {{ '#' + commify0(blockNumber) }}
                 </b-link>
-                <b-link v-if="blockNumber" :href="'https://sepolia.etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
-                  {{ formatTimeDiff(timestamp) }}
-                </b-link>
+                {{ formatTimeDiff(timestamp) }}
               </font>
             </div>
             <div class="mt-0 flex-grow-1">
@@ -984,6 +983,7 @@
             chains: {
               "1": {
                 name: "Ethereum Mainnet",
+                explorerPrefix: "https://etherscan.io/",
                 explorerAddressPrefix: "https://etherscan.io/address/",
                 explorerTokenPrefix: "https://etherscan.io/token/",
                 explorerTxPrefix: "https://etherscan.io/tx/",
@@ -991,6 +991,7 @@
               },
               "5": {
                 name: "Goerli Testnet",
+                explorerPrefix: "https://goerli.etherscan.io/",
                 explorerAddressPrefix: "https://goerli.etherscan.io/address/",
                 explorerTokenPrefix: "https://goerli.etherscan.io/token/",
                 explorerTxPrefix: "https://goerli.etherscan.io/tx/",
@@ -998,6 +999,7 @@
               },
               "11155111": {
                 name: "Sepolia Testnet",
+                explorerPrefix: "https://sepolia.etherscan.io/",
                 explorerAddressPrefix: "https://sepolia.etherscan.io/address/",
                 explorerTokenPrefix: "https://sepolia.etherscan.io/token/",
                 explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
@@ -1079,11 +1081,6 @@
             read: false,
             write: false,
           },
-          // TODO: Delete
-          chains: [
-            { value: 1, text: 'Ethereum Mainnet' },
-            { value: 11155111, text: 'Sepolia Testnet' },
-          ],
           sourceOptions: [
             { value: null, text: '(select)' },
             { value: "attached", text: 'Web3 attached account' },
@@ -1219,6 +1216,20 @@
 
         // --- COMPUTED ---
         computed: {
+          chainInfo() {
+            if (this.chainId in this.settings.chains) {
+              return this.settings.chains[this.chainId];
+            } else {
+              return {
+                name: "Unconfigured ChainId: " + this.chainId,
+                explorerPrefix: "(not configured)",
+                explorerAddressPrefix: "(not configured)",
+                explorerTokenPrefix: "(not configured)",
+                explorerTxPrefix: "(not configured)",
+                explorerBlockPrefix: "(not configured)",
+              };
+            }
+          },
           filteredActivity() {
             return this.announcements.filter(e => e.chainId == this.chainId);
           },
@@ -2925,17 +2936,19 @@
           ensNameOrAddress(address, length = 0) {
             let result = null;
             const account = this.addresses[address];
-            if (account) {
-              if (account.ensName) {
+            if (account && account.ensName) {
+              if (length > 0 && account.ensName.length > length) {
+                result = account.ensName.substring(0, (length-7)/2) + '...' + account.ensName.slice(-((length-7)/2 + 4));
+                // result = account.ensName;
+              } else {
                 result = account.ensName;
+              }
+            } else if (address) {
+              if (length > 0) {
+                result = address.substring(0, ((length-5)/2 + 2)) + '...' + address.slice(-(length-5)/2);
               } else {
                 result = address;
               }
-            } else {
-              result = address;
-            }
-            if (result && length > 0) {
-              result = result.substring(0, length);
             }
             return result;
           },
