@@ -765,7 +765,8 @@
               </b-table>
 
               <!-- :TOKENEVENTS -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+              <!-- <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.tokenEventsTable.currentPage - 1) * settings.tokenEventsTable.pageSize) + 1 }}
@@ -777,16 +778,16 @@
                   </b-link>
                 </template>
                 <template #cell(type)="data">
-                  {{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}
+                  <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
                 </template>
                 <template #cell(decimals)="data">
-                  {{ parseInt(data.item.decimals) }}
+                  <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
                 </template>
                 <template #cell(balance)="data">
-                  {{ data.item.balance }}
+                  <font size="-1">{{ data.item.balance }}</font>
                 </template>
                 <template #cell(totalSupply)="data">
-                  {{ data.item.totalSupply }}
+                  <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
                 </template>
                 <!-- <template #cell(timestamp)="data">
                   <font size="-1">
