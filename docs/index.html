@@ -823,7 +823,7 @@
                 </template>
                 <template #cell(balance)="data">
                   <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-                    <font size="-1">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</font>
+                    <b-button size="sm" :href="chainInfo.explorerTokenPrefix + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
                   </span>
                   <span v-if="data.item.type == 'erc721'">
                     <font size="-1">{{ data.item.tokenIds.join(", ") }}</font>
@@ -2934,29 +2934,30 @@
                         tokenIds[item.tokenId] = item.to;
                       }
                     }
-                    // console.log("tokenIds: " + JSON.stringify(tokenIds));
                     tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
                   }
+
                   // const tokenContract = tokenContracts[item.chainId][item.contract];
                   // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
-                  const events = tokenContracts[item.chainId][item.contract].events;
-                  if (!(item.blockNumber in events)) {
-                    events[item.blockNumber] = { timestamp: item.timestamp, logIndexes: {} };
-                  }
-                  if (!(item.logIndex in events[item.blockNumber].logIndexes)) {
-                    events[item.blockNumber].logIndexes[item.logIndex] = {
-                      txHash: item.txHash,
-                      type: item.type,
-                      eventType: item.eventType,
-                      from: item.from || undefined,
-                      to: item.to || undefined,
-                      tokens: item.tokens || undefined,
-                      tokenId: item.tokenId || undefined,
-                      owner: item.owner || undefined,
-                      operator: item.operator || undefined,
-                      approved: item.approved || undefined,
-                    };
-                  }
+                  // const events = tokenContracts[item.chainId][item.contract].events;
+                  // if (!(item.blockNumber in events)) {
+                  //   events[item.blockNumber] = { timestamp: item.timestamp, logIndexes: {} };
+                  // }
+                  // if (!(item.logIndex in events[item.blockNumber].logIndexes)) {
+                  //   events[item.blockNumber].logIndexes[item.logIndex] = {
+                  //     txHash: item.txHash,
+                  //     type: item.type,
+                  //     eventType: item.eventType,
+                  //     from: item.from || undefined,
+                  //     to: item.to || undefined,
+                  //     tokens: item.tokens || undefined,
+                  //     tokenId: item.tokenId || undefined,
+                  //     owner: item.owner || undefined,
+                  //     operator: item.operator || undefined,
+                  //     approved: item.approved || undefined,
+                  //   };
+                  // }
+
                   // if (item.active) {
                   //   console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
                   // }
