@@ -2933,6 +2933,7 @@
                       }
                     }
                     tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
+                    tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
                   }
 
                   // const tokenContract = tokenContracts[item.chainId][item.contract];
