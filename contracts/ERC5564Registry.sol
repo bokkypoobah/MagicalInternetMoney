@@ -1,7 +1,7 @@
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
-// ERC5564Registry v0.8.0 - Experiments in ERC-5564: Stealth Addresses
+// ERC5564Registry v0.8.1 - Experiments in ERC-5564: Stealth Addresses
 //
 // From https://eips.ethereum.org/EIPS/eip-6538, with `bytes` updated to `bytes32`
 //
