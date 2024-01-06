@@ -2554,8 +2554,8 @@
                   } else {
                     console.log("NOT HANDLED: " + JSON.stringify(log));
                   }
-                  if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
-                  // TODO: Testing if (eventRecord) {
+                  // TODO: Testing if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
+                  if (eventRecord) {
                     records.push( {
                       chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
