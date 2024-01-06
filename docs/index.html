@@ -826,7 +826,11 @@
                     <b-button size="sm" :href="chainInfo.explorerTokenPrefix + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
                   </span>
                   <span v-if="data.item.type == 'erc721'">
-                    <font size="-1">{{ data.item.tokenIds.join(", ") }}</font>
+                    <font size="-1">
+                      <span v-for="tokenId of data.item.tokenIds">
+                        <b-button size="sm" :href="chainInfo.nftTokenPrefix + data.item.contract + '/' + tokenId" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ tokenId }}</b-button>
+                      </span>
+                    </font>
                   </span>
                 </template>
                 <template #cell(totalSupply)="data">
@@ -1057,14 +1061,7 @@
                 explorerTokenPrefix: "https://etherscan.io/token/",
                 explorerTxPrefix: "https://etherscan.io/tx/",
                 explorerBlockPrefix: "https://etherscan.io/block/",
-              },
-              "5": {
-                name: "Goerli Testnet",
-                explorerPrefix: "https://goerli.etherscan.io/",
-                explorerAddressPrefix: "https://goerli.etherscan.io/address/",
-                explorerTokenPrefix: "https://goerli.etherscan.io/token/",
-                explorerTxPrefix: "https://goerli.etherscan.io/tx/",
-                explorerBlockPrefix: "https://goerli.etherscan.io/block/",
+                nftTokenPrefix: "https://opensea.io/assets/ethereum/",
               },
               "11155111": {
                 name: "Sepolia Testnet",
@@ -1073,9 +1070,10 @@
                 explorerTokenPrefix: "https://sepolia.etherscan.io/token/",
                 explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
                 explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
+                nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 33,
+            version: 34,
           },
           contracts: {
             "11155111": {
