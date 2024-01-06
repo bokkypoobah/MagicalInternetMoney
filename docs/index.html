@@ -822,7 +822,12 @@
                   <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
                 </template>
                 <template #cell(balance)="data">
-                  <font size="-1">{{ (data.item.balances[coinbase] && data.item.type == "erc20") ? formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) : "" }}</font>
+                  <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
+                    <font size="-1">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</font>
+                  </span>
+                  <span v-if="data.item.type == 'erc721'">
+                    <font size="-1">{{ data.item.tokenIds.join(", ") }}</font>
+                  </span>
                 </template>
                 <template #cell(totalSupply)="data">
                   <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
@@ -1501,6 +1506,12 @@
                 }
               }
               if (include) {
+                const tokenIds = [];
+                for (const [tokenId, owner] of Object.entries(contractData.tokenIds)) {
+                  if (owner == this.coinbase) {
+                    tokenIds.push(tokenId);
+                  }
+                }
                 results.push({
                   contract,
                   active: contractData.active,
@@ -1509,6 +1520,7 @@
                   type: contractData.type,
                   decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
                   balances: contractData.balances || undefined,
+                  tokenIds,
                   totalSupply: contractData.totalSupply || undefined,
                   firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
                   lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
@@ -2813,10 +2825,15 @@
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-            // TODO: Dev const tokenContracts = this.tokenContracts;
-            const tokenContracts = {};
+            const tokenContracts = this.tokenContracts;
+            // const tokenContracts = {};
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
+            }
+            // TODO: Incremental Sync. Resetting balance in the meantime
+            for (const [contract, contractData] of Object.entries(tokenContracts[this.chainId])) {
+              tokenContracts[this.chainId][contract].balances = {};
+              tokenContracts[this.chainId][contract].tokenIds = {};
             }
             this.sync.completed = 0;
             this.sync.total = 0;
@@ -2884,7 +2901,7 @@
                   const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
                   // console.log("item: " + JSON.stringify(item));
                   if (item.eventType == "erc20" && item.type == "Transfer") {
-                    console.log("ERC-20.Transfer from: " + item.from + ", to: " + item.to + ", tokens: " + item.tokens + ", item.blockNumber: " + item.blockNumber + "; lastEventBlockNumber: " + lastEventBlockNumber);
+                    // console.log("ERC-20.Transfer from: " + item.from + ", to: " + item.to + ", tokens: " + item.tokens + ", item.blockNumber: " + item.blockNumber + "; lastEventBlockNumber: " + lastEventBlockNumber);
                     // if (item.blockNumber > lastEventBlockNumber) {
                       const balances = tokenContracts[item.chainId][item.contract].balances || 0;
                       if (item.from in selectedAddressesMap) {
@@ -2892,23 +2909,35 @@
                           balances[item.from] = "0";
                         }
                         balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
-                        console.log("from included: " + item.from + ", balances[item.from]: " + balances[item.from] + ", tokens: " + item.tokens);
+                        // console.log("from included: " + item.from + ", balances[item.from]: " + balances[item.from] + ", tokens: " + item.tokens);
                       }
                       if (item.to in selectedAddressesMap) {
                         if (!(item.to in balances)) {
                           balances[item.to] = "0";
                         }
                         balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
-                        console.log("to included: " + item.to + ", balances[item.to]: " + balances[item.to] + ", tokens: " + item.tokens);
+                        // console.log("to included: " + item.to + ", balances[item.to]: " + balances[item.to] + ", tokens: " + item.tokens);
                       }
                       tokenContracts[item.chainId][item.contract].balances = balances;
                       tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
                     // }
                     // console.log("tokenContracts[item.chainId][item.contract]: " + JSON.stringify(tokenContracts[item.chainId][item.contract]));
                   } else if (item.eventType == "erc721" && item.type == "Transfer") {
-                    console.log("item: " + JSON.stringify(item));
+                    const tokenIds = tokenContracts[item.chainId][item.contract].tokenIds || {};
+                    if (item.from in selectedAddressesMap) {
+                      if (!(item.from in tokenIds)) {
+                        delete tokenIds[item.tokenId];
+                      }
+                    }
+                    if (item.to in selectedAddressesMap) {
+                      if (!(item.to in tokenIds)) {
+                        tokenIds[item.tokenId] = item.to;
+                      }
+                    }
+                    // console.log("tokenIds: " + JSON.stringify(tokenIds));
+                    tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
                   }
-                  const tokenContract = tokenContracts[item.chainId][item.contract];
+                  // const tokenContract = tokenContracts[item.chainId][item.contract];
                   // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
                   const events = tokenContracts[item.chainId][item.contract].events;
                   if (!(item.blockNumber in events)) {
