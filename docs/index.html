@@ -2082,9 +2082,9 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            // if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
-            }
+            // }
             // if (network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
             // }
@@ -2092,9 +2092,9 @@
             //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
             //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             // }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            // if (network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
-            }
+            // }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -2838,11 +2838,29 @@
               tokenContracts[this.chainId][contract].balances = {};
               tokenContracts[this.chainId][contract].tokenIds = {};
             }
-            this.sync.completed = 0;
-            this.sync.total = 0;
-            this.sync.section = 'Token Contracts';
             let rows = 0;
             let done = false;
+            const newTokenContractsMap = {};
+            do {
+              let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              for (const item of data) {
+                if (item.chainId == this.chainId) {
+                  if (!(item.contract in tokenContracts[item.chainId]) && !(item.contract in newTokenContractsMap)) {
+                    newTokenContractsMap[item.contract] = true;
+                  }
+                }
+              }
+              rows = parseInt(rows) + data.length;
+              done = data.length < this.DB_PROCESSING_BATCH_SIZE;
+            } while (!done);
+            // console.log("newTokenContractsMap.length: " + Object.keys(newTokenContractsMap).length);
+            this.sync.completed = 0;
+            this.sync.total = rows;
+            this.sync.section = 'Token Contracts';
+            // const erc721Helper = this.chainId == CHAINID_MAINNET ? new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider) : null;
+            rows = 0;
+            done = false;
             do {
               let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
@@ -2851,32 +2869,50 @@
                   if (!(item.contract in tokenContracts[item.chainId])) {
                     const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
                     let symbol = null;
-                    try {
-                      symbol = await contract.symbol();
-                    } catch (e) {
-                    }
                     let name = null;
-                    try {
-                      name = await contract.name();
-                    } catch (e) {
-                    }
                     let decimals = null;
-                    if (item.eventType == "erc20") {
+                    let totalSupply = null;
+                    // if (this.chainId == CHAINID_MAINNET) {
+                    //   try {
+                    //     const tokenInfos = await erc721Helper.tokenInfo([item.contract], { gasLimit: 1000000 });
+                    //     console.log(tokenInfos);
+                    //     for (let i = 0; i < tokenInfos[0].length; i++) {
+                    //     //   results.mask = tokenInfos[0][i].toNumber();
+                    //       symbol = tokenInfos[1][i];
+                    //       name = tokenInfos[2][i];
+                    //     }
+                    //   } catch (e) {
+                    //     console.log("getAccountInfo ERROR - account: " + item.contract + ", message: " + e.message);
+                    //     // results.mask = 0;
+                    //     // results.symbol = null;
+                    //     // results.name = null;
+                    //   }
+                    // } else {
                       try {
-                        decimals = await contract.decimals();
+                        symbol = await contract.symbol();
                       } catch (e) {
                       }
-                    }
-                    let totalSupply = null;
-                    try {
-                      totalSupply = await contract.totalSupply();
-                    } catch (e) {
-                    }
+                      try {
+                        name = await contract.name();
+                      } catch (e) {
+                      }
+                      if (item.eventType == "erc20") {
+                        try {
+                          decimals = await contract.decimals();
+                        } catch (e) {
+                        }
+                      }
+                      try {
+                        totalSupply = await contract.totalSupply();
+                      } catch (e) {
+                      }
+                    // }
+
                     if (item.eventType == "erc20") {
                       tokenContracts[item.chainId][item.contract] = {
                         active: false,
-                        symbol: symbol.trim(),
-                        name: name.trim(),
+                        symbol: symbol && symbol.trim() || null,
+                        name: name && name.trim() || null,
                         decimals: parseInt(decimals || 0),
                         totalSupply: totalSupply && totalSupply.toString() || null,
                         type: "erc20",
