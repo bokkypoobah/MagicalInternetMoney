@@ -2082,9 +2082,9 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            // if (network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
-            // }
+            }
             // if (network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
             // }
@@ -2092,9 +2092,9 @@
             //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
             //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             // }
-            // if (network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
-            // }
+            }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -2908,33 +2908,19 @@
                       }
                     // }
 
-                    if (item.eventType == "erc20") {
-                      tokenContracts[item.chainId][item.contract] = {
-                        active: false,
-                        symbol: symbol && symbol.trim() || null,
-                        name: name && name.trim() || null,
-                        decimals: parseInt(decimals || 0),
-                        totalSupply: totalSupply && totalSupply.toString() || null,
-                        type: "erc20",
-                        firstEventBlockNumber: item.blockNumber,
-                        lastEventBlockNumber: null,
-                        events: {},
-                        balances: {},
-                        tokenIds: {},
-                      };
-                    } else {
-                      tokenContracts[item.chainId][item.contract] = {
-                        symbol,
-                        name,
-                        totalSupply: totalSupply && totalSupply.toString() || null,
-                        type: "erc721",
-                        firstEventBlockNumber: item.blockNumber,
-                        lastEventBlockNumber: null,
-                        events: {},
-                        balances: {},
-                        tokenIds: {},
-                      };
-                    }
+                    tokenContracts[item.chainId][item.contract] = {
+                      active: false,
+                      symbol: symbol && symbol.trim() || null,
+                      name: name && name.trim() || null,
+                      decimals: parseInt(decimals || 0),
+                      totalSupply: totalSupply && totalSupply.toString() || null,
+                      type: item.eventType,
+                      firstEventBlockNumber: item.blockNumber,
+                      lastEventBlockNumber: null,
+                      events: {},
+                      balances: {},
+                      tokenIds: {},
+                    };
                     this.sync.completed++;
                   }
                   const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
