@@ -3084,7 +3084,7 @@
           formatETH(e, precision = 9) {
             try {
               if (precision == 0) {
-                return e ? ethers.utils.formatEther(e) : null;
+                return e ? ethers.utils.formatEther(e).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
               } else {
                 return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(precision) : null;
               }
@@ -3093,7 +3093,7 @@
             return e.toFixed(precision);
           },
           formatDecimals(e, decimals = 18) {
-            return e ? ethers.utils.formatUnits(e, decimals) : null;
+            return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
           },
           formatTimestamp(ts) {
             if (ts != null) {
