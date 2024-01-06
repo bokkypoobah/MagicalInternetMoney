@@ -2554,8 +2554,8 @@
                   } else {
                     console.log("NOT HANDLED: " + JSON.stringify(log));
                   }
-                  // if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
-                  if (eventRecord) {
+                  if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
+                  // TODO: Testing if (eventRecord) {
                     records.push( {
                       chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
@@ -2813,8 +2813,8 @@
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
-            const tokenContracts = this.tokenContracts;
-            // TODO: Dev const tokenContracts = {};
+            // TODO: Dev const tokenContracts = this.tokenContracts;
+            const tokenContracts = {};
             if (!(this.chainId in tokenContracts)) {
               tokenContracts[this.chainId] = {};
             }
@@ -2861,7 +2861,7 @@
                         totalSupply: totalSupply && totalSupply.toString() || null,
                         type: "erc20",
                         firstEventBlockNumber: item.blockNumber,
-                        lastEventBlockNumber: item.blockNumber,
+                        lastEventBlockNumber: null,
                         events: {},
                         balances: {},
                         tokenIds: {},
@@ -2873,7 +2873,7 @@
                         totalSupply: totalSupply && totalSupply.toString() || null,
                         type: "erc721",
                         firstEventBlockNumber: item.blockNumber,
-                        lastEventBlockNumber: item.blockNumber,
+                        lastEventBlockNumber: null,
                         events: {},
                         balances: {},
                         tokenIds: {},
@@ -2881,26 +2881,32 @@
                     }
                     this.sync.completed++;
                   }
-                  tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
+                  const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
                   // console.log("item: " + JSON.stringify(item));
                   if (item.eventType == "erc20" && item.type == "Transfer") {
-                    const balances = tokenContracts[item.chainId][item.contract].balances;
-                    if (item.from in selectedAddressesMap) {
-                      // console.log("from included: " + item.from);
-                      if (!(item.from in balances)) {
-                        balances[item.from] = "0";
+                    console.log("ERC-20.Transfer from: " + item.from + ", to: " + item.to + ", tokens: " + item.tokens + ", item.blockNumber: " + item.blockNumber + "; lastEventBlockNumber: " + lastEventBlockNumber);
+                    // if (item.blockNumber > lastEventBlockNumber) {
+                      const balances = tokenContracts[item.chainId][item.contract].balances || 0;
+                      if (item.from in selectedAddressesMap) {
+                        if (!(item.from in balances)) {
+                          balances[item.from] = "0";
+                        }
+                        balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
+                        console.log("from included: " + item.from + ", balances[item.from]: " + balances[item.from] + ", tokens: " + item.tokens);
                       }
-                      balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
-                    }
-                    if (item.to in selectedAddressesMap) {
-                      // console.log("to included: " + item.to);
-                      if (!(item.to in balances)) {
-                        balances[item.to] = "0";
+                      if (item.to in selectedAddressesMap) {
+                        if (!(item.to in balances)) {
+                          balances[item.to] = "0";
+                        }
+                        balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
+                        console.log("to included: " + item.to + ", balances[item.to]: " + balances[item.to] + ", tokens: " + item.tokens);
                       }
-                      balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
-                    }
-                    tokenContracts[item.chainId][item.contract].balances = balances;
+                      tokenContracts[item.chainId][item.contract].balances = balances;
+                      tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
+                    // }
                     // console.log("tokenContracts[item.chainId][item.contract]: " + JSON.stringify(tokenContracts[item.chainId][item.contract]));
+                  } else if (item.eventType == "erc721" && item.type == "Transfer") {
+                    console.log("item: " + JSON.stringify(item));
                   }
                   const tokenContract = tokenContracts[item.chainId][item.contract];
                   // console.log("tokenContract: " + item.contract + " => " + JSON.stringify(tokenContract));
