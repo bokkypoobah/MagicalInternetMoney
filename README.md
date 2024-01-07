@@ -103,6 +103,35 @@ Click [Add/Update] to add your stealth keys to the Registry.
 
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_RegisterStealthMetaAddress_20240107.png" /></kbd>
 
+<br />
+
+---
+
+#### Sync With Ethereum Mainnet For ENS Names
+
+##### Sync With Ethereum Mainnet For ENS Names - Addresses
+
+Switch to the Ethereum Mainnet network and [Sync]. Switch back to the Sepolia testnet.
+
+<kbd><img src="images/SampleScreen_MainnetSync_Addresses_20240107.png" /></kbd>
+
+
+<br />
+
+---
+
+#### After Sync With Generated Stealth Meta-Address
+
+##### After Sync With Generated Stealth Meta-Address - Activity
+
+Click [Sync]. Transfers associated with my stealth keys are identified.
+
+<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Activity_20240107.png" /></kbd>
+
+##### After Sync With Generated Stealth Meta-Address - Transfer
+
+<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_20240107.png" /></kbd>
+
 
 
 
