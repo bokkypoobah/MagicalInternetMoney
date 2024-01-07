@@ -1091,14 +1091,6 @@
                 "blockNumber": 5037061,
                 "timestamp": 1703564424
               },
-              "0x3834bcA9093e375893D65975ad765179A149D017": {
-                "type": "caller",
-                "name": "StealthChad v0.8.1 on Sepolia",
-                "read": true,
-                "write": true,
-                "blockNumber": 5037096,
-                "timestamp": 1703564424
-              },
               "0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde": {
                 "type": "registry",
                 "name": "ERC5564Registry v0.8.1 on Sepolia",
@@ -1106,7 +1098,15 @@
                 "write": true,
                 "blockNumber": 5036735,
                 "timestamp": 1703590932
-              }
+              },
+              "0xA745760E9f1E425215CCD7735F932FdDE3276344": {
+                "type": "caller",
+                "name": "StealthChad v0.8.1 on Sepolia",
+                "read": true,
+                "write": true,
+                "blockNumber": 5037096,
+                "timestamp": 1703564424
+              },
             }
           },
           sync: {
@@ -2116,21 +2116,21 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAnnouncements(db, provider, latestBlockNumber);
-            }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncAnnouncements(db, provider, latestBlockNumber);
+            // }
             // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncRegistryEvents(db, provider, latestBlockNumber);
             // }
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncAnnouncementsData(db, provider, latestBlockNumber);
-            // }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncAnnouncementsData(db, provider, latestBlockNumber);
+            }
             // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             // }
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.collateAccounts(db, provider, latestBlockNumber);
-            // }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.collateAccounts(db, provider, latestBlockNumber);
+            }
             // if (network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncTokenEvents(db, provider, latestBlockNumber);
             // }
