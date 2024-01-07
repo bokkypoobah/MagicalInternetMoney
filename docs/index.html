@@ -3374,10 +3374,10 @@
             } else {
               const t = this;
               function handleChainChanged(_chainId) {
-                t.chainId = _chainId;
-                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId);
-                alert('Ethereum chain has changed - reloading this page.')
-                window.location.reload();
+                t.chainId = parseInt(_chainId);
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId.toString());
+                // alert('Ethereum chain has changed - reloading this page.')
+                // window.location.reload();
               }
               window.ethereum.on('chainChanged', handleChainChanged);
               const provider = new ethers.providers.Web3Provider(window.ethereum);
