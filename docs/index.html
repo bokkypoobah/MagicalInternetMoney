@@ -1716,9 +1716,9 @@
           async searchForContracts() {
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
             // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
-            // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
-            // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-            // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+            // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being address instead of bytes
+            // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
             console.log(moment().format("HH:mm:ss") + " searchForContracts");
             const contractsMap = {};
             let total = 0;
@@ -1750,7 +1750,7 @@
                   fromBlock,
                   toBlock,
                   topics: [
-                    ['0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7', '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233'],
+                    ['0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7', '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9'],
                     null,
                     null
                   ]
@@ -2124,21 +2124,21 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncRegistryEvents(db, provider, latestBlockNumber);
-            // }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncRegistryEvents(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementsData(db, provider, latestBlockNumber);
             }
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncRegistryEventsData(db, provider, latestBlockNumber);
-            // }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncRegistryEventsData(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAccounts(db, provider, latestBlockNumber);
             }
-            // if (network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncTokenEvents(db, provider, latestBlockNumber);
-            // }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.syncTokenEvents(db, provider, latestBlockNumber);
+            }
             // if (network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
             // }
@@ -2146,9 +2146,9 @@
             //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
             //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             // }
-            // if (network.chainId == CHAINID_SEPOLIA) {
-            //   await this.collateTokens(db, provider, latestBlockNumber);
-            // }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.collateTokens(db, provider, latestBlockNumber);
+            }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -2268,8 +2268,10 @@
 
           async syncRegistryEvents(db, provider, latestBlockNumber) {
             // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
-            // StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-            // 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+            // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+            // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+            // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
             const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
             let total = 0;
             let t = this;
@@ -2290,7 +2292,7 @@
                       txHash: log.transactionHash,
                       contract,
                       name: logData.name,
-                      registrant: ethers.utils.getAddress("0x" + logData.args[0].substring(26, 66)),
+                      registrant: ethers.utils.getAddress(logData.args[0]),
                       schemeId: parseInt(logData.args[1]),
                       stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
                       mine: false,
@@ -2301,7 +2303,6 @@
                   }
                 }
               }
-              // console.log("records: " + JSON.stringify(records, null, 2));
               if (records.length) {
                 await db.registryEntries.bulkPut(records).then (function() {
                 }).catch(function(error) {
@@ -2317,7 +2318,7 @@
                   fromBlock,
                   toBlock,
                   topics: [
-                    '0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233',
+                    '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
                     null,
                     null
                   ]
