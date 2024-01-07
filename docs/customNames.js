@@ -30,8 +30,15 @@ const CUSTOMNAMES = {
   "0x3834bcA9093e375893D65975ad765179A149D017": {
     type: "helper",
     name: "StealthChad v0.8.0 on Sepolia",
+    read: false,
+    write: false,
+    blockNumber: 4959008,
+  },
+  "0x3834bcA9093e375893D65975ad765179A149D017": {
+    type: "helper",
+    name: "StealthChad v0.8.1 on Sepolia",
     read: true,
     write: true,
-    blockNumber: 4959008,
+    blockNumber: 5037096,
   },
 };
