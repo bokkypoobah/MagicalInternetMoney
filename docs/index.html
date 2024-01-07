@@ -1085,7 +1085,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 34,
+            version: 35,
           },
           contracts: {
             "11155111": {
@@ -1170,7 +1170,7 @@
           sourceOptions: [
             { value: null, text: '(select)' },
             { value: "attached", text: 'Web3 attached account' },
-            { value: "user.signed", text: 'Signed by web3 attached account' },
+            { value: "attached.signed", text: 'Signed by web3 attached account' },
             { value: "announcer.contract", text: 'ERC-5564 Announcer contract' },
             { value: "announcer.stealthAddress", text: 'ERC-5564 Announcer stealthAddress' },
             { value: "announcer.caller", text: 'ERC-5564 Announcer caller' },
@@ -1316,7 +1316,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080h",
+            name: "stealthchaddata080i",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
@@ -1978,7 +1978,7 @@
                   type: "address",
                   name: null,
                   mine: true,
-                  source: "user.signed",
+                  source: "attached.signed",
                 });
 
               }
@@ -1991,7 +1991,7 @@
                 spendingPublicKey: this.modalNewStealthMetaAddress.spendingPublicKey,
                 viewingPublicKey: this.modalNewStealthMetaAddress.viewingPublicKey,
                 mine: true,
-                source: "user.signed",
+                source: "attached.signed",
               });
             }
             Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress]);
