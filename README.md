@@ -33,77 +33,11 @@ This dapp:
 
 ### Sample Screens
 
-#### Addresses Sample Screens
+#### After Initial Sync
 
-##### Addresses - After Sync
+##### After Initial Sync - Addresses
 
-<kbd><img src="images/SampleScreen_Addresses_AfterSync_20240103.png" /></kbd>
-
-##### Addresses - Generate New Stealth Meta-Address
-
-Click [+] in the Addresses screen to generate a new Stealth Meta-Address.
-
-<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_20240103.png" /></kbd>
-
-##### Addresses - Generate New Stealth Meta-Address - Sign With Web3 Wallet
-
-<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_Sign_20240103.png" /></kbd>
-
-##### Addresses - Generate New Stealth Meta-Address - After Signing
-
-Click [Update] to update the Stealth Meta-Address keys.
-
-<kbd><img src="images/SampleScreen_Addresses_GenerateNewStealthMetaAddress_AfterSigning_20240103.png" /></kbd>
-
-##### Addresses - After New Generated Stealth Meta-Address Updated
-
-<kbd><img src="images/SampleScreen_Addresses_AfterNewGeneratedStealthMetaAddressUpdated_20240103.png" /></kbd>
-
-##### Addresses - View Newly Generated Stealth Meta-Address
-
-<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddress_20240103.png" /></kbd>
-
-##### Addresses - View Newly Generated Stealth Meta-Address - Spending Private Key - Sign
-
-Click on the [eye] button to sign with your web3 wallet to view the Spending Private Key.
-
-<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddressSpendingPrivateKey_Sign_20240103.png" /></kbd>
-
-##### Addresses - View Newly Generated Stealth Meta-Address - Spending Private Key
-
-<kbd><img src="images/SampleScreen_Addresses_ViewNewlyGeneratedStealthMetaAddressSpendingPrivateKey_20240103.png" /></kbd>
-
-<br />
-
----
-
-#### Activity Sample Screens
-
-##### Activity - After Sync With Generated Keys
-
-Note: Duplicated stealth payments to the same receivers for testing
-
-<kbd><img src="images/SampleScreen_Activity_AfterSyncWithGeneratedKeys_20240103.png" /></kbd>
-
-##### Activity - Sample Stealth Payment
-
-Item 4.
-
-<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_20240103.png" /></kbd>
-
-##### Activity - Sample Stealth Payment - Sign To View Receiver's Stealth Address Private Key
-
-Item 4.
-
-<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_Sign_20240103.png" /></kbd>
-
-##### Activity - Sample Stealth Payment - Receiver's Stealth Address Private Key
-
-<kbd><img src="images/SampleScreen_Activity_SampleStealthPayment_SpendingPrivateKey_20240103.png" /></kbd>
-
-##### Activity - Receiver's Stealth Address Private Key In Web3 Wallet
-
-<kbd><img src="images/SampleScreen_Activity_ReceiversStealthAddressPrivateKeyInWeb3Wallet_20240103.png" /></kbd>
+<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_20240107.png " /></kbd>
 
 
 <br />
