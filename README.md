@@ -37,7 +37,7 @@ This dapp:
 
 ##### After Initial Sync - Activity
 
-Events retrieved from the Announcer contract.
+Click [Sync]. Events retrieved from the Announcer contract.
 
 <kbd><img src="images/SampleScreen_AfterInitialSync_Activity_20240107.png" /></kbd>
 
@@ -72,6 +72,40 @@ ERC-20 and ERC-721 token events retrieved for addresses marked "Mine". Active to
 ##### After Initial Sync - Config
 
 <kbd><img src="images/SampleScreen_AfterInitialSync_Config_20240107.png" /></kbd>
+
+<br />
+
+---
+
+#### Generate Stealth Meta-Address
+
+##### Generate Stealth Meta-Address - New Address
+
+Click [+] in the Addresses tab.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_NewAddress_20240107.png" /></kbd>
+
+##### Generate Stealth Meta-Address - Web3 Signing
+
+Click [Generate] in the Addresses tab. Sign with your web3 attached address.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Web3Signing_20240107.png" /></kbd>
+
+##### Generate Stealth Meta-Address - Web3 Signed
+
+Click [Update] to add your stealth keys to your address in the Addresses tab.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Web3Signed_20240107.png" /></kbd>
+
+##### Generate Stealth Meta-Address - Register Stealth Meta-Address
+
+Click [Add/Update] to add your stealth keys to the Registry.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_RegisterStealthMetaAddress_20240107.png" /></kbd>
+
+
+
+
 
 <br />
 
