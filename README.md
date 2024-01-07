@@ -35,9 +35,9 @@ This dapp:
 
 #### After Initial Sync
 
-##### After Initial Sync - Addresses
+##### After Initial Sync - Activity
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_20240107.png " /></kbd>
+<kbd><img src="images/SampleScreen_AfterInitialSync_Activity_20240107.png" /></kbd>
 
 
 <br />
