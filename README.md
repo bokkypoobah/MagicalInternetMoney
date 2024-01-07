@@ -1,6 +1,6 @@
 # Stealth Chad
 
-An implementation of [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538) (using `bytes32` instead of `bytes`).
+An implementation of [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538) (using `address` instead of `bytes`).
 
 Test it at [https://bokkypoobah.github.io/StealthChad/](https://bokkypoobah.github.io/StealthChad/) (WIP) connected to the Ethereum Sepolia testnet.
 
