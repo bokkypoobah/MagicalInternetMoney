@@ -140,6 +140,50 @@ Click [Sync]. Transfers associated with my stealth keys are identified.
 
 <kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_SpendingPrivateKeyImportedIntoWeb3Wallet_20240107.png" /></kbd>
 
+<br />
+
+---
+
+#### Transferring Ethers To A Stealth Address
+
+##### Transferring Ethers To A Stealth Address - Select Stealth Meta-Address
+
+Click [>] in the Addresses tab. Using a separate account for sending in this example.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_SelectStealthMetaAddress_20240107.png" /></kbd>
+
+
+##### Transferring Ethers To A Stealth Address - Select Stealth Meta-Address
+
+Click [>] in the Addresses tab. Using a separate account for sending in this example.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_SelectStealthMetaAddress_20240107.png" /></kbd>
+
+
+##### Transferring Ethers To A Stealth Address - Enter Amount
+
+Enter amount.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_EnterAmount.png" /></kbd>
+
+##### Transferring Ethers To A Stealth Address - Web3 Sign
+
+Click [Transfer] and sign with your web3 account.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_Web3Sign.png" /></kbd>
+
+##### Transferring Ethers To A Stealth Address - Activity After Transfer
+
+Click [Sync] and new transfer will appear. They stealth transfer has been identified as it is associated with my first account.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_ActivityAfterTransfer.png" /></kbd>
+
+##### Transferring Ethers To A Stealth Address - Revealing Stealth Private Key
+
+Click the [eye] button and web3 sign to reveal your spending private key. The private key has been imported into my web3 wallet.
+
+<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_RevealingStealthPrivateKey.png" /></kbd>
+
 
 
 
