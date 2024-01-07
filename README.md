@@ -132,6 +132,14 @@ Click [Sync]. Transfers associated with my stealth keys are identified.
 
 <kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_20240107.png" /></kbd>
 
+##### After Sync With Generated Stealth Meta-Address - Transfer - Web3 Sign To Reveal Spending Private Key
+
+<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_Web3SignToRevealSpendingPrivateKey_20240107.png" /></kbd>
+
+##### After Sync With Generated Stealth Meta-Address - Transfer - Spending Private Key Imported Into Web3 Wallet
+
+<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_SpendingPrivateKeyImportedIntoWeb3Wallet_20240107.png" /></kbd>
+
 
 
 
