@@ -59,7 +59,7 @@ Events retrieved from the Registry contract.
 
 <kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_20240107.png" /></kbd>
 
-##### After Initial Sync - Addresses - StealthMetaAddress Without Keys
+##### After Initial Sync - Addresses - Stealth Meta-Address Without Keys
 
 <kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_StealthMetaAddress_WithoutKeys_20240107.png" /></kbd>
 
