@@ -362,6 +362,9 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalAddress.item" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="modalAddress.item.linkedTo != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
+            </b-form-group>
           </b-modal>
 
           <!-- :MODALNEWSTEALTHMETAADDRESS -->
@@ -407,6 +410,9 @@
             </b-form-group>
             <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoaddressbook" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewStealthMetaAddress.status == 'mine' ? 'Update address with stealth keys' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Already in addresses, to be claimed' : 'Add new to addresses')" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoaddressbook" @click="addStealthMetaAddressToAddresses()" variant="warning">{{ modalNewStealthMetaAddress.status == 'mine' ? 'Update' : (modalNewStealthMetaAddress.status == 'notmine' ? 'Claim' : 'Add') }}</b-button>
+            </b-form-group>
+            <b-form-group v-if="modalNewStealthMetaAddress.stealthMetaAddress" label="" label-for="newsma-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalNewStealthMetaAddress.stealthMetaAddress" id="newsma-addtoregistry" @click="addStealthMetaAddressToRegistry(modalNewStealthMetaAddress.stealthMetaAddress)" variant="warning">{{ 'Add/Update' }}</b-button>
             </b-form-group>
           </b-modal>
 
@@ -1994,22 +2000,21 @@
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
           },
 
-          // async registerKey() {
-          //   // TODO: Register keys
-          //   console.log(moment().format("HH:mm:ss") + " registerKey BEGIN");
-          //   const provider = new ethers.providers.Web3Provider(window.ethereum);
-          //   const contract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
-          //   const contractWithSigner = contract.connect(provider.getSigner());
-          //   const schemeId = 0;
-          //   try {
-          //     const stealthMetaAddress = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.stealthMetaAddress.stealthMetaAddress));
-          //     const tx = await contractWithSigner.registerKeys(schemeId, stealthMetaAddress);
-          //     console.log("tx: " + JSON.stringify(tx));
-          //   } catch (e) {
-          //     console.log("registerKey ERC5564Registry.registerKeys(...) error: " + JSON.stringify(e));
-          //   }
-          //   console.log(moment().format("HH:mm:ss") + " registerKey END");
-          // },
+          async addStealthMetaAddressToRegistry(stealthMetaAddress) {
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToRegistry BEGIN: " + stealthMetaAddress);
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+            const contractWithSigner = contract.connect(provider.getSigner());
+            const schemeId = 0;
+            try {
+              const stealthMetaAddressInBytes = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddress));
+              const tx = await contractWithSigner.registerKeys(schemeId, stealthMetaAddressInBytes);
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("addStealthMetaAddressToRegistry - ERC5564Registry.registerKeys(...) error: " + JSON.stringify(e));
+            }
+            console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToRegistry END");
+          },
 
           async transferEthToStealthMetaAddress() {
             function generateStealthAddress(stealthMetaAddress) {
@@ -2116,9 +2121,9 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncAnnouncements(db, provider, latestBlockNumber);
-            // }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.syncAnnouncements(db, provider, latestBlockNumber);
+            }
             // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncRegistryEvents(db, provider, latestBlockNumber);
             // }
