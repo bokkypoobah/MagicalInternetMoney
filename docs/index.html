@@ -1164,6 +1164,7 @@
           sourceOptions: [
             { value: null, text: '(select)' },
             { value: "attached", text: 'Web3 attached account' },
+            { value: "user.signed", text: 'Signed by web3 attached account' },
             { value: "announcer.contract", text: 'ERC-5564 Announcer contract' },
             { value: "announcer.stealthAddress", text: 'ERC-5564 Announcer stealthAddress' },
             { value: "announcer.caller", text: 'ERC-5564 Announcer caller' },
@@ -1966,6 +1967,15 @@
               account.mine = true;
               Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, account);
             } else {
+              if (!(this.modalNewStealthMetaAddress.linkedTo in this.addresses)) {
+                Vue.set(this.addresses, this.modalNewStealthMetaAddress.linkedTo, {
+                  type: "address",
+                  name: null,
+                  mine: true,
+                  source: "user.signed",
+                });
+
+              }
               Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, {
                 type: "stealthMetaAddress",
                 name: this.modalNewStealthMetaAddress.name,
