@@ -37,18 +37,41 @@ This dapp:
 
 ##### After Initial Sync - Activity
 
+Events retrieved from the Announcer contract.
+
 <kbd><img src="images/SampleScreen_AfterInitialSync_Activity_20240107.png" /></kbd>
 
+##### After Initial Sync - Activity - Stealth Payment
 
-<br />
+<kbd><img src="images/SampleScreen_AfterInitialSync_Activity_StealthPayment_20240107.png" /></kbd>
 
----
+##### After Initial Sync - Registry
 
-#### Tokens Sample Screens
+Events retrieved from the Registry contract.
 
-##### Tokens - Active Only
+<kbd><img src="images/SampleScreen_AfterInitialSync_Registry_20240107.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_Tokens_ActiveOnly_20240106.png" /></kbd>
+##### After Initial Sync - Registry - Entry
+
+<kbd><img src="images/SampleScreen_AfterInitialSync_Registry_Entry_20240107.png" /></kbd>
+
+##### After Initial Sync - Addresses
+
+<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_20240107.png" /></kbd>
+
+##### After Initial Sync - Addresses - StealthMetaAddress Without Keys
+
+<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_StealthMetaAddress_WithoutKeys_20240107.png" /></kbd>
+
+##### After Initial Sync - Tokens
+
+ERC-20 and ERC-721 token events retrieved for addresses marked "Mine". Active tokens manually clicked.
+
+<kbd><img src="images/SampleScreen_AfterInitialSync_Tokens_20240107.png" /></kbd>
+
+##### After Initial Sync - Config
+
+<kbd><img src="images/SampleScreen_AfterInitialSync_Config_20240107.png" /></kbd>
 
 <br />
 
