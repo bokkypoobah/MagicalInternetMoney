@@ -99,7 +99,9 @@
             <b-form-group label="Additional Tokens:" label-for="transfer-additionaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-select size="sm" id="transfer-additionaltokens" v-model="modalTransfer.additionalTokens" @change="saveSettings" :options="additionalTokensOptions" v-b-popover.hover.bottom="'Add ERC-20 or ERC-721 tokens to transfer'" class="w-50"></b-form-select>
             </b-form-group>
-
+            <b-form-group v-if="modalTransfer.additionalTokens == 'erc20'" label="ERC-20:" label-for="transfer-additionaltokens-erc20" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-select size="sm" id="transfer-additionaltokens-erc20" v-model="modalTransfer.additionalERC20Token" @change="additionalERC20TokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Add ERC-20 or ERC-721 tokens to transfer'" class="w-75"></b-form-select>
+            </b-form-group>
             <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
             </b-form-group>
@@ -607,7 +609,7 @@
                   <h5 class="mt-3">Contracts on Sepolia</h5>
                   <ul>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x4f58404f363f8a3282648e80440e075e5c1e28a1#code" target="_blank">ERC5564Announcer</b-link></li>
-                    <li><b-link href="https://sepolia.etherscan.io/address/0xC5F111011acAd96860a3cd3d7C50Dd8f56a5684e#code" target="_blank">ERC5564Registry v0.8.0</b-link></li>
+                    <li><b-link href="https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code" target="_blank">ERC5564Registry v0.8.1</b-link></li>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code" target="_blank">StealthChad v0.8.0</b-link></li>
                   </ul>
 
@@ -1128,7 +1130,8 @@
               { contract: "erc721address", type: "erc721", amount: null },
             ],
             amount: null,
-            additionalTokens: null,
+            additionalTokens: "erc20", // TODO Dev null,
+            additionalERC20Token: null,
           },
           modalActivity: {
             item: null,
@@ -1319,6 +1322,18 @@
 
         // --- COMPUTED ---
         computed: {
+          additionalERC20TokensOptions() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            // console.log("tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
+            results.push({ value: null, text: "(select one)"})
+            for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+              if (contractData.active) {
+                results.push({ value: contract, text: contractData.symbol + ' ' + contractData.name + ' @ ' + contract.substring(0, 10) })
+              }
+            }
+            return results;
+          },
+
           chainInfo() {
             if (this.chainId in this.settings.chains) {
               return this.settings.chains[this.chainId];
@@ -1676,6 +1691,20 @@
 
         // --- METHODS ---
         methods: {
+
+          async additionalERC20TokenSelected() {
+            console.log(moment().format("HH:mm:ss") + " additionalERC20TokenSelected");
+            console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
+
+            if (this.modalTransfer.additionalERC20Token) {
+              const provider = new ethers.providers.Web3Provider(window.ethereum);
+              const contract = new ethers.Contract(this.modalTransfer.additionalERC20Token, ERC20ABI, provider);
+              const balance = await contract.balanceOf(this.coinbase);
+              console.log("balance: " + balance.toString());
+              const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
+              console.log("allowance: " + allowance.toString());
+            }
+          },
 
           async searchForContracts() {
             // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
@@ -3362,11 +3391,11 @@
                 this.tokenContracts = JSON.parse(localStorage.stealthChadTokenContracts);
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
-              // (async() => {
-              //   TODO: TESTING
-              //   await delay(1500);
-              //   await this.transfer(null);
-              // })();
+              // TODO: TESTING
+              (async() => {
+                await delay(1500);
+                await this.transfer(null);
+              })();
             }
             (async() => {
               await this.loadCurrentData();

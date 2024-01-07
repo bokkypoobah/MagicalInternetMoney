@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at Etherscan.io on 2024-01-07
+*/
+
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
@@ -5,7 +9,7 @@ pragma solidity ^0.8.19;
 //
 // From https://eips.ethereum.org/EIPS/eip-6538, with `bytes` updated to `address`
 //
-// Deployed to Sepolia
+// Deployed to Sepolia 0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde
 //
 // https://github.com/bokkypoobah/StealthChad
 //
