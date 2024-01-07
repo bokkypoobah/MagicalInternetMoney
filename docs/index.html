@@ -85,9 +85,9 @@
             <b-form-group v-if="coinbase != ensNameOrAddress(coinbase)" label="" label-for="transfer-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-            <b-form-group label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress)" class="mx-0 my-1 p-0">
+            <b-form-group label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress) || 'Stealth Meta-Address'" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea type="text" id="transfer-stealthmetaaddress" v-model.trim="modalTransfer.stealthMetaAddress" @input="saveSettings" rows="3"></b-form-textarea>
+                <b-form-textarea type="text" id="transfer-stealthmetaaddress" v-model.trim="modalTransfer.stealthMetaAddress" @input="saveSettings" rows="3" placeholder="e.g., st:eth:0x12...89"></b-form-textarea>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalTransfer.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
