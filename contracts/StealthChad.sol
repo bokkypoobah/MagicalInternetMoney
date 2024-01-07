@@ -66,9 +66,9 @@ contract StealthChad {
 
     IERC5564Announcer announcer;
 
-    error WhyEvenTry();
+    error NothingToTransfer();
     error TransferFailure();
-    error TokenAndValueArraysLengthMismatch();
+    error ArrayLengthsMismatch();
 
     constructor(address payable _announcer) {
         announcer = IERC5564Announcer(_announcer);
@@ -81,7 +81,7 @@ contract StealthChad {
     /// @param viewTag The view tag derived from the shared secret.
     function transferEthAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag) external payable {
         if (msg.value == 0) {
-            revert WhyEvenTry();
+            revert NothingToTransfer();
         }
         bytes memory metadata = new bytes(57);
         uint i;
@@ -110,10 +110,10 @@ contract StealthChad {
     /// @param values Array of ERC-20 tokens or ERC-721 tokenId to transfer
     function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, address[] calldata tokens, uint256[] calldata values) external payable {
         if (tokens.length != values.length) {
-            revert TokenAndValueArraysLengthMismatch();
+            revert ArrayLengthsMismatch();
         }
         if (tokens.length == 0 && msg.value == 0) {
-            revert WhyEvenTry();
+            revert NothingToTransfer();
         }
         bytes memory metadata = new bytes(1 + (56 * (tokens.length + (msg.value > 0 ? 1 : 0))));
         uint i;

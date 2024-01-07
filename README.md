@@ -141,7 +141,7 @@ Item 4.
 
 ## Deployments
 
-* [ERC5564Announcer.sol](deployed/ERC5564Announcer_Sepolia_0x4f58404f363f8a3282648e80440e075e5c1e28a1.sol) on Sepolia [0x4f58404f363f8a3282648e80440e075e5c1e28a1](https://sepolia.etherscan.io/address/0x4f58404f363f8a3282648e80440e075e5c1e28a1#code)
+* [ERC5564Announcer.sol v0.8.1](deployed/ERC5564Announcer_v0.8.1_Sepolia_0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365.sol) on Sepolia [0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365](https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code)
 * [ERC5564Registry.sol v0.8.1](deployed/ERC5564Registry_v0.8.1_Sepolia_0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde.sol) on Sepolia [0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde](https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code)
 * [StealthChad.sol v0.8.0](deployed/StealthChad_v0.8.0_Sepolia_0x3834bcA9093e375893D65975ad765179A149D017.sol) on Sepolia [0x3834bcA9093e375893D65975ad765179A149D017](https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code)
 
