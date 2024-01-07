@@ -1,7 +1,7 @@
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
-// StealthChad v0.8.1 - Experiments in ERC-5564: Stealth Addresses
+// StealthChad v0.8.2 - Experiments in ERC-5564: Stealth Addresses
 //
 // Deployed to Sepolia
 //
@@ -62,7 +62,7 @@ interface ITransferFrom {
 /// @notice Stealth Chad things
 contract StealthChad {
     // 0x23b872dd transferFrom(address,address,uint256)
-    bytes4 private constant TRANSFERFROM = 0x23b872dd;
+    bytes4 private constant TRANSFERFROM_SELECTOR = 0x23b872dd;
 
     IERC5564Announcer announcer;
 
@@ -133,10 +133,10 @@ contract StealthChad {
             }
         }
         for (i = 0; i < tokens.length; i = onePlus(i)) {
-            bytes memory tokenInBytes = abi.encodePacked(TRANSFERFROM, tokens[i]);
+            bytes memory selectorAndTokenContractInBytes = abi.encodePacked(TRANSFERFROM_SELECTOR, tokens[i]);
             uint k;
             for (k = 0; k < 24; k = onePlus(k)) {
-                metadata[j++] = tokenInBytes[k];
+                metadata[j++] = selectorAndTokenContractInBytes[k];
             }
             bytes32 valueInBytes = bytes32(values[i]);
             for (k = 0; k < 32; k = onePlus(k)) {
