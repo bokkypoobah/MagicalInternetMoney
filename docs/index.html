@@ -610,7 +610,7 @@
                   <ul>
                     <li><b-link href="https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code" target="_blank">ERC5564Announcer v0.8.1</b-link></li>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code" target="_blank">ERC5564Registry v0.8.1</b-link></li>
-                    <li><b-link href="https://sepolia.etherscan.io/address/0x3834bcA9093e375893D65975ad765179A149D017#code" target="_blank">StealthChad v0.8.0</b-link></li>
+                    <li><b-link href="https://sepolia.etherscan.io/address/0xA745760E9f1E425215CCD7735F932FdDE3276344#code" target="_blank">StealthChad v0.8.1</b-link></li>
                   </ul>
 
                   <h5 class="mt-3">References</h5>
@@ -1083,28 +1083,28 @@
           },
           contracts: {
             "11155111": {
-              "0x4f58404F363f8a3282648E80440e075e5C1E28a1": {
+              "0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365": {
                 "type": "announcer",
-                "name": "ERC5564Announcer on Sepolia",
+                "name": "ERC5564Announcer v0.8.1 on Sepolia",
                 "read": true,
                 "write": false,
-                "blockNumber": 4959070,
+                "blockNumber": 5037061,
                 "timestamp": 1703564424
               },
               "0x3834bcA9093e375893D65975ad765179A149D017": {
                 "type": "caller",
-                "name": "StealthChad v0.8.0 on Sepolia",
+                "name": "StealthChad v0.8.1 on Sepolia",
                 "read": true,
                 "write": true,
-                "blockNumber": 4959070,
+                "blockNumber": 5037096,
                 "timestamp": 1703564424
               },
-              "0xC5F111011acAd96860a3cd3d7C50Dd8f56a5684e": {
+              "0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde": {
                 "type": "registry",
-                "name": "ERC5564Registry v0.8.0 on Sepolia",
+                "name": "ERC5564Registry v0.8.1 on Sepolia",
                 "read": true,
                 "write": true,
-                "blockNumber": 4960971,
+                "blockNumber": 5036735,
                 "timestamp": 1703590932
               }
             }
@@ -2109,21 +2109,21 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEvents(db, provider, latestBlockNumber);
-            }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncAnnouncementsData(db, provider, latestBlockNumber);
-            }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEventsData(db, provider, latestBlockNumber);
-            }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.collateAccounts(db, provider, latestBlockNumber);
-            }
-            if (network.chainId == CHAINID_SEPOLIA) {
-              await this.syncTokenEvents(db, provider, latestBlockNumber);
-            }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncRegistryEvents(db, provider, latestBlockNumber);
+            // }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncAnnouncementsData(db, provider, latestBlockNumber);
+            // }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncRegistryEventsData(db, provider, latestBlockNumber);
+            // }
+            // if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            //   await this.collateAccounts(db, provider, latestBlockNumber);
+            // }
+            // if (network.chainId == CHAINID_SEPOLIA) {
+            //   await this.syncTokenEvents(db, provider, latestBlockNumber);
+            // }
             // if (network.chainId == CHAINID_SEPOLIA) {
             //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
             // }
@@ -2131,9 +2131,9 @@
             //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
             //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             // }
-            if (network.chainId == CHAINID_SEPOLIA) {
-              await this.collateTokens(db, provider, latestBlockNumber);
-            }
+            // if (network.chainId == CHAINID_SEPOLIA) {
+            //   await this.collateTokens(db, provider, latestBlockNumber);
+            // }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
@@ -3391,11 +3391,11 @@
                 this.tokenContracts = JSON.parse(localStorage.stealthChadTokenContracts);
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
-              // TODO: TESTING
-              (async() => {
-                await delay(1500);
-                await this.transfer(null);
-              })();
+              // // TODO: TESTING
+              // (async() => {
+              //   await delay(1500);
+              //   await this.transfer(null);
+              // })();
             }
             (async() => {
               await this.loadCurrentData();
