@@ -94,38 +94,43 @@
             </b-form-group>
             <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalTransfer.items.length > 0 && !modalTransfer.amount ? 'Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses' : ''" class="mx-0 my-1 p-0">
               <b-row>
-                <b-col cols="6" class="pr-1">
-                  <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="text-right"></b-form-input>
-                </b-col>
-                <b-col cols="5" class="mx-0 px-1">
+                <b-col cols="3" class="mx-0 px-1 text-right">
                   <font size="-1">ETH</font>
+                </b-col>
+                <b-col cols="3" class="pr-1">
+                  <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="text-right"></b-form-input>
                 </b-col>
               </b-row>
             </b-form-group>
-            <b-form-group label="ERC-20/ERC-721 Tokens:" label-for="transfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-row v-for="(item, index) of modalTransfer.items">
-                <b-col cols="6" class="mb-1 pr-1">
-                  <div v-if="item.type == 'erc20'">
-                    <b-form-input type="text" disabled size="sm" v-model.trim="item.amount" class="text-right"></b-form-input>
-                  </div>
-                </b-col>
-                <b-col cols="5" class="mx-0 px-1">
+            <b-form-group label="" label-for="transfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-row v-for="(item, index) of modalTransfer.items" v-bind:key="item.token">
+                <b-col cols="3" class="mx-0 px-1 text-right">
                   <font size="-1">{{ item.symbol }}</font>
                 </b-col>
+                <b-col cols="3" class="mb-1 pr-1">
+                  <div v-if="item.type == 'erc20'" class="ml-1">
+                    <font size="-1">{{ item.amount }}</font>
+                  </div>
+                  <div v-if="item.type == 'erc721'">
+                    <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.tokenId" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ item.tokenId.toString().length > 20 ? (item.tokenId.toString().substring(0, 8) + '...' + item.tokenId.toString().slice(-8)) : item.tokenId.toString() }}</b-button>
+                  </div>
+                </b-col>
                 <b-col cols="1" class="mx-0 px-1">
-                  <b-button size="sm" @click="removeTokensForTransfer(index);" variant="link" v-b-popover.hover.bottom="'Remove ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-dash shift-v="+1" font-scale="1.1"></b-icon-dash></b-button>
+                  <b-button size="sm" @click="removeTokensForTransfer(index);" variant="link" v-b-popover.hover.bottom="'Remove ' + item.symbol + ' ' + (item.type == 'erc20' ? item.amount : item.tokenId)" class="m-0 ml-2 p-0"><b-icon-dash shift-v="+1" font-scale="1.1"></b-icon-dash></b-button>
                 </b-col>
               </b-row>
               <b-row>
-                <b-col cols="11" class="mb-1 pr-1">
-                  <b-button size="sm" @click="addTokensForTransfer();" variant="link" v-b-popover.hover.bottom="'Add ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-plus shift-v="+1" font-scale="1.1"></b-icon-plus></b-button>
+                <b-col cols="3" class="mx-0 px-1 text-right">
+                </b-col>
+                <b-col cols="3" class="mb-1 pr-1">
                 </b-col>
                 <b-col cols="1" class="mx-0 px-1">
+                  <b-button size="sm" @click="addTokensForTransfer();" variant="link" v-b-popover.hover.bottom="'Add ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-plus shift-v="+1" font-scale="1.1"></b-icon-plus></b-button>
                 </b-col>
               </b-row>
             </b-form-group>
             <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalTransfer.stealthMetaAddress || !modalTransfer.amount" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+              <b-button size="sm" :disabled="!modalTransfer.stealthMetaAddress || modalTransfer.amount == null || (modalTransfer.amount == 0 && modalTransfer.items.length == 0)" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
             </b-form-group>
           </b-modal>
 
@@ -1201,12 +1206,12 @@
           modalTransfer: {
             stealthMetaAddress: null,
             items: [
-              { token: "0x03563574B3839e2CdD6281D8741497Ba82FD6739", type: "erc20", symbol: "BOKKY", name: "BokkyPooBah wuz here!", decimals: 18, amount: "12.34" },
-              { token: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9", type: "erc20", symbol: "WEENUS", name: "Weenus 💪", decimals: 18, amount: "12.34" },
-              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "1779" },
-              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "4021" },
-              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5183" },
-              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5357" },
+              // { token: "0x03563574B3839e2CdD6281D8741497Ba82FD6739", type: "erc20", symbol: "BOKKY", name: "BokkyPooBah wuz here!", decimals: 18, amount: "12.34" },
+              // { token: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9", type: "erc20", symbol: "WEENUS", name: "Weenus 💪", decimals: 18, amount: "12.34" },
+              // { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "1779" },
+              // { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "4021" },
+              // { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5183" },
+              // { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5357" },
             ],
             amount: null,
           },
@@ -1902,17 +1907,18 @@
               for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
                 if (tokenData.owner == this.coinbase) {
                   const selected = tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds;
-                  console.log(tokenId + " " + selected + " => " + JSON.stringify(tokenData));
-                  // results.push({ tokenId, ...tokenData, selected });
-                  const symbol = tokenContract.symbol || null;
-                  const name = tokenContract.name || null;
-                  this.modalTransfer.items.push({
-                    token: this.modalAddTokensToTransfer.token,
-                    type: this.modalAddTokensToTransfer.type,
-                    symbol,
-                    name,
-                    tokenId,
-                  });
+                  if (selected) {
+                    // console.log(tokenId + " " + selected + " => " + JSON.stringify(tokenData));
+                    const symbol = tokenContract.symbol || null;
+                    const name = tokenContract.name || null;
+                    this.modalTransfer.items.push({
+                      token: this.modalAddTokensToTransfer.token,
+                      type: this.modalAddTokensToTransfer.type,
+                      symbol,
+                      name,
+                      tokenId,
+                    });
+                  }
                 }
               }
             }
@@ -2267,7 +2273,7 @@
                 result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
                 return result;
             }
-            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN");
+            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN - this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
             const result = generateStealthAddress(this.modalTransfer.stealthMetaAddress);
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
@@ -2278,8 +2284,22 @@
             const contractWithSigner = contract.connect(provider.getSigner());
             const schemeId = 0;
             const value = ethers.utils.parseEther(this.modalTransfer.amount);
+            const tokens = [];
+            const values = [];
+            for (const item of this.modalTransfer.items) {
+              console.log(JSON.stringify(item));
+              tokens.push(item.token);
+              if (item.type == "erc20") {
+                values.push(ethers.utils.parseUnits(item.amount, item.decimals).toString());
+              } else {
+                values.push(item.tokenId.toString());
+              }
+            }
+            console.log("tokens: " + JSON.stringify(tokens));
+            console.log("values: " + JSON.stringify(values));
             try {
-              const tx = await contractWithSigner.transferEthAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, { value });
+              // const tx = await contractWithSigner.transferEthAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, { value });
+              const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokens, values, { value });
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("transferEthToStealthMetaAddress StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
@@ -2354,7 +2374,7 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
@@ -2367,9 +2387,9 @@
               await this.syncRegistryEventsData(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.collateAccounts(db, provider, latestBlockNumber);
+              await this.collateAddresses(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
             }
             // if (network.chainId == CHAINID_SEPOLIA) {
@@ -2379,7 +2399,7 @@
             //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
             //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
             // }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
@@ -2413,12 +2433,19 @@
                   if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
                     const transfers = [];
                     const metadata = logData.args[4];
-                    const functionSelector = metadata.substring(4, 12);
-                    const tokenContractAddress = metadata.substring(12, 52);
-                    const tokensString = metadata.substring(52, 116)
-                    const tokens = ethers.BigNumber.from("0x" + tokensString).toString();
-                    // TODO: Handle ERC-20 & ERC-721 transfers
-                    transfers.push({ functionSelector, tokenContractAddress, tokens });
+                    let segment = 0;
+                    let part;
+                    do {
+                      part = metadata.substring(4 + (segment * 112), 4 + (segment * 112) + 112);
+                      if (part.length == 112) {
+                        const functionSelector = part.substring(0, 8);
+                        const token = part.substring(8, 48);
+                        const valueString = part.substring(48, 112)
+                        const value = ethers.BigNumber.from("0x" + valueString).toString();
+                        transfers.push({ functionSelector, token, value });
+                      }
+                      segment++;
+                    } while (part.length == 112);
                     records.push( {
                       chainId: t.chainId,
                       blockNumber: parseInt(log.blockNumber),
@@ -2709,31 +2736,31 @@
             } while (!done);
           },
 
-          async collateAccounts(db, provider, latestBlockNumber) {
-            console.log(moment().format("HH:mm:ss") + " collateAccounts BEGIN");
-            const accounts = this.addresses;
-            if (!(this.coinbase in accounts)) {
-              accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
+          async collateAddresses(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " collateAddresses BEGIN");
+            const addresses = this.addresses;
+            if (!(this.coinbase in addresses)) {
+              addresses[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
             }
             let rows = 0;
             let done = false;
             do {
               let data = await db.announcements.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " collateAddresses - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
-                if (!(item.contract in accounts)) {
+                if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  accounts[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
+                  addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
                 }
-                if (!(item.stealthAddress in accounts)) {
-                  accounts[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
+                if (!(item.stealthAddress in addresses)) {
+                  addresses[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
                 }
-                if (!(item.caller in accounts)) {
+                if (!(item.caller in addresses)) {
                   const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-                  accounts[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
+                  addresses[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
                 }
-                if (!(item.tx.from in accounts)) {
-                  accounts[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
+                if (!(item.tx.from in addresses)) {
+                  addresses[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -2744,36 +2771,36 @@
             done = false;
             do {
               let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " collateAccounts - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              console.log(moment().format("HH:mm:ss") + " collateAddresses - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
-                if (!(item.contract in accounts)) {
+                if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  accounts[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
+                  addresses[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
                 }
-                if (!(item.registrant in accounts)) {
-                  accounts[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
+                if (!(item.registrant in addresses)) {
+                  addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
                 }
-                if (!(item.stealthMetaAddress in accounts)) {
-                  accounts[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
+                if (!(item.stealthMetaAddress in addresses)) {
+                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
                 }
               }
               rows = parseInt(rows) + data.length;
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
 
-            for (const [address, accountData] of Object.entries(accounts)) {
+            for (const [address, accountData] of Object.entries(addresses)) {
               if (accountData.type == "stealthMetaAddress") {
-                const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
+                const linkedToData = accountData.linkedTo && addresses[accountData.linkedTo] || null;
                 if (linkedToData && linkedToData.mine) {
-                  accounts[address].mine = true;
+                  addresses[address].mine = true;
                 }
               }
             }
 
-            Vue.set(this, 'accounts', accounts);
+            Vue.set(this, 'addresses', addresses);
             localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            console.log(moment().format("HH:mm:ss") + " collateAccounts - addresses: " + JSON.stringify(accounts, null, 2));
-            console.log(moment().format("HH:mm:ss") + " collateAccounts END");
+            // console.log(moment().format("HH:mm:ss") + " collateAddresses - addresses: " + JSON.stringify(accounts, null, 2));
+            console.log(moment().format("HH:mm:ss") + " collateAddresses END");
           },
 
           async syncTokenEvents(db, provider, latestBlockNumber) {
@@ -3313,7 +3340,7 @@
             //
             Vue.set(this, 'tokenContracts', tokenContracts);
             localStorage.stealthChadTokenContracts = JSON.stringify(this.tokenContracts);
-            console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateTokens END");
           },
 
@@ -3644,6 +3671,7 @@
               // (async() => {
               //   await delay(1500);
               //   await this.transfer(null);
+              //   await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
               //   await this.addTokensForTransfer();
               // })();
             }
