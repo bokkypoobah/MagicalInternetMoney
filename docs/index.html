@@ -766,17 +766,30 @@
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
-                <template #cell(tokens)="data">
-                  <!-- TODO: Handle ERC-20/ERC-721 -->
-                  <font size="-1">
-                    {{ formatETH(data.item.transfers[0].tokens) }}
-                  </font>
-                </template>
                 <template #cell(token)="data">
-                  <!-- TODO: Handle ERC-20/ERC-721 -->
-                  <font size="-1">
-                    ETH
-                  </font>
+                  <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
+                    <b-col>
+                      <span v-if="isEthereums(item.token)">
+                        <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
+                      </span>
+                      <span v-else>
+                        <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button>
+                      </span>
+                    </b-col>
+                  </b-row>
+                </template>
+                <template #cell(tokens)="data">
+                  <!-- TODO: Handle ERC-20/ERC-721 properly -->
+                  <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
+                    <b-col>
+                      <span v-if="isEthereums(item.token)">
+                        <font size="-1">{{ formatETH(data.item.transfers[0].value) }}</font>
+                      </span>
+                      <span v-else>
+                        <font size="-1">{{ formatETH(data.item.transfers[0].value) }}</font>
+                      </span>
+                    </b-col>
+                  </b-row>
                 </template>
               </b-table>
 
@@ -1349,8 +1362,8 @@
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           transfersFields: [
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 50%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -1849,6 +1862,19 @@
 
         // --- METHODS ---
         methods: {
+          isEthereums(address) {
+            return address == ADDRESS_ETHEREUMS;
+          },
+          getTokenSymbol(address) {
+            console.log(moment().format("HH:mm:ss") + " getTokenSymbol - address: " + JSON.stringify(address));
+            if (address == ADDRESS_ETHEREUMS) {
+              return "ETH";
+            } else {
+              return address.substring(0, 10);
+
+            }
+        },
+
           erc721TokenIdToggle(tokenId) {
             // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - tokenId: " + tokenId);
             if (tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds) {
