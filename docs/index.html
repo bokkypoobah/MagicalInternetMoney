@@ -96,28 +96,31 @@
             <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="w-50"></b-form-input>
             </b-form-group>
-            <b-form-group label="Additional Tokens:" label-for="transfer-additionaltokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-select size="sm" id="transfer-additionaltokens" v-model="modalTransfer.additionalTokens" @change="saveSettings" :options="additionalTokensOptions" v-b-popover.hover.bottom="'Add ERC-20 or ERC-721 tokens to transfer'" class="w-50"></b-form-select>
+            <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalTransfer.stealthMetaAddress || !modalTransfer.amount" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
             </b-form-group>
-            <b-form-group v-if="modalTransfer.additionalTokens == 'erc20'" label="ERC-20:" label-for="transfer-additionaltokens-erc20" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-select size="sm" id="transfer-additionaltokens-erc20" v-model="modalTransfer.additionalERC20Token" @change="additionalERC20TokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Add ERC-20 or ERC-721 tokens to transfer'" class="w-75"></b-form-select>
+          </b-modal>
+
+          <!-- :MODALADDTOKENSTOTRANSFER -->
+          <b-modal id="modal-addtokensfortransfer" hide-footer size="md">
+            <template #modal-title>
+              Add Tokens For Transfer
+            </template>
+            <b-form-select size="sm" v-model="modalAddTokensToTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
+            <b-form-group v-if="modalAddTokensToTransfer.token" label="Balance:" label-for="transfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <font size="-1">{{ modalAddTokensToTransfer.balance }}</font>
             </b-form-group>
-            <b-form-group v-if="modalTransfer.additionalERC20Token" label="Balance:" label-for="transfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <font size="-1">{{ modalTransfer.additionalERC20Balance }}</font>
-            </b-form-group>
-            <b-form-group v-if="modalTransfer.additionalERC20Token" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-50">
-                <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-approved" v-model.trim="modalTransfer.additionalERC20ApprovedInput"></b-form-input>
+            <b-form-group v-if="modalAddTokensToTransfer.token" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to StealthChad for transfer" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-approved" v-model.trim="modalAddTokensToTransfer.approvedInput"></b-form-input>
                 <b-input-group-append>
-                  <b-button :disabled="modalTransfer.additionalERC20Approved == modalTransfer.additionalERC20ApprovedInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button :disabled="modalAddTokensToTransfer.approved == modalAddTokensToTransfer.approvedInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button @click="additionalTokenSelected();" variant="link"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalTransfer.additionalERC20Token" label="Amount To Transfer:" label-for="transfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalTransfer.additionalERC20Amount" class="w-50"></b-form-input>
-            </b-form-group>
-            <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+            <b-form-group v-if="modalAddTokensToTransfer.token" label="Amount To Transfer:" label-for="transfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalAddTokensToTransfer.amount" class="w-100"></b-form-input>
             </b-form-group>
           </b-modal>
 
@@ -1150,13 +1153,14 @@
               { contract: "erc721address", type: "erc721", amount: null },
             ],
             amount: null,
-            additionalTokens: "erc20", // TODO Dev null,
-            additionalERC20Token: null,
-            additionalERC20Decimals: null,
-            additionalERC20Amount: null,
-            additionalERC20Balance: null,
-            additionalERC20Approved: null,
-            additionalERC20ApprovedInput: null,
+          },
+          modalAddTokensToTransfer: {
+            token: null,
+            decimals: null,
+            amount: null,
+            balance: null,
+            approved: null,
+            approvedInput: null,
           },
           modalActivity: {
             item: null,
@@ -1350,16 +1354,14 @@
         computed: {
           additionalERC20TokensOptions() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            // console.log("tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
-            results.push({ value: null, text: "(select one)"})
-            for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-              if (contractData.active) {
-                results.push({ value: contract, text: contractData.symbol + ' ' + contractData.name + ' @ ' + contract.substring(0, 10) })
+            results.push({ value: null, text: "(select ERC-20 or ERC-721 token)"})
+            for (const item of this.filteredSortedTokenEvents) {
+              if (item.active) {
+                results.push({ value: item.contract, text: (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + ' @ ' + item.contract.substring(0, 10) })
               }
             }
             return results;
           },
-
           chainInfo() {
             if (this.chainId in this.settings.chains) {
               return this.settings.chains[this.chainId];
@@ -1718,23 +1720,27 @@
         // --- METHODS ---
         methods: {
 
-          async additionalERC20TokenSelected() {
-            console.log(moment().format("HH:mm:ss") + " additionalERC20TokenSelected");
-            console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
+          async additionalTokenSelected() {
+            console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
+            console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
 
-            if (this.modalTransfer.additionalERC20Token) {
+            if (this.modalAddTokensToTransfer.token) {
               const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const contract = new ethers.Contract(this.modalTransfer.additionalERC20Token, ERC20ABI, provider);
-              const decimals = await contract.decimals();
-              Vue.set(this.modalTransfer, 'additionalERC20Decimals', decimals.toString());
+              const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
+              let decimals = null;
+              try {
+                decimals = await contract.decimals();
+              } catch (e) {
+              }
+              Vue.set(this.modalAddTokensToTransfer, 'decimals', decimals.toString());
               const balance = await contract.balanceOf(this.coinbase);
               console.log("balance: " + balance.toString());
-              Vue.set(this.modalTransfer, 'additionalERC20Balance', this.formatDecimals(balance.toString(), decimals));
+              Vue.set(this.modalAddTokensToTransfer, 'balance', this.formatDecimals(balance.toString(), decimals));
               const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
               console.log("allowance: " + allowance.toString());
-              Vue.set(this.modalTransfer, 'additionalERC20Approved', this.formatDecimals(allowance.toString(), decimals));
-              Vue.set(this.modalTransfer, 'additionalERC20ApprovedInput', this.formatDecimals(allowance.toString(), decimals));
-              console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer));
+              Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
+              Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
+              console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
             }
           },
 
@@ -1865,6 +1871,12 @@
             this.modalTransfer.stealthMetaAddress = stealthMetaAddress;
             this.modalTransfer.amount = null;
             this.$bvModal.show('modal-transfertostealthmetaaddress');
+          },
+          addTokensForTransfer() {
+            console.log(moment().format("HH:mm:ss") + " addTokensForTransfer");
+            // this.modalTransfer.stealthMetaAddress = stealthMetaAddress;
+            // this.modalTransfer.amount = null;
+            this.$bvModal.show('modal-addtokensfortransfer');
           },
 
           newStealthMetaAddress() {
@@ -2026,12 +2038,12 @@
           },
 
           async updateApproval() {
-            console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalTransfer, null, 2));
+            console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const contract = new ethers.Contract(this.modalTransfer.additionalERC20Token, ERC20ABI, provider);
+            const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
             const contractWithSigner = contract.connect(provider.getSigner());
             try {
-              const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalTransfer.additionalERC20ApprovedInput, this.modalTransfer.additionalERC20Decimals));
+              const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToTransfer.approvedInput, this.modalTransfer.decimals));
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
@@ -3450,6 +3462,7 @@
               // (async() => {
               //   await delay(1500);
               //   await this.transfer(null);
+              //   await this.addTokensForTransfer();
               // })();
             }
             (async() => {
