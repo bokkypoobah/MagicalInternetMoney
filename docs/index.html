@@ -44,8 +44,8 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">StealthChad</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Activity</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry Activity'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Announcements</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry Activity'">Registrations</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
@@ -293,47 +293,47 @@
           </b-modal>
 
           <!-- :MODALREGISTRY -->
-          <b-modal id="modal-registry" hide-footer size="lg">
+          <b-modal id="modal-registration" hide-footer size="lg">
             <template #modal-title>
               Registry Entry
             </template>
-            <b-form-group v-if="modalRegistry.item" label="Transaction:" label-for="registry-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistration.item" label="Transaction:" label-for="registration-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-txhash" :href="chainInfo.explorerTxPrefix + modalRegistry.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.txHash" target="_blank">{{ modalRegistry.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registration-txhash" :href="chainInfo.explorerTxPrefix + modalRegistration.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.txHash" target="_blank">{{ modalRegistration.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistration.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalRegistry.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalRegistration.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Timestamp:" label-for="registry-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="registry-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistry.item.blockNumber)">{{ formatTimestamp(modalRegistry.item.timestamp) }}</b-button>
+            <b-form-group v-if="modalRegistration.item" label="Timestamp:" label-for="registration-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="registration-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistration.item.blockNumber)">{{ formatTimestamp(modalRegistration.item.timestamp) }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Registrant:" label-for="registry-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.registrant)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistration.item" label="Registrant:" label-for="registration-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistry.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistry.item.registrant }}</b-button>
+                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistration.item.registrant }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalRegistry.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalRegistration.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalRegistry.item && modalRegistry.item.registrant && (modalRegistry.item.registrant != ensNameOrAddress(modalRegistry.item.registrant))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalRegistry.item.registrant, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalRegistration.item && modalRegistration.item.registrant && (modalRegistration.item.registrant != ensNameOrAddress(modalRegistration.item.registrant))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalRegistration.item.registrant, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Scheme Id:" label-for="registry-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="registry-schemeid">{{ modalRegistry.item.schemeId }}</b-button>
+            <b-form-group v-if="modalRegistration.item" label="Scheme Id:" label-for="registration-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="registration-schemeid">{{ modalRegistration.item.schemeId }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalRegistry.item" label="Stealth Meta-Address:" label-for="registry-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistry.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registry-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistry.item.stealthMetaAddress" >{{ modalRegistry.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistry.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" >{{ modalRegistration.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistration.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="transfer(modalRegistry.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistry.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
-                  <b-button size="sm" @click="copyToClipboard(modalRegistry.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="transfer(modalRegistration.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalRegistration.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -532,7 +532,7 @@
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.activityTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
+                  <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
                     Mine Only
                   </b-form-checkbox>
                 </div>
@@ -598,10 +598,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.announcementsTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.registryActivityTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
@@ -613,7 +613,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryEntries.length) + '/' + commify0(registryEntries.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryEntries.length) + '/' + commify0(registrations.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
@@ -623,10 +623,10 @@
                   <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenEvents.length) + '/' + commify0(filteredTokenEvents.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.activityTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.activityTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.registryActivityTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryEntries.length" :per-page="settings.registryActivityTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryEntries.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
@@ -636,10 +636,10 @@
                   <b-pagination size="sm" v-model="settings.tokenEventsTable.currentPage" @input="saveSettings" :total-rows="filteredTokenEvents.length" :per-page="settings.tokenEventsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.activityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.announcementsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.registryActivityTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.registrationsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -730,10 +730,10 @@
 
 
               <!-- :ACTIVITY -->
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="activityTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.announcementsTable.currentPage - 1) * settings.announcementsTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(timestamp)="data">
@@ -781,10 +781,10 @@
               </b-table>
 
               <!-- :REGISTRY -->
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registryEntriesFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.registryActivityTable.currentPage - 1) * settings.registryActivityTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.registrationsTable.currentPage - 1) * settings.registrationsTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(timestamp)="data">
@@ -1101,14 +1101,14 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            activityTable: {
+            announcementsTable: {
               mineOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            registryActivityTable: {
+            registrationsTable: {
               filter: null,
               currentPage: 1,
               pageSize: 100,
@@ -1160,7 +1160,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 36,
+            version: 37,
           },
           contracts: {
             "11155111": {
@@ -1198,7 +1198,7 @@
           },
 
           announcements: [],
-          registryEntries: [],
+          registrations: [],
           tokenEvents: [],
           addresses: {},
           tokenContracts: {},
@@ -1228,7 +1228,7 @@
             item: null,
             stealthPrivateKey: null,
           },
-          modalRegistry: {
+          modalRegistration: {
             item: null,
           },
           modalAddress: {
@@ -1356,7 +1356,7 @@
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 50%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'tokenContractAddress', label: 'Token', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
-          registryEntriesFields: [
+          registrationsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1406,11 +1406,11 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080i",
+            name: "stealthchaddata080j",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
-              registryEntries: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+              registrations: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
               tokenEvents: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
             },
             updated: null,
@@ -1448,7 +1448,7 @@
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
                 let include = true;
-                if (this.settings.activityTable.mineOnly) {
+                if (this.settings.announcementsTable.mineOnly) {
                   if (!announcement.mine) {
                     include = false;
                   }
@@ -1462,7 +1462,7 @@
           },
           filteredSortedActivity() {
             let results = this.filteredActivity;
-            if (this.settings.activityTable.sortOption == 'txorderasc') {
+            if (this.settings.announcementsTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1474,7 +1474,7 @@
                   return a.blockNumber - b.blockNumber;
                 }
               });
-            } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
+            } else if (this.settings.announcementsTable.sortOption == 'txorderdsc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1491,15 +1491,15 @@
           },
           pagedFilteredSortedActivity() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
-            return this.filteredSortedActivity.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
+            return this.filteredSortedActivity.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
           filteredRegistryEntries() {
-            return this.registryEntries.filter(e => e.chainId == this.chainId);
+            return this.registrations.filter(e => e.chainId == this.chainId);
           },
           filteredSortedRegistryEntries() {
             let results = this.filteredRegistryEntries;
-            if (this.settings.registryActivityTable.sortOption == 'txorderasc') {
+            if (this.settings.registrationsTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1511,7 +1511,7 @@
                   return a.blockNumber - b.blockNumber;
                 }
               });
-            } else if (this.settings.registryActivityTable.sortOption == 'txorderdsc') {
+            } else if (this.settings.registrationsTable.sortOption == 'txorderdsc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1528,7 +1528,7 @@
           },
           pagedFilteredSortedRegistryEntries() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryEntries - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 10), null, 2));
-            return this.filteredSortedRegistryEntries.slice((this.settings.registryActivityTable.currentPage - 1) * this.settings.registryActivityTable.pageSize, this.settings.registryActivityTable.currentPage * this.settings.registryActivityTable.pageSize);
+            return this.filteredSortedRegistryEntries.slice((this.settings.registrationsTable.currentPage - 1) * this.settings.registrationsTable.pageSize, this.settings.registrationsTable.currentPage * this.settings.registrationsTable.pageSize);
           },
 
           totalAddresses() {
@@ -1779,7 +1779,7 @@
           },
           pagedFilteredSortedContracts() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedContracts - results[0..9]: " + JSON.stringify(this.filteredSortedContracts.slice(0, 10), null, 2));
-            return this.filteredSortedContracts.slice((this.settings.activityTable.currentPage - 1) * this.settings.activityTable.pageSize, this.settings.activityTable.currentPage * this.settings.activityTable.pageSize);
+            return this.filteredSortedContracts.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
           filteredERC721Tokens() {
@@ -2313,15 +2313,15 @@
               this.modalActivity.item = item[0];
               this.modalActivity.stealthPrivateKey = null;
               this.$bvModal.show('modal-activity');
-              this.$refs.activityTable.clearSelected();
+              this.$refs.announcementsTable.clearSelected();
             }
           },
 
           registryRowSelected(item) {
             console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
-              this.modalRegistry.item = item[0];
-              this.$bvModal.show('modal-registry');
+              this.modalRegistration.item = item[0];
+              this.$bvModal.show('modal-registration');
               this.$refs.registryTable.clearSelected();
             }
           },
@@ -2378,13 +2378,13 @@
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEvents(db, provider, latestBlockNumber);
+              await this.syncRegistrations(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncementsData(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncRegistryEventsData(db, provider, latestBlockNumber);
+              await this.syncRegistrationsData(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAddresses(db, provider, latestBlockNumber);
@@ -2438,8 +2438,8 @@
                     do {
                       part = metadata.substring(4 + (segment * 112), 4 + (segment * 112) + 112);
                       if (part.length == 112) {
-                        const functionSelector = part.substring(0, 8);
-                        const token = part.substring(8, 48);
+                        const functionSelector = "0x" + part.substring(0, 8);
+                        const token = ethers.utils.getAddress("0x" + part.substring(8, 48));
                         const valueString = part.substring(48, 112)
                         const value = ethers.BigNumber.from("0x" + valueString).toString();
                         transfers.push({ functionSelector, token, value });
@@ -2520,13 +2520,14 @@
             if (selectedContracts.length > 0) {
               const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              // TODO Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              const startBlock = 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
           },
 
-          async syncRegistryEvents(db, provider, latestBlockNumber) {
+          async syncRegistrations(db, provider, latestBlockNumber) {
             // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
             // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
             // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
@@ -2537,7 +2538,7 @@
             let t = this;
             async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
               total = parseInt(total) + logs.length;
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEvents.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+              console.log(moment().format("HH:mm:ss") + " syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
               const records = [];
               for (const log of logs) {
                 if (!log.removed) {
@@ -2564,14 +2565,14 @@
                 }
               }
               if (records.length) {
-                await db.registryEntries.bulkPut(records).then (function() {
+                await db.registrations.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncRegistryEvents.bulkPut error: " + error);
+                  console.log("syncRegistrations.bulkPut error: " + error);
                 });
               }
             }
             async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEvents.getLogs: " + fromBlock + " - " + toBlock);
+              console.log(moment().format("HH:mm:ss") + " syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
               try {
                 const filter = {
                   address: null,
@@ -2591,7 +2592,7 @@
                 await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
               }
             }
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncRegistrations BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Stealth Address Registry';
@@ -2604,12 +2605,12 @@
               }
             }
             if (selectedContracts.length > 0) {
-              const deleteCall = await db.registryEntries.where("confirmations").below(this.CONFIRMATIONS).delete();
-              const latest = await db.registryEntries.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+              const deleteCall = await db.registrations.where("confirmations").below(this.CONFIRMATIONS).delete();
+              const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
               const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, processLogs);
             }
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEvents END");
+            console.log(moment().format("HH:mm:ss") + " syncRegistrations END");
           },
 
           async syncAnnouncementsData(db, provider, latestBlockNumber) {
@@ -2674,27 +2675,27 @@
             } while (!done);
           },
 
-          async syncRegistryEventsData(db, provider, latestBlockNumber) {
-            console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData BEGIN");
+          async syncRegistrationsData(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " syncRegistrationsData BEGIN");
             let rows = 0;
             let done = false;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              let data = await db.registrations.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               rows = parseInt(rows) + data.length;
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
-            // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - total: " + total);
+            // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - total: " + total);
             this.sync.completed = 0;
             this.sync.total = rows;
             this.sync.section = 'Registry Entries Tx Data';
             rows = 0;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-              console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+              let data = await db.registrations.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const records = [];
               for (const item of data) {
-                // console.log(moment().format("HH:mm:ss") + " syncRegistryEventsData: " + JSON.stringify(item));
+                // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
                 if (item.timestamp == null && item.chainId == this.chainId) {
                   const block = await provider.getBlock(item.blockNumber);
                   item.timestamp = block.timestamp;
@@ -2725,9 +2726,9 @@
                 }
               }
               if (records.length > 0) {
-                await db.registryEntries.bulkPut(records).then (function() {
+                await db.registrations.bulkPut(records).then (function() {
                 }).catch(function(error) {
-                  console.log("syncRegistryEventsData.bulkPut error: " + error);
+                  console.log("syncRegistrationsData.bulkPut error: " + error);
                 });
               }
               rows = parseInt(rows) + data.length;
@@ -2770,7 +2771,7 @@
 
             done = false;
             do {
-              let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+              let data = await db.registrations.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
               console.log(moment().format("HH:mm:ss") + " collateAddresses - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               for (const item of data) {
                 if (!(item.contract in addresses)) {
@@ -3311,7 +3312,7 @@
 
             // done = false;
             // do {
-            //   let data = await db.registryEntries.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
+            //   let data = await db.registrations.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
             //   console.log(moment().format("HH:mm:ss") + " collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
             //   for (const item of data) {
             //     if (!(item.contract in accounts)) {
@@ -3432,8 +3433,8 @@
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const announcements = await db.announcements.toArray();
             Vue.set(this, 'announcements', announcements);
-            const registryEntries = await db.registryEntries.toArray();
-            Vue.set(this, 'registryEntries', registryEntries);
+            const registrations = await db.registrations.toArray();
+            Vue.set(this, 'registrations', registrations);
             const tokenEvents = await db.tokenEvents.toArray();
             Vue.set(this, 'tokenEvents', tokenEvents);
             // console.log(moment().format("HH:mm:ss") + " loadCurrentData - tokenEvents[0..1]: " + JSON.stringify(tokenEvents.slice(0, 2), null, 2));
@@ -3641,11 +3642,11 @@
             const tempSettings = JSON.parse(localStorage.stealthChadSettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              if (this.settings.activityTable.currentPage > 1) {
-                this.settings.activityTable.currentPage = 1;
+              if (this.settings.announcementsTable.currentPage > 1) {
+                this.settings.announcementsTable.currentPage = 1;
               }
-              if (this.settings.registryActivityTable.currentPage > 1) {
-                this.settings.registryActivityTable.currentPage = 1;
+              if (this.settings.registrationsTable.currentPage > 1) {
+                this.settings.registrationsTable.currentPage = 1;
               }
               if (this.settings.addressesTable.currentPage > 1) {
                 this.settings.addressesTable.currentPage = 1;
