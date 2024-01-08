@@ -71,7 +71,6 @@
             <template #modal-title>
               Transfer To Stealth Meta-Address
             </template>
-
             <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -93,8 +92,35 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses" class="mx-0 my-1 p-0">
-              <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="w-50"></b-form-input>
+            <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalTransfer.items.length > 0 && !modalTransfer.amount ? 'Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses' : ''" class="mx-0 my-1 p-0">
+              <b-row>
+                <b-col cols="6" class="pr-1">
+                  <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="text-right"></b-form-input>
+                </b-col>
+                <b-col cols="5" class="mx-0 px-1">
+                  <font size="-1">ETH</font>
+                </b-col>
+              </b-row>
+            </b-form-group>
+            <b-form-group label="ERC-20/ERC-721 Tokens:" label-for="transfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-row v-for="(item, index) of modalTransfer.items">
+                <b-col cols="6" class="mb-1 pr-1">
+                  <b-form-input type="text" disabled size="sm" v-model.trim="item.amount" class="text-right"></b-form-input>
+                </b-col>
+                <b-col cols="5" class="mx-0 px-1">
+                  <font size="-1">{{ item.symbol }}</font>
+                </b-col>
+                <b-col cols="1" class="mx-0 px-1">
+                  <b-button size="sm" @click="removeTokensForTransfer(index);" variant="link" v-b-popover.hover.bottom="'Remove ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-dash shift-v="+1" font-scale="1.1"></b-icon-dash></b-button>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col cols="11" class="mb-1 pr-1">
+                  <b-button size="sm" @click="addTokensForTransfer();" variant="link" v-b-popover.hover.bottom="'Add ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-plus shift-v="+1" font-scale="1.1"></b-icon-plus></b-button>
+                </b-col>
+                <b-col cols="1" class="mx-0 px-1">
+                </b-col>
+              </b-row>
             </b-form-group>
             <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="!modalTransfer.stealthMetaAddress || !modalTransfer.amount" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
@@ -102,7 +128,7 @@
           </b-modal>
 
           <!-- :MODALADDTOKENSTOTRANSFER -->
-          <b-modal id="modal-addtokensfortransfer" hide-footer size="md">
+          <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer size="md">
             <template #modal-title>
               Add Tokens For Transfer
             </template>
@@ -121,6 +147,9 @@
             </b-form-group>
             <b-form-group v-if="modalAddTokensToTransfer.token" label="Amount To Transfer:" label-for="transfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalAddTokensToTransfer.amount" class="w-100"></b-form-input>
+            </b-form-group>
+            <b-form-group v-if="modalAddTokensToTransfer.token" label="" label-for="transfer-additionaltokens-transfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalAddTokensToTransfer.amount" id="transfer-additionaltokens-transfer" @click="addTokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
           </b-modal>
 
@@ -203,7 +232,7 @@
                 <b-table small fixed striped responsive hover :fields="transfersFields" :items="modalActivity.item.transfers" head-variant="light" class="mx-0 my-1" thead-class="hidden_header">
                   <template #cell(tokens)="data">
                     <!-- TODO: Handle ERC-20/ERC-721 -->
-                    {{ formatETH(data.item.tokens, 0) }}
+                    {{ formatETH(data.item.tokens) }}
                   </template>
                   <template #cell(tokenContractAddress)="data">
                     <!-- TODO: Handle ERC-20/ERC-721 -->
@@ -715,7 +744,7 @@
                 <template #cell(tokens)="data">
                   <!-- TODO: Handle ERC-20/ERC-721 -->
                   <font size="-1">
-                    {{ formatETH(data.item.transfers[0].tokens, 0) }}
+                    {{ formatETH(data.item.transfers[0].tokens) }}
                   </font>
                 </template>
                 <template #cell(token)="data">
@@ -892,7 +921,7 @@
                 </template>
                 <template #cell(tokens)="data">
                   <font size="-1">
-                    {{ formatETH(data.item.transfers[0].tokens, 0) }}
+                    {{ formatETH(data.item.transfers[0].tokens) }}
                   </font>
                 </template>
                 <template #cell(token)="data">
@@ -1148,14 +1177,14 @@
           modalTransfer: {
             stealthMetaAddress: null,
             items: [
-              { contract: null, type: "eth", amount: null },
-              { contract: "erc20address", type: "erc20", amount: null },
-              { contract: "erc721address", type: "erc721", amount: null },
+              { token: "0x03563574B3839e2CdD6281D8741497Ba82FD6739", type: "erc20", symbol: "BOKKY", name: "BokkyPooBah wuz here!", decimals: 18, amount: "12.34" },
+              { token: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9", type: "erc20", symbol: "WEENUS", name: "Weenus 💪", decimals: 18, amount: "12.34" },
             ],
             amount: null,
           },
           modalAddTokensToTransfer: {
             token: null,
+            type: null,
             decimals: null,
             amount: null,
             balance: null,
@@ -1723,25 +1752,45 @@
           async additionalTokenSelected() {
             console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
             console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
-
             if (this.modalAddTokensToTransfer.token) {
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
-              let decimals = null;
-              try {
-                decimals = await contract.decimals();
-              } catch (e) {
-              }
-              Vue.set(this.modalAddTokensToTransfer, 'decimals', decimals.toString());
+              const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+              Vue.set(this.modalAddTokensToTransfer, 'type', tokenContract.type || null);
+              const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
+              // TODO: Delete
+              Vue.set(this.modalAddTokensToTransfer, 'decimals', decimals);
               const balance = await contract.balanceOf(this.coinbase);
-              console.log("balance: " + balance.toString());
               Vue.set(this.modalAddTokensToTransfer, 'balance', this.formatDecimals(balance.toString(), decimals));
               const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
-              console.log("allowance: " + allowance.toString());
               Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
               Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
               console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
             }
+          },
+
+          addTokenToTransfer() {
+            console.log(moment().format("HH:mm:ss") + " addTokenToTransfer");
+            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+            const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
+            const symbol = tokenContract.symbol || null;
+            const name = tokenContract.name || null;
+            this.modalTransfer.items.push({
+              token: this.modalAddTokensToTransfer.token,
+              type: this.modalAddTokensToTransfer.type,
+              symbol,
+              name,
+              decimals,
+              amount: this.modalAddTokensToTransfer.amount
+            });
+            console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
+            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            this.$refs['addtokensfortransfer'].hide();
+          },
+
+          removeTokensForTransfer(index) {
+            console.log(moment().format("HH:mm:ss") + " removeTokensForTransfer: " + index);
+            this.modalTransfer.items.splice(index, 1);
           },
 
           async searchForContracts() {
@@ -3249,7 +3298,7 @@
             }
             return null;
           },
-          formatETH(e, precision = 9) {
+          formatETH(e, precision = 0) {
             try {
               if (precision == 0) {
                 return e ? ethers.utils.formatEther(e).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
