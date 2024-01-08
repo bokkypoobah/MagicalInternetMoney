@@ -105,7 +105,9 @@
             <b-form-group label="ERC-20/ERC-721 Tokens:" label-for="transfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-row v-for="(item, index) of modalTransfer.items">
                 <b-col cols="6" class="mb-1 pr-1">
-                  <b-form-input type="text" disabled size="sm" v-model.trim="item.amount" class="text-right"></b-form-input>
+                  <div v-if="item.type == 'erc20'">
+                    <b-form-input type="text" disabled size="sm" v-model.trim="item.amount" class="text-right"></b-form-input>
+                  </div>
                 </b-col>
                 <b-col cols="5" class="mx-0 px-1">
                   <font size="-1">{{ item.symbol }}</font>
@@ -148,14 +150,27 @@
             <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Amount To Transfer:" label-for="transfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalAddTokensToTransfer.amount" class="w-100"></b-form-input>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="" label-for="transfer-additionaltokens-transfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalAddTokensToTransfer.amount" id="transfer-additionaltokens-transfer" @click="addTokenToTransfer()" variant="primary">Add To Transfer List</b-button>
+            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="" label-for="transfer-additionaltokens-transfer-erc-20" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalAddTokensToTransfer.amount" id="transfer-additionaltokens-transfer-erc-20" @click="addERC20TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
-            <font size="-2">
-              <pre>
-{{ filteredSortedERC721Tokens }}
-              </pre>
-            </font>
+
+            <!-- <b-table v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-2 p-2 pr-3"> -->
+            <b-table v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-0 mt-1 p-0">
+              <template #cell(number)="data">
+                <font size="-1">
+                  {{ parseInt(data.index) + ((settings.erc721TokensTable.currentPage - 1) * settings.erc721TokensTable.pageSize) + 1 }}
+                </font>
+              </template>
+              <template #cell(tokenId)="data">
+                <b-button size="sm" :href="chainInfo.nftTokenPrefix + modalAddTokensToTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.bottom="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
+              </template>
+              <template #cell(select)="data">
+                <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)"></b-form-checkbox>
+              </template>
+            </b-table>
+            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="" label-for="transfer-additionaltokens-transfer-erc721" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalAddTokensToTransfer.token || Object.keys(modalAddTokensToTransfer.selectedERC721TokenIds) == 0" id="transfer-additionaltokens-transfer-erc721" @click="addERC721TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
+            </b-form-group>
           </b-modal>
 
           <!-- :MODALACTIVITY -->
@@ -936,8 +951,6 @@
                 </template> -->
               </b-table>
 
-
-
               <!-- :CONFIG -->
               <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
@@ -1190,6 +1203,10 @@
             items: [
               { token: "0x03563574B3839e2CdD6281D8741497Ba82FD6739", type: "erc20", symbol: "BOKKY", name: "BokkyPooBah wuz here!", decimals: 18, amount: "12.34" },
               { token: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9", type: "erc20", symbol: "WEENUS", name: "Weenus 💪", decimals: 18, amount: "12.34" },
+              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "1779" },
+              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "4021" },
+              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5183" },
+              { token: "0x8b73448426797099b6b9a96c4343f528bbAfc55e", type: "erc721", symbol: "TESTTOADZ", name: "TestToadz", tokenId: "5357" },
             ],
             amount: null,
           },
@@ -1200,6 +1217,7 @@
             balance: null,
             approved: null,
             approvedInput: null,
+            selectedERC721TokenIds: {},
           },
           modalActivity: {
             item: null,
@@ -1372,6 +1390,11 @@
             { key: 'read', label: 'Read', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'write', label: 'Write', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'firstEvent', label: 'First Event', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+          ],
+          erc721TokensFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'tokenId', label: 'Token Id', sortable: false, thStyle: 'width: 75%;', tdClass: 'text-truncate' },
+            { key: 'select', label: 'Select', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           reportingDateTimeOptions: [
             { value: 0, text: 'Local Time' },
@@ -1759,9 +1782,9 @@
             const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
             if (tokenContract.type == "erc721") {
               for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
-                console.log(tokenId + " => " + JSON.stringify(tokenData));
                 if (tokenData.owner == this.coinbase) {
-                  results.push({ tokenId, ...tokenData });
+                  const selected = tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds;
+                  results.push({ tokenId, ...tokenData, selected });
                 }
               }
             }
@@ -1813,7 +1836,7 @@
             return results;
           },
           pagedFilteredSortedERC721Tokens() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedContracts - results[0..9]: " + JSON.stringify(this.filteredSortedERC721Tokens.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedERC721Tokens - results[0..9]: " + JSON.stringify(this.filteredSortedERC721Tokens.slice(0, 10), null, 2));
             return this.filteredSortedERC721Tokens.slice((this.settings.erc721TokensTable.currentPage - 1) * this.settings.erc721TokensTable.pageSize, this.settings.erc721TokensTable.currentPage * this.settings.erc721TokensTable.pageSize);
           },
 
@@ -1821,10 +1844,19 @@
 
         // --- METHODS ---
         methods: {
+          erc721TokenIdToggle(tokenId) {
+            // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - tokenId: " + tokenId);
+            if (tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds) {
+              Vue.delete(this.modalAddTokensToTransfer.selectedERC721TokenIds, tokenId);
+            } else {
+              Vue.set(this.modalAddTokensToTransfer.selectedERC721TokenIds, tokenId, true);
+            }
+            // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - this.modalAddTokensToTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToTransfer.selectedERC721TokenIds, null, 2));
+          },
 
           async additionalTokenSelected() {
-            console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
-            console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
+            // console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
             if (this.modalAddTokensToTransfer.token) {
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
@@ -1838,12 +1870,12 @@
                 Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
                 Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
               }
-              console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
+              // console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
             }
           },
 
-          addTokenToTransfer() {
-            console.log(moment().format("HH:mm:ss") + " addTokenToTransfer");
+          addERC20TokenToTransfer() {
+            console.log(moment().format("HH:mm:ss") + " addERC20TokenToTransfer");
             const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
             const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
             const symbol = tokenContract.symbol || null;
@@ -1856,6 +1888,34 @@
               decimals,
               amount: this.modalAddTokensToTransfer.amount
             });
+            console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
+            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            this.$refs['addtokensfortransfer'].hide();
+          },
+
+          addERC721TokenToTransfer() {
+            console.log(moment().format("HH:mm:ss") + " addERC721TokenToTransfer");
+            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+            console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
+            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            if (tokenContract.type == "erc721") {
+              for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
+                if (tokenData.owner == this.coinbase) {
+                  const selected = tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds;
+                  console.log(tokenId + " " + selected + " => " + JSON.stringify(tokenData));
+                  // results.push({ tokenId, ...tokenData, selected });
+                  const symbol = tokenContract.symbol || null;
+                  const name = tokenContract.name || null;
+                  this.modalTransfer.items.push({
+                    token: this.modalAddTokensToTransfer.token,
+                    type: this.modalAddTokensToTransfer.type,
+                    symbol,
+                    name,
+                    tokenId,
+                  });
+                }
+              }
+            }
             console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
             console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
             this.$refs['addtokensfortransfer'].hide();
@@ -3184,7 +3244,7 @@
                     }
                     if (item.to in selectedAddressesMap) {
                       if (!(item.to in tokenIds)) {
-                        tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber };
+                        tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber, logIndex: item.logIndex };
                       }
                     }
                     tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
