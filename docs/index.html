@@ -178,83 +178,83 @@
             </b-form-group>
           </b-modal>
 
-          <!-- :MODALACTIVITY -->
-          <b-modal id="modal-activity" hide-footer size="lg">
+          <!-- :MODALANNOUNCEMENT -->
+          <b-modal id="modal-announcement" hide-footer size="lg">
             <template #modal-title>
-              Activity
+              Announcement
             </template>
-            <b-form-group v-if="modalActivity.item" label="Transaction:" label-for="activity-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item" label="Transaction:" label-for="announcement-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-txhash" :href="chainInfo.explorerTxPrefix + modalActivity.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalActivity.item.txHash" target="_blank">{{ modalActivity.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalActivity.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="announcement-txhash" :href="chainInfo.explorerTxPrefix + modalAnnouncement.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAnnouncement.item.txHash" target="_blank">{{ modalAnnouncement.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalAnnouncement.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item" label="Timestamp:" label-for="activity-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="activity-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalActivity.item.blockNumber)">{{ formatTimestamp(modalActivity.item.timestamp) }}</b-button>
+            <b-form-group v-if="modalAnnouncement.item" label="Timestamp:" label-for="announcement-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="announcement-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalAnnouncement.item.blockNumber)">{{ formatTimestamp(modalAnnouncement.item.timestamp) }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.tx" label="Sender:" label-for="activity-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.tx.from)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.tx.from)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-registrant" :href="chainInfo.explorerAddressPrefix + modalActivity.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.tx.from }}</b-button>
+                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.tx.from }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.tx.from && (modalActivity.item.tx.from != ensNameOrAddress(modalActivity.item.tx.from))" label="" label-for="activity-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="activity-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx.from && (modalAnnouncement.item.tx.from != ensNameOrAddress(modalAnnouncement.item.tx.from))" label="" label-for="announcement-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="announcement-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAnnouncement.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.stealthAddress" label="Receiver:" label-for="activity-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-receiver" :href="chainInfo.explorerAddressPrefix + modalActivity.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.stealthAddress }}</b-button>
+                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.stealthAddress }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="activity-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="announcement-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalActivity.stealthPrivateKey ? 'text' : 'password'" readonly size="sm" id="activity-spendingprivatekey" :value="modalActivity.stealthPrivateKey ? modalActivity.stealthPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAnnouncement.stealthPrivateKey ? 'text' : 'password'" readonly size="sm" id="announcement-spendingprivatekey" :value="modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
-                  <b-button v-if="!modalActivity.stealthPrivateKey" :disabled="modalActivity.item.linkedTo.address != coinbase" @click="revealModalActivitySpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                  <b-button v-if="modalActivity.stealthPrivateKey" @click="copyToClipboard(modalActivity.stealthPrivateKey ? modalActivity.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button v-if="!modalAnnouncement.stealthPrivateKey" :disabled="modalAnnouncement.item.linkedTo.address != coinbase" @click="revealModalAnnouncementSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalAnnouncement.stealthPrivateKey" @click="copyToClipboard(modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="activity-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-textarea readonly id="activity-stealthmetaaddress" :value="modalActivity.item.linkedTo.stealthMetaAddress" rows="3"></b-textarea>
+                <b-textarea readonly id="announcement-stealthmetaaddress" :value="modalAnnouncement.item.linkedTo.stealthMetaAddress" rows="3"></b-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalActivity.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && modalActivity.item.linkedTo.address" label="and Address:" label-for="activity-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.linkedTo.address)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="and Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.linkedTo.address)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-owner" :href="chainInfo.explorerAddressPrefix + modalActivity.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.linkedTo.address }}</b-button>
+                  <b-button size="sm" id="announcement-owner" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.linkedTo.address }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.linkedTo && (modalActivity.item.linkedTo.address != ensNameOrAddress(modalActivity.item.linkedTo.address))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalActivity.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && (modalAnnouncement.item.linkedTo.address != ensNameOrAddress(modalAnnouncement.item.linkedTo.address))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAnnouncement.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item" label="Mine:" label-for="activity-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" disabled id="activity-mine" value="1" :checked="modalActivity.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
+            <b-form-group v-if="modalAnnouncement.item" label="Mine:" label-for="announcement-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" disabled id="announcement-mine" value="1" :checked="modalAnnouncement.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.transfers" label="Transfers:" label-for="activity-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.transfers" label="Transfers:" label-for="announcement-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
-                <b-table small fixed striped responsive hover :fields="transfersFields" :items="modalActivity.item.transfers" head-variant="light" class="mx-0 my-1" thead-class="hidden_header">
+                <b-table small fixed striped responsive hover :fields="transfersFields" :items="modalAnnouncement.item.transfers" head-variant="light" class="mx-0 my-1" thead-class="hidden_header">
                   <template #cell(tokens)="data">
                     <!-- TODO: Handle ERC-20/ERC-721 -->
                     {{ formatETH(data.item.tokens) }}
@@ -269,24 +269,24 @@
                 </b-table>
               </font>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item" label="Scheme Id:" label-for="activity-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="activity-schemeid">{{ modalActivity.item.schemeId }}</b-button>
+            <b-form-group v-if="modalAnnouncement.item" label="Scheme Id:" label-for="announcement-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="announcement-schemeid">{{ modalAnnouncement.item.schemeId }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="activity-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="announcement-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="activity-ephemeralpublickey" :value="modalActivity.item.ephemeralPublicKey"></b-form-input>
+                <b-form-input type="text" readonly size="sm" id="announcement-ephemeralpublickey" :value="modalAnnouncement.item.ephemeralPublicKey"></b-form-input>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalActivity.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalAnnouncement.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalActivity.item && modalActivity.item.caller" label="Caller:" label-for="activity-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalActivity.item.caller)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.caller)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="activity-caller" :href="chainInfo.explorerAddressPrefix + modalActivity.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalActivity.item.caller }}</b-button>
+                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.caller }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalActivity.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -610,7 +610,7 @@
                   <b-form-select size="sm" v-model="settings.tokenEventsTable.sortOption" @change="saveSettings" :options="tokenEventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredAnnouncements.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
@@ -623,7 +623,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenEvents.length) + '/' + commify0(filteredTokenEvents.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredAnnouncements.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistrations.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
@@ -729,8 +729,8 @@
               </b-card>
 
 
-              <!-- :ACTIVITY -->
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+              <!-- :ANNOUNCEMENTS -->
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="announcementsFields" :items="pagedFilteredSortedAnnouncements" show-empty empty-html="Click Sync above to retrieve stealth address announcements" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.announcementsTable.currentPage - 1) * settings.announcementsTable.pageSize) + 1 }}
@@ -871,7 +871,7 @@
               </b-table>
 
               <!-- :TOKENEVENTS -->
-              <!-- <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='activityRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
+              <!-- <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
               <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -1224,7 +1224,7 @@
             approvedInput: null,
             selectedERC721TokenIds: {},
           },
-          modalActivity: {
+          modalAnnouncement: {
             item: null,
             stealthPrivateKey: null,
           },
@@ -1342,7 +1342,7 @@
             { value: "17", text: '17' },
             { value: "18", text: '18 (common)' },
           ],
-          activityFields: [
+          announcementsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
@@ -1443,7 +1443,7 @@
               };
             }
           },
-          filteredActivity() {
+          filteredAnnouncements() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
@@ -1460,8 +1460,8 @@
             }
             return results;
           },
-          filteredSortedActivity() {
-            let results = this.filteredActivity;
+          filteredSortedAnnouncements() {
+            let results = this.filteredAnnouncements;
             if (this.settings.announcementsTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
@@ -1489,9 +1489,9 @@
             }
             return results;
           },
-          pagedFilteredSortedActivity() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedActivity - results[0..9]: " + JSON.stringify(this.filteredSortedActivity.slice(0, 10), null, 2));
-            return this.filteredSortedActivity.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
+          pagedFilteredSortedAnnouncements() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
           filteredRegistrations() {
@@ -2116,7 +2116,7 @@
             console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
           },
 
-          async revealModalActivitySpendingPrivateKey() {
+          async revealModalAnnouncementSpendingPrivateKey() {
             function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
               const result = {};
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
@@ -2129,9 +2129,9 @@
               return result;
             }
 
-            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - modalActivity: " + JSON.stringify(this.modalActivity, null, 2));
-            const stealthMetaAddressData = this.addresses[this.modalActivity.item.linkedTo.stealthMetaAddress];
-            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
+            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - modalAnnouncement: " + JSON.stringify(this.modalAnnouncement, null, 2));
+            const stealthMetaAddressData = this.addresses[this.modalAnnouncement.item.linkedTo.stealthMetaAddress];
+            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
             const signature = await ethereum.request({
               method: 'personal_sign',
@@ -2153,11 +2153,11 @@
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-            console.log(moment().format("HH:mm:ss") + " revealModalActivitySpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
-            const computedStealthKey = computeStealthKey(this.modalActivity.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
+            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+            const computedStealthKey = computeStealthKey(this.modalAnnouncement.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
             const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
-            Vue.set(this.modalActivity, 'stealthPrivateKey', stealthPrivateKey);
-            console.log("this.modalActivity: " + JSON.stringify(this.modalActivity, null, 2));
+            Vue.set(this.modalAnnouncement, 'stealthPrivateKey', stealthPrivateKey);
+            console.log("this.modalAnnouncement: " + JSON.stringify(this.modalAnnouncement, null, 2));
           },
 
           async revealModalAddressSpendingPrivateKey() {
@@ -2307,12 +2307,12 @@
             console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress END");
           },
 
-          activityRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " activityRowSelected: " + JSON.stringify(item, null, 2));
+          announcementRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " announcementRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
-              this.modalActivity.item = item[0];
-              this.modalActivity.stealthPrivateKey = null;
-              this.$bvModal.show('modal-activity');
+              this.modalAnnouncement.item = item[0];
+              this.modalAnnouncement.stealthPrivateKey = null;
+              this.$bvModal.show('modal-announcement');
               this.$refs.announcementsTable.clearSelected();
             }
           },
