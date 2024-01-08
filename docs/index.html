@@ -292,10 +292,10 @@
             </b-form-group>
           </b-modal>
 
-          <!-- :MODALREGISTRY -->
+          <!-- :MODALREGISTRATION -->
           <b-modal id="modal-registration" hide-footer size="lg">
             <template #modal-title>
-              Registry Entry
+              Registration
             </template>
             <b-form-group v-if="modalRegistration.item" label="Transaction:" label-for="registration-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -598,10 +598,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.announcementsTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.announcementsTable.sortOption" @change="saveSettings" :options="announcementsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registryActivitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registrationsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
@@ -613,11 +613,11 @@
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredActivity.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredRegistryEntries.length) + '/' + commify0(registrations.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
-                  <font size="-2" v-b-popover.hover.bottom="'# registry events'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenEvents.length) + '/' + commify0(filteredTokenEvents.length) }}</font>
@@ -626,7 +626,7 @@
                   <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredActivity.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistryEntries.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistrations.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <!-- TODO -->
@@ -780,8 +780,8 @@
                 </template>
               </b-table>
 
-              <!-- :REGISTRY -->
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registryTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registryRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistryEntries" show-empty empty-html="Click Sync above to retrieve stealth address registry events" head-variant="light" class="mx-0 my-1">
+              <!-- :REGISTRATIONS -->
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve stealth address registrations" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registrationsTable.currentPage - 1) * settings.registrationsTable.pageSize) + 1 }}
@@ -830,7 +830,7 @@
               </b-table>
 
               <!-- :ADDRESSES -->
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address registry events before adding new entries" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address from announcements and registrations" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
@@ -1270,11 +1270,11 @@
             { value: "registry", text: 'ERC-6538 Registry' },
             { value: "caller", text: 'ERC-5564 Caller' },
           ],
-          activitySortOptions: [
+          announcementsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
-          registryActivitySortOptions: [
+          registrationsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
@@ -1494,11 +1494,11 @@
             return this.filteredSortedActivity.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
-          filteredRegistryEntries() {
+          filteredRegistrations() {
             return this.registrations.filter(e => e.chainId == this.chainId);
           },
-          filteredSortedRegistryEntries() {
-            let results = this.filteredRegistryEntries;
+          filteredSortedRegistrations() {
+            let results = this.filteredRegistrations;
             if (this.settings.registrationsTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
@@ -1526,9 +1526,9 @@
             }
             return results;
           },
-          pagedFilteredSortedRegistryEntries() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistryEntries - results[0..9]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 10), null, 2));
-            return this.filteredSortedRegistryEntries.slice((this.settings.registrationsTable.currentPage - 1) * this.settings.registrationsTable.pageSize, this.settings.registrationsTable.currentPage * this.settings.registrationsTable.pageSize);
+          pagedFilteredSortedRegistrations() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedRegistrations - results[0..9]: " + JSON.stringify(this.filteredSortedRegistrations.slice(0, 10), null, 2));
+            return this.filteredSortedRegistrations.slice((this.settings.registrationsTable.currentPage - 1) * this.settings.registrationsTable.pageSize, this.settings.registrationsTable.currentPage * this.settings.registrationsTable.pageSize);
           },
 
           totalAddresses() {
@@ -2317,12 +2317,12 @@
             }
           },
 
-          registryRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " registryRowSelected: " + JSON.stringify(item, null, 2));
+          registrationRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " registrationRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
               this.modalRegistration.item = item[0];
               this.$bvModal.show('modal-registration');
-              this.$refs.registryTable.clearSelected();
+              this.$refs.registrationsTable.clearSelected();
             }
           },
 
@@ -2688,7 +2688,7 @@
             // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - total: " + total);
             this.sync.completed = 0;
             this.sync.total = rows;
-            this.sync.section = 'Registry Entries Tx Data';
+            this.sync.section = 'Registrations Tx Data';
             rows = 0;
             do {
               let data = await db.registrations.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
