@@ -1870,10 +1870,14 @@
             if (address == ADDRESS_ETHEREUMS) {
               return "ETH";
             } else {
-              return address.substring(0, 10);
-
+              if (address in this.tokenContracts[this.chainId]) {
+                const tokenContract = this.tokenContracts[this.chainId][address];
+                return tokenContract.symbol;
+              } else {
+                return address.substring(0, 10);
+              }
             }
-        },
+          },
 
           erc721TokenIdToggle(tokenId) {
             // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - tokenId: " + tokenId);
