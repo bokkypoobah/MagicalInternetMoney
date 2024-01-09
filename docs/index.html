@@ -880,7 +880,7 @@
                     <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) : data.item.address }}</font>
                   </b-link>
                 </template>
-                <template #cell(linkedTo)="data">
+                <!-- <template #cell(linkedTo)="data">
                   <span v-if="data.item.linkedTo && data.item.linkedTo.substring(0, 2) == 'st'">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
                   </span>
@@ -889,7 +889,7 @@
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ nameOrAddress(data.item.linkedTo) }}</font>
                     </b-link>
                   </span>
-                </template>
+                </template> -->
                 <template #cell(name)="data">
                   <!-- <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font> -->
                   <font size="-1">{{ nameOrNull(data.item.address) }}</font>
@@ -1199,7 +1199,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 37,
+            version: 38,
           },
           contracts: {
             "11155111": {
@@ -1443,7 +1443,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080j",
+            name: "stealthchaddata080k",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
@@ -2171,7 +2171,7 @@
             Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
             Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
             Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
-            Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', this.coinbase);
+            Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', { address: this.coinbase });
             let status;
             if (stealthMetaAddress in this.addresses) {
               status = this.addresses[stealthMetaAddress].mine ? "mine" : "notmine";
@@ -2852,7 +2852,7 @@
                   addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
                 }
                 if (!(item.stealthMetaAddress in addresses)) {
-                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: item.registrant, mine: false };
+                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: { address: item.registrant }, mine: false };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -2861,7 +2861,7 @@
 
             for (const [address, addressData] of Object.entries(addresses)) {
               if (addressData.type == "stealthMetaAddress") {
-                const linkedToData = addressData.linkedTo && addresses[addressData.linkedTo] || null;
+                const linkedToData = addressData.linkedTo && addressData.linkedTo.address && addresses[addressData.linkedTo.address] || null;
                 if (linkedToData && linkedToData.mine) {
                   addresses[address].mine = true;
                 }
@@ -3467,6 +3467,8 @@
               const writeRecords = [];
               for (const item of data) {
                 const stealthAddress = item.stealthAddress;
+                const stealthAddressData = this.addresses[stealthAddress];
+                console.log("stealthAddressData: " + JSON.stringify(stealthAddressData, null, 2));
                 const ephemeralPublicKey = item.ephemeralPublicKey;
                 for (const address of checkAddresses) {
                   const viewingPrivateKey = address.viewingPrivateKey;
@@ -3480,6 +3482,8 @@
                     console.log("address: " + JSON.stringify(address, null, 2));
                     item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo };
                     item.mine = true;
+                    Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo });
+                    Vue.set(this.addresses[stealthAddress], 'mine', true);
                     console.log("item: " + JSON.stringify(item, null, 2));
                     writeRecords.push(item);
                     break;
@@ -3497,7 +3501,8 @@
             } while (!done);
             rows = 0;
 
-            // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(accounts, null, 2));
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
