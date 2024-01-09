@@ -351,7 +351,7 @@
                   <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" >{{ modalRegistration.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistration.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="transfer(modalRegistration.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="transfer(modalRegistration.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
