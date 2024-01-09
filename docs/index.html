@@ -2252,17 +2252,17 @@
 
           addStealthMetaAddressToAddresses() {
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses");
-            const account = this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress];
-            if (account) {
-              account.type = "stealthMetaAddress";
-              account.name = this.modalNewStealthMetaAddress.name;
-              account.linkedTo = this.modalNewStealthMetaAddress.linkedTo;
-              account.phrase = this.modalNewStealthMetaAddress.phrase;
-              account.viewingPrivateKey = this.modalNewStealthMetaAddress.viewingPrivateKey;
-              account.spendingPublicKey = this.modalNewStealthMetaAddress.spendingPublicKey;
-              account.viewingPublicKey = this.modalNewStealthMetaAddress.viewingPublicKey;
-              account.mine = true;
-              Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, account);
+            const address = this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress];
+            if (address) {
+              address.type = "stealthMetaAddress";
+              address.name = this.modalNewStealthMetaAddress.name;
+              address.linkedTo = this.modalNewStealthMetaAddress.linkedTo;
+              address.phrase = this.modalNewStealthMetaAddress.phrase;
+              address.viewingPrivateKey = this.modalNewStealthMetaAddress.viewingPrivateKey;
+              address.spendingPublicKey = this.modalNewStealthMetaAddress.spendingPublicKey;
+              address.viewingPublicKey = this.modalNewStealthMetaAddress.viewingPublicKey;
+              address.mine = true;
+              Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, address);
             } else {
               if (!(this.modalNewStealthMetaAddress.linkedTo in this.addresses)) {
                 Vue.set(this.addresses, this.modalNewStealthMetaAddress.linkedTo, {
@@ -2859,9 +2859,9 @@
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
 
-            for (const [address, accountData] of Object.entries(addresses)) {
-              if (accountData.type == "stealthMetaAddress") {
-                const linkedToData = accountData.linkedTo && addresses[accountData.linkedTo] || null;
+            for (const [address, addressData] of Object.entries(addresses)) {
+              if (addressData.type == "stealthMetaAddress") {
+                const linkedToData = addressData.linkedTo && addresses[addressData.linkedTo] || null;
                 if (linkedToData && linkedToData.mine) {
                   addresses[address].mine = true;
                 }
@@ -3402,9 +3402,9 @@
             //   done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             // } while (!done);
             //
-            // for (const [address, accountData] of Object.entries(accounts)) {
-            //   if (accountData.type == "stealthMetaAddress") {
-            //     const linkedToData = accountData.linkedTo && accounts[accountData.linkedTo] || null;
+            // for (const [address, addressData] of Object.entries(accounts)) {
+            //   if (addressData.type == "stealthMetaAddress") {
+            //     const linkedToData = addressData.linkedTo && accounts[addressData.linkedTo] || null;
             //     if (linkedToData && linkedToData.mine) {
             //       accounts[address].mine = true;
             //     }
@@ -3420,8 +3420,8 @@
           async syncENSNames(provider) {
             console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            for (const [account, accountData] of Object.entries(this.addresses)) {
-              if (accountData.type == "address") {
+            for (const [account, addressData] of Object.entries(this.addresses)) {
+              if (addressData.type == "address") {
                 try {
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   const name = allnames.length >= 0 && allnames[0] && ethers.utils.isValidName(allnames[0]) && allnames[0] || null;
@@ -3451,13 +3451,13 @@
             }
 
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
-            const checkAccounts = [];
-            for (const [address, accountData] of Object.entries(this.addresses)) {
-              if (accountData.type == "stealthMetaAddress" && accountData.mine && accountData.viewingPrivateKey) {
-                checkAccounts.push({ address, ...accountData });
+            const checkAddresses = [];
+            for (const [address, addressData] of Object.entries(this.addresses)) {
+              if (addressData.type == "stealthMetaAddress" && addressData.mine && addressData.viewingPrivateKey) {
+                checkAddresses.push({ address, ...addressData });
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - checkAccounts: " + JSON.stringify(checkAccounts.map(e => e.address)));
+            console.log(moment().format("HH:mm:ss") + " processData - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
             let rows = 0;
             let done = false;
@@ -3468,18 +3468,19 @@
               for (const item of data) {
                 const stealthAddress = item.stealthAddress;
                 const ephemeralPublicKey = item.ephemeralPublicKey;
-                for (const account of checkAccounts) {
-                  const viewingPrivateKey = account.viewingPrivateKey;
-                  const viewingPublicKey = account.viewingPublicKey;
-                  const spendingPublicKey = account.spendingPublicKey;
+                for (const address of checkAddresses) {
+                  const viewingPrivateKey = address.viewingPrivateKey;
+                  const viewingPublicKey = address.viewingPublicKey;
+                  const spendingPublicKey = address.spendingPublicKey;
                   const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
                   if (status && status.match) {
                     // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
                     // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
                     // console.log("item: " + JSON.stringify(item, null, 2));
-                    // console.log("account: " + JSON.stringify(account, null, 2));
-                    item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedTo };
+                    console.log("address: " + JSON.stringify(address, null, 2));
+                    item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo };
                     item.mine = true;
+                    console.log("item: " + JSON.stringify(item, null, 2));
                     writeRecords.push(item);
                     break;
                   }
