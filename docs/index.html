@@ -2975,7 +2975,9 @@
             if (selectedAddresses.length > 0) {
               const deleteCall = await db.tokenEvents.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              // TODO Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              // TODO Need to rescan when address set changed
+              const startBlock = 0;
               for (let section = 0; section < 2; section++) {
                 await getLogs(startBlock, latestBlockNumber, section, selectedAddresses, processLogs);
               }
