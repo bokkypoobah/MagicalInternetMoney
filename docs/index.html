@@ -266,20 +266,23 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.transfers" label="Transfers:" label-for="announcement-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
                 <b-row v-for="(item, index) of modalAnnouncement.item.transfers" v-bind:key="item.token">
-                  <b-col cols="3">
+                  <b-col cols="3" class="text-right px-0">
+                    <span v-if="getTokenType(item.token) == 'eth'">
+                      <font size="-1">{{ formatETH(item.value) }}</font>
+                    </span>
+                    <span v-else-if="getTokenType(item.token) == 'erc20'">
+                      <font size="-1">{{ formatETH(item.value) }}</font>
+                    </span>
+                    <span v-else>
+                      <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button>
+                    </span>
+                  </b-col>
+                  <b-col cols="3" class="px-0">
                     <span v-if="isEthereums(item.token)">
                       <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
                     </span>
                     <span v-else>
                       <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button>
-                    </span>
-                  </b-col>
-                  <b-col cols="3">
-                    <span v-if="isEthereums(item.token)">
-                      <font size="-1">{{ formatETH(item.value) }}</font>
-                    </span>
-                    <span v-else>
-                      <font size="-1">{{ formatETH(item.value) }}</font>
                     </span>
                   </b-col>
                 </b-row>
@@ -782,6 +785,21 @@
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
+                <template #cell(tokens)="data">
+                  <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
+                    <b-col>
+                      <span v-if="getTokenType(item.token) == 'eth'">
+                        <font size="-1">{{ formatETH(item.value) }}</font>
+                      </span>
+                      <span v-else-if="getTokenType(item.token) == 'erc20'">
+                        <font size="-1">{{ formatETH(item.value) }}</font>
+                      </span>
+                      <span v-else>
+                        <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button>
+                      </span>
+                    </b-col>
+                  </b-row>
+                </template>
                 <template #cell(token)="data">
                   <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
                     <b-col>
@@ -790,19 +808,6 @@
                       </span>
                       <span v-else>
                         <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button>
-                      </span>
-                    </b-col>
-                  </b-row>
-                </template>
-                <template #cell(tokens)="data">
-                  <!-- TODO: Handle ERC-20/ERC-721 properly -->
-                  <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
-                    <b-col>
-                      <span v-if="isEthereums(item.token)">
-                        <font size="-1">{{ formatETH(item.value) }}</font>
-                      </span>
-                      <span v-else>
-                        <font size="-1">{{ formatETH(item.value) }}</font>
                       </span>
                     </b-col>
                   </b-row>
@@ -1377,11 +1382,11 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
-            { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-truncate', tdClass: 'text-truncate' },
           ],
           registrationsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1880,7 +1885,7 @@
             return address == ADDRESS_ETHEREUMS;
           },
           getTokenSymbol(address) {
-            console.log(moment().format("HH:mm:ss") + " getTokenSymbol - address: " + JSON.stringify(address));
+            // console.log(moment().format("HH:mm:ss") + " getTokenSymbol - address: " + JSON.stringify(address));
             if (address == ADDRESS_ETHEREUMS) {
               return "ETH";
             } else {
@@ -1890,6 +1895,14 @@
               } else {
                 return address.substring(0, 10);
               }
+            }
+          },
+          getTokenType(address) {
+            // console.log(moment().format("HH:mm:ss") + " getTokenType - address: " + JSON.stringify(address));
+            if (address == ADDRESS_ETHEREUMS) {
+              return "eth";
+            } else {
+              return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][address] && this.tokenContracts[this.chainId][address].type || null;
             }
           },
 
@@ -1920,11 +1933,8 @@
                 Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
                 Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
               } else if (tokenContract.type == "erc721") {
-                console.log("DEBUG 1");
                 const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC721ABI, provider);
-                console.log("DEBUG 2: " + this.coinbase + " " + STEALTHCHADADDRESS_SEPOLIA);
                 const isApprovedForAll = await contract.isApprovedForAll(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
-                console.log("DEBUG 3");
                 Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAll', isApprovedForAll.toString());
                 Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAllInput', isApprovedForAll.toString());
               }
@@ -3651,7 +3661,7 @@
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 this.connected = window.ethereum.isConnected();
               } catch (e) {
-                console.log("window.ethereum.request error: " + e.message);
+                console.log("connectToWeb3 - window.ethereum.request error: " + e.message);
                 this.connected = false;
               }
             }
@@ -3661,7 +3671,7 @@
               const t = this;
               function handleChainChanged(_chainId) {
                 t.chainId = parseInt(_chainId);
-                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId.toString());
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleChainChanged - this.chainId: " + t.chainId.toString());
                 // alert('Ethereum chain has changed - reloading this page.')
                 // window.location.reload();
               }
@@ -3670,7 +3680,7 @@
               async function handleAccountsChanged(accounts) {
                 const signer = provider.getSigner();
                 t.coinbase = await signer.getAddress();
-                console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleAccountsChanged: " + t.coinbase);
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged: " + t.coinbase);
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
@@ -3733,12 +3743,12 @@
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
               // TODO: TESTING
-              // (async() => {
-              //   await delay(1500);
-              //   await this.transfer(null);
-              //   await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
-              //   await this.addTokensForTransfer();
-              // })();
+              (async() => {
+                await delay(1500);
+                await this.transfer(null);
+                // await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
+                // await this.addTokensForTransfer();
+              })();
             }
             (async() => {
               await this.loadCurrentData();
