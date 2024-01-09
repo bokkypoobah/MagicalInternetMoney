@@ -2446,7 +2446,7 @@
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncAnnouncements(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
@@ -2461,24 +2461,17 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateAddresses(db, provider, latestBlockNumber);
             }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.syncTokenEvents(db, provider, latestBlockNumber);
-            }
-            // if (network.chainId == CHAINID_SEPOLIA) {
-            //   await this.syncTokenEventsData(db, provider, latestBlockNumber);
-            // }
-            // if (false && network.chainId == CHAINID_MAINNET) {
-            //   // TODO: Handle large volumes of data by indexing addresses and moving LocalStorage items -> IndexedDB
-            //   await this.syncTokenEventsDataMainnet(db, provider, latestBlockNumber);
-            // }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
-              await this.collateTokens(db, provider, latestBlockNumber);
-            }
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
+            }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.syncTokenEvents(db, provider, latestBlockNumber);
+            }
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+              await this.collateTokens(db, provider, latestBlockNumber);
             }
             await this.loadCurrentData();
             this.forceRefresh++; // UI refresh workaround
@@ -3437,6 +3430,7 @@
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
+          // TODO: Rename - identifyMyStealthPayments
           async processData(db, provider, latestBlockNumber) {
             function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
               const result = {};
@@ -3743,12 +3737,12 @@
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
               // TODO: TESTING
-              (async() => {
-                await delay(1500);
-                await this.transfer(null);
-                // await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
-                // await this.addTokensForTransfer();
-              })();
+              // (async() => {
+              //   await delay(1500);
+              //   await this.transfer(null);
+              //   await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
+              //   await this.addTokensForTransfer();
+              // })();
             }
             (async() => {
               await this.loadCurrentData();
