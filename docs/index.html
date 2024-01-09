@@ -170,9 +170,20 @@
                 <b-button size="sm" :href="chainInfo.nftTokenPrefix + modalAddTokensToTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.bottom="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
               </template>
               <template #cell(select)="data">
-                <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)"></b-form-checkbox>
+                <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox>
               </template>
             </b-table>
+            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to StealthChad for transfer" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <!-- <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox> -->
+                <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" unchecked-value="false" class="ml-2"></b-form-checkbox>
+                <!-- <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc721-approved" v-model.trim="modalAddTokensToTransfer.approvedInput"></b-form-input> -->
+                <b-input-group-append>
+                  <b-button :disabled="modalAddTokensToTransfer.isApprovedForAll == modalAddTokensToTransfer.isApprovedForAllInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button @click="additionalTokenSelected();" variant="link"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
             <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="" label-for="transfer-additionaltokens-transfer-erc721" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="!modalAddTokensToTransfer.token || Object.keys(modalAddTokensToTransfer.selectedERC721TokenIds) == 0" id="transfer-additionaltokens-transfer-erc721" @click="addERC721TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
@@ -1240,6 +1251,8 @@
             balance: null,
             approved: null,
             approvedInput: null,
+            isApprovedForAll: null,
+            isApprovedForAllInput: null,
             selectedERC721TokenIds: {},
           },
           modalAnnouncement: {
@@ -1891,11 +1904,12 @@
           },
 
           async additionalTokenSelected() {
-            // console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
-            // console.log(moment().format("HH:mm:ss") + " this.modalTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
+            console.log(moment().format("HH:mm:ss") + " this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
             if (this.modalAddTokensToTransfer.token) {
               const provider = new ethers.providers.Web3Provider(window.ethereum);
               const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+              console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
               Vue.set(this.modalAddTokensToTransfer, 'type', tokenContract.type || null);
               if (tokenContract.type == "erc20") {
                 const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
@@ -1905,8 +1919,16 @@
                 const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
                 Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
                 Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
+              } else if (tokenContract.type == "erc721") {
+                console.log("DEBUG 1");
+                const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC721ABI, provider);
+                console.log("DEBUG 2: " + this.coinbase + " " + STEALTHCHADADDRESS_SEPOLIA);
+                const isApprovedForAll = await contract.isApprovedForAll(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
+                console.log("DEBUG 3");
+                Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAll', isApprovedForAll.toString());
+                Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAllInput', isApprovedForAll.toString());
               }
-              // console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
+              console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
             }
           },
 
@@ -2257,13 +2279,24 @@
           async updateApproval() {
             console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
-            const contractWithSigner = contract.connect(provider.getSigner());
-            try {
-              const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToTransfer.approvedInput, this.modalTransfer.decimals));
-              console.log("tx: " + JSON.stringify(tx));
-            } catch (e) {
-              console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
+            if (this.modalAddTokensToTransfer.type == "erc20") {
+              const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToTransfer.approvedInput, this.modalTransfer.decimals));
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
+              }
+            } else if (this.modalAddTokensToTransfer.type == "erc721") {
+              const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC721ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.setApprovalForAll(STEALTHCHADADDRESS_SEPOLIA, this.modalAddTokensToTransfer.isApprovedForAllInput);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval - ERC721.setApprovalForAll(...) error: " + JSON.stringify(e));
+              }
             }
             console.log(moment().format("HH:mm:ss") + " updateApproval END");
           },
