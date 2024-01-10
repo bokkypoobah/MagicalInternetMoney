@@ -1017,7 +1017,7 @@
               <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Settings</h5>
-                  <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                  <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(new Date()/1000)" class="mx-0 my-1 p-0">
                     <b-form-select size="sm" id="reporting-datetime" v-model="settings.reportingDateTime" @change="saveSettings" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
                   </b-form-group>
 
