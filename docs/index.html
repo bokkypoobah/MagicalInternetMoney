@@ -3668,7 +3668,7 @@
             const account = this.addresses[address];
             if (account) {
               result = address;
-              for (let key of [ 'linkedTo', 'ensName', 'name', 'source', 'stealthMetaAddress' ]) {
+              for (let key of [ 'linkedTo.address', 'linkedTo.stealthMetaAddress', 'ensName', 'name', 'source', 'stealthMetaAddress' ]) {
                 if (key in account) {
                   result = result + "; " + key + "=" + account[key];
                 }
