@@ -387,13 +387,25 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="Linked To:" label-for="address-linkedto" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo)" class="mx-0 my-1 p-0">
+
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-linkedto" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.linkedTo }}</b-button>
+                  <b-button size="sm" id="address-linkedto-stealthmetaaddress" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.stealthMetaAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ nameOrAddress(modalAddress.item.linkedTo.stealthMetaAddress, 28) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo.address)" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto-address" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ nameOrAddress(modalAddress.item.linkedTo.address, 28) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -778,9 +790,17 @@
                   </b-link>
                 </template>
                 <template #cell(linkedTo)="data">
-                  <b-link @click="viewAddress(data.item.linkedTo.address)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
-                  </b-link>
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
+                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
+                      <font v-if="data.item.linkedTo.stealthMetaAddress" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
+                    </b-link>
+                    <br />
+                  </div>
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.address">
+                    <b-link @click="viewAddress(data.item.linkedTo.address)">
+                      <font v-if="data.item.linkedTo.address" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                    </b-link>
+                  </div>
                 </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
@@ -880,16 +900,19 @@
                     <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) : data.item.address }}</font>
                   </b-link>
                 </template>
-                <!-- <template #cell(linkedTo)="data">
-                  <span v-if="data.item.linkedTo && data.item.linkedTo.substring(0, 2) == 'st'">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ shortAddress(data.item.linkedTo) }}</font>
-                  </span>
-                  <span v-else>
-                    <b-link @click="viewAddress(data.item.linkedTo)">
-                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo)">{{ nameOrAddress(data.item.linkedTo) }}</font>
+                <template #cell(linkedTo)="data">
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
+                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
+                      <font v-if="data.item.linkedTo.stealthMetaAddress" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
                     </b-link>
-                  </span>
-                </template> -->
+                    <br />
+                  </div>
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.address">
+                    <b-link @click="viewAddress(data.item.linkedTo.address)">
+                      <font v-if="data.item.linkedTo.address" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                    </b-link>
+                  </div>
+                </template>
                 <template #cell(name)="data">
                   <!-- <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font> -->
                   <font size="-1">{{ nameOrNull(data.item.address) }}</font>
@@ -2469,10 +2492,10 @@
             if (!devMode && network.chainId == CHAINID_MAINNET) {
               await this.syncENSNames(provider);
             }
-            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
+            if (network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
             }
-            if (network.chainId == CHAINID_SEPOLIA) {
+            if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
             }
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
@@ -3480,9 +3503,9 @@
                     // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
                     // console.log("item: " + JSON.stringify(item, null, 2));
                     console.log("address: " + JSON.stringify(address, null, 2));
-                    item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo };
+                    item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo.address };
                     item.mine = true;
-                    Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo });
+                    Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
                     Vue.set(this.addresses[stealthAddress], 'mine', true);
                     console.log("item: " + JSON.stringify(item, null, 2));
                     writeRecords.push(item);
