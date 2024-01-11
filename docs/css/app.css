@@ -46,3 +46,7 @@ img {
 .popover-max-width {
   max-width: 600px !important;
 }
+
+.noscroll::-webkit-scrollbar {
+   display: none;
+ }
