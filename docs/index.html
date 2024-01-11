@@ -410,10 +410,13 @@
               </div>
             </b-form-group>
 
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo.stealthMetaAddress)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-linkedto-stealthmetaaddress" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.stealthMetaAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ nameOrAddress(modalAddress.item.linkedTo.stealthMetaAddress, 28) }}</b-button>
+                  <b-button size="sm" disabled id="address-linkedto-stealthmetaaddress" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.stealthMetaAddress" variant="transparent" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -458,7 +461,7 @@
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
                 <b-input-group-append>
-                  <b-button v-if="!modalAddress.spendingPrivateKey" :disabled="modalAddress.item.linkedTo != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="!modalAddress.spendingPrivateKey" :disabled="modalAddress.item.linkedTo.address != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
                   <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
