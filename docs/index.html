@@ -207,25 +207,30 @@
             <b-form-group v-if="modalAnnouncement.item" label="Timestamp:" label-for="announcement-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="announcement-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalAnnouncement.item.blockNumber)">{{ formatTimestamp(modalAnnouncement.item.timestamp) }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.tx.from)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.tx.from) }}</b-button>
+                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.tx.from) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.tx.from)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.tx.from) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.tx.from)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx.from && ensName(modalAnnouncement.item.tx.from)" label="" label-for="announcement-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="announcement-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-            </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.stealthAddress) }}</b-button>
+                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.stealthAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.stealthAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.stealthAddress) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.stealthAddress)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.stealthAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -239,26 +244,33 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-textarea readonly id="announcement-stealthmetaaddress" :value="modalAnnouncement.item.linkedTo.stealthMetaAddress" rows="3"></b-textarea>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="and Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.linkedTo.address)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-owner" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.linkedTo.address }}</b-button>
+                  <b-button size="sm" id="announcement-stealthmetaaddress" variant="transparent" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && ensName(modalAnnouncement.item.linkedTo.address)" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="and Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="announcement-owner" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.linkedTo.address" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAnnouncement.item" label="Mine:" label-for="announcement-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" disabled id="announcement-mine" value="1" :checked="modalAnnouncement.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
@@ -292,17 +304,22 @@
               <b-button size="sm" variant="transparent" id="announcement-schemeid">{{ modalAnnouncement.item.schemeId }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="announcement-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="announcement-ephemeralpublickey" :value="modalAnnouncement.item.ephemeralPublicKey"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAnnouncement.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.caller)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.caller) }}</b-button>
+                  <b-button size="sm" id="announcement-ephemeralpublickey" variant="transparent" v-b-popover.hover.bottom="modalAnnouncement.item.ephemeralPublicKey" class="m-0 ml-2 p-0">{{ modalAnnouncement.item.ephemeralPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAnnouncement.item.ephemeralPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.caller) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.caller)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.caller) }}</font>
+                  </div>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -329,26 +346,30 @@
             <b-form-group v-if="modalRegistration.item" label="Timestamp:" label-for="registration-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="registration-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalRegistration.item.blockNumber)">{{ formatTimestamp(modalRegistration.item.timestamp) }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalRegistration.item" label="Registrant:" label-for="registration-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.registrant)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistration.item" label="Registrant:" label-for="registration-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalRegistration.item.registrant) }}</b-button>
+                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalRegistration.item.registrant) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalRegistration.item.registrant)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.registrant) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(modalRegistration.item.registrant)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalRegistration.item.registrant)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalRegistration.item && modalRegistration.item.registrant && ensName(modalRegistration.item.registrant)" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalRegistration.item.registrant)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-            </b-form-group>
             <b-form-group v-if="modalRegistration.item" label="Scheme Id:" label-for="registration-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="registration-schemeid">{{ modalRegistration.item.schemeId }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddress(modalRegistration.item.stealthMetaAddress) }}</b-button>
+                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress) }}</font>
+                  </div>
                 </div>
                 <div>
                   <b-button size="sm" @click="transfer(modalRegistration.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -443,28 +464,34 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="address-viewingprivatekey" :value="modalAddress.item.viewingPrivateKey"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-viewingprivatekey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.viewingPrivateKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.viewingPrivateKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="address-spendingpublickey" :value="modalAddress.item.spendingPublicKey"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-spendingpublickey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.spendingPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.spendingPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Spending Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" readonly size="sm" id="address-viewingpublickey" :value="modalAddress.item.viewingPublicKey"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-viewingpublickey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.viewingPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.viewingPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="modalAddress.item.linkedTo != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
@@ -575,7 +602,7 @@
                   </b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.tokenEventsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">
+                  <b-form-checkbox size="sm" v-model.trim="settings.tokenContractsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">
                     Active Only
                   </b-form-checkbox>
                 </div>
@@ -648,7 +675,7 @@
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.tokenEventsTable.sortOption" @change="saveSettings" :options="tokenEventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.tokenContractsTable.sortOption" @change="saveSettings" :options="tokenContractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredAnnouncements.length) + '/' + commify0(announcements.length) }}</font>
@@ -661,7 +688,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenEvents.length) + '/' + commify0(filteredTokenEvents.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenContracts.length) + '/' + commify0(filteredTokenContracts.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredAnnouncements.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
@@ -674,7 +701,7 @@
                   <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="filteredAddresses.length" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.tokenEventsTable.currentPage" @input="saveSettings" :total-rows="filteredTokenEvents.length" :per-page="settings.tokenEventsTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.tokenContractsTable.currentPage" @input="saveSettings" :total-rows="filteredTokenContracts.length" :per-page="settings.tokenContractsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.announcementsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -686,7 +713,7 @@
                   <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.tokenEventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.tokenContractsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -938,11 +965,10 @@
               </b-table>
 
               <!-- :TOKENEVENTS -->
-              <!-- <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1"> -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenEventsTable" small fixed striped responsive hover :fields="tokenEventsFields" :items="pagedFilteredSortedTokenEvents" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.tokenEventsTable.currentPage - 1) * settings.tokenEventsTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.tokenContractsTable.currentPage - 1) * settings.tokenContractsTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(contract)="data">
@@ -1153,7 +1179,8 @@
           DB_PROCESSING_BATCH_SIZE: 1000,
           TXHASH_SEGMENT_LENGTH: 8,
           ADDRESS_SEGMENT_LENGTH: 12,
-          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 18,
+          PUBLICKEY_SEGMENT_LENGTH: 18,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -1193,7 +1220,7 @@
               pageSize: 25,
               sortOption: 'typenameasc',
             },
-            tokenEventsTable: {
+            tokenContractsTable: {
               activeOnly: false,
               filter: null,
               currentPage: 1,
@@ -1232,7 +1259,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 38,
+            version: 39,
           },
           contracts: {
             "11155111": {
@@ -1366,7 +1393,7 @@
             { value: 'addressasc', text: '▲ Address' },
             { value: 'addressdsc', text: '▼ Address' },
           ],
-          tokenEventsSortOptions: [
+          tokenContractsSortOptions: [
             { value: 'typenameasc', text: '▲ Type, ▲ Name' },
             { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
             { value: 'nameasc', text: '▲ Name' },
@@ -1443,7 +1470,7 @@
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
-          tokenEventsFields: [
+          tokenContractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'active', label: 'Active', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1492,7 +1519,7 @@
           additionalERC20TokensOptions() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
-            for (const item of this.filteredSortedTokenEvents) {
+            for (const item of this.filteredSortedTokenContracts) {
               if (item.active) {
                 results.push({ value: item.contract, text: (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + ' @ ' + item.contract.substring(0, 10) })
               }
@@ -1689,11 +1716,11 @@
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
-          filteredTokenEvents() {
+          filteredTokenContracts() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
               let include = true;
-              if (this.settings.tokenEventsTable.activeOnly) {
+              if (this.settings.tokenContractsTable.activeOnly) {
                 if (!contractData.active) {
                   include = false;
                 }
@@ -1720,13 +1747,11 @@
                 });
               }
             }
-            // console.log("filteredTokenEvents - this.tokenEvents: " + JSON.stringify(this.tokenEvents));
             return results;
           },
-
-          filteredSortedTokenEvents() {
-            let results = this.filteredTokenEvents;
-            if (this.settings.tokenEventsTable.sortOption == 'typenameasc') {
+          filteredSortedTokenContracts() {
+            let results = this.filteredTokenContracts;
+            if (this.settings.tokenContractsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
@@ -1738,7 +1763,7 @@
                   return ('' + a.type).localeCompare(b.type);
                 }
               });
-            } else if (this.settings.tokenEventsTable.sortOption == 'typenamedsc') {
+            } else if (this.settings.tokenContractsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
                 if (('' + a.type).localeCompare(b.type) == 0) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
@@ -1750,7 +1775,7 @@
                   return ('' + b.type).localeCompare(a.type);
                 }
               });
-            } else if (this.settings.tokenEventsTable.sortOption == 'nameasc') {
+            } else if (this.settings.tokenContractsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
                 if (('' + a.name).localeCompare(b.name) == 0) {
                   return ('' + a.address).localeCompare(b.address);
@@ -1758,7 +1783,7 @@
                   return ('' + a.name).localeCompare(b.name);
                 }
               });
-            } else if (this.settings.tokenEventsTable.sortOption == 'namedsc') {
+            } else if (this.settings.tokenContractsTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
                 if (('' + a.name).localeCompare(b.name) == 0) {
                   return ('' + b.address).localeCompare(a.address);
@@ -1766,20 +1791,20 @@
                   return ('' + b.name).localeCompare(a.name);
                 }
               });
-            } else if (this.settings.tokenEventsTable.sortOption == 'addressasc') {
+            } else if (this.settings.tokenContractsTable.sortOption == 'addressasc') {
               results.sort((a, b) => {
                 return ('' + a.contract).localeCompare(b.contract);
               });
-            } else if (this.settings.tokenEventsTable.sortOption == 'addressdsc') {
+            } else if (this.settings.tokenContractsTable.sortOption == 'addressdsc') {
               results.sort((a, b) => {
                 return ('' + b.contract).localeCompare(a.contract);
               });
             }
             return results;
           },
-          pagedFilteredSortedTokenEvents() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedTokenEvents - results[0..9]: " + JSON.stringify(this.pagedFilteredSortedTokenEvents.slice(0, 10), null, 2));
-            return this.filteredSortedTokenEvents.slice((this.settings.tokenEventsTable.currentPage - 1) * this.settings.tokenEventsTable.pageSize, this.settings.tokenEventsTable.currentPage * this.settings.tokenEventsTable.pageSize);
+          pagedFilteredSortedTokenContracts() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedTokenContracts - results[0..9]: " + JSON.stringify(this.pagedFilteredSortedTokenContracts.slice(0, 10), null, 2));
+            return this.filteredSortedTokenContracts.slice((this.settings.tokenContractsTable.currentPage - 1) * this.settings.tokenContractsTable.pageSize, this.settings.tokenContractsTable.currentPage * this.settings.tokenContractsTable.pageSize);
           },
 
           totalContracts() {
@@ -1927,7 +1952,7 @@
             if (address == ADDRESS_ETHEREUMS) {
               return "ETH";
             } else {
-              if (address in this.tokenContracts[this.chainId]) {
+              if (address in (this.tokenContracts[this.chainId] || {})) {
                 const tokenContract = this.tokenContracts[this.chainId][address];
                 return tokenContract.symbol;
               } else {
@@ -3059,182 +3084,6 @@
             console.log(moment().format("HH:mm:ss") + " syncTokenEvents END");
           },
 
-          // async syncTokenEventsData(db, provider, latestBlockNumber) {
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsData BEGIN");
-          //   let rows = 0;
-          //   let done = false;
-          //   do {
-          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-          //     rows = parseInt(rows) + data.length;
-          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-          //   } while (!done);
-          //   // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - total: " + total);
-          //   this.sync.completed = 0;
-          //   this.sync.total = rows;
-          //   this.sync.section = 'Token Events Tx Data';
-          //   rows = 0;
-          //   do {
-          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-          //     const records = [];
-          //     for (const item of data) {
-          //       if (item.timestamp == null && item.chainId == this.chainId) {
-          //         console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: " + JSON.stringify(item));
-          //         const block = await provider.getBlock(item.blockNumber);
-          //         item.timestamp = block.timestamp;
-          //         // const tx = await provider.getTransaction(item.txHash);
-          //         // const txReceipt = await provider.getTransactionReceipt(item.txHash);
-          //         // item.tx = {
-          //         //   type: tx.type,
-          //         //   blockHash: tx.blockHash,
-          //         //   from: tx.from,
-          //         //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-          //         //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-          //         //   to: tx.to,
-          //         //   value: ethers.BigNumber.from(tx.value).toString(),
-          //         //   nonce: tx.nonce,
-          //         //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-          //         //   chainId: tx.chainId,
-          //         //   contractAddress: txReceipt.contractAddress,
-          //         //   transactionIndex: txReceipt.transactionIndex,
-          //         //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-          //         //   blockHash: txReceipt.blockHash,
-          //         //   logs: txReceipt.logs,
-          //         //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-          //         //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-          //         //   status: txReceipt.status,
-          //         //   type: txReceipt.type,
-          //         // };
-          //         records.push(item);
-          //       } else {
-          //         // console.log(moment().format("HH:mm:ss") + " syncTokenEventsData: TIMESTAMP <> NULL" + JSON.stringify(item));
-          //       }
-          //     }
-          //     if (records.length > 0) {
-          //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsData - records: " + JSON.stringify(records));
-          //       await db.tokenEvents.bulkPut(records).then (function() {
-          //       }).catch(function(error) {
-          //         console.log("syncTokenEventsData.bulkPut error: " + error);
-          //       });
-          //     }
-          //     rows = parseInt(rows) + data.length;
-          //     this.sync.completed = rows;
-          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-          //   } while (!done);
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsData END");
-          // },
-
-          // async syncTokenEventsDataMainnet(db, provider, latestBlockNumber) {
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet BEGIN");
-          //   let rows = 0;
-          //   let done = false;
-          //
-          //   const blocksWithNullTimestampsMap = {};
-          //   do {
-          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-          //     for (const item of data) {
-          //       if (item.timestamp == null) {
-          //         if (!(item.blockNumber in blocksWithNullTimestampsMap)) {
-          //           blocksWithNullTimestampsMap[item.blockNumber] = true;
-          //         }
-          //       }
-          //     }
-          //     rows = parseInt(rows) + data.length;
-          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-          //   } while (!done);
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - rows: " + rows);
-          //   const blocksWithNullTimestamps = Object.keys(blocksWithNullTimestampsMap);
-          //   // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blocksWithNullTimestamps: " + JSON.stringify(blocksWithNullTimestamps));
-          //
-          //   const blockTimestamps = {};
-          //   const BATCHSIZE = 1000;
-          //   for (let i = 0; i < blocksWithNullTimestamps.length; i += BATCHSIZE) {
-          //     const batch = blocksWithNullTimestamps.slice(i, parseInt(i) + BATCHSIZE);
-          //     // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - batch[0]: " + batch[0] + ", batch[-1]: " + batch.slice(-1));
-          //     const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-          //       method: 'POST',
-          //       headers: {
-          //         'Content-Type': 'application/json',
-          //         'Accept': 'application/json',
-          //       },
-          //       body: JSON.stringify({
-          //         query: BLOCKTIMESTAMPINQUERY,
-          //         variables: { blockNumbers: batch.map(e => parseInt(e)) },
-          //       })
-          //     }).then(response => response.json())
-          //       .catch(function(e) {
-          //         console.log("error: " + e);
-          //       });
-          //     const timestamps = data.data && data.data.blocks || [];
-          //     // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - timestamps: " + JSON.stringify(timestamps));
-          //     for (const timestampItem of timestamps) {
-          //       blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
-          //     //   Vue.set(this.blockTimestamps, parseInt(timestampItem.number), parseInt(timestampItem.timestamp));
-          //     }
-          //     this.sync.completed += batch.length;
-          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet " + this.sync.completed + " of " + blocksWithNullTimestamps.length);
-          //   }
-          //
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - blockTimestamps: " + JSON.stringify(blockTimestamps));
-          //
-          //   // this.sync.completed = 0;
-          //   // this.sync.total = rows;
-          //   // this.sync.section = 'Token Events Tx Data';
-          //   rows = 0;
-          //   do {
-          //     let data = await db.tokenEvents.offset(rows).limit(this.DB_PROCESSING_BATCH_SIZE).toArray();
-          //     console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-          //     const records = [];
-          //     for (const item of data) {
-          //       if (item.timestamp == null && item.chainId == this.chainId) {
-          //         item.timestamp = blockTimestamps[item.blockNumber];
-          //   //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: " + JSON.stringify(item));
-          //   //       const block = await provider.getBlock(item.blockNumber);
-          //   //       item.timestamp = block.timestamp;
-          //   //       // const tx = await provider.getTransaction(item.txHash);
-          //   //       // const txReceipt = await provider.getTransactionReceipt(item.txHash);
-          //   //       // item.tx = {
-          //   //       //   type: tx.type,
-          //   //       //   blockHash: tx.blockHash,
-          //   //       //   from: tx.from,
-          //   //       //   gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
-          //   //       //   gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
-          //   //       //   to: tx.to,
-          //   //       //   value: ethers.BigNumber.from(tx.value).toString(),
-          //   //       //   nonce: tx.nonce,
-          //   //       //   data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
-          //   //       //   chainId: tx.chainId,
-          //   //       //   contractAddress: txReceipt.contractAddress,
-          //   //       //   transactionIndex: txReceipt.transactionIndex,
-          //   //       //   gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
-          //   //       //   blockHash: txReceipt.blockHash,
-          //   //       //   logs: txReceipt.logs,
-          //   //       //   cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
-          //   //       //   effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
-          //   //       //   status: txReceipt.status,
-          //   //       //   type: txReceipt.type,
-          //   //       // };
-          //         records.push(item);
-          //   //     } else {
-          //   //       // console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet: TIMESTAMP <> NULL" + JSON.stringify(item));
-          //       }
-          //     }
-          //     if (records.length > 0) {
-          //       console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet - records: " + JSON.stringify(records));
-          //       await db.tokenEvents.bulkPut(records).then (function() {
-          //       }).catch(function(error) {
-          //         console.log("syncTokenEventsDataMainnet.bulkPut error: " + error);
-          //       });
-          //     }
-          //     rows = parseInt(rows) + data.length;
-          //     // this.sync.completed = rows;
-          //     done = data.length < this.DB_PROCESSING_BATCH_SIZE;
-          //   } while (!done);
-          //   console.log(moment().format("HH:mm:ss") + " syncTokenEventsDataMainnet END");
-          // },
-
           async collateTokens(db, provider, latestBlockNumber) {
             // TODO: Handle low confirmation events
             console.log(moment().format("HH:mm:ss") + " collateTokens BEGIN");
@@ -3641,7 +3490,11 @@
               } else if (account && account.ensName) {
                   return account.ensName;
               } else {
-                return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                if (address.substring(0, 3) == "st:") {
+                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                } else {
+                  return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                }
               }
             }
             return null;
@@ -3651,12 +3504,24 @@
               const account = this.addresses[address];
               if (account && account.name) {
                 if (account.ensName) {
-                  return account.ensName + ', ' + address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                  if (address.substring(0, 3) == "st:") {
+                    return account.ensName + ', ' + address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                  } else {
+                    return account.ensName + ', ' + address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                  }
+                } else {
+                  if (address.substring(0, 3) == "st:") {
+                    return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                  } else {
+                    return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                  }
+                }
+              } else if (account && account.ensName) {
+                if (address.substring(0, 3) == "st:") {
+                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
                 } else {
                   return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
                 }
-              } else if (account && account.ensName) {
-                  return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
               } else {
                 return null;
               }
@@ -3843,8 +3708,8 @@
               if (this.settings.addressesTable.currentPage > 1) {
                 this.settings.addressesTable.currentPage = 1;
               }
-              if (this.settings.tokenEventsTable.currentPage > 1) {
-                this.settings.tokenEventsTable.currentPage = 1;
+              if (this.settings.tokenContractsTable.currentPage > 1) {
+                this.settings.tokenContractsTable.currentPage = 1;
               }
               if (this.settings.contractsTable.currentPage > 1) {
                 this.settings.contractsTable.currentPage = 1;
