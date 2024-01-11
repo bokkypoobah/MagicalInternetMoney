@@ -363,18 +363,19 @@
             <template #modal-title>
               {{ modalAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
             </template>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.address)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" v-b-popover.hover="modalAddress.item.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.address) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.address) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-            </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address' && modalAddress.item.ensName" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -399,18 +400,19 @@
               </div>
             </b-form-group>
 
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAddress.item.linkedTo.address)" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-linkedto-address" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.address" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ nameOrAddress(modalAddress.item.linkedTo.address, 28) }}</b-button>
+                  <b-button size="sm" id="address-linkedto-address" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.address" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.address) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.address) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-            </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="(modalAddress.item.linkedTo)" id="address-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -1150,8 +1152,8 @@
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 1000,
           TXHASH_SEGMENT_LENGTH: 8,
-          ADDRESS_SEGMENT_LENGTH: 8,
-          STEALTHMETAADDRESS_SEGMENT_LENGTH: 8,
+          ADDRESS_SEGMENT_LENGTH: 12,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
