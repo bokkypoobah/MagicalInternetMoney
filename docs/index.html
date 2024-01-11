@@ -621,7 +621,10 @@
                 <div class="mt-0 pl-1">
                   <b-button size="sm" @click="transfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 flex-grow-1">
+                <div v-if="settings.tabIndex == 0 || settings.tabIndex == 2" class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-button size="sm" @click="downloadAnnouncements" variant="link" v-b-popover.hover.bottom="'Download announcements'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-button size="sm" @click="downloadAddresses" variant="link" v-b-popover.hover.bottom="'Download addresses'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
@@ -794,6 +797,9 @@
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ nameOrAddress(data.item.stealthAddress, 28) }}</font>
                   </b-link>
                 </template>
+                <template #cell(mine)="data">
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
+                </template>
                 <template #cell(linkedTo)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
@@ -806,9 +812,6 @@
                       <font v-if="data.item.linkedTo.address" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
                     </b-link>
                   </div>
-                </template>
-                <template #cell(mine)="data">
-                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(tokens)="data">
                   <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
@@ -1413,10 +1416,10 @@
           ],
           announcementsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-truncate', tdClass: 'text-truncate' },
@@ -3716,6 +3719,40 @@
           copyToClipboard(str) {
             navigator.clipboard.writeText(str);
           },
+          downloadAnnouncements() {
+            console.log(moment().format("HH:mm:ss") + " downloadAnnouncements");
+            const rows = [
+                ["Chain Id", "Block Number", "Tx Index", "Log Index", "Tx Hash", "When", "Sender", "Receiver Stealth Address", "Ephemeral Public Key", "Mine", "Linked To Stealth Meta-Address", "Linked To Address", "Token", "Value" ],
+            ];
+            for (const item of this.filteredSortedAnnouncements) {
+              for (const transfer of item.transfers) {
+                rows.push([
+                  item.chainId,
+                  item.blockNumber,
+                  item.txIndex,
+                  item.logIndex,
+                  item.txHash,
+                  this.formatTimestamp(item.timestamp),
+                  item.tx.from,
+                  item.stealthAddress,
+                  item.ephemeralPublicKey,
+                  item.mine,
+                  item.linkedTo && item.linkedTo.stealthMetaAddress,
+                  item.linkedTo && item.linkedTo.address,
+                  transfer.token == ADDRESS_ETHEREUMS ? "ETH" : transfer.token,
+                  transfer.value, // TODO: handle token decimals etc
+                ]);
+              }
+            }
+            let tsvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
+            // console.log("tsvContent: " + tsvContent);
+            var encodedUri = encodeURI(tsvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
+            link.setAttribute("download", "stealthchad_announcements-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            document.body.appendChild(link); // Required for FF
+            link.click(); // This will download the data with the specified file name
+          },
           downloadAddresses() {
             console.log(moment().format("HH:mm:ss") + " downloadAddresses");
             const rows = [
@@ -3724,8 +3761,8 @@
             for (const item of this.filteredSortedAddresses) {
               rows.push([ item.address, item.type, item.mine, item.name, item.ensName, item.phrase, item.linkedTo && item.linkedTo.stealthMetaAddress, item.linkedTo && item.linkedTo.address ]);
             }
-            let csvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
-            var encodedUri = encodeURI(csvContent);
+            let tsvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
+            var encodedUri = encodeURI(tsvContent);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
             link.setAttribute("download", "stealthchad_addresses-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
