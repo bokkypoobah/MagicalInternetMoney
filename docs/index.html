@@ -49,7 +49,7 @@
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
-            <b-avatar v-if="coinbase && coinbase != ensNameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
@@ -81,8 +81,8 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="coinbase != ensNameOrAddress(coinbase)" label="" label-for="transfer-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="ensName(coinbase)" label="" label-for="transfer-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress) || 'Stealth Meta-Address'" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -217,8 +217,8 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx.from && (modalAnnouncement.item.tx.from != ensNameOrAddress(modalAnnouncement.item.tx.from))" label="" label-for="announcement-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="announcement-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAnnouncement.item.tx.from, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx.from && ensName(modalAnnouncement.item.tx.from)" label="" label-for="announcement-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="announcement-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -257,8 +257,8 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && (modalAnnouncement.item.linkedTo.address != ensNameOrAddress(modalAnnouncement.item.linkedTo.address))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAnnouncement.item.linkedTo.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && ensName(modalAnnouncement.item.linkedTo.address)" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAnnouncement.item" label="Mine:" label-for="announcement-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" description="NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" disabled id="announcement-mine" value="1" :checked="modalAnnouncement.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
@@ -339,8 +339,8 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalRegistration.item && modalRegistration.item.registrant && (modalRegistration.item.registrant != ensNameOrAddress(modalRegistration.item.registrant))" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalRegistration.item.registrant, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="modalRegistration.item && modalRegistration.item.registrant && ensName(modalRegistration.item.registrant)" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalRegistration.item.registrant)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalRegistration.item" label="Scheme Id:" label-for="registration-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="registration-schemeid">{{ modalRegistration.item.schemeId }}</b-button>
@@ -374,7 +374,7 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address' && modalAddress.item.ensName" label="" label-for="address-ensnameimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="modalAddress.item.address != ensNameOrAddress(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.address, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+              <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -410,7 +410,7 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-linkedtoimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar v-if="modalAddress.item.linkedTo != ensNameOrAddress(modalAddress.item.linkedTo)" id="address-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(modalAddress.item.linkedTo, 100)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+              <b-avatar v-if="(modalAddress.item.linkedTo)" id="address-linkedtoimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -485,8 +485,8 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="coinbase != ensNameOrAddress(coinbase)" label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensNameOrAddress(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            <b-form-group v-if="ensName(coinbase)" label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-avatar id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
@@ -937,7 +937,7 @@
                 </template>
                 <template #cell(contract)="data">
                   <b-link :href="chainInfo.explorerAddressPrefix + data.item.contract + '#code'" target="_blank">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.contract)">{{ ensNameOrAddress(data.item.contract, 21) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.contract)">{{ formatAddress(data.item.contract) }}</font>
                   </b-link>
                 </template>
                 <template #cell(type)="data">
@@ -1141,9 +1141,9 @@
         data: {
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 1000,
-          TXHASH_SEGMENT_LENGTH: 12,
-          ADDRESS_SEGMENT_LENGTH: 12,
-          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
+          TXHASH_SEGMENT_LENGTH: 8,
+          ADDRESS_SEGMENT_LENGTH: 8,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 8,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -3605,22 +3605,21 @@
             }
             return null;
           },
+          ensName(address) {
+            const account = this.addresses[address];
+            return account && account.ensName || null;
+          },
           ensNameOrAddress(address, length = 0) {
             let result = null;
             const account = this.addresses[address];
             if (account && account.ensName) {
               if (length > 0 && account.ensName.length > length) {
                 result = account.ensName.substring(0, (length-7)/2) + '...' + account.ensName.slice(-((length-7)/2 + 4));
-                // result = account.ensName;
               } else {
                 result = account.ensName;
               }
             } else if (address) {
-              if (length > 0) {
-                result = address.substring(0, ((length-5)/2 + 2)) + '...' + address.slice(-(length-5)/2);
-              } else {
-                result = address;
-              }
+              result =  address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
             }
             return result;
           },
