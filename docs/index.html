@@ -399,7 +399,17 @@
               </div>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
+
+              <b-input-group size="sm" class="w-100">
+                <!-- <b-form-textarea size="sm" readonly id="address-stealthmetaaddress" :value="modalAddress.item.address" rows="3" max-rows="4"></b-form-textarea> -->
+                <b-form-textarea size="sm" id="address-stealthmetaaddress" v-model.trim="modalAddress.item.address" plaintext rows="3" max-rows="4" class="ml-2" style="overflow:auto"></b-form-textarea>
+                <b-input-group-append style="vertical-align: text-top;">
+                  <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+
+              <!-- <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ formatAddress(modalAddress.item.address) }}</b-button>
                 </div>
@@ -407,7 +417,7 @@
                   <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
-              </div>
+              </div> -->
             </b-form-group>
 
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
