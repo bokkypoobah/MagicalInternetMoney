@@ -621,6 +621,11 @@
                 <div class="mt-0 pl-1">
                   <b-button size="sm" @click="transfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 flex-grow-1">
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-button size="sm" @click="downloadAddresses" variant="link" v-b-popover.hover.bottom="'Download addresses'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
+                </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div class="mt-0 pl-1">
@@ -3710,6 +3715,22 @@
           },
           copyToClipboard(str) {
             navigator.clipboard.writeText(str);
+          },
+          downloadAddresses() {
+            console.log(moment().format("HH:mm:ss") + " downloadAddresses");
+            const rows = [
+                ["Address", "Type", "Mine", "Name", "ENS Name", "Phrase"],
+            ];
+            for (const item of this.filteredSortedAddresses) {
+              rows.push([ item.address, item.type, item.mine, item.name, item.ensName, item.phrase ]);
+            }
+            let csvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
+            var encodedUri = encodeURI(csvContent);
+            var link = document.createElement("a");
+            link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
+            link.setAttribute("download", "stealthchad_addresses-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            document.body.appendChild(link); // Required for FF
+            link.click(); // This will download the data with the specified file name
           },
           async connectToWeb3() {
             if (!window.ethereum) {
