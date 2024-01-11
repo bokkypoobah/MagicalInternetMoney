@@ -197,7 +197,7 @@
             <b-form-group v-if="modalAnnouncement.item" label="Transaction:" label-for="announcement-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-txhash" :href="chainInfo.explorerTxPrefix + modalAnnouncement.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAnnouncement.item.txHash" target="_blank">{{ modalAnnouncement.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalAnnouncement.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="announcement-txhash" :href="chainInfo.explorerTxPrefix + modalAnnouncement.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAnnouncement.item.txHash" target="_blank">{{ formatTxHash(modalAnnouncement.item.txHash) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -210,7 +210,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.tx.from)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.tx.from }}</b-button>
+                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.tx.from) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -223,7 +223,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.stealthAddress) || 'Receiver Stealth Address'" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.stealthAddress }}</b-button>
+                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.stealthAddress) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -302,7 +302,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalAnnouncement.item.caller)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalAnnouncement.item.caller }}</b-button>
+                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalAnnouncement.item.caller) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -319,7 +319,7 @@
             <b-form-group v-if="modalRegistration.item" label="Transaction:" label-for="registration-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-txhash" :href="chainInfo.explorerTxPrefix + modalRegistration.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.txHash" target="_blank">{{ modalRegistration.item.txHash.substring(0, (TXHASH_DISPLAY_LENGTH-2)/2) + '...' + modalRegistration.item.txHash.slice(-TXHASH_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registration-txhash" :href="chainInfo.explorerTxPrefix + modalRegistration.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.txHash" target="_blank">{{ formatTxHash(modalRegistration.item.txHash) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -332,7 +332,7 @@
             <b-form-group v-if="modalRegistration.item" label="Registrant:" label-for="registration-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.registrant)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalRegistration.item.registrant }}</b-button>
+                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalRegistration.item.registrant) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -348,7 +348,7 @@
             <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalRegistration.item.stealthMetaAddress)" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" >{{ modalRegistration.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalRegistration.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddress(modalRegistration.item.stealthMetaAddress) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="transfer(modalRegistration.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -379,7 +379,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ modalAddress.item.address.substring(0, (STEALTHMETAADDRESS_DISPLAY_LENGTH-2)/2) + '...' + modalAddress.item.address.slice(-STEALTHMETAADDRESS_DISPLAY_LENGTH/2) }}</b-button>
+                  <b-button size="sm" id="address-stealthmetaaddress" variant="transparent" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAddress.item.address" >{{ formatAddress(modalAddress.item.address) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -529,7 +529,7 @@
             <b-form-group v-if="modalContract.item && modalContract.item.contract" label="Address:" label-for="contract-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ modalContract.item.contract }}</b-button>
+                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalContract.item.contract" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatAddress(modalContract.item.contract) }}</b-button>
                 </div>
                 <div>
                   <b-button size="sm" @click="copyToClipboard(modalContract.item.contract);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -866,7 +866,7 @@
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ data.item.stealthMetaAddress.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.stealthMetaAddress.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ formatAddress(data.item.stealthMetaAddress) }}</font>
                   </b-link>
                 </template>
                 <!-- <template #cell(contract)="data">
@@ -897,7 +897,7 @@
                 </template>
                 <template #cell(address)="data">
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
-                    <font size="-1">{{ data.item.address.substring(0, 2) == 'st' ? data.item.address.substring(0, (STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH-2)/2) + '...' + data.item.address.slice(-STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH/2) : data.item.address }}</font>
+                    <font size="-1">{{ formatAddress(data.item.address) }}</font>
                   </b-link>
                 </template>
                 <template #cell(linkedTo)="data">
@@ -1017,7 +1017,7 @@
               <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Settings</h5>
-                  <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(new Date()/1000)" class="mx-0 my-1 p-0">
+                  <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(timestamp)" class="mx-0 my-1 p-0">
                     <b-form-select size="sm" id="reporting-datetime" v-model="settings.reportingDateTime" @change="saveSettings" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
                   </b-form-group>
 
@@ -1141,9 +1141,9 @@
         data: {
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 1000,
-          TXHASH_DISPLAY_LENGTH: 50,
-          STEALTHMETAADDRESS_SHORT_DISPLAY_LENGTH: 39,
-          STEALTHMETAADDRESS_DISPLAY_LENGTH: 59,
+          TXHASH_SEGMENT_LENGTH: 12,
+          ADDRESS_SEGMENT_LENGTH: 12,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
           chainId: null,
@@ -3592,17 +3592,18 @@
               return moment.unix(unixtime).fromNow();
             }
           },
-          shortAddress(address) {
-            let result = null;
+          formatTxHash(txHash) {
+            return txHash && txHash.substring(0, this.TXHASH_SEGMENT_LENGTH + 2) + '...' + txHash.slice(-this.TXHASH_SEGMENT_LENGTH) || null;
+          },
+          formatAddress(address) {
             if (address) {
               if (address.substring(0, 3) == "st:") {
-                result = address.substring(0, (9+16)) + "..." + address.slice(-16);
+                return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
               } else {
-                // result = address.substring(0, 10) + "..." + address.slice(-8);
-                result = address;
+                return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
               }
             }
-            return result;
+            return null;
           },
           ensNameOrAddress(address, length = 0) {
             let result = null;
