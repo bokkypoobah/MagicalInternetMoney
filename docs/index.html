@@ -474,19 +474,19 @@
             <template #modal-title>
               Generate New Stealth Meta-Address
             </template>
-            <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
-
+            <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="newsma-attachedaddress" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="newsma-attachedaddress" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" v-b-popover.hover="coinbase" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(coinbase) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(coinbase)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(coinbase) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-            </b-form-group>
-            <b-form-group v-if="ensName(coinbase)" label="" label-for="newsma-attachedaddressimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="newsma-attachedaddressimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="Name:" label-for="newsma-smaname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input type="text" size="sm" id="newsma-smaname" v-model.trim="modalNewStealthMetaAddress.name" class="w-50"></b-form-input>
@@ -3611,7 +3611,7 @@
           },
           ensNameOrAddress(address, length = 0) {
             let result = null;
-            const account = this.addresses[address];
+            const account = address && this.addresses[address] || null;
             if (account && account.ensName) {
               if (length > 0 && account.ensName.length > length) {
                 result = account.ensName.substring(0, (length-7)/2) + '...' + account.ensName.slice(-((length-7)/2 + 4));
@@ -3622,6 +3622,36 @@
               result =  address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
             }
             return result;
+          },
+          formatAddressNamePrimary(address) {
+            if (address) {
+              const account = this.addresses[address];
+              if (account && account.name) {
+                return account.name;
+              } else if (account && account.ensName) {
+                  return account.ensName;
+              } else {
+                return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+              }
+            }
+            return null;
+          },
+          formatAddressNameSecondary(address) {
+            if (address) {
+              const account = this.addresses[address];
+              if (account && account.name) {
+                if (account.ensName) {
+                  return account.ensName + ', ' + address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                } else {
+                  return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+                }
+              } else if (account && account.ensName) {
+                  return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
+              } else {
+                return null;
+              }
+            }
+            return null;
           },
           nameOrAddress(address, length = 0) {
             let result = null;
@@ -3776,6 +3806,7 @@
               //   await this.transfer(null);
               //   await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
               //   await this.addTokensForTransfer();
+              //   await this.newStealthMetaAddress();
               // })();
             }
             (async() => {
