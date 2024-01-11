@@ -3719,10 +3719,10 @@
           downloadAddresses() {
             console.log(moment().format("HH:mm:ss") + " downloadAddresses");
             const rows = [
-                ["Address", "Type", "Mine", "Name", "ENS Name", "Phrase"],
+                ["Address", "Type", "Mine", "Name", "ENS Name", "Phrase", "Linked To Stealth Meta-Address", "Linked To Address" ],
             ];
             for (const item of this.filteredSortedAddresses) {
-              rows.push([ item.address, item.type, item.mine, item.name, item.ensName, item.phrase ]);
+              rows.push([ item.address, item.type, item.mine, item.name, item.ensName, item.phrase, item.linkedTo && item.linkedTo.stealthMetaAddress, item.linkedTo && item.linkedTo.address ]);
             }
             let csvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
             var encodedUri = encodeURI(csvContent);
