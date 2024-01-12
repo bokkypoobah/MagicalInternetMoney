@@ -210,7 +210,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-registrant" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.tx.from" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.tx.from) }}</b-button>
+                  <b-button size="sm" id="announcement-registrant" @click="viewAddress(modalAnnouncement.item.tx.from)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.tx.from) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.tx.from)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.tx.from) }}</font>
                   </div>
@@ -224,7 +224,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-receiver" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.stealthAddress" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.stealthAddress) }}</b-button>
+                  <b-button size="sm" id="announcement-receiver" @click="viewAddress(modalAnnouncement.item.stealthAddress)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.stealthAddress) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.stealthAddress) }}</font>
                   </div>
@@ -247,7 +247,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-stealthmetaaddress" variant="transparent" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <b-button size="sm" id="announcement-stealthmetaaddress" @click="viewAddress(modalAnnouncement.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
                   </div>
@@ -261,7 +261,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="and Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-owner" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.linkedTo.address" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
+                  <b-button size="sm" id="announcement-owner" @click="viewAddress(modalAnnouncement.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address) }}</font>
                   </div>
@@ -316,7 +316,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-caller" :href="chainInfo.explorerAddressPrefix + modalAnnouncement.item.caller" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAnnouncement.item.caller) }}</b-button>
+                  <b-button size="sm" id="announcement-caller" @click="viewAddress(modalAnnouncement.item.caller)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.caller) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.caller)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.caller) }}</font>
                   </div>
@@ -387,13 +387,13 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" v-b-popover.hover="modalAddress.item.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.address) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAddress.item.address)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.address) }}</font>
+                  <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" v-b-popover.hover="modalAddress.item.address" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                  <div v-if="ensName(modalAddress.item.address)">
+                    <font size="-1" class="text-muted">{{ ensName(modalAddress.item.address) }}</font>
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -433,7 +433,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -491,8 +491,8 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="modalAddress.item.linkedTo != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="modalAddress.item.linkedTo.address != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
             </b-form-group>
           </b-modal>
 
