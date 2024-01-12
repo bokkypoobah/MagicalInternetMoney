@@ -401,7 +401,7 @@
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <!-- :TEXTAREA -->
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" id="address-stealthmetaaddress" :value="modalAddress.item.address" plaintext rows="3" max-rows="4" class="m-0 ml-2 noscroll"></b-form-textarea>
+                <b-form-textarea size="sm" plaintext id="address-stealthmetaaddress" :value="modalAddress.item.address" rows="3" max-rows="4" class="px-2 noscroll"></b-form-textarea>
                 <b-input-group-append>
                   <div>
                     <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -440,7 +440,8 @@
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" readonly id="address-phrase" v-model.trim="modalAddress.item.phrase" rows="3"></b-form-textarea>
+                <b-form-input v-if="modalAddress.item.phrase.length <= 80 && modalAddress.item.phrase.indexOf('\n') < 0" size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" class="px-2"></b-form-input>
+                <b-form-textarea v-if="modalAddress.item.phrase.length > 80 || modalAddress.item.phrase.indexOf('\n') >= 0" size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" rows="1" max-rows="4" class="px-2 noscroll"></b-form-textarea>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalAddress.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
@@ -459,7 +460,7 @@
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" readonly size="sm" id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
                 <b-input-group-append>
                   <b-button v-if="!modalAddress.spendingPrivateKey" :disabled="modalAddress.item.linkedTo.address != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
                   <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
@@ -467,34 +468,28 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="address-viewingprivatekey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.viewingPrivateKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.viewingPrivateKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
-                </div>
-                <div>
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-viewingprivatekey" :value="modalAddress.item.viewingPrivateKey" class="px-2"></b-form-input>
+                <b-input-group-append>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="address-spendingpublickey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.spendingPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.spendingPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
-                </div>
-                <div>
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-spendingpublickey" :value="modalAddress.item.spendingPublicKey" class="px-2"></b-form-input>
+                <b-input-group-append>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="address-viewingpublickey" variant="transparent" class="m-0 ml-2 p-0">{{ modalAddress.item.viewingPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAddress.item.viewingPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
-                </div>
-                <div>
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-viewingpublickey" :value="modalAddress.item.viewingPublicKey" class="px-2"></b-form-input>
+                <b-input-group-append>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
+                </b-input-group-append>
+              </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="modalAddress.item.linkedTo != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
