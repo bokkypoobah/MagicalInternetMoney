@@ -3521,7 +3521,6 @@
               for (const item of data) {
                 const stealthAddress = item.stealthAddress;
                 const stealthAddressData = this.addresses[stealthAddress];
-                console.log("stealthAddressData: " + JSON.stringify(stealthAddressData, null, 2));
                 const ephemeralPublicKey = item.ephemeralPublicKey;
                 for (const address of checkAddresses) {
                   const viewingPrivateKey = address.viewingPrivateKey;
@@ -3532,12 +3531,12 @@
                     // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
                     // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
                     // console.log("item: " + JSON.stringify(item, null, 2));
-                    console.log("address: " + JSON.stringify(address, null, 2));
+                    // console.log("address: " + JSON.stringify(address, null, 2));
                     item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo.address };
                     item.mine = true;
                     Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
                     Vue.set(this.addresses[stealthAddress], 'mine', true);
-                    console.log("item: " + JSON.stringify(item, null, 2));
+                    // console.log("item: " + JSON.stringify(item, null, 2));
                     writeRecords.push(item);
                     break;
                   }
@@ -3555,7 +3554,7 @@
             rows = 0;
 
             localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
-            console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
