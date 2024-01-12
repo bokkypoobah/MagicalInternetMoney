@@ -285,7 +285,7 @@
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.transfers" label="Transfers:" label-for="announcement-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
                 <b-row v-for="(item, index) of modalAnnouncement.item.transfers" v-bind:key="item.token">
-                  <b-col cols="3" class="text-right px-0">
+                  <b-col cols="3" class="text-right px-0 mt-1">
                     <span v-if="getTokenType(item.token) == 'eth'">
                       <font size="-1">{{ formatETH(item.value) }}</font>
                     </span>
@@ -296,7 +296,7 @@
                       <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button>
                     </span>
                   </b-col>
-                  <b-col cols="3" class="px-0">
+                  <b-col cols="3" class="px-0 mt-1">
                     <span v-if="isEthereums(item.token)">
                       <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
                     </span>
@@ -307,10 +307,10 @@
                 </b-row>
               </font>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item" label="Scheme Id:" label-for="announcement-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalAnnouncement.item" label="Scheme Id:" label-for="announcement-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="announcement-schemeid">{{ modalAnnouncement.item.schemeId }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="announcement-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalAnnouncement.item && modalAnnouncement.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="announcement-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-ephemeralpublickey" variant="transparent" v-b-popover.hover.bottom="modalAnnouncement.item.ephemeralPublicKey" class="m-0 ml-2 p-0">{{ modalAnnouncement.item.ephemeralPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAnnouncement.item.ephemeralPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
@@ -320,7 +320,7 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-caller" @click="viewAddress(modalAnnouncement.item.caller)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.caller) }}</b-button>
@@ -367,7 +367,7 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalRegistration.item" label="Scheme Id:" label-for="registration-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalRegistration.item" label="Scheme Id:" label-for="registration-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="registration-schemeid">{{ modalRegistration.item.schemeId }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -1127,9 +1127,9 @@
                     <b-form-select size="sm" id="config-datetime" v-model="settings.reportingDateTime" @change="saveSettings" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
                   </b-form-group>
                   <b-form-group label="Show Details:" label-for="config-showdetails" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Show details like intermediate public keys" class="mx-0 my-1 p-0">
-                    <b-form-checkbox size="sm" v-model="settings.showDetails" value="true" unchecked-value="false" class="ml-2 mt-1"></b-form-checkbox>
+                    <!-- <b-form-checkbox size="sm" v-model="settings.showDetails" value=true unchecked-value=false @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox> -->
+                    <b-form-checkbox size="sm" v-model="settings.showDetails" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
                   </b-form-group>
-
                   <h5 class="mt-5">Configure Contracts</h5>
                   <b-card no-body no-header bg-variant="light" class="m-1 p-1">
                     <!-- <b-form-group label-cols-lg="2" label="Search" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
