@@ -624,7 +624,10 @@
                 <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
+                </div>
+                <div v-if="settings.tabIndex == 0" class="mt-2 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
                     Mine Only
                   </b-form-checkbox>
@@ -634,7 +637,7 @@
                     Mine Only
                   </b-form-checkbox>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-2 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
                     Mine Only
                   </b-form-checkbox>
@@ -1673,10 +1676,8 @@
               if (item.chainId == this.chainId) {
                 const registrantData = this.addresses[item.registrant] || {};
                 let include = true;
-                if (regex) {
-                  if (regex && !(regex.test(registrantData.name) || regex.test(registrantData.ensName) || regex.test(item.tx.from))) {
-                    include = false;
-                  }
+                if (regex && !(regex.test(registrantData.name) || regex.test(registrantData.ensName) || regex.test(item.tx.from))) {
+                  include = false;
                 }
                 if (include && this.settings.registrationsTable.mineOnly) {
                   if (!registrantData.mine) {
@@ -1733,9 +1734,13 @@
           },
           filteredAddresses() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const regex = this.settings.addressesTable.filter != null && this.settings.addressesTable.filter.length > 0 ? new RegExp(this.settings.addressesTable.filter, 'i') : null;
             for (const [address, data] of Object.entries(this.addresses)) {
               let include = true;
-              if (this.settings.addressesTable.mineOnly) {
+              if (regex && !(regex.test(data.name) || regex.test(data.ensName) || regex.test(address))) {
+                include = false;
+              }
+              if (include && this.settings.addressesTable.mineOnly) {
                 if (!data.mine) {
                   include = false;
                 }
