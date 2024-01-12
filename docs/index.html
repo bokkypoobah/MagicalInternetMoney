@@ -71,18 +71,22 @@
             <template #modal-title>
               Transfer To Stealth Meta-Address
             </template>
-            <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(coinbase)" class="mx-0 my-1 p-0">
+            <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <template slot="label">
+                From:
+              </template>
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="transfer-sender" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ coinbase }}</b-button>
+                  <b-button size="sm" id="transfer-sender" @click="viewAddress(coinbase)" variant="link" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(coinbase) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(coinbase)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(coinbase) }}</font>
+                  </div>
                 </div>
                 <div>
+                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-            </b-form-group>
-            <b-form-group v-if="ensName(coinbase)" label="" label-for="transfer-senderensimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-avatar id="transfer-senderensimage" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
             </b-form-group>
             <b-form-group label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress) || 'Stealth Meta-Address'" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -481,7 +485,7 @@
               </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalStealthMetaAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalStealthMetaAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalStealthMetaAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
+              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalStealthMetaAddress.item.mine ? 1 : 0" @change="toggleModalStealthMetaAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -2210,7 +2214,16 @@
           },
 
           toggleModalAddressMine() {
-            console.log(moment().format("HH:mm:ss") + " toggleModalAddressMine: " + JSON.stringify(this.modalStealthMetaAddress));
+            console.log(moment().format("HH:mm:ss") + " toggleModalAddressMine: " + JSON.stringify(this.modalAddress));
+            this.modalAddress.item.mine = !this.modalAddress.item.mine;
+            Vue.set(this.addresses[this.modalAddress.item.address], 'mine', this.modalAddress.item.mine);
+            Vue.set(this.addresses, this.modalAddress.item.address, this.addresses[this.modalAddress.item.address]);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+          },
+
+          toggleModalStealthMetaAddressMine() {
+            console.log(moment().format("HH:mm:ss") + " toggleModalStealthMetaAddressMine: " + JSON.stringify(this.modalStealthMetaAddress));
             this.modalStealthMetaAddress.item.mine = !this.modalStealthMetaAddress.item.mine;
             Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'mine', this.modalStealthMetaAddress.item.mine);
             Vue.set(this.addresses, this.modalStealthMetaAddress.item.address, this.addresses[this.modalStealthMetaAddress.item.address]);
