@@ -440,8 +440,7 @@
             </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input v-if="modalAddress.item.phrase.length <= 80 && modalAddress.item.phrase.indexOf('\n') < 0" size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" class="px-2"></b-form-input>
-                <b-form-textarea v-if="modalAddress.item.phrase.length > 80 || modalAddress.item.phrase.indexOf('\n') >= 0" size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" rows="1" max-rows="4" class="px-2 noscroll"></b-form-textarea>
+                <b-form-input size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" class="px-2"></b-form-input>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalAddress.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
@@ -504,7 +503,7 @@
             <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="newsma-attachedaddress" :href="chainInfo.explorerAddressPrefix + coinbase" variant="link" v-b-popover.hover="coinbase" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(coinbase) }}</b-button>
+                  <b-button size="sm" id="newsma-attachedaddress" @click="viewAddress(coinbase)" variant="link" v-b-popover.hover="coinbase" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(coinbase) }}</b-button>
                   <div v-if="formatAddressNameSecondary(coinbase)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(coinbase) }}</font>
                   </div>
@@ -520,7 +519,7 @@
             </b-form-group>
             <b-form-group label="Phrase:" label-for="newsma-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0" description="This exact phrase with the attached address is required for the recovery of your stealth keys!">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase"></b-form-textarea>
+                <b-form-input type="text" size="sm" id="newsma-phrase" v-model.trim="modalNewStealthMetaAddress.phrase"></b-form-input>
                 <b-input-group-append>
                   <b-button @click="copyToClipboard(modalNewStealthMetaAddress.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
@@ -813,6 +812,9 @@
                       </span>
                     </b-link>
                   </font>
+                  <div>
+                    &nbsp;
+                  </div>
                 </template>
                 <template #cell(sender)="data">
                   <b-link v-if="data.item.tx && data.item.tx.from" @click="viewAddress(data.item.tx.from)">
@@ -934,18 +936,28 @@
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
                     <font size="-1">{{ formatAddress(data.item.address) }}</font>
                   </b-link>
-                </template>
-                <template #cell(linkedTo)="data">
-                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
-                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
-                      <font v-if="data.item.linkedTo.stealthMetaAddress" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
-                    </b-link>
-                    <br />
+                  <div>
+                    &nbsp;
                   </div>
+                </template>
+                <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
-                      <font v-if="data.item.linkedTo.address" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
                     </b-link>
+                    <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
+                      <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
+                    </div>
+                  </div>
+                </template>
+                <template #cell(linkedToStealthMetaAddress)="data">
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
+                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
+                    </b-link>
+                    <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
+                      <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
+                    </div>
                   </div>
                 </template>
                 <template #cell(name)="data">
@@ -1177,7 +1189,7 @@
           DB_PROCESSING_BATCH_SIZE: 1000,
           TXHASH_SEGMENT_LENGTH: 8,
           ADDRESS_SEGMENT_LENGTH: 12,
-          STEALTHMETAADDRESS_SEGMENT_LENGTH: 18,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
           PUBLICKEY_SEGMENT_LENGTH: 18,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
@@ -1463,10 +1475,11 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedTo', label: 'Linked To', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedToStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           tokenContractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
