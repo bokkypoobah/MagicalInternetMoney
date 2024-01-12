@@ -490,7 +490,7 @@
             <b-form-group v-if="modalStealthMetaAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalStealthMetaAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalStealthMetaAddress.item.mine ? 1 : 0" @change="toggleModalStealthMetaAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
-            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalStealthMetaAddress.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="modalStealthMetaAddress.spendingPrivateKey ? modalStealthMetaAddress.spendingPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
                 <b-input-group-append>
@@ -499,7 +499,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input size="sm" plaintext id="address-viewingprivatekey" :value="modalStealthMetaAddress.item.viewingPrivateKey" class="px-2"></b-form-input>
                 <b-input-group-append>
@@ -507,7 +507,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input size="sm" plaintext id="address-spendingpublickey" :value="modalStealthMetaAddress.item.spendingPublicKey" class="px-2"></b-form-input>
                 <b-input-group-append>
@@ -515,7 +515,7 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input size="sm" plaintext id="address-viewingpublickey" :value="modalStealthMetaAddress.item.viewingPublicKey" class="px-2"></b-form-input>
                 <b-input-group-append>
@@ -1123,8 +1123,11 @@
               <b-card v-if="settings.tabIndex == 4 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Settings</h5>
-                  <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(timestamp)" class="mx-0 my-1 p-0">
-                    <b-form-select size="sm" id="reporting-datetime" v-model="settings.reportingDateTime" @change="saveSettings" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
+                  <b-form-group label="Local or UTC Time:" label-for="config-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(timestamp)" class="mx-0 my-1 p-0">
+                    <b-form-select size="sm" id="config-datetime" v-model="settings.reportingDateTime" @change="saveSettings" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="Show Details:" label-for="config-showdetails" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Show details like intermediate public keys" class="mx-0 my-1 p-0">
+                    <b-form-checkbox size="sm" v-model="settings.showDetails" value="true" unchecked-value="false" class="ml-2 mt-1"></b-form-checkbox>
                   </b-form-group>
 
                   <h5 class="mt-5">Configure Contracts</h5>
@@ -1270,6 +1273,7 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
+            showDetails: false,
             announcementsTable: {
               filter: null,
               mineOnly: false,
@@ -1330,7 +1334,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 40,
+            version: 41,
           },
           contracts: {
             "11155111": {
@@ -2581,11 +2585,16 @@
             if (item && item.length > 0) {
               const address = item[0].address;
               const addressData = this.addresses[address];
-              this.modalStealthMetaAddress.item = { address, ...addressData };
-              this.modalStealthMetaAddress.name = addressData.name;
-              this.modalStealthMetaAddress.spendingPrivateKey = null;
-              // console.log(moment().format("HH:mm:ss") + " addressesRowSelected - modalStealthMetaAddress: " + JSON.stringify(this.modalStealthMetaAddress, null, 2));
-              this.$bvModal.show('modal-stealthmetaaddress');
+              if (address.substring(0, 3) == "st:") {
+                this.modalStealthMetaAddress.item = { address, ...addressData };
+                this.modalStealthMetaAddress.name = addressData.name;
+                this.modalStealthMetaAddress.spendingPrivateKey = null;
+                this.$bvModal.show('modal-stealthmetaaddress');
+              } else {
+                this.modalAddress.item = { address, ...addressData };
+                this.modalAddress.name = addressData.name;
+                this.$bvModal.show('modal-address');
+              }
               this.$refs.addressesTable.clearSelected();
             }
           },
