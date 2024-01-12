@@ -922,8 +922,11 @@
                 </template>
                 <template #cell(registrant)="data">
                   <b-link @click="viewAddress(data.item.registrant)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ nameOrAddress(data.item.registrant) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ formatAddressNamePrimary(data.item.registrant) }}</font>
                   </b-link>
+                  <div>
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.registrant) || '&nbsp' }}</font>
+                  </div>
                 </template>
                 <template #cell(schemeId)="data">
                   <font size="-1">{{ data.item.schemeId }}</font>
@@ -933,8 +936,11 @@
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ formatAddress(data.item.stealthMetaAddress) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.stealthMetaAddress) }}</font>
                   </b-link>
+                  <div>
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthMetaAddress) }}</font>
+                  </div>
                 </template>
                 <!-- <template #cell(contract)="data">
                   <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.contract" target="_blank">
