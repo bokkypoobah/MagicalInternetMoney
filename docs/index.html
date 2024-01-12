@@ -940,6 +940,16 @@
                     &nbsp;
                   </div>
                 </template>
+                <template #head(linkedToAddress)="data">
+                  <span v-b-popover.hover="'Linked to Address'">
+                    <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Address
+                  </span>
+                </template>
+                <template #head(linkedToStealthMetaAddress)="data">
+                  <span v-b-popover.hover="'Linked via Stealth Meta-Address'">
+                    <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Stealth Meta-Address
+                  </span>
+                </template>
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
