@@ -244,28 +244,14 @@
             </b-form-group>
             <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="announcement-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalAnnouncement.stealthPrivateKey ? 'text' : 'password'" readonly size="sm" id="announcement-spendingprivatekey" :value="modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : '*'.repeat(66)"></b-form-input>
+                <b-form-input :type="modalAnnouncement.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="announcement-spendingprivatekey" :value="modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
                 <b-input-group-append>
                   <b-button v-if="!modalAnnouncement.stealthPrivateKey" :disabled="modalAnnouncement.item.linkedTo.address != coinbase" @click="revealModalAnnouncementSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
                   <b-button v-if="modalAnnouncement.stealthPrivateKey" @click="copyToClipboard(modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="linked to Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="announcement-stealthmetaaddress" @click="viewAddress(modalAnnouncement.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
-                  </div>
-                </div>
-                <div>
-                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
-            </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="and Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="Linked To Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-owner" @click="viewAddress(modalAnnouncement.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
@@ -276,6 +262,20 @@
                 <div>
                   <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="Via Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="announcement-stealthmetaaddress" @click="viewAddress(modalAnnouncement.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
+                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -996,16 +996,16 @@
                     &nbsp;
                   </div>
                 </template>
-                <template #head(linkedToAddress)="data">
+                <!-- <template #head(linkedToAddress)="data">
                   <span v-b-popover.hover="'Linked to Address'">
                     <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Address
                   </span>
-                </template>
-                <template #head(linkedToStealthMetaAddress)="data">
+                </template> -->
+                <!-- <template #head(linkedToStealthMetaAddress)="data">
                   <span v-b-popover.hover="'Linked via Stealth Meta-Address'">
                     <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Stealth Meta-Address
                   </span>
-                </template>
+                </template> -->
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
@@ -1639,10 +1639,6 @@
                   const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
                   const linkedAddress = announcement.linkedTo.address;
                   const linkedAddressData = this.addresses[linkedAddress] || {};
-                  // console.log("sender: " + sender + " " + JSON.stringify(senderData));
-                  // console.log("receiver: " + receiver + " " + JSON.stringify(receiverData));
-                  // console.log("linkedStealthMetaAddress: " + linkedStealthMetaAddress + " " + JSON.stringify(linkedStealthMetaAddressData));
-                  // console.log("linkedAddress: " + linkedAddress + " " + JSON.stringify(linkedAddressData));
                   if (!(
                     regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
                     regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
@@ -1762,8 +1758,18 @@
               if (this.settings.addressesTable.mineOnly && !data.mine) {
                 include = false;
               }
-              if (include && regex && !(regex.test(data.name) || regex.test(data.ensName) || regex.test(address))) {
-                include = false;
+              if (include && regex) {
+                const linkedStealthMetaAddress = data.linkedTo && data.linkedTo.stealthMetaAddress || null;
+                const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+                const linkedAddress = data.linkedTo && data.linkedTo.address || null;
+                const linkedAddressData = this.addresses[linkedAddress] || {};
+                if (!(
+                  regex.test(data.name) || regex.test(data.ensName) || regex.test(address) ||
+                  regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress) ||
+                  regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress)
+                )) {
+                  include = false;
+                }
               }
               if (include) {
                 results.push({ address, ...data });
