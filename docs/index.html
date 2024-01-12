@@ -864,29 +864,44 @@
                   </div>
                 </template>
                 <template #cell(sender)="data">
-                  <b-link v-if="data.item.tx && data.item.tx.from" @click="viewAddress(data.item.tx.from)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ nameOrAddress(data.item.tx.from, 28) }}</font>
-                  </b-link>
+                  <div v-if="data.item.tx && data.item.tx.from">
+                    <b-link @click="viewAddress(data.item.tx.from)">
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ formatAddressNamePrimary(data.item.tx.from) }}</font>
+                    </b-link>
+                    <div v-if="formatAddressNameSecondary(data.item.tx.from)">
+                      <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.tx.from) }}</font>
+                    </div>
+                  </div>
                 </template>
                 <template #cell(receiver)="data">
                   <b-link @click="viewAddress(data.item.stealthAddress)">
-                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ nameOrAddress(data.item.stealthAddress, 28) }}</font>
+                    <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
                   </b-link>
+                  <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
+                  </div>
                 </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
-                <template #cell(linkedTo)="data">
-                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
-                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
-                      <font v-if="data.item.linkedTo.stealthMetaAddress" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
-                    </b-link>
-                    <br />
-                  </div>
+                <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
-                      <font v-if="data.item.linkedTo.address" size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
+                    <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
+                      <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
+                    </div>
+                  </div>
+                </template>
+                <template #cell(viaStealthMetaAddress)="data">
+                  <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
+                    <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress) }}</font>
+                    </b-link>
+                    <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
+                      <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
+                    </div>
                   </div>
                 </template>
                 <template #cell(tokens)="data">
@@ -1001,7 +1016,7 @@
                     <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Address
                   </span>
                 </template> -->
-                <!-- <template #head(linkedToStealthMetaAddress)="data">
+                <!-- <template #head(viaStealthMetaAddress)="data">
                   <span v-b-popover.hover="'Linked via Stealth Meta-Address'">
                     <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Stealth Meta-Address
                   </span>
@@ -1009,14 +1024,14 @@
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
-                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address, 28) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
                     </div>
                   </div>
                 </template>
-                <template #cell(linkedToStealthMetaAddress)="data">
+                <template #cell(viaStealthMetaAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
@@ -1251,7 +1266,7 @@
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 1000,
           TXHASH_SEGMENT_LENGTH: 8,
-          ADDRESS_SEGMENT_LENGTH: 12,
+          ADDRESS_SEGMENT_LENGTH: 10,
           STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
           PUBLICKEY_SEGMENT_LENGTH: 18,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
@@ -1524,12 +1539,13 @@
           ],
           announcementsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedTo', label: 'Receiver Linked To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'token', label: 'Token', sortable: false, thStyle: 'width: 10%;', thClass: 'text-truncate', tdClass: 'text-truncate' },
           ],
           registrationsFields: [
@@ -1547,7 +1563,7 @@
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'linkedToStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
