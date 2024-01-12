@@ -943,7 +943,7 @@
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
-                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ nameOrAddress(data.item.linkedTo.address, 28) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address, 28) }}</font>
                     </b-link>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
@@ -953,7 +953,7 @@
                 <template #cell(linkedToStealthMetaAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.stealthMetaAddress">
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
-                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ nameOrAddress(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
+                      <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
                     </b-link>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
