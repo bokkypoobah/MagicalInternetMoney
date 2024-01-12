@@ -349,7 +349,7 @@
             <b-form-group v-if="modalRegistration.item" label="Registrant:" label-for="registration-registrant" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-registrant" :href="chainInfo.explorerAddressPrefix + modalRegistration.item.registrant" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalRegistration.item.registrant) }}</b-button>
+                  <b-button size="sm" id="registration-registrant" @click="viewAddress(modalRegistration.item.registrant)" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.registrant) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalRegistration.item.registrant)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.registrant) }}</font>
                   </div>
@@ -366,7 +366,7 @@
             <b-form-group v-if="modalRegistration.item" label="Stealth Meta-Address:" label-for="registration-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="registration-stealthmetaaddress" variant="transparent" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.stealthMetaAddress) }}</b-button>
+                  <b-button size="sm" id="registration-stealthmetaaddress" @click="viewAddress(modalRegistration.item.stealthMetaAddress)" variant="link" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.stealthMetaAddress) }}</b-button>
                   <div v-if="formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress) }}</font>
                   </div>
