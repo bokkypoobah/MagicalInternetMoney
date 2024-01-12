@@ -83,7 +83,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -223,7 +223,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.tx.from)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.tx.from)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -237,7 +237,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.stealthAddress)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.stealthAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.stealthAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.stealthAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -260,7 +260,7 @@
                   </div>
                 </div>
                 <div>
-                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
+                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -274,7 +274,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.address)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -362,7 +362,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalRegistration.item.registrant)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalRegistration.item.registrant)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(modalRegistration.item.registrant)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalRegistration.item.registrant)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.registrant);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -400,7 +400,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
+                  <b-avatar v-if="ensName(modalAddress.item.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -466,7 +466,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalStealthMetaAddress.item.linkedTo.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalStealthMetaAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
+                  <b-avatar v-if="ensName(modalStealthMetaAddress.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalStealthMetaAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -542,7 +542,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(coinbase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
