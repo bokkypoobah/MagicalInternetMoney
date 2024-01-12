@@ -382,7 +382,7 @@
           <!-- :MODALADDRESS -->
           <b-modal id="modal-address" hide-footer size="lg">
             <template #modal-title>
-              {{ modalAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
+              Address
             </template>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -397,54 +397,6 @@
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
-            </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <!-- :TEXTAREA -->
-              <b-input-group size="sm" class="w-100">
-                <b-form-textarea size="sm" plaintext id="address-stealthmetaaddress" :value="modalAddress.item.address" rows="3" max-rows="4" class="px-2 noscroll"></b-form-textarea>
-                <b-input-group-append>
-                  <div>
-                    <b-button size="sm" @click="transfer(modalAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
-                    <b-button size="sm" @click="copyToClipboard(modalAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                  </div>
-                </b-input-group-append>
-              </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" disabled id="address-linkedto-stealthmetaaddress" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.stealthMetaAddress" variant="transparent" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
-                  </div>
-                </div>
-                <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
-            </b-form-group>
-
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="address-linkedto-address" :href="chainInfo.explorerAddressPrefix + modalAddress.item.linkedTo.address" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.address" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.address) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.address)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.address) }}</font>
-                  </div>
-                </div>
-                <div>
-                  <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
-            </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-input-group size="sm" class="w-100">
-                <b-form-input size="sm" plaintext id="address-phrase" :value="modalAddress.item.phrase" class="px-2"></b-form-input>
-                <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalAddress.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </b-input-group-append>
-              </b-input-group>
             </b-form-group>
             <b-form-group v-if="modalAddress.item" label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -466,32 +418,106 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          </b-modal>
+
+          <!-- :MODALSTEALTHMETAADDRESS -->
+          <b-modal id="modal-stealthmetaaddress" hide-footer size="lg">
+            <template #modal-title>
+              {{ modalStealthMetaAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
+            </template>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <!-- :TEXTAREA -->
               <b-input-group size="sm" class="w-100">
-                <b-form-input size="sm" plaintext id="address-viewingprivatekey" :value="modalAddress.item.viewingPrivateKey" class="px-2"></b-form-input>
+                <b-form-textarea size="sm" plaintext id="address-stealthmetaaddress" :value="modalStealthMetaAddress.item.address" rows="3" max-rows="4" class="px-2 noscroll"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <div>
+                    <b-button size="sm" @click="transfer(modalStealthMetaAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalStealthMetaAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                    <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  </div>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.linkedTo && modalStealthMetaAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" disabled id="address-linkedto-stealthmetaaddress" :href="chainInfo.explorerAddressPrefix + modalStealthMetaAddress.item.linkedTo.stealthMetaAddress" variant="transparent" class="m-0 ml-2 p-0" target="_blank">{{ formatAddressNamePrimary(modalStealthMetaAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.linkedTo && modalStealthMetaAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto-address" @click="viewAddress(modalStealthMetaAddress.item.linkedTo.address)" variant="link" v-b-popover.hover="modalStealthMetaAddress.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalStealthMetaAddress.item.linkedTo.address) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.address) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-avatar v-if="ensName(modalStealthMetaAddress.item.linkedTo.address)" rounded variant="light" size="2.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalStealthMetaAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.phrase" label="Phrase:" label-for="address-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input size="sm" plaintext id="address-spendingpublickey" :value="modalAddress.item.spendingPublicKey" class="px-2"></b-form-input>
+                <b-form-input size="sm" plaintext id="address-phrase" :value="modalStealthMetaAddress.item.phrase" class="px-2"></b-form-input>
                 <b-input-group-append>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalStealthMetaAddress.item.phrase);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalStealthMetaAddress.item" label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input size="sm" plaintext id="address-viewingpublickey" :value="modalAddress.item.viewingPublicKey" class="px-2"></b-form-input>
+                <b-form-input type="text" size="sm" id="address-name" v-model.trim="modalStealthMetaAddress.name"></b-form-input>
                 <b-input-group-append>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button :disabled="modalStealthMetaAddress.name == modalStealthMetaAddress.item.name" @click="saveModalStealthMetaAddressName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="modalAddress.item.linkedTo.address != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
+            <b-form-group v-if="modalStealthMetaAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalStealthMetaAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalStealthMetaAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input :type="modalStealthMetaAddress.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="modalStealthMetaAddress.spendingPrivateKey ? modalStealthMetaAddress.spendingPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
+                <b-input-group-append>
+                  <b-button v-if="!modalStealthMetaAddress.spendingPrivateKey" :disabled="modalStealthMetaAddress.item.linkedTo.address != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalStealthMetaAddress.spendingPrivateKey" @click="copyToClipboard(modalStealthMetaAddress.spendingPrivateKey ? modalStealthMetaAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Viewing Private Key:" label-for="address-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-viewingprivatekey" :value="modalStealthMetaAddress.item.viewingPrivateKey" class="px-2"></b-form-input>
+                <b-input-group-append>
+                  <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.viewingPrivateKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.spendingPublicKey" label="Spending Public Key:" label-for="address-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-spendingpublickey" :value="modalStealthMetaAddress.item.spendingPublicKey" class="px-2"></b-form-input>
+                <b-input-group-append>
+                  <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.spendingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPublicKey" label="Viewing Public Key:" label-for="address-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="address-viewingpublickey" :value="modalStealthMetaAddress.item.viewingPublicKey" class="px-2"></b-form-input>
+                <b-input-group-append>
+                  <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.linkedTo" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="modalStealthMetaAddress.item.linkedTo.address != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalStealthMetaAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
             </b-form-group>
           </b-modal>
 
@@ -1355,6 +1381,10 @@
           modalAddress: {
             item: null,
             name: null,
+          },
+          modalStealthMetaAddress: {
+            item: null,
+            name: null,
             spendingPrivateKey: null,
           },
           modalNewStealthMetaAddress: {
@@ -2171,11 +2201,19 @@
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
+          saveModalStealthMetaAddressName() {
+            console.log(moment().format("HH:mm:ss") + " saveModalStealthMetaAddressName: " + JSON.stringify(this.modalStealthMetaAddress));
+            this.modalStealthMetaAddress.item.name = this.modalStealthMetaAddress.name;
+            Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'name', this.modalStealthMetaAddress.name);
+            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+          },
+
           toggleModalAddressMine() {
-            console.log(moment().format("HH:mm:ss") + " toggleModalAddressMine: " + JSON.stringify(this.modalAddress));
-            this.modalAddress.item.mine = !this.modalAddress.item.mine;
-            Vue.set(this.addresses[this.modalAddress.item.address], 'mine', this.modalAddress.item.mine);
-            Vue.set(this.addresses, this.modalAddress.item.address, this.addresses[this.modalAddress.item.address]);
+            console.log(moment().format("HH:mm:ss") + " toggleModalAddressMine: " + JSON.stringify(this.modalStealthMetaAddress));
+            this.modalStealthMetaAddress.item.mine = !this.modalStealthMetaAddress.item.mine;
+            Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'mine', this.modalStealthMetaAddress.item.mine);
+            Vue.set(this.addresses, this.modalStealthMetaAddress.item.address, this.addresses[this.modalStealthMetaAddress.item.address]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
           },
@@ -2306,8 +2344,8 @@
           },
 
           async revealModalAddressSpendingPrivateKey() {
-            console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.modalAddress.item.phrase);
-            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalAddress.item.phrase));
+            console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.modalStealthMetaAddress.item.phrase);
+            const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.modalStealthMetaAddress.item.phrase));
             const signature = await ethereum.request({
               method: 'personal_sign',
               params: [phraseInHex, this.coinbase],
@@ -2323,7 +2361,7 @@
             const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
             const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
             const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-            Vue.set(this.modalAddress, 'spendingPrivateKey', keyPair1.privateKey);
+            Vue.set(this.modalStealthMetaAddress, 'spendingPrivateKey', keyPair1.privateKey);
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
@@ -2487,11 +2525,11 @@
             if (item && item.length > 0) {
               const address = item[0].address;
               const addressData = this.addresses[address];
-              this.modalAddress.item = { address, ...addressData };
-              this.modalAddress.name = addressData.name;
-              this.modalAddress.spendingPrivateKey = null;
-              // console.log(moment().format("HH:mm:ss") + " addressesRowSelected - modalAddress: " + JSON.stringify(this.modalAddress, null, 2));
-              this.$bvModal.show('modal-address');
+              this.modalStealthMetaAddress.item = { address, ...addressData };
+              this.modalStealthMetaAddress.name = addressData.name;
+              this.modalStealthMetaAddress.spendingPrivateKey = null;
+              // console.log(moment().format("HH:mm:ss") + " addressesRowSelected - modalStealthMetaAddress: " + JSON.stringify(this.modalStealthMetaAddress, null, 2));
+              this.$bvModal.show('modal-stealthmetaaddress');
               this.$refs.addressesTable.clearSelected();
             }
           },
@@ -2500,9 +2538,15 @@
             // console.log(moment().format("HH:mm:ss") + " viewAddress: " + JSON.stringify(address, null, 2));
             if (address && address.length > 0) {
               const addressData = this.addresses[address];
-              this.modalAddress.item = { address, ...addressData };
-              this.modalAddress.name = addressData.name;
-              this.$bvModal.show('modal-address');
+              if (address.substring(0, 3) == "st:") {
+                this.modalStealthMetaAddress.item = { address, ...addressData };
+                this.modalStealthMetaAddress.name = addressData.name;
+                this.$bvModal.show('modal-stealthmetaaddress');
+              } else {
+                this.modalAddress.item = { address, ...addressData };
+                this.modalAddress.name = addressData.name;
+                this.$bvModal.show('modal-address');
+              }
             }
           },
 

@@ -142,6 +142,7 @@ contract StealthChad {
             for (k = 0; k < 32; k = onePlus(k)) {
                 metadata[j++] = valueInBytes[k];
             }
+            // TODO: May have to check ERC721.ownerOf() for ownerof, and check ERC20.allowance() to ensure that ERC721.ownerOf() checks are not skipped
             ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
         }
         announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
