@@ -621,6 +621,9 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.announcementsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
+                </div>
                 <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
@@ -1620,11 +1623,32 @@
           },
           filteredAnnouncements() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const regex = this.settings.announcementsTable.filter != null && this.settings.announcementsTable.filter.length > 0 ? new RegExp(this.settings.announcementsTable.filter, 'i') : null;
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
                 let include = true;
-                if (this.settings.announcementsTable.mineOnly) {
-                  if (!announcement.mine) {
+                if (this.settings.announcementsTable.mineOnly && !announcement.mine) {
+                  include = false;
+                }
+                if (include && regex) {
+                  const sender = announcement.tx.from;
+                  const senderData = this.addresses[sender] || {};
+                  const receiver = announcement.stealthAddress;
+                  const receiverData = this.addresses[receiver] || {};
+                  const linkedStealthMetaAddress = announcement.linkedTo.stealthMetaAddress;
+                  const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+                  const linkedAddress = announcement.linkedTo.address;
+                  const linkedAddressData = this.addresses[linkedAddress] || {};
+                  // console.log("sender: " + sender + " " + JSON.stringify(senderData));
+                  // console.log("receiver: " + receiver + " " + JSON.stringify(receiverData));
+                  // console.log("linkedStealthMetaAddress: " + linkedStealthMetaAddress + " " + JSON.stringify(linkedStealthMetaAddressData));
+                  // console.log("linkedAddress: " + linkedAddress + " " + JSON.stringify(linkedAddressData));
+                  if (!(
+                    regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
+                    regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
+                    regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress) ||
+                    regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress)
+                  )) {
                     include = false;
                   }
                 }
@@ -1676,13 +1700,11 @@
               if (item.chainId == this.chainId) {
                 const registrantData = this.addresses[item.registrant] || {};
                 let include = true;
-                if (regex && !(regex.test(registrantData.name) || regex.test(registrantData.ensName) || regex.test(item.tx.from))) {
+                if (this.settings.registrationsTable.mineOnly && !registrantData.mine) {
                   include = false;
                 }
-                if (include && this.settings.registrationsTable.mineOnly) {
-                  if (!registrantData.mine) {
-                    include = false;
-                  }
+                if (include && regex && !(regex.test(registrantData.name) || regex.test(registrantData.ensName) || regex.test(item.tx.from))) {
+                  include = false;
                 }
                 if (include) {
                   results.push({ ...item, mine: registrantData.mine });
@@ -1737,13 +1759,11 @@
             const regex = this.settings.addressesTable.filter != null && this.settings.addressesTable.filter.length > 0 ? new RegExp(this.settings.addressesTable.filter, 'i') : null;
             for (const [address, data] of Object.entries(this.addresses)) {
               let include = true;
-              if (regex && !(regex.test(data.name) || regex.test(data.ensName) || regex.test(address))) {
+              if (this.settings.addressesTable.mineOnly && !data.mine) {
                 include = false;
               }
-              if (include && this.settings.addressesTable.mineOnly) {
-                if (!data.mine) {
-                  include = false;
-                }
+              if (include && regex && !(regex.test(data.name) || regex.test(data.ensName) || regex.test(address))) {
+                include = false;
               }
               if (include) {
                 results.push({ address, ...data });
