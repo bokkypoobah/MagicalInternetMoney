@@ -144,6 +144,9 @@
               Add Tokens For Transfer
             </template>
             <b-form-select size="sm" v-model="modalAddTokensToTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
+            <div v-if="additionalERC20TokensOptions.length == 1">
+              <b-alert size="sm" show variant="warning" class="mt-2">Select active tokens in the Tokens tab first</b-alert>
+            </div>
             <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Balance:" label-for="transfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">{{ modalAddTokensToTransfer.balance }}</font>
             </b-form-group>
@@ -618,8 +621,16 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
+                    Mine Only
+                  </b-form-checkbox>
+                </div>
+                <div v-if="settings.tabIndex == 1" class="mt-2 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
                     Mine Only
                   </b-form-checkbox>
                 </div>
@@ -927,6 +938,9 @@
                   <div>
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.registrant) || '&nbsp' }}</font>
                   </div>
+                </template>
+                <template #cell(mine)="data">
+                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(schemeId)="data">
                   <font size="-1">{{ data.item.schemeId }}</font>
@@ -1257,21 +1271,22 @@
             showInfo: false,
             reportingDateTime: 0,
             announcementsTable: {
-              mineOnly: false,
               filter: null,
+              mineOnly: false,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
             registrationsTable: {
               filter: null,
+              mineOnly: false,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
             addressesTable: {
-              mineOnly: false,
               filter: null,
+              mineOnly: false,
               currentPage: 1,
               pageSize: 25,
               sortOption: 'typenameasc',
@@ -1315,7 +1330,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 39,
+            version: 40,
           },
           contracts: {
             "11155111": {
@@ -1517,9 +1532,10 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'schemeId', label: 'Scheme Id', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 38%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 33%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           addressesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
@@ -1653,7 +1669,28 @@
           },
 
           filteredRegistrations() {
-            return this.registrations.filter(e => e.chainId == this.chainId);
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const regex = this.settings.registrationsTable.filter != null && this.settings.registrationsTable.filter.length > 0 ? new RegExp(this.settings.registrationsTable.filter, 'i') : null;
+            for (const item of this.registrations) {
+              if (item.chainId == this.chainId) {
+                const registrantData = this.addresses[item.registrant] || {};
+                let include = true;
+                if (regex) {
+                  if (regex && !(regex.test(registrantData.name) || regex.test(registrantData.ensName) || regex.test(item.tx.from))) {
+                    include = false;
+                  }
+                }
+                if (include && this.settings.registrationsTable.mineOnly) {
+                  if (!registrantData.mine) {
+                    include = false;
+                  }
+                }
+                if (include) {
+                  results.push({ ...item, mine: registrantData.mine });
+                }
+              }
+            }
+            return results;
           },
           filteredSortedRegistrations() {
             let results = this.filteredRegistrations;
