@@ -767,7 +767,7 @@
               <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h4>Welcome</h4>
-                  Stealth Chad is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>bytes32</i> instead of <i>bytes</i>).
+                  Stealth Chad is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>).
 
                   <h5 class="mt-4">How The ERC-5564: Stealth Addresses Protocol Works</h5>
                   <ul>
@@ -1046,7 +1046,7 @@
                   <font size="-1">{{ nameOrNull(data.item.address) }}</font>
                 </template>
                 <template #cell(mine)="data">
-                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
+                  <b-form-checkbox size="sm" disabled :checked="data.item.mine" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(source)="data">
                   <font size="-1">
