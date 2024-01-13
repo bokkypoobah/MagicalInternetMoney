@@ -425,6 +425,36 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto-stealthmetaaddress" @click="viewAddress(modalAddress.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto-address" @click="viewAddress(modalAddress.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.address) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.address) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="settings.showDetails && modalAddress.item && modalAddress.item.source" label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" disabled id="address-source" variant="transparent" class="m-0 ml-2 p-0">{{ sourceOptions.filter(e => e.value == modalAddress.item.source)[0] && sourceOptions.filter(e => e.value == modalAddress.item.source)[0].text || ("Unknown: " + modalAddress.item.source) }}</b-button>
+            </b-form-group>
           </b-modal>
 
           <!-- :MODALSTEALTHMETAADDRESS -->
@@ -522,6 +552,9 @@
                   <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.viewingPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.source" label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" disabled id="address-source" variant="transparent" class="m-0 ml-2 p-0">{{ sourceOptions.filter(e => e.value == modalStealthMetaAddress.item.source)[0] && sourceOptions.filter(e => e.value == modalStealthMetaAddress.item.source)[0].text || ("Unknown: " + modalStealthMetaAddress.item.source) }}</b-button>
             </b-form-group>
             <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.linkedTo" label="" label-for="address-addtoregistry" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="'Add or update in registry'" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="modalStealthMetaAddress.item.linkedTo.address != coinbase" id="address-addtoregistry" @click="addStealthMetaAddressToRegistry(modalStealthMetaAddress.item.address)" variant="warning">{{ 'Add/Update' }}</b-button>
@@ -2667,6 +2700,10 @@
             localStorage.stealthChadCoinbase = this.coinbase;
             const network = await provider.getNetwork();
             localStorage.stealthChadChainId = network.chainId;
+            if (!(this.coinbase in this.addresses)) {
+              Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null });
+              localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            }
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
@@ -3825,8 +3862,8 @@
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged: " + t.coinbase);
                 if (!(t.coinbase in t.addresses)) {
                   Vue.set(t.addresses, t.coinbase, { type: "address", source: "attached", mine: true, name: null });
+                  localStorage.stealthChadAddresses = JSON.stringify(t.addresses);
                 }
-                localStorage.stealthChadAddresses = JSON.stringify(t.addresses);
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged - address: " + JSON.stringify(t.addresses[t.coinbase]));
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
