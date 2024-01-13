@@ -631,24 +631,16 @@
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-2 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
-                    Mine Only
-                  </b-form-checkbox>
+                  <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-2 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
-                    Mine Only
-                  </b-form-checkbox>
+                  <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-2 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">
-                    Mine Only
-                  </b-form-checkbox>
+                  <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.tokenContractsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">
-                    Active Only
-                  </b-form-checkbox>
+                  <b-form-checkbox size="sm" v-model.trim="settings.tokenContractsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">Active Only</b-form-checkbox>
                 </div>
                 <!-- <div v-if="false && (settings.tabIndex == 0 || settings.tabIndex == 1)" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
@@ -741,7 +733,6 @@
                   <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistrations.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
-                  <!-- TODO -->
                   <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="filteredAddresses.length" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
@@ -3295,9 +3286,8 @@
               rows = parseInt(rows) + data.length;
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
-            // console.log("newTokenContractsMap.length: " + Object.keys(newTokenContractsMap).length);
             this.sync.completed = 0;
-            this.sync.total = rows;
+            this.sync.total = Object.keys(newTokenContractsMap).length;
             this.sync.section = 'Token Contracts';
             // const erc721Helper = this.chainId == CHAINID_MAINNET ? new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider) : null;
             rows = 0;
