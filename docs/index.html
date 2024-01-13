@@ -2480,7 +2480,6 @@
                   mine: true,
                   source: "attached.signed",
                 });
-
               }
               Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, {
                 type: "stealthMetaAddress",
@@ -3824,6 +3823,11 @@
                 const signer = provider.getSigner();
                 t.coinbase = await signer.getAddress();
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged: " + t.coinbase);
+                if (!(t.coinbase in t.addresses)) {
+                  Vue.set(t.addresses, t.coinbase, { type: "address", source: "attached", mine: true, name: null });
+                }
+                localStorage.stealthChadAddresses = JSON.stringify(t.addresses);
+                console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged - address: " + JSON.stringify(t.addresses[t.coinbase]));
               }
               window.ethereum.on('accountsChanged', handleAccountsChanged);
               async function handleNewBlock(blockNumber) {
