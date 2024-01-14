@@ -887,6 +887,9 @@
                     &nbsp;
                   </div>
                 </template>
+                <template #cell(iSent)="data">
+                  <b-form-checkbox size="sm" disabled :checked="data.item.iSent" class="mt-1 ml-2"></b-form-checkbox>
+                </template>
                 <template #cell(sender)="data">
                   <div v-if="data.item.tx && data.item.tx.from">
                     <b-link @click="viewAddress(data.item.tx.from)">
@@ -897,6 +900,9 @@
                     </div>
                   </div>
                 </template>
+                <template #cell(iReceived)="data">
+                  <b-form-checkbox size="sm" disabled :checked="data.item.iReceived" class="mt-1 ml-2"></b-form-checkbox>
+                </template>
                 <template #cell(receiver)="data">
                   <b-link @click="viewAddress(data.item.stealthAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
@@ -904,9 +910,6 @@
                   <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
                   </div>
-                </template>
-                <template #cell(mine)="data">
-                  <b-form-checkbox size="sm" disabled value="1" :checked="data.item.mine ? 1 : 0" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
@@ -1564,8 +1567,9 @@
           announcementsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+            { key: 'iSent', label: 'I Sent', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'iReceived', label: 'I Received', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1725,7 +1729,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -3563,10 +3567,10 @@
                     item.iReceived = true;
                     Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
                     Vue.set(this.addresses[stealthAddress], 'mine', true);
-                    writeRecords.push(item);
                     break;
                   }
                 }
+                writeRecords.push(item);
               }
               if (writeRecords.length > 0) {
                 await db.announcements.bulkPut(writeRecords).then (function() {
