@@ -663,8 +663,8 @@
                 <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 0" class="mt-2 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.announcementsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
+                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                  <b-form-select size="sm" v-model="settings.announcementsTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-2 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
@@ -1318,7 +1318,7 @@
             showDetails: false,
             announcementsTable: {
               filter: null,
-              mineOnly: false,
+              iSentIReceived: null,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
@@ -1376,7 +1376,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 0,
+            version: 1,
           },
           contracts: {
             "11155111": {
@@ -1474,6 +1474,13 @@
             read: false,
             write: false,
           },
+          iSentIReceivedOptions: [
+            { value: null, text: 'All Transfers' },
+            { value: "iSent", text: 'I Sent' },
+            { value: "iReceived", text: 'I Received' },
+            { value: "iSentOrIReceived", text: 'I Sent OR I Received' },
+            { value: "iSentAndIReceived", text: 'I Sent AND I Received' },
+          ],
           sourceOptions: [
             { value: null, text: '(select)' },
             { value: "attached", text: 'Web3 attached account' },
@@ -1567,9 +1574,9 @@
           announcementsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'iSent', label: 'I Sent', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'iSent', label: 'I Sent', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'iReceived', label: 'I Received', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'iReceived', label: 'I Received', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1671,8 +1678,24 @@
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
                 let include = true;
-                if (this.settings.announcementsTable.mineOnly && !announcement.mine) {
-                  include = false;
+                if (this.settings.announcementsTable.iSentIReceived) {
+                  if (this.settings.announcementsTable.iSentIReceived == 'iSent') {
+                    if (!announcement.iSent) {
+                      include = false;
+                    }
+                  } else if (this.settings.announcementsTable.iSentIReceived == 'iReceived') {
+                    if (!announcement.iReceived) {
+                      include = false;
+                    }
+                  } else if (this.settings.announcementsTable.iSentIReceived == 'iSentOrIReceived') {
+                    if (!announcement.iSent && !announcement.iReceived) {
+                      include = false;
+                    }
+                  } else if (this.settings.announcementsTable.iSentIReceived == 'iSentAndIReceived') {
+                    if (!announcement.iSent || !announcement.iReceived) {
+                      include = false;
+                    }
+                  }
                 }
                 if (include && regex) {
                   const sender = announcement.tx.from;
@@ -1693,7 +1716,11 @@
                   }
                 }
                 if (include) {
-                  results.push(announcement);
+                  const _cellVariants = {
+                    sender: announcement.iSent ? 'success' : undefined,
+                    receiver: announcement.iReceived ? 'success' : undefined,
+                  };
+                  results.push({ ...announcement, _cellVariants });
                 }
               }
             }
@@ -1729,7 +1756,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -2511,7 +2538,7 @@
               Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, address);
             } else {
               if (!(this.modalNewStealthMetaAddress.linkedTo in this.addresses)) {
-                Vue.set(this.addresses, this.modalNewStealthMetaAddress.linkedTo, {
+                Vue.set(this.addresses, this.modalNewStealthMetaAddress.linkedTo.address, {
                   type: "address",
                   name: null,
                   mine: true,
