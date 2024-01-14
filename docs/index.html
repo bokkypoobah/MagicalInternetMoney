@@ -3545,6 +3545,11 @@
               console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
               const writeRecords = [];
               for (const item of data) {
+                const sender = item.tx && item.tx.from || null;
+                const senderData = sender && this.addresses[sender] || {};
+                if (senderData.mine) {
+                  item.iSent = true;
+                }
                 const stealthAddress = item.stealthAddress;
                 const stealthAddressData = this.addresses[stealthAddress];
                 const ephemeralPublicKey = item.ephemeralPublicKey;
@@ -3554,15 +3559,10 @@
                   const spendingPublicKey = address.spendingPublicKey;
                   const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
                   if (status && status.match) {
-                    // console.log(moment().format("HH:mm:ss") + " processData - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey.substring(0, 20) + '... @ ' + item.blockNumber);
-                    // console.log( " viewingPrivateKey: " + viewingPrivateKey + ", viewingPublicKey: " + viewingPublicKey.substring(0, 20) + "... " + spendingPublicKey.substring(0, 20) + "...");
-                    // console.log("item: " + JSON.stringify(item, null, 2));
-                    // console.log("address: " + JSON.stringify(address, null, 2));
                     item.linkedTo = { stealthMetaAddress: address.address, address: address.linkedTo.address };
-                    item.mine = true;
+                    item.iReceived = true;
                     Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
                     Vue.set(this.addresses[stealthAddress], 'mine', true);
-                    // console.log("item: " + JSON.stringify(item, null, 2));
                     writeRecords.push(item);
                     break;
                   }
@@ -3578,7 +3578,6 @@
               done = data.length < this.DB_PROCESSING_BATCH_SIZE;
             } while (!done);
             rows = 0;
-
             localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
