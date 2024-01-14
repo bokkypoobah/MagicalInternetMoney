@@ -2,10 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>StealthChad</title>
+    <title>Magical Internet Money</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <meta name="description" content="StealthChad (c) Bok Consulting Pty Ltd 2024" />
+    <meta name="description" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
     <meta name="author" content="BokkyPooBah" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@BokkyPooBah" />
@@ -39,9 +39,9 @@
     <div id="app">
       <b-container fluid class="m-0 p-0">
         <b-navbar toggleable="sm" variant="light" class="mx-1 my-0 p-0">
-          <b-navbar-brand to="https://bokkypoobah.github.io/StealthChad/" variant="primary">
+          <b-navbar-brand to="https://bokkypoobah.github.io/MagicalInternetMoney/" variant="primary">
             <b-avatar rounded variant="light" size="3.0rem" src="images/LarvaChad_1532_zoomed_transparentbg.png" v-b-popover.hover.bottom="'gm'" class="ml-0"></b-avatar>
-            <em v-b-popover.hover.bottom="'gm gm gm'">StealthChad</em>
+            <em v-b-popover.hover.bottom="'gm gm gm'">Magical Internet Money</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Announcements</b-nav-item>
@@ -150,7 +150,7 @@
             <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Balance:" label-for="transfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">{{ modalAddTokensToTransfer.balance }}</font>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to StealthChad for transfer" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-approved" v-model.trim="modalAddTokensToTransfer.approvedInput"></b-form-input>
                 <b-input-group-append>
@@ -180,7 +180,7 @@
                 <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox>
               </template>
             </b-table>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to StealthChad for transfer" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <!-- <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox> -->
                 <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" unchecked-value="false" class="ml-2"></b-form-checkbox>
@@ -425,19 +425,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <b-button size="sm" id="address-linkedto-stealthmetaaddress" @click="viewAddress(modalAddress.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
-                  </div>
-                </div>
-                <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-                </div>
-              </div>
-            </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.address" label="Linked To Address:" label-for="address-linkedto-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -449,6 +436,19 @@
                 <div>
                   <b-avatar v-if="ensName(modalAddress.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAddress.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'" class="mt-1"></b-avatar>
                   <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                </div>
+              </div>
+            </b-form-group>
+            <b-form-group v-if="modalAddress.item && modalAddress.item.linkedTo && modalAddress.item.linkedTo.stealthMetaAddress" label="Via Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <b-button size="sm" id="address-linkedto-stealthmetaaddress" @click="viewAddress(modalAddress.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
+                  </div>
+                </div>
+                <div>
+                  <b-button size="sm" @click="copyToClipboard(modalAddress.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -834,14 +834,14 @@
 
                   <h5 class="mt-3">This Dapp</h5>
                   <ul>
-                    <li>Dapp: <b-link href="https://bokkypoobah.github.io/StealthChad/" target="_blank">https://bokkypoobah.github.io/StealthChad/</b-link></li>
-                    <li>GitHub: <b-link href="https://github.com/bokkypoobah/StealthChad" target="_blank">https://github.com/bokkypoobah/StealthChad</b-link></li>
-                    <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/StealthChad/blob/main/docs/index.html" target="_blank">https://github.com/bokkypoobah/StealthChad/blob/main/docs/index.html</b-link></li>
+                    <li>Dapp: <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link></li>
+                    <li>GitHub: <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney</b-link></li>
+                    <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney/blob/main/docs/index.html" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney/blob/main/docs/index.html</b-link></li>
                   </ul>
 
                   <!-- <h5 class="mt-3">Running Locally</h5>
                   <ul>
-                    <li>In a folder on your computer, <b>git clone <b-link href="https://github.com/bokkypoobah/StealthChad" target="_blank">https://github.com/bokkypoobah/StealthChad</b-link></b></li>
+                    <li>In a folder on your computer, <b>git clone <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney</b-link></b></li>
                     <li>Run a tool like <b-link href="https://www.npmjs.com/package/anywhere" target="_blank">anywhere</b-link> in the <b>./docs</b> subdirectory of the folder created above</li>
                   </ul> -->
 
@@ -859,7 +859,7 @@
                   <h5 class="mt-3">Troubleshooting</h5>
                   <ul>
                     <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
-                    <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>stealthChad</b></li>
+                    <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>MagicalInternetMoney</b></li>
                   </ul>
                 </b-card-body>
               </b-card>
@@ -1275,7 +1275,7 @@
             <div class="mt-0 flex-grow-1">
             </div>
             <div class="mt-0 pl-1 pr-1">
-              gm, and enjoy! <i>StealthChad</i> &copy; Bok Consulting Pty Ltd 2024
+              gm, and enjoy! <i>Magical Internet Money</i> &copy; Bok Consulting Pty Ltd 2024
             </div>
           </div>
         </b-card>
@@ -1373,7 +1373,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 41,
+            version: 0,
           },
           contracts: {
             "11155111": {
@@ -1624,7 +1624,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "stealthchaddata080k",
+            name: "magicalinternetmoneydata080a",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
@@ -2278,9 +2278,9 @@
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
-            localStorage.stealthChadCoinbase = this.coinbase;
+            localStorage.magicalInternetMoneyCoinbase = this.coinbase;
             const network = await provider.getNetwork();
-            localStorage.stealthChadChainId = network.chainId;
+            localStorage.magicalInternetMoneyChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " searchForContracts - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
@@ -2298,14 +2298,14 @@
               contracts[this.chainId][contract] = { type, name: customData.name || null, read: customData.read || false, write: customData.write || false, blockNumber, timestamp };
             }
             Vue.set(this, 'contracts', contracts);
-            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+            localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
           },
 
           saveModalContractName() {
             console.log(moment().format("HH:mm:ss") + " saveModalContractName: " + JSON.stringify(this.modalContract));
             this.modalContract.item.name = this.modalContract.name;
             Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'name', this.modalContract.name);
-            localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+            localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
@@ -2313,7 +2313,7 @@
             console.log(moment().format("HH:mm:ss") + " saveModalAddressName: " + JSON.stringify(this.modalAddress));
             this.modalAddress.item.name = this.modalAddress.name;
             Vue.set(this.addresses[this.modalAddress.item.address], 'name', this.modalAddress.name);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
@@ -2321,7 +2321,7 @@
             console.log(moment().format("HH:mm:ss") + " saveModalStealthMetaAddressName: " + JSON.stringify(this.modalStealthMetaAddress));
             this.modalStealthMetaAddress.item.name = this.modalStealthMetaAddress.name;
             Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'name', this.modalStealthMetaAddress.name);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
@@ -2331,7 +2331,7 @@
             Vue.set(this.addresses[this.modalAddress.item.address], 'mine', this.modalAddress.item.mine);
             Vue.set(this.addresses, this.modalAddress.item.address, this.addresses[this.modalAddress.item.address]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
           },
 
           toggleModalStealthMetaAddressMine() {
@@ -2340,28 +2340,28 @@
             Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'mine', this.modalStealthMetaAddress.item.mine);
             Vue.set(this.addresses, this.modalStealthMetaAddress.item.address, this.addresses[this.modalStealthMetaAddress.item.address]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
           },
 
           toggleContractRead(item) {
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'read', !this.modalContract.read);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-              localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+              localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
             }
           },
           toggleContractWrite(item) {
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
               Vue.set(this.contracts[this.modalContract.item.chainId][this.modalContract.item.contract], 'write', !this.modalContract.write);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-              localStorage.stealthChadContracts = JSON.stringify(this.contracts);
+              localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
             }
           },
           toggleTokenContractActive(item) {
             if (item && item.contract) {
               Vue.set(this.tokenContracts[this.chainId][item.contract], 'active', !this.tokenContracts[this.chainId][item.contract].active);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-              localStorage.stealthChadTokenContracts = JSON.stringify(this.tokenContracts);
+              localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
             }
           },
           transfer(stealthMetaAddress) {
@@ -2528,7 +2528,7 @@
             }
             Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, this.addresses[this.modalNewStealthMetaAddress.stealthMetaAddress]);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
           },
 
@@ -2697,12 +2697,12 @@
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
-            localStorage.stealthChadCoinbase = this.coinbase;
+            localStorage.magicalInternetMoneyCoinbase = this.coinbase;
             const network = await provider.getNetwork();
-            localStorage.stealthChadChainId = network.chainId;
+            localStorage.magicalInternetMoneyChainId = network.chainId;
             if (!(this.coinbase in this.addresses)) {
               Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null });
-              localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+              localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             }
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
@@ -3125,7 +3125,7 @@
             }
 
             Vue.set(this, 'addresses', addresses);
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             // console.log(moment().format("HH:mm:ss") + " collateAddresses - addresses: " + JSON.stringify(accounts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateAddresses END");
           },
@@ -3491,7 +3491,7 @@
             // }
             //
             Vue.set(this, 'tokenContracts', tokenContracts);
-            localStorage.stealthChadTokenContracts = JSON.stringify(this.tokenContracts);
+            localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
             // console.log(moment().format("HH:mm:ss") + " collateTokens - tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
             console.log(moment().format("HH:mm:ss") + " collateTokens END");
           },
@@ -3510,7 +3510,7 @@
                 }
               }
             }
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
@@ -3579,7 +3579,7 @@
             } while (!done);
             rows = 0;
 
-            localStorage.stealthChadAddresses = JSON.stringify(this.addresses);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             // console.log(moment().format("HH:mm:ss") + " processData - addresses: " + JSON.stringify(this.addresses, null, 2));
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
@@ -3601,7 +3601,7 @@
 
           saveSettings() {
             // console.log(moment().format("HH:mm:ss") + " saveSettings: " + JSON.stringify(this.settings));
-            localStorage.stealthChadSettings = JSON.stringify(this.settings);
+            localStorage.magicalInternetMoneySettings = JSON.stringify(this.settings);
           },
           async processNewBlock(blockNumber) {
             console.log(moment().format("HH:mm:ss") + " processNewBlock[" + this.chainId + "] #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
@@ -3862,7 +3862,7 @@
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged: " + t.coinbase);
                 if (!(t.coinbase in t.addresses)) {
                   Vue.set(t.addresses, t.coinbase, { type: "address", source: "attached", mine: true, name: null });
-                  localStorage.stealthChadAddresses = JSON.stringify(t.addresses);
+                  localStorage.magicalInternetMoneyAddresses = JSON.stringify(t.addresses);
                 }
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged - address: " + JSON.stringify(t.addresses[t.coinbase]));
               }
@@ -3890,14 +3890,14 @@
           (async() => {
             await this.connectToWeb3();
           })();
-          if ('stealthChadChainId' in localStorage) {
-            this.chainId = localStorage.stealthChadChainId;
+          if ('magicalInternetMoneyChainId' in localStorage) {
+            this.chainId = localStorage.magicalInternetMoneyChainId;
           }
-          if ('stealthChadCoinbase' in localStorage) {
-            this.coinbase = localStorage.stealthChadCoinbase;
+          if ('magicalInternetMoneyCoinbase' in localStorage) {
+            this.coinbase = localStorage.magicalInternetMoneyCoinbase;
           }
-          if ('stealthChadSettings' in localStorage) {
-            const tempSettings = JSON.parse(localStorage.stealthChadSettings);
+          if ('magicalInternetMoneySettings' in localStorage) {
+            const tempSettings = JSON.parse(localStorage.magicalInternetMoneySettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
               if (this.settings.announcementsTable.currentPage > 1) {
@@ -3916,14 +3916,14 @@
                 this.settings.contractsTable.currentPage = 1;
               }
               // Restore other settings for the same version
-              if ('stealthChadContracts' in localStorage) {
-                this.contracts = JSON.parse(localStorage.stealthChadContracts);
+              if ('magicalInternetMoneyContracts' in localStorage) {
+                this.contracts = JSON.parse(localStorage.magicalInternetMoneyContracts);
               }
-              if ('stealthChadAddresses' in localStorage) {
-                this.addresses = JSON.parse(localStorage.stealthChadAddresses);
+              if ('magicalInternetMoneyAddresses' in localStorage) {
+                this.addresses = JSON.parse(localStorage.magicalInternetMoneyAddresses);
               }
-              if ('stealthChadTokenContracts' in localStorage) {
-                this.tokenContracts = JSON.parse(localStorage.stealthChadTokenContracts);
+              if ('magicalInternetMoneyTokenContracts' in localStorage) {
+                this.tokenContracts = JSON.parse(localStorage.magicalInternetMoneyTokenContracts);
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
               }
               // TODO: TESTING
