@@ -44,8 +44,8 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Magical Internet Money</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'ERC-5564: Stealth Addresses Announcer Activity'">Announcements</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry Activity'">Registrations</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Stealth Transfers - ERC-5564: Stealth Addresses'">Transfers</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Directory - ERC-6538: Stealth Meta-Address Registry'">Directory</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
