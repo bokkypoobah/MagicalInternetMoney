@@ -841,7 +841,7 @@
               </b-card>
 
 
-              <!-- :ANNOUNCEMENTS -->
+              <!-- :TRANSFERS -->
               <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="announcementsFields" :items="pagedFilteredSortedAnnouncements" show-empty empty-html="Click Sync above to retrieve stealth address announcements" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -936,7 +936,7 @@
                 </template>
               </b-table>
 
-              <!-- :REGISTRATIONS -->
+              <!-- :DIRECTORY -->
               <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve stealth address registrations" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -1058,7 +1058,7 @@
                 </template>
               </b-table>
 
-              <!-- :TOKENEVENTS -->
+              <!-- :TOKENS -->
               <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
@@ -3987,20 +3987,10 @@
             const tempSettings = JSON.parse(localStorage.magicalInternetMoneySettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              if (this.settings.announcementsTable.currentPage > 1) {
-                this.settings.announcementsTable.currentPage = 1;
-              }
-              if (this.settings.registrationsTable.currentPage > 1) {
-                this.settings.registrationsTable.currentPage = 1;
-              }
-              if (this.settings.addressesTable.currentPage > 1) {
-                this.settings.addressesTable.currentPage = 1;
-              }
-              if (this.settings.tokenContractsTable.currentPage > 1) {
-                this.settings.tokenContractsTable.currentPage = 1;
-              }
-              if (this.settings.contractsTable.currentPage > 1) {
-                this.settings.contractsTable.currentPage = 1;
+              for (let table of ['announcementsTable', 'registrationsTable', 'addressesTable', 'tokenContractsTable', 'contractsTable']) {
+                if (this.settings[table].currentPage > 1) {
+                  this.settings[table].currentPage = 1;
+                }
               }
               // Restore other settings for the same version
               if ('magicalInternetMoneyContracts' in localStorage) {
