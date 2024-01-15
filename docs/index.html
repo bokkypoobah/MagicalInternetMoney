@@ -961,6 +961,7 @@
                   <b-link @click="viewAddress(data.item.registrant)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ formatAddressNamePrimary(data.item.registrant) }}</font>
                   </b-link>
+                  <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.registrantType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.registrant) || '&nbsp' }}</font>
                   </div>
@@ -978,6 +979,7 @@
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.stealthMetaAddress) }}</font>
                   </b-link>
+                  <span v-if="data.item.mine"><b-icon-star-fill :variant="'success'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthMetaAddress) }}</font>
                   </div>
@@ -1773,7 +1775,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -1794,7 +1796,7 @@
                   const _cellVariants = {
                     registrant: registrantData.mine ? 'success' : undefined,
                   };
-                  results.push({ ...item, mine: registrantData.mine, _cellVariants });
+                  results.push({ ...item, mine: registrantData.mine /*, _cellVariants */, registrantType: registrantData.type });
                 }
               }
             }
