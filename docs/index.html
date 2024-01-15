@@ -654,22 +654,22 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 0" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.announcementsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 0" class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.announcementsTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-2 pr-1">
+                <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-2 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
