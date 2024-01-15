@@ -33,7 +33,7 @@ This dapp:
 
 ### Sample Screens
 
-#### Generate New Stealth Meta-Address
+#### Generate And Register New Stealth Meta-Address
 
 ##### Generate New Stealth Meta-Address - Initial Addresses
 
@@ -62,6 +62,19 @@ Click [Add/Update] to add your newly generated Stealth Meta-Address to the Steal
 ##### Generate New Stealth Meta-Address - Addresses
 
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Addresses_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - Sync
+
+Click [Sync] to retrieve events from the blockchains.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Sync_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - Registry
+
+The newly registered Stealth Meta-Address.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Registry_20240115.png" /></kbd>
+
 
 
 
