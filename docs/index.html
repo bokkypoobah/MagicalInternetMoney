@@ -871,6 +871,7 @@
                     <b-link @click="viewAddress(data.item.tx.from)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ formatAddressNamePrimary(data.item.tx.from) }}</font>
                     </b-link>
+                    <span v-if="data.item.iSent"><b-icon-star-fill :variant="data.item.senderType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.tx.from)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.tx.from) }}</font>
                     </div>
@@ -883,6 +884,7 @@
                   <b-link @click="viewAddress(data.item.stealthAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
                   </b-link>
+                  <span v-if="data.item.iReceived"><b-icon-star-fill :variant="data.item.receiverType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
                   </div>
@@ -1051,8 +1053,10 @@
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled :checked="data.item.mine" class="mt-1 ml-2"></b-form-checkbox>
                 </template>
-                <template #cell(source)="data">
+                <template #cell(typeAndSource)="data">
                   <font size="-1">
+                    {{ addressTypeOptions.filter(e => e.value == data.item.type)[0] && addressTypeOptions.filter(e => e.value == data.item.type)[0].text || ("Unknown: " + data.item.type) }}
+                    <br />
                     {{ sourceOptions.filter(e => e.value == data.item.source)[0] && sourceOptions.filter(e => e.value == data.item.source)[0].text || ("Unknown: " + data.item.source) }}
                   </font>
                 </template>
@@ -1370,7 +1374,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 3,
+            version: 4,
           },
           contracts: {
             "11155111": {
@@ -1487,6 +1491,12 @@
             { value: 'JPY', text: 'JPY' },
             { value: 'NZD', text: 'NZD' },
             { value: 'USD', text: 'USD' },
+          ],
+          addressTypeOptions: [
+            { value: null, text: '(unknown)' },
+            { value: "address", text: 'Address' },
+            { value: "stealthMetaAddress", text: 'Stealth Meta-Address' },
+            { value: "stealthAddress", text: 'Stealth Address' },
           ],
           sourceOptions: [
             { value: null, text: '(select)' },
@@ -1607,7 +1617,7 @@
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'typeAndSource', label: 'Type & Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           tokenContractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1642,7 +1652,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "magicalinternetmoneydata080a",
+            name: "magicalinternetmoneydata080b",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
@@ -1704,11 +1714,11 @@
                     }
                   }
                 }
+                const sender = announcement.tx.from;
+                const senderData = this.addresses[sender] || {};
+                const receiver = announcement.stealthAddress;
+                const receiverData = this.addresses[receiver] || {};
                 if (include && regex) {
-                  const sender = announcement.tx.from;
-                  const senderData = this.addresses[sender] || {};
-                  const receiver = announcement.stealthAddress;
-                  const receiverData = this.addresses[receiver] || {};
                   const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
                   const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
                   const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
@@ -1727,7 +1737,7 @@
                     sender: announcement.iSent ? 'success' : undefined,
                     receiver: announcement.iReceived ? 'success' : undefined,
                   };
-                  results.push({ ...announcement, _cellVariants });
+                  results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, /*, _cellVariants */ });
                 }
               }
             }
@@ -1763,7 +1773,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -1923,7 +1933,7 @@
             return results;
           },
           pagedFilteredSortedAddresses() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
@@ -3133,7 +3143,7 @@
                   addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
                 }
                 if (!(item.stealthAddress in addresses)) {
-                  addresses[item.stealthAddress] = { type: "address", source: "announcer.stealthAddress", mine: false, name: null };
+                  addresses[item.stealthAddress] = { type: "stealthAddress", source: "announcer.stealthAddress", mine: false, name: null };
                 }
                 if (!(item.caller in addresses)) {
                   const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
