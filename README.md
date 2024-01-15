@@ -103,6 +103,22 @@ Click on the [>] button to send ETH/ERC-20/ERC-721 tokens to that Stealth Meta-A
 
 <kbd><img src="images/SampleScreen_StealthTransfer_NewStealthTransfer_20240115.png" /></kbd>
 
+##### Stealth Transfer - New Stealth Transfer Details
+
+<kbd><img src="images/SampleScreen_StealthTransfer_NewStealthTransferDetails_20240115.png" /></kbd>
+
+##### Stealth Transfer - Sign Message To View Private Key
+
+<kbd><img src="images/SampleScreen_StealthTransfer_SignMessageToViewPrivateKey_20240115.png" /></kbd>
+
+##### Stealth Transfer - Private Key Entered In Web3 Wallet
+
+`0.000012345 ETH` rounded to 0 in the web3 wallet.
+
+<kbd><img src="images/SampleScreen_StealthTransfer_PrivateKeyEnteredInWeb3Wallet_20240115.png" /></kbd>
+
+
+
 <br />
 
 ---
