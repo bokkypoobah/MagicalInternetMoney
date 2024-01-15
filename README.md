@@ -37,13 +37,13 @@ This dapp:
 
 ##### Generate New Stealth Meta-Address - Initial Addresses
 
-Click [+] to generate a new Stealth Meta-Address.
+Click [+] from the Addresses menu to access the Stealth Meta-Address generation screen.
 
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Initial_20240115.png" /></kbd>
 
 ##### Generate New Stealth Meta-Address - Generate And Sign
 
-Click [+] to generate a new Stealth Meta-Address, then sign the phrase with your web3 attached account.
+Click [Generate] to generate a new Stealth Meta-Address, then sign the phrase with your web3 attached account.
 
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_GenerateAndSign_20240115.png" /></kbd>
 
@@ -51,9 +51,13 @@ Click [+] to generate a new Stealth Meta-Address, then sign the phrase with your
 
 Click [Add] to add your newly generated Stealth Meta-Address to your addresses.
 
-Click [Add/Update] to add your newly generated Stealth Meta-Address to the Stealth Address Registry.
-
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_AfterGeneration_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - Add To Registry
+
+Click [Add/Update] to add your newly generated Stealth Meta-Address to the Stealth Address Registry, then sign and send the web3 transaction.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_AddToRegistry_20240115.png" /></kbd>
 
 ##### Generate New Stealth Meta-Address - Addresses
 
