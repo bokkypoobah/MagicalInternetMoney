@@ -75,161 +75,33 @@ The newly registered Stealth Meta-Address.
 
 <kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Registry_20240115.png" /></kbd>
 
-
-
-
-<br />
-
 <br />
 
 ---
 
-##### After Initial Sync - Activity - Stealth Payment
+#### Stealth Transfer
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Activity_StealthPayment_20240107.png" /></kbd>
+##### Stealth Transfer - To Stealth Meta-Address In Registry
 
-##### After Initial Sync - Registry
+Click on the [>] button to send ETH/ERC-20/ERC-721 tokens to that Stealth Meta-Address.
 
-Events retrieved from the Registry contract.
+<kbd><img src="images/SampleScreen_StealthTransfer_Registry_20240115.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Registry_20240107.png" /></kbd>
+##### Stealth Transfer - Specify Transfer Amount
 
-##### After Initial Sync - Registry - Entry
+<kbd><img src="images/SampleScreen_StealthTransfer_TransferAmount_20240115.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Registry_Entry_20240107.png" /></kbd>
+##### Stealth Transfer - Send Transaction
 
-##### After Initial Sync - Addresses
+<kbd><img src="images/SampleScreen_StealthTransfer_SendTransaction_20240115.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_20240107.png" /></kbd>
+##### Stealth Transfer - Sync
 
-##### After Initial Sync - Addresses - Stealth Meta-Address Without Keys
+<kbd><img src="images/SampleScreen_StealthTransfer_Sync_20240115.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Addresses_StealthMetaAddress_WithoutKeys_20240107.png" /></kbd>
+##### Stealth Transfer - New Stealth Transfer
 
-##### After Initial Sync - Tokens
-
-ERC-20 and ERC-721 token events retrieved for addresses marked "Mine". Active tokens manually clicked.
-
-<kbd><img src="images/SampleScreen_AfterInitialSync_Tokens_20240107.png" /></kbd>
-
-##### After Initial Sync - Config
-
-<kbd><img src="images/SampleScreen_AfterInitialSync_Config_20240107.png" /></kbd>
-
-<br />
-
----
-
-#### Generate Stealth Meta-Address
-
-##### Generate Stealth Meta-Address - New Address
-
-Click [+] in the Addresses tab.
-
-<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_NewAddress_20240107.png" /></kbd>
-
-##### Generate Stealth Meta-Address - Web3 Signing
-
-Click [Generate] in the Addresses tab. Sign with your web3 attached address.
-
-<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Web3Signing_20240107.png" /></kbd>
-
-##### Generate Stealth Meta-Address - Web3 Signed
-
-Click [Update] to add your stealth keys to your address in the Addresses tab.
-
-<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Web3Signed_20240107.png" /></kbd>
-
-##### Generate Stealth Meta-Address - Register Stealth Meta-Address
-
-Click [Add/Update] to add your stealth keys to the Registry.
-
-<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_RegisterStealthMetaAddress_20240107.png" /></kbd>
-
-<br />
-
----
-
-#### Sync With Ethereum Mainnet For ENS Names
-
-##### Sync With Ethereum Mainnet For ENS Names - Addresses
-
-Switch to the Ethereum Mainnet network and [Sync]. Switch back to the Sepolia testnet.
-
-<kbd><img src="images/SampleScreen_MainnetSync_Addresses_20240107.png" /></kbd>
-
-
-<br />
-
----
-
-#### After Sync With Generated Stealth Meta-Address
-
-##### After Sync With Generated Stealth Meta-Address - Activity
-
-Click [Sync]. Transfers associated with my stealth keys are identified.
-
-<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Activity_20240107.png" /></kbd>
-
-##### After Sync With Generated Stealth Meta-Address - Transfer
-
-<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_20240107.png" /></kbd>
-
-##### After Sync With Generated Stealth Meta-Address - Transfer - Web3 Sign To Reveal Spending Private Key
-
-<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_Web3SignToRevealSpendingPrivateKey_20240107.png" /></kbd>
-
-##### After Sync With Generated Stealth Meta-Address - Transfer - Spending Private Key Imported Into Web3 Wallet
-
-<kbd><img src="images/SampleScreen_AfterSyncWithGeneratedStealthMetaAddress_Transfer_SpendingPrivateKeyImportedIntoWeb3Wallet_20240107.png" /></kbd>
-
-<br />
-
----
-
-#### Transferring Ethers To A Stealth Address
-
-##### Transferring Ethers To A Stealth Address - Select Stealth Meta-Address
-
-Click [>] in the Addresses tab. Using a separate account for sending in this example.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_SelectStealthMetaAddress_20240107.png" /></kbd>
-
-
-##### Transferring Ethers To A Stealth Address - Select Stealth Meta-Address
-
-Click [>] in the Addresses tab. Using a separate account for sending in this example.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_SelectStealthMetaAddress_20240107.png" /></kbd>
-
-
-##### Transferring Ethers To A Stealth Address - Enter Amount
-
-Enter amount.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_EnterAmount.png" /></kbd>
-
-##### Transferring Ethers To A Stealth Address - Web3 Sign
-
-Click [Transfer] and sign with your web3 account.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_Web3Sign.png" /></kbd>
-
-##### Transferring Ethers To A Stealth Address - Activity After Transfer
-
-Click [Sync] and new transfer will appear. They stealth transfer has been identified as it is associated with my first account.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_ActivityAfterTransfer.png" /></kbd>
-
-##### Transferring Ethers To A Stealth Address - Revealing Stealth Private Key
-
-Click the [eye] button and web3 sign to reveal your spending private key. The private key has been imported into my web3 wallet.
-
-<kbd><img src="images/SampleScreen_TransferringEthersToAStealthAddress_RevealingStealthPrivateKey.png" /></kbd>
-
-
-
-
+<kbd><img src="images/SampleScreen_StealthTransfer_NewStealthTransfer_20240115.png" /></kbd>
 
 <br />
 
