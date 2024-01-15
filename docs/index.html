@@ -1587,7 +1587,7 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
             { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             // { key: 'schemeId', label: 'Scheme Id', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -1774,7 +1774,10 @@
                   include = false;
                 }
                 if (include) {
-                  results.push({ ...item, mine: registrantData.mine });
+                  const _cellVariants = {
+                    registrant: registrantData.mine ? 'success' : undefined,
+                  };
+                  results.push({ ...item, mine: registrantData.mine, _cellVariants });
                 }
               }
             }
