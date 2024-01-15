@@ -69,16 +69,16 @@
           <!-- :MODALSYNC -->
           <b-modal ref="modalsync" id="modal-sync" hide-footer size="md">
             <template #modal-title>Sync</template>
-            <b-form-group label="" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group label="" label-size="sm" label-cols-sm="1" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1">ERC-20 & ERC-721 transfers for my addresses</b-form-checkbox>
-              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full rescan, when my addresses changes</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full ERC-20 & ERC-721 rescan, when addresses changed</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">Exchange rates</b-form-checkbox>
             </b-form-group>
-            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Do It!</b-button>
             </b-form-group>
           </b-modal>
