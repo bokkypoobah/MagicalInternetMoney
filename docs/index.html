@@ -3993,27 +3993,16 @@
                 }
               }
               // Restore other settings for the same version
-              if ('magicalInternetMoneyContracts' in localStorage) {
-                this.contracts = JSON.parse(localStorage.magicalInternetMoneyContracts);
-              }
-              if ('magicalInternetMoneyAddresses' in localStorage) {
-                this.addresses = JSON.parse(localStorage.magicalInternetMoneyAddresses);
-              }
-              if ('magicalInternetMoneyTokenContracts' in localStorage) {
-                this.tokenContracts = JSON.parse(localStorage.magicalInternetMoneyTokenContracts);
-                // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
-              }
-              if ('magicalInternetMoneyExchangeRates' in localStorage) {
-                this.exchangeRates = JSON.parse(localStorage.magicalInternetMoneyExchangeRates);
-                // console.log(moment().format("HH:mm:ss") + " mounted - exchangeRates: " + JSON.stringify(this.exchangeRates, null, 2));
+              for (const name of ['contracts', 'addresses', 'tokenContracts', 'exchangeRates']) {
+                const keyName = 'magicalInternetMoney' + name.substring(0, 1).toUpperCase() + name.substring(1);
+                if (keyName in localStorage) {
+                  Vue.set(this, name, JSON.parse(localStorage[keyName]));
+                }
               }
               // TODO: TESTING
               // (async() => {
               //   await delay(1500);
-              //   await this.transfer(null);
               //   await this.transfer("st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96");
-              //   await this.addTokensForTransfer();
-              //   await this.newStealthMetaAddress();
               // })();
             }
             (async() => {
