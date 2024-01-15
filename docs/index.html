@@ -69,32 +69,18 @@
           <!-- :MODALSYNC -->
           <b-modal ref="modalsync" id="modal-sync" hide-footer size="md">
             <template #modal-title>Sync</template>
-            <b-form-group label="Transfers:" label-for="sync-transfers" label-size="sm" label-cols-sm="4" label-align-sm="right" description="Stealth Address Announcement events" class="mx-0 my-1 p-0">
-              <!-- <template v-slot:label>
-                Transfers<b-icon-info-circle shift-v="+1" font-scale="0.7" v-b-popover.hover.bottom="'Yeah. Page size'" class="ml-1"></b-icon-info-circle>:
-              </template> -->
-              <b-form-checkbox size="sm" :disabled="chainId != 11155111" id="sync-transfers" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
+
+            <b-form-group label="" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1">ERC-20 & ERC-721 transfers for my addresses</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full rescan, when my addresses changes</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">Exchange Rates</b-form-checkbox>
             </b-form-group>
-            <b-form-group label="Directory:" label-for="sync-directory" label-size="sm" label-cols-sm="4" label-align-sm="right" description="Stealth Address Registry events" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="chainId != 11155111" id="sync-directory" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="Tokens:" label-for="sync-tokens" label-size="sm" label-cols-sm="4" label-align-sm="right" description="ERC-20 & ERC-721 events for my addresses" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="chainId != 11155111" id="sync-tokens" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="Rescan Tokens:" label-for="sync-rescantokens" label-size="sm" label-cols-sm="4" label-align-sm="right" description="Full rescan when my addresses changes" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="chainId != 11155111 || !settings.sync.tokens" id="sync-rescantokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="ENS:" label-for="sync-ens" label-size="sm" label-cols-sm="4" label-align-sm="right" v-b-popover.hover.bottom="'Sync ENS Names in Mainnet for Testnet addresses'" description="Mainnet ENS for testnet addresses" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="chainId != 1" id="sync-ens" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="Balances:" label-for="sync-balances" label-size="sm" label-cols-sm="4" label-align-sm="right" description="TODO: Sync balances for my addresses" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="true" id="sync-balances" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="Exchange Rates:" label-for="sync-exchangerates" label-size="sm" label-cols-sm="4" label-align-sm="right" description="Select currency in Config" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" :disabled="chainId != 11155111 || !settings.reportingCurrency" id="sync-exchangerates" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
-            </b-form-group>
-            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Go</b-button>
+            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Do It!</b-button>
             </b-form-group>
           </b-modal>
 
