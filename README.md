@@ -33,13 +33,39 @@ This dapp:
 
 ### Sample Screens
 
-#### After Initial Sync
+#### Generate New Stealth Meta-Address
 
-##### After Initial Sync - Activity
+##### Generate New Stealth Meta-Address - Initial Addresses
 
-Click [Sync]. Events retrieved from the Announcer contract.
+Click [+] to generate a new Stealth Meta-Address.
 
-<kbd><img src="images/SampleScreen_AfterInitialSync_Activity_20240107.png" /></kbd>
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Initial_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - Generate And Sign
+
+Click [+] to generate a new Stealth Meta-Address, then sign the phrase with your web3 attached account.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_GenerateAndSign_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - After Generation
+
+Click [Add] to add your newly generated Stealth Meta-Address to your addresses.
+
+Click [Add/Update] to add your newly generated Stealth Meta-Address to the Stealth Address Registry.
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_AfterGeneration_20240115.png" /></kbd>
+
+##### Generate New Stealth Meta-Address - Addresses
+
+<kbd><img src="images/SampleScreen_GenerateStealthMetaAddress_Addresses_20240115.png" /></kbd>
+
+
+
+<br />
+
+<br />
+
+---
 
 ##### After Initial Sync - Activity - Stealth Payment
 
