@@ -1048,6 +1048,10 @@
                     <b-icon-link shift-v="+1" font-scale="0.9"></b-icon-link> Stealth Meta-Address
                   </span>
                 </template> -->
+                <template #cell(name)="data">
+                  <!-- <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font> -->
+                  <font size="-1">{{ nameOrNull(data.item.address) }}</font>
+                </template>
                 <template #cell(linkedToAddress)="data">
                   <div v-if="data.item.linkedTo && data.item.linkedTo.address">
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
@@ -1067,10 +1071,6 @@
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </div>
                   </div>
-                </template>
-                <template #cell(name)="data">
-                  <!-- <font size="-1">{{ data.item.ensName ? (data.item.ensName + (data.item.name ? ('; ' + data.item.name) : '')) : data.item.name }}</font> -->
-                  <font size="-1">{{ nameOrNull(data.item.address) }}</font>
                 </template>
                 <template #cell(mine)="data">
                   <b-form-checkbox size="sm" disabled :checked="data.item.mine" class="mt-1 ml-2"></b-form-checkbox>
@@ -1594,12 +1594,12 @@
           ],
           addressesFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
-            { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            // { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           tokenContractsFields: [
@@ -1702,10 +1702,10 @@
                   const senderData = this.addresses[sender] || {};
                   const receiver = announcement.stealthAddress;
                   const receiverData = this.addresses[receiver] || {};
-                  const linkedStealthMetaAddress = announcement.linkedTo.stealthMetaAddress;
-                  const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
-                  const linkedAddress = announcement.linkedTo.address;
-                  const linkedAddressData = this.addresses[linkedAddress] || {};
+                  const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
+                  const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
+                  const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
+                  const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
                   if (!(
                     regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
                     regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
@@ -1843,7 +1843,10 @@
                 }
               }
               if (include) {
-                results.push({ address, ...data });
+                const _cellVariants = {
+                  address: data.mine ? 'success' : undefined,
+                };
+                results.push({ address, ...data, _cellVariants });
               }
             }
             return results;
@@ -1910,7 +1913,7 @@
             return results;
           },
           pagedFilteredSortedAddresses() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
@@ -3578,9 +3581,9 @@
               for (const item of data) {
                 const sender = item.tx && item.tx.from || null;
                 const senderData = sender && this.addresses[sender] || {};
-                if (senderData.mine) {
-                  item.iSent = true;
-                }
+                item.iSent = senderData.mine;
+                item.iReceived = false;
+                delete item.linkedTo;
                 const stealthAddress = item.stealthAddress;
                 const stealthAddressData = this.addresses[stealthAddress];
                 const ephemeralPublicKey = item.ephemeralPublicKey;
