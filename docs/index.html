@@ -69,7 +69,6 @@
           <!-- :MODALSYNC -->
           <b-modal ref="modalsync" id="modal-sync" hide-footer size="md">
             <template #modal-title>Sync</template>
-
             <b-form-group label="" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
@@ -77,7 +76,7 @@
               <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full rescan, when my addresses changes</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
               <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
-              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">Exchange Rates</b-form-checkbox>
+              <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">Exchange rates</b-form-checkbox>
             </b-form-group>
             <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Do It!</b-button>
@@ -86,9 +85,7 @@
 
           <!-- :MODALTRANSFER -->
           <b-modal id="modal-transfertostealthmetaaddress" hide-footer size="lg">
-            <template #modal-title>
-              Transfer To Stealth Meta-Address
-            </template>
+            <template #modal-title>Transfer To Stealth Meta-Address</template>
             <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <template slot="label">
                 From:
@@ -158,9 +155,7 @@
 
           <!-- :MODALADDTOKENSTOTRANSFER -->
           <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer size="md">
-            <template #modal-title>
-              Add Tokens For Transfer
-            </template>
+            <template #modal-title>Add Tokens For Transfer</template>
             <b-form-select size="sm" v-model="modalAddTokensToTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
             <div v-if="additionalERC20TokensOptions.length == 1">
               <b-alert size="sm" show variant="warning" class="mt-2">Select active tokens in the Tokens tab first</b-alert>
@@ -216,9 +211,7 @@
 
           <!-- :MODALANNOUNCEMENT -->
           <b-modal id="modal-announcement" hide-footer size="lg">
-            <template #modal-title>
-              Stealth Transfer
-            </template>
+            <template #modal-title>Stealth Transfer</template>
             <b-form-group v-if="modalAnnouncement.item" label="Transaction:" label-for="announcement-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -355,9 +348,7 @@
 
           <!-- :MODALREGISTRATION -->
           <b-modal id="modal-registration" hide-footer size="lg">
-            <template #modal-title>
-              Registration
-            </template>
+            <template #modal-title>Registration</template>
             <b-form-group v-if="modalRegistration.item" label="Transaction:" label-for="registration-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -406,9 +397,7 @@
 
           <!-- :MODALADDRESS -->
           <b-modal id="modal-address" hide-footer size="lg">
-            <template #modal-title>
-              Address
-            </template>
+            <template #modal-title>Address</template>
             <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -477,11 +466,8 @@
 
           <!-- :MODALSTEALTHMETAADDRESS -->
           <b-modal id="modal-stealthmetaaddress" hide-footer size="lg">
-            <template #modal-title>
-              {{ modalStealthMetaAddress.item.type == "address" ? "Address" : "Stealth Meta-Address" }}
-            </template>
+            <template #modal-title>Stealth Meta-Address</template>
             <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <!-- :TEXTAREA -->
               <b-input-group size="sm" class="w-100">
                 <b-form-textarea size="sm" plaintext id="address-stealthmetaaddress" :value="modalStealthMetaAddress.item.address" rows="3" max-rows="4" class="px-2 noscroll"></b-form-textarea>
                 <b-input-group-append>
@@ -581,9 +567,7 @@
 
           <!-- :MODALNEWSTEALTHMETAADDRESS -->
           <b-modal id="modal-newstealthmetaaddress" hide-footer size="lg">
-            <template #modal-title>
-              Generate New Stealth Meta-Address
-            </template>
+            <template #modal-title>Generate New Stealth Meta-Address</template>
             <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
@@ -630,9 +614,7 @@
 
           <!-- :MODALCONTRACT -->
           <b-modal id="modal-contract" hide-footer size="lg">
-            <template #modal-title>
-              {{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}
-            </template>
+            <template #modal-title>{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</template>
             <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="contract-chain">{{ settings.chains[modalContract.item.chainId] && settings.chains[modalContract.item.chainId].name || ("Unconfigured ChainId: " + modalContract.item.chainId) }}</b-button>
             </b-form-group>
@@ -693,33 +675,11 @@
                 <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.tokenContractsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">Active Only</b-form-checkbox>
                 </div>
-                <!-- <div v-if="false && (settings.tabIndex == 0 || settings.tabIndex == 1)" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
-                    Attached
-                  </b-form-checkbox>
-                </div> -->
-                <!-- <div v-if="false && !settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
-                  <b-form-textarea :disabled="sync.section != null" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
-                </div> -->
-                <!-- <div v-if="false && settings.tabIndex == 0" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
-                    Inactive
-                  </b-form-checkbox>
-                </div> -->
-                <!-- <div v-if="false && settings.tabIndex == 1" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include less important events like ERC-721 Approval to Null:0x0000...0000'">
-                    Fluff
-                  </b-form-checkbox>
-                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
-                  <!-- <b-button size="sm" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button> -->
                 </div>
-                <!-- <div v-if="settings.tabIndex != 5 && !sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
-                </div> -->
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
                     <b-progress-bar :value="sync.completed">
@@ -772,7 +732,6 @@
                   <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
-                  <!-- TODO -->
                   <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
