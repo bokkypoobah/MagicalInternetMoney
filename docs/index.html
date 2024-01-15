@@ -1014,6 +1014,7 @@
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
                     <font size="-1">{{ formatAddress(data.item.address) }}</font>
                   </b-link>
+                  <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.type == 'stealthAddress' ? 'dark' : (data.item.type == 'stealthMetaAddress' ? 'success' : 'warning')" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     &nbsp;
                   </div>
@@ -1037,6 +1038,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
+                    <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.linkedAddressType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
                     </div>
@@ -1047,6 +1049,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
                     </b-link>
+                    <span v-if="data.item.mine"><b-icon-star-fill variant="success" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </div>
@@ -1282,8 +1285,8 @@
           CONFIRMATIONS: 100,
           DB_PROCESSING_BATCH_SIZE: 1000,
           TXHASH_SEGMENT_LENGTH: 8,
-          ADDRESS_SEGMENT_LENGTH: 10,
-          STEALTHMETAADDRESS_SEGMENT_LENGTH: 12,
+          ADDRESS_SEGMENT_LENGTH: 8,
+          STEALTHMETAADDRESS_SEGMENT_LENGTH: 8,
           PUBLICKEY_SEGMENT_LENGTH: 18,
           defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           connected: false,
@@ -1851,15 +1854,15 @@
               if (this.settings.addressesTable.mineOnly && !data.mine) {
                 include = false;
               }
+              const linkedAddress = data.linkedTo && data.linkedTo.address || null;
+              const linkedAddressData = this.addresses[linkedAddress] || {};
+              const linkedStealthMetaAddress = data.linkedTo && data.linkedTo.stealthMetaAddress || null;
+              const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
               if (include && regex) {
-                const linkedStealthMetaAddress = data.linkedTo && data.linkedTo.stealthMetaAddress || null;
-                const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
-                const linkedAddress = data.linkedTo && data.linkedTo.address || null;
-                const linkedAddressData = this.addresses[linkedAddress] || {};
                 if (!(
                   regex.test(data.name) || regex.test(data.ensName) || regex.test(address) ||
-                  regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress) ||
-                  regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress)
+                  regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress) ||
+                  regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress)
                 )) {
                   include = false;
                 }
@@ -1868,7 +1871,7 @@
                 const _cellVariants = {
                   address: data.mine ? 'success' : undefined,
                 };
-                results.push({ address, ...data, _cellVariants });
+                results.push({ address, ...data /*, _cellVariants */, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddress: linkedStealthMetaAddressData.type });
               }
             }
             return results;
@@ -3752,7 +3755,7 @@
           formatAddress(address) {
             if (address) {
               if (address.substring(0, 3) == "st:") {
-                return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
               } else {
                 return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
               }
@@ -3786,7 +3789,7 @@
                   return account.ensName;
               } else {
                 if (address.substring(0, 3) == "st:") {
-                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
                 } else {
                   return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
                 }
@@ -3800,20 +3803,20 @@
               if (account && account.name) {
                 if (account.ensName) {
                   if (address.substring(0, 3) == "st:") {
-                    return account.ensName + ', ' + address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                    return account.ensName + ', ' + address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
                   } else {
                     return account.ensName + ', ' + address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
                   }
                 } else {
                   if (address.substring(0, 3) == "st:") {
-                    return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                    return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
                   } else {
                     return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
                   }
                 }
               } else if (account && account.ensName) {
                 if (address.substring(0, 3) == "st:") {
-                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 7) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
+                  return address.substring(0, this.STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-this.STEALTHMETAADDRESS_SEGMENT_LENGTH);
                 } else {
                   return address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-this.ADDRESS_SEGMENT_LENGTH);
                 }
