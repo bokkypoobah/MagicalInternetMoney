@@ -1177,6 +1177,13 @@
                   <b-form-group label="Show Details:" label-for="config-showdetails" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Show details like Scheme Id and intermediate keys" class="mx-0 my-1 p-0">
                     <b-form-checkbox size="sm" v-model="settings.showDetails" @input="saveSettings" class="ml-2 mt-1"></b-form-checkbox>
                   </b-form-group>
+                  <b-form-group label="Currency:" label-for="config-reportingcurrency" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Used in https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000. Changes take effect after a re-sync'" class="mx-0 my-1 p-0">
+                    <b-form-select size="sm" id="config-reportingcurrency" v-model="settings.reportingCurrency" @change="saveSettings" :options="reportingCurrencyOptions" class="w-25"></b-form-select>
+                  </b-form-group>
+                  <b-form-group label="CryptoCompare API Key:" label-for="config-cryptocompareapikey" label-size="sm" label-cols-sm="2" label-align-sm="right" description="This key is stored in your local browser storage and is sent with CryptoCompare API requests for historical ETH/{ccy} rates. If not supplied, imports from CryptoCompare may fail if you reach your free quota" class="mx-0 my-1 p-0">
+                    <b-form-input type="text" size="sm" id="config-cryptocompareapikey" v-model="settings.cryptoCompareAPIKey" @change="saveSettings" placeholder="See https://www.cryptocompare.com/ to obtain an API key" class="w-75"></b-form-input>
+                  </b-form-group>
+
                   <h5 class="mt-5">Configure Contracts</h5>
                   <b-card no-body no-header bg-variant="light" class="m-1 p-1">
                     <div class="d-flex flex-wrap m-0 p-0">
@@ -1316,6 +1323,8 @@
             showInfo: false,
             reportingDateTime: 0,
             showDetails: false,
+            cryptoCompareAPIKey: null,
+            reportingCurrency: "USD",
             announcementsTable: {
               filter: null,
               iSentIReceived: null,
@@ -1376,7 +1385,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 1,
+            version: 2,
           },
           contracts: {
             "11155111": {
@@ -1418,6 +1427,7 @@
           tokenEvents: [],
           addresses: {},
           tokenContracts: {},
+          exchangeRates: {},
 
           modalTransfer: {
             stealthMetaAddress: null,
@@ -1480,6 +1490,18 @@
             { value: "iReceived", text: 'I Received' },
             { value: "iSentOrIReceived", text: 'I Sent OR I Received' },
             { value: "iSentAndIReceived", text: 'I Sent AND I Received' },
+          ],
+          // As supported by https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000
+          reportingCurrencyOptions: [
+            { value: null, text: '(no currency reporting)' },
+            { value: 'AUD', text: 'AUD' },
+            { value: 'CAD', text: 'CAD' },
+            { value: 'CHF', text: 'CHF' },
+            { value: 'EUR', text: 'EUR' },
+            { value: 'GBP', text: 'GBP' },
+            { value: 'JPY', text: 'JPY' },
+            { value: 'NZD', text: 'NZD' },
+            { value: 'USD', text: 'USD' },
           ],
           sourceOptions: [
             { value: null, text: '(select)' },
@@ -2771,6 +2793,9 @@
             if (!devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
             }
+            if (network.chainId == CHAINID_SEPOLIA) {
+              await this.syncExchangeRates(db, provider, latestBlockNumber);
+            }
             await this.loadCurrentData();
             this.forceRefresh++; // UI refresh workaround
             this.sync.section = null;
@@ -3533,6 +3558,40 @@
             console.log(moment().format("HH:mm:ss") + " collateTokens END");
           },
 
+          async syncExchangeRates(db, provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " syncExchangeRates - reportingCurrency: " + this.settings.reportingCurrency);
+            if (this.settings.reportingCurrency) {
+              const MAXDAYS = 2000;
+              const MINDATE = moment("2017-06-09");
+              let toTs = moment();
+              const exchangeRates = {};
+              while (toTs.year() >= 2017) {
+                let days = toTs.diff(MINDATE, 'days');
+                if (days > MAXDAYS) {
+                  days = MAXDAYS;
+                }
+                let url = "https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=" + this.settings.reportingCurrency + "&toTs=" + toTs.unix() + "&limit=" + days;
+                if (this.settings.cryptoCompareAPIKey) {
+                  url = url + "&api_key=" + this.settings.cryptoCompareAPIKey;
+                }
+                console.log(moment().format("HH:mm:ss") + " syncExchangeRates - url: " + url);
+                const data = await fetch(url)
+                  .then(response => response.json())
+                  .catch(function(e) {
+                    console.log("error: " + e);
+                  });
+                for (day of data.Data.Data) {
+                  exchangeRates[moment.unix(day.time).format("YYYYMMDD")] = day.close;
+                }
+                toTs = moment(toTs).subtract(MAXDAYS, 'days');
+              }
+              console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
+              Vue.set(this, 'exchangeRates', exchangeRates);
+              localStorage.magicalInternetMoneyExchangeRates = JSON.stringify(this.exchangeRates);
+            }
+            console.log(moment().format("HH:mm:ss") + " syncExchangeRates END");
+          },
+
           async syncENSNames(provider) {
             console.log(moment().format("HH:mm:ss") + " syncENSNames BEGIN");
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
@@ -3961,6 +4020,10 @@
               if ('magicalInternetMoneyTokenContracts' in localStorage) {
                 this.tokenContracts = JSON.parse(localStorage.magicalInternetMoneyTokenContracts);
                 // console.log(moment().format("HH:mm:ss") + " mounted - tokenContracts: " + JSON.stringify(this.tokenContracts, null, 2));
+              }
+              if ('magicalInternetMoneyExchangeRates' in localStorage) {
+                this.exchangeRates = JSON.parse(localStorage.magicalInternetMoneyExchangeRates);
+                // console.log(moment().format("HH:mm:ss") + " mounted - exchangeRates: " + JSON.stringify(this.exchangeRates, null, 2));
               }
               // TODO: TESTING
               // (async() => {
