@@ -228,7 +228,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="transfer-registrant" @click="viewAddress(modalTransfer.item.tx.from)" variant="link" v-b-popover.hover.bottom="modalTransfer.item.tx.from" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.tx.from) }}</b-button>
-                  <span v-if="modalTransfer.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.senderType].name" :variant="addressTypeInfo[modalTransfer.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="modalTransfer.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.senderInfo.type].name" :variant="addressTypeInfo[modalTransfer.item.senderInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalTransfer.item.tx.from)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.tx.from) }}</font>
                   </div>
@@ -243,7 +243,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="transfer-receiver" @click="viewAddress(modalTransfer.item.stealthAddress)" variant="link" v-b-popover.hover.bottom="modalTransfer.item.stealthAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.stealthAddress) }}</b-button>
-                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.receiverType].name" :variant="addressTypeInfo[modalTransfer.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.receiverInfo.type].name" :variant="addressTypeInfo[modalTransfer.item.receiverInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalTransfer.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.stealthAddress) }}</font>
                   </div>
@@ -267,7 +267,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="transfer-owner" @click="viewAddress(modalTransfer.item.linkedTo.address)" variant="link" v-b-popover.hover="modalTransfer.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.linkedTo.address) }}</b-button>
-                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedAddressType].name" :variant="addressTypeInfo[modalTransfer.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedAddressInfo.type].name" :variant="addressTypeInfo[modalTransfer.item.linkedAddressInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalTransfer.item.linkedTo.address)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.linkedTo.address) }}</font>
                   </div>
@@ -282,13 +282,12 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="transfer-stealthmetaaddress" @click="viewAddress(modalTransfer.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalTransfer.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.linkedTo.stealthMetaAddress) }}</b-button>
-                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressInfo.type].name" :variant="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalTransfer.item.linkedTo.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.linkedTo.stealthMetaAddress) }}</font>
                   </div>
                 </div>
                 <div>
-                  <!-- <b-avatar v-if="ensName(modalTransfer.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalTransfer.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
                   <b-button size="sm" @click="copyToClipboard(modalTransfer.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -727,7 +726,7 @@
                   <b-form-select size="sm" v-model="settings.tokenContractsTable.sortOption" @change="saveSettings" :options="tokenContractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredTransfers.length) + '/' + commify0(announcements.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredTransfers.length) + '/' + commify0(transfers.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
@@ -859,7 +858,7 @@
               <div v-if="settings.tabIndex == 0 && !settings.showInfo && coinbase != null">
                 <font size="-2">
                   <pre>
-{{ allTransfers }}
+{{ transfers }}
                   </pre>
                 </font>
               </div>
@@ -894,7 +893,7 @@
                     <b-link @click="viewAddress(data.item.tx.from)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ formatAddressNamePrimary(data.item.tx.from) }}</font>
                     </b-link>
-                    <span v-if="data.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.senderType].name" :variant="addressTypeInfo[data.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.senderInfo.type].name" :variant="addressTypeInfo[data.item.senderInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.tx.from)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.tx.from) }}</font>
                     </div>
@@ -907,7 +906,7 @@
                   <b-link @click="viewAddress(data.item.stealthAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
                   </b-link>
-                  <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.receiverType].name" :variant="addressTypeInfo[data.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.receiverInfo.type].name" :variant="addressTypeInfo[data.item.receiverInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
                   </div>
@@ -917,7 +916,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
-                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedAddressType].name" :variant="addressTypeInfo[data.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedAddressInfo.type].name" :variant="addressTypeInfo[data.item.linkedAddressInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
                     </div>
@@ -928,7 +927,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </b-link>
-                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[data.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedStealthMetaAddressInfo.type].name" :variant="addressTypeInfo[data.item.linkedStealthMetaAddressInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </div>
@@ -1724,7 +1723,7 @@
               };
             }
           },
-          allTransfers() {
+          transfers() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
@@ -1736,7 +1735,6 @@
                 const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
                 const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
                 const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
-                // results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type /*, _cellVariants */ });
                 results.push({
                   ...announcement,
                   senderInfo: {
@@ -1764,54 +1762,91 @@
             return results;
           },
           filteredTransfers() {
-            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            let results = [];
             const regex = this.settings.transfersTable.filter != null && this.settings.transfersTable.filter.length > 0 ? new RegExp(this.settings.transfersTable.filter, 'i') : null;
-            for (const announcement of this.announcements) {
-              if (announcement.chainId == this.chainId) {
-                let include = true;
-                if (this.settings.transfersTable.iSentIReceived) {
-                  if (this.settings.transfersTable.iSentIReceived == 'iSent') {
-                    if (!announcement.iSent) {
-                      include = false;
-                    }
-                  } else if (this.settings.transfersTable.iSentIReceived == 'iReceived') {
-                    if (!announcement.iReceived) {
-                      include = false;
-                    }
-                  } else if (this.settings.transfersTable.iSentIReceived == 'iSentOrIReceived') {
-                    if (!announcement.iSent && !announcement.iReceived) {
-                      include = false;
-                    }
-                  } else if (this.settings.transfersTable.iSentIReceived == 'iSentAndIReceived') {
-                    if (!announcement.iSent || !announcement.iReceived) {
-                      include = false;
-                    }
+            for (const transfer of this.transfers) {
+              let include = true;
+              if (this.settings.transfersTable.iSentIReceived) {
+                if (this.settings.transfersTable.iSentIReceived == 'iSent') {
+                  if (!transfer.iSent) {
+                    include = false;
                   }
-                }
-                const sender = announcement.tx.from;
-                const senderData = sender && this.addresses[sender] || {};
-                const receiver = announcement.stealthAddress;
-                const receiverData = receiver && this.addresses[receiver] || {};
-                const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
-                const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
-                const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
-                const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
-                if (include && regex) {
-                  if (!(
-                    regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
-                    regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
-                    regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress) ||
-                    regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress)
-                  )) {
+                } else if (this.settings.transfersTable.iSentIReceived == 'iReceived') {
+                  if (!transfer.iReceived) {
+                    include = false;
+                  }
+                } else if (this.settings.transfersTable.iSentIReceived == 'iSentOrIReceived') {
+                  if (!transfer.iSent && !transfer.iReceived) {
+                    include = false;
+                  }
+                } else if (this.settings.transfersTable.iSentIReceived == 'iSentAndIReceived') {
+                  if (!transfer.iSent || !transfer.iReceived) {
                     include = false;
                   }
                 }
-                if (include) {
-                  const _cellVariants = {
-                    sender: announcement.iSent ? 'success' : undefined,
-                    receiver: announcement.iReceived ? 'success' : undefined,
-                  };
-                  results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type /*, _cellVariants */ });
+              }
+              if (include && regex) {
+                if (!(
+                  regex.test(transfer.senderInfo.name) || regex.test(transfer.senderInfo.ensName) || regex.test(transfer.tx.from) ||
+                  regex.test(transfer.receiverInfo.name) || regex.test(transfer.receiverInfo.ensName) || regex.test(transfer.stealthAddress) ||
+                  regex.test(transfer.linkedAddressInfo.name) || regex.test(transfer.linkedAddressInfo.ensName) || regex.test(transfer.linkedTo && transfer.linkedTo.address) ||
+                  regex.test(transfer.linkedStealthMetaAddressInfo.name) || regex.test(transfer.linkedTo && transfer.linkedTo.stealthMetaAddress)
+                )) {
+                  include = false;
+                }
+              }
+              if (include) {
+                results.push(transfer);
+              }
+            }
+            if (false) {
+              for (const announcement of this.announcements) {
+                if (announcement.chainId == this.chainId) {
+                  let include = true;
+                  if (this.settings.transfersTable.iSentIReceived) {
+                    if (this.settings.transfersTable.iSentIReceived == 'iSent') {
+                      if (!announcement.iSent) {
+                        include = false;
+                      }
+                    } else if (this.settings.transfersTable.iSentIReceived == 'iReceived') {
+                      if (!announcement.iReceived) {
+                        include = false;
+                      }
+                    } else if (this.settings.transfersTable.iSentIReceived == 'iSentOrIReceived') {
+                      if (!announcement.iSent && !announcement.iReceived) {
+                        include = false;
+                      }
+                    } else if (this.settings.transfersTable.iSentIReceived == 'iSentAndIReceived') {
+                      if (!announcement.iSent || !announcement.iReceived) {
+                        include = false;
+                      }
+                    }
+                  }
+                  const sender = announcement.tx.from;
+                  const senderData = sender && this.addresses[sender] || {};
+                  const receiver = announcement.stealthAddress;
+                  const receiverData = receiver && this.addresses[receiver] || {};
+                  const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
+                  const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
+                  const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
+                  const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
+                  if (include && regex) {
+                    if (!(
+                      regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
+                      regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
+                      regex.test(linkedStealthMetaAddressData.name) || regex.test(linkedStealthMetaAddress) ||
+                      regex.test(linkedAddressData.name) || regex.test(linkedAddressData.ensName) || regex.test(linkedAddress)
+                    )) {
+                      include = false;
+                    }
+                  }
+                  if (include) {
+                    const _cellVariants = {
+                      sender: announcement.iSent ? 'success' : undefined,
+                      receiver: announcement.iReceived ? 'success' : undefined,
+                    };
+                    results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type /*, _cellVariants */ });
+                  }
                 }
               }
             }
