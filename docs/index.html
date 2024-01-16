@@ -227,6 +227,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-registrant" @click="viewAddress(modalAnnouncement.item.tx.from)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.tx.from) }}</b-button>
+                  <span v-if="modalAnnouncement.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.senderType].name" :variant="addressTypeInfo[modalAnnouncement.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.tx.from)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.tx.from) }}</font>
                   </div>
@@ -241,6 +242,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-receiver" @click="viewAddress(modalAnnouncement.item.stealthAddress)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.stealthAddress) }}</b-button>
+                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.receiverType].name" :variant="addressTypeInfo[modalAnnouncement.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.stealthAddress) }}</font>
                   </div>
@@ -264,6 +266,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-owner" @click="viewAddress(modalAnnouncement.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
+                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.linkedAddressType].name" :variant="addressTypeInfo[modalAnnouncement.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address) }}</font>
                   </div>
@@ -278,6 +281,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="announcement-stealthmetaaddress" @click="viewAddress(modalAnnouncement.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[modalAnnouncement.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
                   </div>
@@ -871,7 +875,7 @@
                     <b-link @click="viewAddress(data.item.tx.from)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ formatAddressNamePrimary(data.item.tx.from) }}</font>
                     </b-link>
-                    <span v-if="data.item.iSent"><b-icon-star-fill :variant="data.item.senderType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.senderType].name" :variant="addressTypeInfo[data.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.tx.from)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.tx.from) }}</font>
                     </div>
@@ -884,7 +888,7 @@
                   <b-link @click="viewAddress(data.item.stealthAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
                   </b-link>
-                  <span v-if="data.item.iReceived"><b-icon-star-fill :variant="data.item.receiverType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.receiverType].name" :variant="addressTypeInfo[data.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
                   </div>
@@ -894,6 +898,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
+                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedAddressType].name" :variant="addressTypeInfo[data.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
                     </div>
@@ -904,6 +909,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </b-link>
+                    <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[data.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </div>
@@ -961,7 +967,7 @@
                   <b-link @click="viewAddress(data.item.registrant)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.registrant)">{{ formatAddressNamePrimary(data.item.registrant) }}</font>
                   </b-link>
-                  <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.registrantType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="data.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.registrantType].name" :variant="addressTypeInfo[data.item.registrantType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.registrant) || '&nbsp' }}</font>
                   </div>
@@ -979,7 +985,7 @@
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
                     <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.stealthMetaAddress) }}</font>
                   </b-link>
-                  <span v-if="data.item.mine"><b-icon-star-fill :variant="'success'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="data.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo['stealthMetaAddress'].name" :variant="addressTypeInfo['stealthMetaAddress'].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthMetaAddress) }}</font>
                   </div>
@@ -1014,7 +1020,7 @@
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
                     <font size="-1">{{ formatAddress(data.item.address) }}</font>
                   </b-link>
-                  <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.type == 'stealthAddress' ? 'dark' : (data.item.type == 'stealthMetaAddress' ? 'success' : 'warning')" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <span v-if="data.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.type].name" :variant="addressTypeInfo[data.item.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div>
                     &nbsp;
                   </div>
@@ -1038,7 +1044,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.address)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.address)">{{ formatAddressNamePrimary(data.item.linkedTo.address) }}</font>
                     </b-link>
-                    <span v-if="data.item.mine"><b-icon-star-fill :variant="data.item.linkedAddressType == 'stealthAddress' ? 'dark' : 'warning'" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.linkedAddressType].name" :variant="addressTypeInfo[data.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.address)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.address) }}</font>
                     </div>
@@ -1049,7 +1055,7 @@
                     <b-link @click="viewAddress(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" v-b-popover.hover="addressDescription(data.item.linkedTo.stealthMetaAddress)">{{ formatAddressNamePrimary(data.item.linkedTo.stealthMetaAddress, 28) }}</font>
                     </b-link>
-                    <span v-if="data.item.mine"><b-icon-star-fill variant="success" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                    <span v-if="data.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo['stealthMetaAddress'].name" :variant="addressTypeInfo['stealthMetaAddress'].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                     <div v-if="formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress)">
                       <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.linkedTo.stealthMetaAddress) }}</font>
                     </div>
@@ -1478,6 +1484,11 @@
             read: false,
             write: false,
           },
+          addressTypeInfo: {
+            "address": { variant: "warning", name: "My Address" },
+            "stealthAddress": { variant: "dark", name: "My Stealth Address" },
+            "stealthMetaAddress": { variant: "success", name: "My Stealth Meta-Address" },
+          },
           iSentIReceivedOptions: [
             { value: null, text: 'All Transfers' },
             { value: "iSent", text: 'I Sent' },
@@ -1723,11 +1734,11 @@
                 const senderData = this.addresses[sender] || {};
                 const receiver = announcement.stealthAddress;
                 const receiverData = this.addresses[receiver] || {};
+                const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
+                const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
+                const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
+                const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
                 if (include && regex) {
-                  const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
-                  const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
-                  const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
-                  const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
                   if (!(
                     regex.test(senderData.name) || regex.test(senderData.ensName) || regex.test(sender) ||
                     regex.test(receiverData.name) || regex.test(receiverData.ensName) || regex.test(receiver) ||
@@ -1742,7 +1753,7 @@
                     sender: announcement.iSent ? 'success' : undefined,
                     receiver: announcement.iReceived ? 'success' : undefined,
                   };
-                  results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, /*, _cellVariants */ });
+                  results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type /*, _cellVariants */ });
                 }
               }
             }
@@ -1778,7 +1789,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -1871,7 +1882,7 @@
                 const _cellVariants = {
                   address: data.mine ? 'success' : undefined,
                 };
-                results.push({ address, ...data /*, _cellVariants */, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddress: linkedStealthMetaAddressData.type });
+                results.push({ address, ...data /*, _cellVariants */, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type });
               }
             }
             return results;
@@ -3964,6 +3975,9 @@
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged: " + t.coinbase);
                 if (!(t.coinbase in t.addresses)) {
                   Vue.set(t.addresses, t.coinbase, { type: "address", source: "attached", mine: true, name: null });
+                  localStorage.magicalInternetMoneyAddresses = JSON.stringify(t.addresses);
+                } if (!t.addresses[t.coinbase].mine) {
+                  Vue.set(t.addresses[t.coinbase], 'mine', true);
                   localStorage.magicalInternetMoneyAddresses = JSON.stringify(t.addresses);
                 }
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3.handleAccountsChanged - address: " + JSON.stringify(t.addresses[t.coinbase]));
