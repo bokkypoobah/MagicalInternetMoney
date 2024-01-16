@@ -365,6 +365,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="registration-registrant" @click="viewAddress(modalRegistration.item.registrant)" variant="link" v-b-popover.hover.bottom="modalRegistration.item.registrant" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.registrant) }}</b-button>
+                  <span v-if="modalRegistration.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalRegistration.item.registrantType].name" :variant="addressTypeInfo[modalRegistration.item.registrantType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalRegistration.item.registrant)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.registrant) }}</font>
                   </div>
@@ -382,6 +383,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="registration-stealthmetaaddress" @click="viewAddress(modalRegistration.item.stealthMetaAddress)" variant="link" v-b-popover.hover.bottom="modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalRegistration.item.stealthMetaAddress) }}</b-button>
+                  <span v-if="modalRegistration.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo['stealthMetaAddress'].name" :variant="addressTypeInfo['stealthMetaAddress'].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalRegistration.item.stealthMetaAddress) }}</font>
                   </div>
