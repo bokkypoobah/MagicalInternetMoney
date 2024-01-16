@@ -714,7 +714,7 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.transfersTable.sortOption" @change="saveSettings" :options="announcementsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.transfersTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registrationsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
@@ -847,7 +847,25 @@
                 <b-col class="m-0 p-0 pt-1 pr-1">
                   <!-- :RECEIVED -->
                   <b-card no-body class="m-0 p-1">
-                    <h5>Received</h5>
+                    <div class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 pl-1 pr-1">
+                        Received
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.receivedTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <font size="-2" v-b-popover.hover.bottom="'# received'">{{ commify0(filteredReceived.length) }}</font>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-pagination size="sm" v-model="settings.receivedTable.currentPage" @input="saveSettings" :total-rows="filteredReceived.length" :per-page="settings.receivedTable.pageSize" style="height: 0;"></b-pagination>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.receivedTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                      </div>
+                    </div>
                     <b-table ref="receivedTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='receivedRowSelected' :fields="receivedFields" :items="pagedFilteredSortedReceived" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
                       <template #cell(number)="data">
                         <font size="-1">
@@ -925,7 +943,25 @@
                 <b-col class="m-0 p-0 pt-1 pl-1">
                   <!-- :SENT -->
                   <b-card no-body class="m-0 p-1">
-                    <h5>Sent</h5>
+                    <div class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 pl-1 pr-1">
+                        Sent
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.sentTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <font size="-2" v-b-popover.hover.bottom="'# sent'">{{ commify0(filteredSent.length) }}</font>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-pagination size="sm" v-model="settings.sentTable.currentPage" @input="saveSettings" :total-rows="filteredSent.length" :per-page="settings.sentTable.pageSize" style="height: 0;"></b-pagination>
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-form-select size="sm" v-model="settings.sentTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                      </div>
+                    </div>
                     <b-table ref="sentTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='sentRowSelected' :fields="sentFields" :items="pagedFilteredSortedSent" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
                       <template #cell(number)="data">
                         <font size="-1">
@@ -1699,7 +1735,7 @@
             { value: "registry", text: 'ERC-6538 Registry' },
             { value: "caller", text: 'ERC-5564 Caller' },
           ],
-          announcementsSortOptions: [
+          transfersSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
