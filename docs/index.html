@@ -845,8 +845,16 @@
               <!-- :DASHBOARD -->
               <b-row v-if="settings.tabIndex == 0 && !settings.showInfo && coinbase != null" class="m-0 p-0">
                 <b-col class="m-0 p-0 pt-1 pr-1">
+                  <!-- :RECEIVED -->
                   <b-card no-body class="m-0 p-1">
                     <h5>Stealth Transfers Received</h5>
+                    <b-table ref="receivedTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="receivedFields" :items="received" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
+                      <template #cell(number)="data">
+                        <font size="-1">
+                          {{ parseInt(data.index) + ((settings.receivedTable.currentPage - 1) * settings.receivedTable.pageSize) + 1 }}
+                        </font>
+                      </template>
+                    </b-table>
                     <font size="-2">
                       <pre>
 {{ received }}
@@ -855,8 +863,16 @@
                   </b-card>
                 </b-col>
                 <b-col class="m-0 p-0 pt-1 pl-1">
+                  <!-- :SENT -->
                   <b-card no-body class="m-0 p-1">
                     <h5>Stealth Transfers Sent</h5>
+                    <b-table ref="sentTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="sentFields" :items="sent" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
+                      <template #cell(number)="data">
+                        <font size="-1">
+                          {{ parseInt(data.index) + ((settings.sentTable.currentPage - 1) * settings.sentTable.pageSize) + 1 }}
+                        </font>
+                      </template>
+                    </b-table>
                     <font size="-2">
                       <pre>
 {{ sent }}
@@ -865,13 +881,6 @@
                   </b-card>
                 </b-col>
               </b-row>
-              <!-- <div v-if="settings.tabIndex == 0 && !settings.showInfo && coinbase != null">
-                <font size="-2">
-                  <pre>
-{{ transfers }}
-                  </pre>
-                </font>
-              </div> -->
 
               <!-- :TRANSFERS -->
               <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
@@ -1353,6 +1362,16 @@
               balances: true,
               exchangeRates: true,
             },
+            receivedTable: {
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'txorderdsc',
+            },
+            sentTable: {
+              currentPage: 1,
+              pageSize: 10,
+              sortOption: 'txorderdsc',
+            },
             transfersTable: {
               filter: null,
               iSentIReceived: null,
@@ -1413,7 +1432,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 6,
+            version: 7,
           },
           contracts: {
             "11155111": {
@@ -1631,6 +1650,14 @@
             { value: "16", text: '16' },
             { value: "17", text: '17' },
             { value: "18", text: '18 (common)' },
+          ],
+          receivedFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+          ],
+          sentFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
           ],
           transfersFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -2943,7 +2970,6 @@
                         stealthMetaAddress: null,
                         address: null,
                       },
-                      mine: false,
                       caller,
                       ephemeralPublicKey: logData.args[3],
                       metadata: logData.args[4],
