@@ -82,16 +82,16 @@
             </b-form-group>
           </b-modal>
 
-          <!-- :MODALTRANSFER -->
-          <b-modal id="modal-transfertostealthmetaaddress" hide-footer size="lg">
+          <!-- :MODALNEWTRANSFER -->
+          <b-modal id="modal-newtransfer" hide-footer size="lg">
             <template #modal-title>Transfer To Stealth Meta-Address</template>
-            <b-form-group label="From:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group label="From:" label-for="newtransfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <template slot="label">
                 From:
               </template>
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="transfer-sender" @click="viewAddress(coinbase)" variant="link" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(coinbase) }}</b-button>
+                  <b-button size="sm" id="newtransfer-sender" @click="viewAddress(coinbase)" variant="link" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(coinbase) }}</b-button>
                   <div v-if="formatAddressNameSecondary(coinbase)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(coinbase) }}</font>
                   </div>
@@ -102,26 +102,26 @@
                 </div>
               </div>
             </b-form-group>
-            <b-form-group label="To:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalTransfer.stealthMetaAddress) || 'Stealth Meta-Address'" class="mx-0 my-1 p-0">
+            <b-form-group label="To:" label-for="newtransfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="nameOrNull(modalNewTransfer.stealthMetaAddress) || 'Stealth Meta-Address'" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-textarea type="text" id="transfer-stealthmetaaddress" v-model.trim="modalTransfer.stealthMetaAddress" @input="saveSettings" rows="3" placeholder="e.g., st:eth:0x12...89"></b-form-textarea>
+                <b-form-textarea type="text" id="newtransfer-stealthmetaaddress" v-model.trim="modalNewTransfer.stealthMetaAddress" @input="saveSettings" rows="3" placeholder="e.g., st:eth:0x12...89"></b-form-textarea>
                 <b-input-group-append>
-                  <b-button @click="copyToClipboard(modalTransfer.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button @click="copyToClipboard(modalNewTransfer.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group label="Amount:" label-for="transfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalTransfer.items.length > 0 && !modalTransfer.amount ? 'Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses' : ''" class="mx-0 my-1 p-0">
+            <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalNewTransfer.items.length > 0 && !modalNewTransfer.amount ? 'Note: Send some ETH with ERC-20/ERC-721 transfers to cover conversion expenses' : ''" class="mx-0 my-1 p-0">
               <b-row>
                 <b-col cols="3" class="mx-0 px-1 text-right">
                   <font size="-1">ETH</font>
                 </b-col>
                 <b-col cols="3" class="pr-1">
-                  <b-form-input type="text" size="sm" id="transfer-amount" v-model.trim="modalTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="text-right"></b-form-input>
+                  <b-form-input type="text" size="sm" id="newtransfer-amount" v-model.trim="modalNewTransfer.amount" placeholder="e.g., 0.01 for 0.01 ETH" class="text-right"></b-form-input>
                 </b-col>
               </b-row>
             </b-form-group>
-            <b-form-group label="" label-for="transfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-row v-for="(item, index) of modalTransfer.items" v-bind:key="item.token">
+            <b-form-group label="" label-for="newtransfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-row v-for="(item, index) of modalNewTransfer.items" v-bind:key="item.token">
                 <b-col cols="3" class="mx-0 px-1 text-right">
                   <font size="-1">{{ item.symbol }}</font>
                 </b-col>
@@ -147,155 +147,155 @@
                 </b-col>
               </b-row>
             </b-form-group>
-            <b-form-group label="" label-for="transfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalTransfer.stealthMetaAddress || modalTransfer.amount == null || (modalTransfer.amount == 0 && modalTransfer.items.length == 0)" id="transfer-transfer" @click="transferEthToStealthMetaAddress()" variant="warning">Transfer</b-button>
+            <b-form-group label="" label-for="newtransfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalNewTransfer.stealthMetaAddress || modalNewTransfer.amount == null || (modalNewTransfer.amount == 0 && modalNewTransfer.items.length == 0)" id="newtransfer-transfer" @click="executeNewTransfer()" variant="warning">Transfer</b-button>
             </b-form-group>
           </b-modal>
 
           <!-- :MODALADDTOKENSTOTRANSFER -->
           <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer size="md">
             <template #modal-title>Add Tokens For Transfer</template>
-            <b-form-select size="sm" v-model="modalAddTokensToTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
+            <b-form-select size="sm" v-model="modalAddTokensToNewTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
             <div v-if="additionalERC20TokensOptions.length == 1">
               <b-alert size="sm" show variant="warning" class="mt-2">Select active tokens in the Tokens tab first</b-alert>
             </div>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Balance:" label-for="transfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
-              <font size="-1">{{ modalAddTokensToTransfer.balance }}</font>
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc20'" label="Balance:" label-for="newtransfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <font size="-1">{{ modalAddTokensToNewTransfer.balance }}</font>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc20'" label="Approved To Transfer:" label-for="newtransfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-approved" v-model.trim="modalAddTokensToTransfer.approvedInput"></b-form-input>
+                <b-form-input type="text" size="sm" id="newtransfer-additionaltokens-erc20-approved" v-model.trim="modalAddTokensToNewTransfer.approvedInput"></b-form-input>
                 <b-input-group-append>
-                  <b-button :disabled="modalAddTokensToTransfer.approved == modalAddTokensToTransfer.approvedInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button :disabled="modalAddTokensToNewTransfer.approved == modalAddTokensToNewTransfer.approvedInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                   <b-button @click="additionalTokenSelected();" variant="link"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="Amount To Transfer:" label-for="transfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalAddTokensToTransfer.amount" class="w-100"></b-form-input>
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc20'" label="Amount To Transfer:" label-for="newtransfer-additionaltokens-erc20-amounttotransfer" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input type="text" size="sm" id="newtransfer-additionaltokens-erc20-amounttotransfer" v-model.trim="modalAddTokensToNewTransfer.amount" class="w-100"></b-form-input>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc20'" label="" label-for="transfer-additionaltokens-transfer-erc-20" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalAddTokensToTransfer.amount" id="transfer-additionaltokens-transfer-erc-20" @click="addERC20TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc20'" label="" label-for="newtransfer-additionaltokens-transfer-erc-20" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalAddTokensToNewTransfer.amount" id="newtransfer-additionaltokens-transfer-erc-20" @click="addERC20TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
 
-            <!-- <b-table v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-2 p-2 pr-3"> -->
-            <b-table v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-0 mt-1 p-0">
+            <!-- <b-table v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-2 p-2 pr-3"> -->
+            <b-table v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc721'" small fixed striped responsive hover :fields="erc721TokensFields" :items="pagedFilteredSortedERC721Tokens" head-variant="light" class="m-0 mt-1 p-0">
               <template #cell(number)="data">
                 <font size="-1">
                   {{ parseInt(data.index) + ((settings.erc721TokensTable.currentPage - 1) * settings.erc721TokensTable.pageSize) + 1 }}
                 </font>
               </template>
               <template #cell(tokenId)="data">
-                <b-button size="sm" :href="chainInfo.nftTokenPrefix + modalAddTokensToTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.bottom="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
+                <b-button size="sm" :href="chainInfo.nftTokenPrefix + modalAddTokensToNewTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.bottom="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
               </template>
               <template #cell(select)="data">
                 <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox>
               </template>
             </b-table>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="Approved To Transfer:" label-for="transfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc721'" label="Approved To Transfer:" label-for="newtransfer-additionaltokens-erc20-approved" label-size="sm" label-cols-sm="5" label-align-sm="right" description="Approval to MagicalInternetMoney for transfer" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <!-- <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox> -->
-                <b-form-checkbox size="sm" v-model="modalAddTokensToTransfer.isApprovedForAllInput" value="true" unchecked-value="false" class="ml-2"></b-form-checkbox>
-                <!-- <b-form-input type="text" size="sm" id="transfer-additionaltokens-erc721-approved" v-model.trim="modalAddTokensToTransfer.approvedInput"></b-form-input> -->
+                <!-- <b-form-checkbox size="sm" v-model="modalAddTokensToNewTransfer.isApprovedForAllInput" value="true" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox> -->
+                <b-form-checkbox size="sm" v-model="modalAddTokensToNewTransfer.isApprovedForAllInput" value="true" unchecked-value="false" class="ml-2"></b-form-checkbox>
+                <!-- <b-form-input type="text" size="sm" id="newtransfer-additionaltokens-erc721-approved" v-model.trim="modalAddTokensToNewTransfer.approvedInput"></b-form-input> -->
                 <b-input-group-append>
-                  <b-button :disabled="modalAddTokensToTransfer.isApprovedForAll == modalAddTokensToTransfer.isApprovedForAllInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                  <b-button :disabled="modalAddTokensToNewTransfer.isApprovedForAll == modalAddTokensToNewTransfer.isApprovedForAllInput" @click="updateApproval();" variant="warning"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                   <b-button @click="additionalTokenSelected();" variant="link"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddTokensToTransfer.token && modalAddTokensToTransfer.type =='erc721'" label="" label-for="transfer-additionaltokens-transfer-erc721" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" :disabled="!modalAddTokensToTransfer.token || Object.keys(modalAddTokensToTransfer.selectedERC721TokenIds) == 0" id="transfer-additionaltokens-transfer-erc721" @click="addERC721TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
+            <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc721'" label="" label-for="newtransfer-additionaltokens-transfer-erc721" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="!modalAddTokensToNewTransfer.token || Object.keys(modalAddTokensToNewTransfer.selectedERC721TokenIds) == 0" id="newtransfer-additionaltokens-transfer-erc721" @click="addERC721TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
           </b-modal>
 
-          <!-- :MODALANNOUNCEMENT -->
-          <b-modal id="modal-announcement" hide-footer size="lg">
+          <!-- :MODALTRANSFER -->
+          <b-modal id="modal-transfer" hide-footer size="lg">
             <template #modal-title>Stealth Transfer</template>
-            <b-form-group v-if="modalAnnouncement.item" label="Transaction:" label-for="announcement-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item" label="Transaction:" label-for="transfer-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-txhash" :href="chainInfo.explorerTxPrefix + modalAnnouncement.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalAnnouncement.item.txHash" target="_blank">{{ formatTxHash(modalAnnouncement.item.txHash) }}</b-button>
+                  <b-button size="sm" id="transfer-txhash" :href="chainInfo.explorerTxPrefix + modalTransfer.item.txHash" variant="link" class="m-0 ml-2 p-0" v-b-popover.hover.bottom="modalTransfer.item.txHash" target="_blank">{{ formatTxHash(modalTransfer.item.txHash) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.txHash);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item" label="Timestamp:" label-for="announcement-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="announcement-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalAnnouncement.item.blockNumber)">{{ formatTimestamp(modalAnnouncement.item.timestamp) }}</b-button>
+            <b-form-group v-if="modalTransfer.item" label="Timestamp:" label-for="transfer-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="transfer-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(modalTransfer.item.blockNumber)">{{ formatTimestamp(modalTransfer.item.timestamp) }}</b-button>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.tx" label="Sender:" label-for="announcement-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.tx" label="Sender:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-registrant" @click="viewAddress(modalAnnouncement.item.tx.from)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.tx.from" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.tx.from) }}</b-button>
-                  <span v-if="modalAnnouncement.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.senderType].name" :variant="addressTypeInfo[modalAnnouncement.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.tx.from)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.tx.from) }}</font>
+                  <b-button size="sm" id="transfer-registrant" @click="viewAddress(modalTransfer.item.tx.from)" variant="link" v-b-popover.hover.bottom="modalTransfer.item.tx.from" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.tx.from) }}</b-button>
+                  <span v-if="modalTransfer.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.senderType].name" :variant="addressTypeInfo[modalTransfer.item.senderType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <div v-if="formatAddressNameSecondary(modalTransfer.item.tx.from)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.tx.from) }}</font>
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.tx.from)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-avatar v-if="ensName(modalTransfer.item.tx.from)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalTransfer.item.tx.from)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.tx.from);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.stealthAddress" label="Receiver:" label-for="announcement-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.stealthAddress" label="Receiver:" label-for="transfer-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-receiver" @click="viewAddress(modalAnnouncement.item.stealthAddress)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.stealthAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.stealthAddress) }}</b-button>
-                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.receiverType].name" :variant="addressTypeInfo[modalAnnouncement.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.stealthAddress)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.stealthAddress) }}</font>
+                  <b-button size="sm" id="transfer-receiver" @click="viewAddress(modalTransfer.item.stealthAddress)" variant="link" v-b-popover.hover.bottom="modalTransfer.item.stealthAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.stealthAddress) }}</b-button>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.receiverType].name" :variant="addressTypeInfo[modalTransfer.item.receiverType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <div v-if="formatAddressNameSecondary(modalTransfer.item.stealthAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.stealthAddress) }}</font>
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.stealthAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.stealthAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-avatar v-if="ensName(modalTransfer.item.stealthAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalTransfer.item.stealthAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.stealthAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="announcement-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.linkedTo && modalTransfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
-                <b-form-input :type="modalAnnouncement.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="announcement-spendingprivatekey" :value="modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
+                <b-form-input :type="modalTransfer.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="transfer-spendingprivatekey" :value="modalTransfer.stealthPrivateKey ? modalTransfer.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
                 <b-input-group-append>
-                  <b-button v-if="!modalAnnouncement.stealthPrivateKey" :disabled="modalAnnouncement.item.linkedTo.address != coinbase" @click="revealModalAnnouncementSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                  <b-button v-if="modalAnnouncement.stealthPrivateKey" @click="copyToClipboard(modalAnnouncement.stealthPrivateKey ? modalAnnouncement.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button v-if="!modalTransfer.stealthPrivateKey" :disabled="modalTransfer.item.linkedTo.address != coinbase" @click="revealModalTransferSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+                  <b-button v-if="modalTransfer.stealthPrivateKey" @click="copyToClipboard(modalTransfer.stealthPrivateKey ? modalTransfer.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.address" label="Linked To Address:" label-for="announcement-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.linkedTo && modalTransfer.item.linkedTo.address" label="Linked To Address:" label-for="transfer-owner" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-owner" @click="viewAddress(modalAnnouncement.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.address) }}</b-button>
-                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.linkedAddressType].name" :variant="addressTypeInfo[modalAnnouncement.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.address) }}</font>
+                  <b-button size="sm" id="transfer-owner" @click="viewAddress(modalTransfer.item.linkedTo.address)" variant="link" v-b-popover.hover="modalTransfer.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.linkedTo.address) }}</b-button>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedAddressType].name" :variant="addressTypeInfo[modalTransfer.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <div v-if="formatAddressNameSecondary(modalTransfer.item.linkedTo.address)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.linkedTo.address) }}</font>
                   </div>
                 </div>
                 <div>
-                  <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-avatar v-if="ensName(modalTransfer.item.linkedTo.address)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalTransfer.item.linkedTo.address)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.linkedTo.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.linkedTo && modalAnnouncement.item.linkedTo.stealthMetaAddress" label="Via Stealth Meta-Address:" label-for="announcement-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.linkedTo && modalTransfer.item.linkedTo.stealthMetaAddress" label="Via Stealth Meta-Address:" label-for="transfer-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-stealthmetaaddress" @click="viewAddress(modalAnnouncement.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAnnouncement.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</b-button>
-                  <span v-if="modalAnnouncement.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAnnouncement.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[modalAnnouncement.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.linkedTo.stealthMetaAddress) }}</font>
+                  <b-button size="sm" id="transfer-stealthmetaaddress" @click="viewAddress(modalTransfer.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalTransfer.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <span v-if="modalTransfer.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[modalTransfer.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                  <div v-if="formatAddressNameSecondary(modalTransfer.item.linkedTo.stealthMetaAddress)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.linkedTo.stealthMetaAddress) }}</font>
                   </div>
                 </div>
                 <div>
-                  <!-- <b-avatar v-if="ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalAnnouncement.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <!-- <b-avatar v-if="ensName(modalTransfer.item.linkedTo.stealthMetaAddress)" rounded variant="light" size="2.5rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(modalTransfer.item.linkedTo.stealthMetaAddress)" v-b-popover.hover="'ENS avatar if set'"></b-avatar> -->
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.linkedTo.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="modalAnnouncement.item && modalAnnouncement.item.transfers" label="Transfers:" label-for="announcement-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalTransfer.item && modalTransfer.item.transfers" label="Transfers:" label-for="transfer-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">
-                <b-row v-for="(item, index) of modalAnnouncement.item.transfers" v-bind:key="item.token">
+                <b-row v-for="(item, index) of modalTransfer.item.transfers" v-bind:key="item.token">
                   <b-col cols="3" class="text-right px-0 mt-1">
                     <span v-if="getTokenType(item.token) == 'eth'">
                       <font size="-1">{{ formatETH(item.value) }}</font>
@@ -318,29 +318,29 @@
                 </b-row>
               </font>
             </b-form-group>
-            <b-form-group v-if="settings.showDetails && modalAnnouncement.item" label="Scheme Id:" label-for="announcement-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" variant="transparent" id="announcement-schemeid">{{ modalAnnouncement.item.schemeId }}</b-button>
+            <b-form-group v-if="settings.showDetails && modalTransfer.item" label="Scheme Id:" label-for="transfer-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" variant="transparent" id="transfer-schemeid">{{ modalTransfer.item.schemeId }}</b-button>
             </b-form-group>
-            <b-form-group v-if="settings.showDetails && modalAnnouncement.item && modalAnnouncement.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="announcement-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalTransfer.item && modalTransfer.item.ephemeralPublicKey" label="Ephemeral Public Key:" label-for="transfer-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-ephemeralpublickey" variant="transparent" v-b-popover.hover.bottom="modalAnnouncement.item.ephemeralPublicKey" class="m-0 ml-2 p-0">{{ modalAnnouncement.item.ephemeralPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalAnnouncement.item.ephemeralPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
+                  <b-button size="sm" id="transfer-ephemeralpublickey" variant="transparent" v-b-popover.hover.bottom="modalTransfer.item.ephemeralPublicKey" class="m-0 ml-2 p-0">{{ modalTransfer.item.ephemeralPublicKey.substring(0, PUBLICKEY_SEGMENT_LENGTH + 2) + "..." + modalTransfer.item.ephemeralPublicKey.slice(-PUBLICKEY_SEGMENT_LENGTH) }}</b-button>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.ephemeralPublicKey);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
-            <b-form-group v-if="settings.showDetails && modalAnnouncement.item && modalAnnouncement.item.caller" label="Caller:" label-for="announcement-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="settings.showDetails && modalTransfer.item && modalTransfer.item.caller" label="Caller:" label-for="transfer-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
-                  <b-button size="sm" id="announcement-caller" @click="viewAddress(modalAnnouncement.item.caller)" variant="link" v-b-popover.hover.bottom="modalAnnouncement.item.caller" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAnnouncement.item.caller) }}</b-button>
-                  <div v-if="formatAddressNameSecondary(modalAnnouncement.item.caller)">
-                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAnnouncement.item.caller) }}</font>
+                  <b-button size="sm" id="transfer-caller" @click="viewAddress(modalTransfer.item.caller)" variant="link" v-b-popover.hover.bottom="modalTransfer.item.caller" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalTransfer.item.caller) }}</b-button>
+                  <div v-if="formatAddressNameSecondary(modalTransfer.item.caller)">
+                    <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalTransfer.item.caller) }}</font>
                   </div>
                 </div>
                 <div>
-                  <b-button size="sm" @click="copyToClipboard(modalAnnouncement.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+                  <b-button size="sm" @click="copyToClipboard(modalTransfer.item.caller);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
             </b-form-group>
@@ -390,7 +390,7 @@
                   </div>
                 </div>
                 <div>
-                  <b-button size="sm" @click="transfer(modalRegistration.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="newTransfer(modalRegistration.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + modalRegistration.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   <b-button size="sm" @click="copyToClipboard(modalRegistration.item.stealthMetaAddress);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </div>
               </div>
@@ -474,7 +474,7 @@
                 <b-form-textarea size="sm" plaintext id="address-stealthmetaaddress" :value="modalStealthMetaAddress.item.address" rows="3" max-rows="4" class="px-2 noscroll"></b-form-textarea>
                 <b-input-group-append>
                   <div>
-                    <b-button size="sm" @click="transfer(modalStealthMetaAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalStealthMetaAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                    <b-button size="sm" @click="newTransfer(modalStealthMetaAddress.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + modalStealthMetaAddress.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                     <b-button size="sm" @click="copyToClipboard(modalStealthMetaAddress.item.address);" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                   </div>
                 </b-input-group-append>
@@ -656,7 +656,7 @@
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.announcementsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
+                  <b-form-input type="text" size="sm" v-model.trim="settings.transfersTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
@@ -665,7 +665,7 @@
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
-                  <b-form-select size="sm" v-model="settings.announcementsTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.transfersTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
@@ -697,12 +697,12 @@
                   <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
                 <div class="mt-0 pl-1">
-                  <b-button size="sm" @click="transfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 1 || settings.tabIndex == 3" class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-button size="sm" @click="downloadAnnouncements" variant="link" v-b-popover.hover.bottom="'Download announcements'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
+                  <b-button size="sm" @click="downloadTransfers" variant="link" v-b-popover.hover.bottom="'Download transfers'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-button size="sm" @click="downloadAddresses" variant="link" v-b-popover.hover.bottom="'Download addresses'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
@@ -715,7 +715,7 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.announcementsTable.sortOption" @change="saveSettings" :options="announcementsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.transfersTable.sortOption" @change="saveSettings" :options="announcementsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registrationsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
@@ -727,7 +727,7 @@
                   <b-form-select size="sm" v-model="settings.tokenContractsTable.sortOption" @change="saveSettings" :options="tokenContractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredAnnouncements.length) + '/' + commify0(announcements.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredTransfers.length) + '/' + commify0(announcements.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
@@ -739,7 +739,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenContracts.length) + '/' + commify0(filteredTokenContracts.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-pagination size="sm" v-model="settings.announcementsTable.currentPage" @input="saveSettings" :total-rows="filteredAnnouncements.length" :per-page="settings.announcementsTable.pageSize" style="height: 0;"></b-pagination>
+                  <b-pagination size="sm" v-model="settings.transfersTable.currentPage" @input="saveSettings" :total-rows="filteredTransfers.length" :per-page="settings.transfersTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistrations.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
@@ -751,7 +751,7 @@
                   <b-pagination size="sm" v-model="settings.tokenContractsTable.currentPage" @input="saveSettings" :total-rows="filteredTokenContracts.length" :per-page="settings.tokenContractsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.announcementsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                  <b-form-select size="sm" v-model="settings.transfersTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registrationsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
@@ -860,10 +860,10 @@
               </b-row>
 
               <!-- :TRANSFERS -->
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="announcementsFields" :items="pagedFilteredSortedAnnouncements" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
-                    {{ parseInt(data.index) + ((settings.announcementsTable.currentPage - 1) * settings.announcementsTable.pageSize) + 1 }}
+                    {{ parseInt(data.index) + ((settings.transfersTable.currentPage - 1) * settings.transfersTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(timestamp)="data">
@@ -993,7 +993,7 @@
                   <font size="-1">{{ data.item.schemeId }}</font>
                 </template>
                 <template #cell(transfer)="data">
-                  <b-button size="sm" @click="transfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                  <b-button size="sm" @click="newTransfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                 </template>
                 <template #cell(stealthMetaAddress)="data">
                   <b-link @click="viewAddress(data.item.stealthMetaAddress)">
@@ -1027,7 +1027,7 @@
                 </template>
                 <template #cell(transfer)="data">
                   <div v-if="data.item.address.substring(0, 2) == 'st'">
-                    <b-button size="sm" @click="transfer(data.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+                    <b-button size="sm" @click="newTransfer(data.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
                   </div>
                 </template>
                 <template #cell(address)="data">
@@ -1339,7 +1339,7 @@
               balances: true,
               exchangeRates: true,
             },
-            announcementsTable: {
+            transfersTable: {
               filter: null,
               iSentIReceived: null,
               currentPage: 1,
@@ -1399,7 +1399,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 5,
+            version: 6,
           },
           contracts: {
             "11155111": {
@@ -1443,7 +1443,7 @@
           tokenContracts: {},
           exchangeRates: {},
 
-          modalTransfer: {
+          modalNewTransfer: {
             stealthMetaAddress: null,
             items: [
               // { token: "0x03563574B3839e2CdD6281D8741497Ba82FD6739", type: "erc20", symbol: "BOKKY", name: "BokkyPooBah wuz here!", decimals: 18, amount: "12.34" },
@@ -1455,7 +1455,7 @@
             ],
             amount: null,
           },
-          modalAddTokensToTransfer: {
+          modalAddTokensToNewTransfer: {
             token: null,
             type: null,
             amount: null,
@@ -1466,7 +1466,7 @@
             isApprovedForAllInput: null,
             selectedERC721TokenIds: {},
           },
-          modalAnnouncement: {
+          modalTransfer: {
             item: null,
             stealthPrivateKey: null,
           },
@@ -1618,7 +1618,7 @@
             { value: "17", text: '17' },
             { value: "18", text: '18 (common)' },
           ],
-          announcementsFields: [
+          transfersFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             // { key: 'iSent', label: 'I Sent', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1719,26 +1719,26 @@
               };
             }
           },
-          filteredAnnouncements() {
+          filteredTransfers() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            const regex = this.settings.announcementsTable.filter != null && this.settings.announcementsTable.filter.length > 0 ? new RegExp(this.settings.announcementsTable.filter, 'i') : null;
+            const regex = this.settings.transfersTable.filter != null && this.settings.transfersTable.filter.length > 0 ? new RegExp(this.settings.transfersTable.filter, 'i') : null;
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
                 let include = true;
-                if (this.settings.announcementsTable.iSentIReceived) {
-                  if (this.settings.announcementsTable.iSentIReceived == 'iSent') {
+                if (this.settings.transfersTable.iSentIReceived) {
+                  if (this.settings.transfersTable.iSentIReceived == 'iSent') {
                     if (!announcement.iSent) {
                       include = false;
                     }
-                  } else if (this.settings.announcementsTable.iSentIReceived == 'iReceived') {
+                  } else if (this.settings.transfersTable.iSentIReceived == 'iReceived') {
                     if (!announcement.iReceived) {
                       include = false;
                     }
-                  } else if (this.settings.announcementsTable.iSentIReceived == 'iSentOrIReceived') {
+                  } else if (this.settings.transfersTable.iSentIReceived == 'iSentOrIReceived') {
                     if (!announcement.iSent && !announcement.iReceived) {
                       include = false;
                     }
-                  } else if (this.settings.announcementsTable.iSentIReceived == 'iSentAndIReceived') {
+                  } else if (this.settings.transfersTable.iSentIReceived == 'iSentAndIReceived') {
                     if (!announcement.iSent || !announcement.iReceived) {
                       include = false;
                     }
@@ -1773,9 +1773,9 @@
             }
             return results;
           },
-          filteredSortedAnnouncements() {
-            let results = this.filteredAnnouncements;
-            if (this.settings.announcementsTable.sortOption == 'txorderasc') {
+          filteredSortedTransfers() {
+            let results = this.filteredTransfers;
+            if (this.settings.transfersTable.sortOption == 'txorderasc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1787,7 +1787,7 @@
                   return a.blockNumber - b.blockNumber;
                 }
               });
-            } else if (this.settings.announcementsTable.sortOption == 'txorderdsc') {
+            } else if (this.settings.transfersTable.sortOption == 'txorderdsc') {
               results.sort((a, b) => {
                 if (a.blockNumber == b.blockNumber) {
                   if (a.txIndex == b.txIndex) {
@@ -1802,9 +1802,9 @@
             }
             return results;
           },
-          pagedFilteredSortedAnnouncements() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
-            return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
+          pagedFilteredSortedTransfers() {
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedTransfers - results[0..9]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 10), null, 2));
+            return this.filteredSortedTransfers.slice((this.settings.transfersTable.currentPage - 1) * this.settings.transfersTable.pageSize, this.settings.transfersTable.currentPage * this.settings.transfersTable.pageSize);
           },
 
           filteredRegistrations() {
@@ -2125,16 +2125,16 @@
           },
           pagedFilteredSortedContracts() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedContracts - results[0..9]: " + JSON.stringify(this.filteredSortedContracts.slice(0, 10), null, 2));
-            return this.filteredSortedContracts.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
+            return this.filteredSortedContracts.slice((this.settings.transfersTable.currentPage - 1) * this.settings.transfersTable.pageSize, this.settings.transfersTable.currentPage * this.settings.transfersTable.pageSize);
           },
 
           filteredERC721Tokens() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
             if (tokenContract.type == "erc721") {
               for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
                 if (tokenData.owner == this.coinbase) {
-                  const selected = tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds;
+                  const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
                   results.push({ tokenId, ...tokenData, selected });
                 }
               }
@@ -2222,75 +2222,75 @@
 
           erc721TokenIdToggle(tokenId) {
             // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - tokenId: " + tokenId);
-            if (tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds) {
-              Vue.delete(this.modalAddTokensToTransfer.selectedERC721TokenIds, tokenId);
+            if (tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds) {
+              Vue.delete(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId);
             } else {
-              Vue.set(this.modalAddTokensToTransfer.selectedERC721TokenIds, tokenId, true);
+              Vue.set(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId, true);
             }
-            // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - this.modalAddTokensToTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToTransfer.selectedERC721TokenIds, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - this.modalAddTokensToNewTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, null, 2));
           },
 
           async additionalTokenSelected() {
             console.log(moment().format("HH:mm:ss") + " additionalTokenSelected");
-            console.log(moment().format("HH:mm:ss") + " this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
-            if (this.modalAddTokensToTransfer.token) {
+            console.log(moment().format("HH:mm:ss") + " this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
+            if (this.modalAddTokensToNewTransfer.token) {
               const provider = new ethers.providers.Web3Provider(window.ethereum);
-              const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+              const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
               console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
-              Vue.set(this.modalAddTokensToTransfer, 'type', tokenContract.type || null);
+              Vue.set(this.modalAddTokensToNewTransfer, 'type', tokenContract.type || null);
               if (tokenContract.type == "erc20") {
-                const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
+                const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
                 const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
                 const balance = await contract.balanceOf(this.coinbase);
-                Vue.set(this.modalAddTokensToTransfer, 'balance', this.formatDecimals(balance.toString(), decimals));
+                Vue.set(this.modalAddTokensToNewTransfer, 'balance', this.formatDecimals(balance.toString(), decimals));
                 const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
-                Vue.set(this.modalAddTokensToTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
-                Vue.set(this.modalAddTokensToTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
+                Vue.set(this.modalAddTokensToNewTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
+                Vue.set(this.modalAddTokensToNewTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
               } else if (tokenContract.type == "erc721") {
-                const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC721ABI, provider);
+                const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC721ABI, provider);
                 const isApprovedForAll = await contract.isApprovedForAll(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
-                Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAll', isApprovedForAll.toString());
-                Vue.set(this.modalAddTokensToTransfer, 'isApprovedForAllInput', isApprovedForAll.toString());
+                Vue.set(this.modalAddTokensToNewTransfer, 'isApprovedForAll', isApprovedForAll.toString());
+                Vue.set(this.modalAddTokensToNewTransfer, 'isApprovedForAllInput', isApprovedForAll.toString());
               }
-              console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer));
+              console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer));
             }
           },
 
           addERC20TokenToTransfer() {
             console.log(moment().format("HH:mm:ss") + " addERC20TokenToTransfer");
-            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
             const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
             const symbol = tokenContract.symbol || null;
             const name = tokenContract.name || null;
-            this.modalTransfer.items.push({
-              token: this.modalAddTokensToTransfer.token,
-              type: this.modalAddTokensToTransfer.type,
+            this.modalNewTransfer.items.push({
+              token: this.modalAddTokensToNewTransfer.token,
+              type: this.modalAddTokensToNewTransfer.type,
               symbol,
               name,
               decimals,
-              amount: this.modalAddTokensToTransfer.amount
+              amount: this.modalAddTokensToNewTransfer.amount
             });
-            console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
-            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            console.log("this.modalNewTransfer: " + JSON.stringify(this.modalNewTransfer, null, 2));
+            console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
             this.$refs['addtokensfortransfer'].hide();
           },
 
           addERC721TokenToTransfer() {
             console.log(moment().format("HH:mm:ss") + " addERC721TokenToTransfer");
-            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToTransfer.token] || {};
+            const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
             console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
-            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
             if (tokenContract.type == "erc721") {
               for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
                 if (tokenData.owner == this.coinbase) {
-                  const selected = tokenId in this.modalAddTokensToTransfer.selectedERC721TokenIds;
+                  const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
                   if (selected) {
                     // console.log(tokenId + " " + selected + " => " + JSON.stringify(tokenData));
                     const symbol = tokenContract.symbol || null;
                     const name = tokenContract.name || null;
-                    this.modalTransfer.items.push({
-                      token: this.modalAddTokensToTransfer.token,
-                      type: this.modalAddTokensToTransfer.type,
+                    this.modalNewTransfer.items.push({
+                      token: this.modalAddTokensToNewTransfer.token,
+                      type: this.modalAddTokensToNewTransfer.type,
                       symbol,
                       name,
                       tokenId,
@@ -2299,14 +2299,14 @@
                 }
               }
             }
-            console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
-            console.log("this.modalAddTokensToTransfer: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            console.log("this.modalNewTransfer: " + JSON.stringify(this.modalNewTransfer, null, 2));
+            console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
             this.$refs['addtokensfortransfer'].hide();
           },
 
           removeTokensForTransfer(index) {
             console.log(moment().format("HH:mm:ss") + " removeTokensForTransfer: " + index);
-            this.modalTransfer.items.splice(index, 1);
+            this.modalNewTransfer.items.splice(index, 1);
           },
 
           async searchForContracts() {
@@ -2448,11 +2448,11 @@
               localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
             }
           },
-          transfer(stealthMetaAddress) {
-            console.log(moment().format("HH:mm:ss") + " transfer: " + stealthMetaAddress);
-            this.modalTransfer.stealthMetaAddress = stealthMetaAddress;
-            this.modalTransfer.amount = null;
-            this.$bvModal.show('modal-transfertostealthmetaaddress');
+          newTransfer(stealthMetaAddress) {
+            console.log(moment().format("HH:mm:ss") + " newTransfer: " + stealthMetaAddress);
+            this.modalNewTransfer.stealthMetaAddress = stealthMetaAddress;
+            this.modalNewTransfer.amount = null;
+            this.$bvModal.show('modal-newtransfer');
           },
           addTokensForTransfer() {
             console.log(moment().format("HH:mm:ss") + " addTokensForTransfer");
@@ -2508,7 +2508,7 @@
             console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
           },
 
-          async revealModalAnnouncementSpendingPrivateKey() {
+          async revealModalTransferSpendingPrivateKey() {
             function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
               const result = {};
               result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
@@ -2521,9 +2521,9 @@
               return result;
             }
 
-            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - modalAnnouncement: " + JSON.stringify(this.modalAnnouncement, null, 2));
-            const stealthMetaAddressData = this.addresses[this.modalAnnouncement.item.linkedTo.stealthMetaAddress];
-            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
+            console.log(moment().format("HH:mm:ss") + " revealModalTransferSpendingPrivateKey - modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
+            const stealthMetaAddressData = this.addresses[this.modalTransfer.item.linkedTo.stealthMetaAddress];
+            console.log(moment().format("HH:mm:ss") + " revealModalTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
             const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
             const signature = await ethereum.request({
               method: 'personal_sign',
@@ -2545,11 +2545,11 @@
             const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
             const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
             // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-            console.log(moment().format("HH:mm:ss") + " revealModalAnnouncementSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
-            const computedStealthKey = computeStealthKey(this.modalAnnouncement.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
+            console.log(moment().format("HH:mm:ss") + " revealModalTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+            const computedStealthKey = computeStealthKey(this.modalTransfer.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
             const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
-            Vue.set(this.modalAnnouncement, 'stealthPrivateKey', stealthPrivateKey);
-            console.log("this.modalAnnouncement: " + JSON.stringify(this.modalAnnouncement, null, 2));
+            Vue.set(this.modalTransfer, 'stealthPrivateKey', stealthPrivateKey);
+            console.log("this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
           },
 
           async revealModalAddressSpendingPrivateKey() {
@@ -2617,22 +2617,22 @@
           },
 
           async updateApproval() {
-            console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToTransfer, null, 2));
+            console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            if (this.modalAddTokensToTransfer.type == "erc20") {
-              const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC20ABI, provider);
+            if (this.modalAddTokensToNewTransfer.type == "erc20") {
+              const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
               const contractWithSigner = contract.connect(provider.getSigner());
               try {
-                const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToTransfer.approvedInput, this.modalTransfer.decimals));
+                const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToNewTransfer.approvedInput, this.modalNewTransfer.decimals));
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
                 console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
               }
-            } else if (this.modalAddTokensToTransfer.type == "erc721") {
-              const contract = new ethers.Contract(this.modalAddTokensToTransfer.token, ERC721ABI, provider);
+            } else if (this.modalAddTokensToNewTransfer.type == "erc721") {
+              const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC721ABI, provider);
               const contractWithSigner = contract.connect(provider.getSigner());
               try {
-                const tx = await contractWithSigner.setApprovalForAll(STEALTHCHADADDRESS_SEPOLIA, this.modalAddTokensToTransfer.isApprovedForAllInput);
+                const tx = await contractWithSigner.setApprovalForAll(STEALTHCHADADDRESS_SEPOLIA, this.modalAddTokensToNewTransfer.isApprovedForAllInput);
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
                 console.log("updateApproval - ERC721.setApprovalForAll(...) error: " + JSON.stringify(e));
@@ -2657,7 +2657,7 @@
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToRegistry END");
           },
 
-          async transferEthToStealthMetaAddress() {
+          async executeNewTransfer() {
             function generateStealthAddress(stealthMetaAddress) {
                 const result = {};
                 result.stealthMetaAddress = stealthMetaAddress;
@@ -2675,8 +2675,8 @@
                 result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
                 return result;
             }
-            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress BEGIN - this.modalTransfer: " + JSON.stringify(this.modalTransfer, null, 2));
-            const result = generateStealthAddress(this.modalTransfer.stealthMetaAddress);
+            console.log(moment().format("HH:mm:ss") + " executeNewTransfer BEGIN - this.modalNewTransfer: " + JSON.stringify(this.modalNewTransfer, null, 2));
+            const result = generateStealthAddress(this.modalNewTransfer.stealthMetaAddress);
             for (const [k, v] of Object.entries(result)) {
               console.log("    ", k, "=>", v);
             }
@@ -2685,10 +2685,10 @@
             const contract = new ethers.Contract(STEALTHCHADADDRESS_SEPOLIA, STEALTHCHADABI_SEPOLIA, provider);
             const contractWithSigner = contract.connect(provider.getSigner());
             const schemeId = 0;
-            const value = ethers.utils.parseEther(this.modalTransfer.amount);
+            const value = ethers.utils.parseEther(this.modalNewTransfer.amount);
             const tokens = [];
             const values = [];
-            for (const item of this.modalTransfer.items) {
+            for (const item of this.modalNewTransfer.items) {
               console.log(JSON.stringify(item));
               tokens.push(item.token);
               if (item.type == "erc20") {
@@ -2704,18 +2704,18 @@
               const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokens, values, { value });
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
-              console.log("transferEthToStealthMetaAddress StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
+              console.log("executeNewTransfer StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
             }
-            console.log(moment().format("HH:mm:ss") + " transferEthToStealthMetaAddress END");
+            console.log(moment().format("HH:mm:ss") + " executeNewTransfer END");
           },
 
-          announcementRowSelected(item) {
-            console.log(moment().format("HH:mm:ss") + " announcementRowSelected: " + JSON.stringify(item, null, 2));
+          transferRowSelected(item) {
+            console.log(moment().format("HH:mm:ss") + " transferRowSelected: " + JSON.stringify(item, null, 2));
             if (item && item.length > 0) {
-              this.modalAnnouncement.item = item[0];
-              this.modalAnnouncement.stealthPrivateKey = null;
-              this.$bvModal.show('modal-announcement');
-              this.$refs.announcementsTable.clearSelected();
+              this.modalTransfer.item = item[0];
+              this.modalTransfer.stealthPrivateKey = null;
+              this.$bvModal.show('modal-transfer');
+              this.$refs.transfersTable.clearSelected();
             }
           },
 
@@ -3917,12 +3917,12 @@
           copyToClipboard(str) {
             navigator.clipboard.writeText(str);
           },
-          downloadAnnouncements() {
-            console.log(moment().format("HH:mm:ss") + " downloadAnnouncements");
+          downloadTransfers() {
+            console.log(moment().format("HH:mm:ss") + " downloadTransfers");
             const rows = [
-                ["Chain Id", "Block Number", "Tx Index", "Log Index", "Tx Hash", "When", "Sender", "Receiver Stealth Address", "Ephemeral Public Key", "Mine", "Linked To Stealth Meta-Address", "Linked To Address", "Token", "Value" ],
+                ["Chain Id", "Block Number", "Tx Index", "Log Index", "Tx Hash", "When", "I Sent", "Sender", "I Received", "Receiver Stealth Address", "Ephemeral Public Key", "Linked To Address", "Via Stealth Meta-Address", "Token", "Value" ],
             ];
-            for (const item of this.filteredSortedAnnouncements) {
+            for (const item of this.filteredSortedTransfers) {
               for (const transfer of item.transfers) {
                 rows.push([
                   item.chainId,
@@ -3931,12 +3931,13 @@
                   item.logIndex,
                   item.txHash,
                   this.formatTimestamp(item.timestamp),
+                  item.iSent,
                   item.tx.from,
+                  item.iReceived,
                   item.stealthAddress,
                   item.ephemeralPublicKey,
-                  item.mine,
-                  item.linkedTo && item.linkedTo.stealthMetaAddress,
                   item.linkedTo && item.linkedTo.address,
+                  item.linkedTo && item.linkedTo.stealthMetaAddress,
                   transfer.token == ADDRESS_ETHEREUMS ? "ETH" : transfer.token,
                   transfer.value, // TODO: handle token decimals etc
                 ]);
@@ -3947,7 +3948,7 @@
             var encodedUri = encodeURI(tsvContent);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
-            link.setAttribute("download", "stealthchad_announcements-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            link.setAttribute("download", "stealthchad_transfers-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
             document.body.appendChild(link); // Required for FF
             link.click(); // This will download the data with the specified file name
           },
@@ -4038,7 +4039,7 @@
             const tempSettings = JSON.parse(localStorage.magicalInternetMoneySettings);
             if ('version' in tempSettings && tempSettings.version == this.settings.version) {
               this.settings = tempSettings;
-              for (let table of ['announcementsTable', 'registrationsTable', 'addressesTable', 'tokenContractsTable', 'contractsTable']) {
+              for (let table of ['transfersTable', 'registrationsTable', 'addressesTable', 'tokenContractsTable', 'contractsTable']) {
                 if (this.settings[table].currentPage > 1) {
                   this.settings[table].currentPage = 1;
                 }
