@@ -399,10 +399,11 @@
           <!-- :MODALADDRESS -->
           <b-modal id="modal-address" hide-footer size="lg">
             <template #modal-title>Address</template>
-            <b-form-group v-if="modalAddress.item && modalAddress.item.type == 'address'" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-group v-if="modalAddress.item && (modalAddress.item.type == 'address' || modalAddress.item.type == 'stealthAddress')" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" :href="chainInfo.explorerAddressPrefix + modalAddress.item.address" variant="link" v-b-popover.hover="modalAddress.item.address" class="m-0 ml-2 p-0" target="_blank">{{ modalAddress.item.address }}</b-button>
+                  <span v-if="modalAddress.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAddress.item.type].name" :variant="addressTypeInfo[modalAddress.item.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="ensName(modalAddress.item.address)">
                     <font size="-1" class="text-muted">{{ ensName(modalAddress.item.address) }}</font>
                   </div>
@@ -421,9 +422,6 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
-            <b-form-group v-if="modalAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalAddress.item.mine ? 1 : 0" @change="toggleModalAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
-            </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
@@ -437,6 +435,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="address-linkedto-address" @click="viewAddress(modalAddress.item.linkedTo.address)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.address) }}</b-button>
+                  <span v-if="modalAddress.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAddress.item.linkedAddressType].name" :variant="addressTypeInfo[modalAddress.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.address)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.address) }}</font>
                   </div>
@@ -451,6 +450,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="address-linkedto-stealthmetaaddress" @click="viewAddress(modalAddress.item.linkedTo.stealthMetaAddress)" variant="link" v-b-popover.hover="modalAddress.item.linkedTo.stealthMetaAddress" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalAddress.item.linkedTo.stealthMetaAddress) }}</b-button>
+                  <span v-if="modalAddress.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalAddress.item.linkedStealthMetaAddressType].name" :variant="addressTypeInfo[modalAddress.item.linkedStealthMetaAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalAddress.item.linkedTo.stealthMetaAddress) }}</font>
                   </div>
@@ -478,6 +478,7 @@
                   </div>
                 </b-input-group-append>
               </b-input-group>
+              <span v-if="modalStealthMetaAddress.item.mine" class="pl-2"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalStealthMetaAddress.item.type].name" :variant="addressTypeInfo[modalStealthMetaAddress.item.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
             </b-form-group>
             <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.linkedTo && modalStealthMetaAddress.item.linkedTo.stealthMetaAddress" label="Linked To Stealth Meta-Address:" label-for="address-linkedto-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -496,6 +497,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <b-button size="sm" id="address-linkedto-address" @click="viewAddress(modalStealthMetaAddress.item.linkedTo.address)" variant="link" v-b-popover.hover="modalStealthMetaAddress.item.linkedTo.address" class="m-0 ml-2 p-0">{{ formatAddressNamePrimary(modalStealthMetaAddress.item.linkedTo.address) }}</b-button>
+                  <span v-if="modalStealthMetaAddress.item.mine"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[modalStealthMetaAddress.item.linkedAddressType].name" :variant="addressTypeInfo[modalStealthMetaAddress.item.linkedAddressType].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
                   <div v-if="formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.address)">
                     <font size="-1" class="text-muted">{{ formatAddressNameSecondary(modalStealthMetaAddress.item.linkedTo.address) }}</font>
                   </div>
@@ -521,9 +523,6 @@
                   <b-button :disabled="modalStealthMetaAddress.name == modalStealthMetaAddress.item.name" @click="saveModalStealthMetaAddressName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                 </b-input-group-append>
               </b-input-group>
-            </b-form-group>
-            <b-form-group v-if="modalStealthMetaAddress.item" label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="modalStealthMetaAddress.item.type == 'address' ? null : 'NOTE: Generate your Stealth Meta-Addresses for stealth keys to be linked'" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="address-mine" value="1" :checked="modalStealthMetaAddress.item.mine ? 1 : 0" @change="toggleModalStealthMetaAddressMine()" class="mt-1 ml-2"></b-form-checkbox>
             </b-form-group>
             <b-form-group v-if="settings.showDetails && modalStealthMetaAddress.item && modalStealthMetaAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -1788,7 +1787,7 @@
             return results;
           },
           pagedFilteredSortedAnnouncements() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAnnouncements - results[0..9]: " + JSON.stringify(this.filteredSortedAnnouncements.slice(0, 10), null, 2));
             return this.filteredSortedAnnouncements.slice((this.settings.announcementsTable.currentPage - 1) * this.settings.announcementsTable.pageSize, this.settings.announcementsTable.currentPage * this.settings.announcementsTable.pageSize);
           },
 
@@ -1948,7 +1947,7 @@
             return results;
           },
           pagedFilteredSortedAddresses() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
@@ -2403,14 +2402,14 @@
             localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
           },
 
-          toggleModalStealthMetaAddressMine() {
-            console.log(moment().format("HH:mm:ss") + " toggleModalStealthMetaAddressMine: " + JSON.stringify(this.modalStealthMetaAddress));
-            this.modalStealthMetaAddress.item.mine = !this.modalStealthMetaAddress.item.mine;
-            Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'mine', this.modalStealthMetaAddress.item.mine);
-            Vue.set(this.addresses, this.modalStealthMetaAddress.item.address, this.addresses[this.modalStealthMetaAddress.item.address]);
-            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
-          },
+          // toggleModalStealthMetaAddressMine() {
+          //   console.log(moment().format("HH:mm:ss") + " toggleModalStealthMetaAddressMine: " + JSON.stringify(this.modalStealthMetaAddress));
+          //   this.modalStealthMetaAddress.item.mine = !this.modalStealthMetaAddress.item.mine;
+          //   Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'mine', this.modalStealthMetaAddress.item.mine);
+          //   Vue.set(this.addresses, this.modalStealthMetaAddress.item.address, this.addresses[this.modalStealthMetaAddress.item.address]);
+          //   Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+          //   localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+          // },
 
           toggleContractRead(item) {
             if (this.modalContract.item && this.modalContract.item.chainId && this.modalContract.item.contract) {
@@ -2718,13 +2717,17 @@
             if (item && item.length > 0) {
               const address = item[0].address;
               const addressData = this.addresses[address];
+              const linkedAddress = addressData.linkedTo && addressData.linkedTo.address || null;
+              const linkedAddressData = this.addresses[linkedAddress] || {};
               if (address.substring(0, 3) == "st:") {
-                this.modalStealthMetaAddress.item = { address, ...addressData };
+                this.modalStealthMetaAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type };
                 this.modalStealthMetaAddress.name = addressData.name;
                 this.modalStealthMetaAddress.spendingPrivateKey = null;
                 this.$bvModal.show('modal-stealthmetaaddress');
               } else {
-                this.modalAddress.item = { address, ...addressData };
+                const linkedStealthMetaAddress = addressData.linkedTo && addressData.linkedTo.stealthMetaAddress || null;
+                const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+                this.modalAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type };
                 this.modalAddress.name = addressData.name;
                 this.$bvModal.show('modal-address');
               }
@@ -2761,7 +2764,7 @@
           },
 
           viewModalSyncOptions() {
-            console.log(moment().format("HH:mm:ss") + " viewModalSyncOptions - settings: " + JSON.stringify(this.settings, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " viewModalSyncOptions - settings: " + JSON.stringify(this.settings, null, 2));
             this.$bvModal.show('modal-sync');
           },
 
@@ -3370,7 +3373,7 @@
                 selectedAddressesMap[address] = true;
               }
             }
-            console.log(moment().format("HH:mm:ss") + " collateTokens - selectedAddressesMap: " + JSON.stringify(Object.keys(selectedAddressesMap)));
+            // console.log(moment().format("HH:mm:ss") + " collateTokens - selectedAddressesMap: " + JSON.stringify(Object.keys(selectedAddressesMap)));
             const accounts = this.addresses;
             if (!(this.coinbase in accounts)) {
               accounts[this.coinbase] = { type: "address", source: "attached", mine: true, name: null };
@@ -3602,7 +3605,7 @@
                 }
                 toTs = moment(toTs).subtract(MAXDAYS, 'days');
               }
-              console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
+              // console.log(moment().format("HH:mm:ss") + " syncExchangeRates - exchangeRates: " + JSON.stringify(exchangeRates));
               Vue.set(this, 'exchangeRates', exchangeRates);
               localStorage.magicalInternetMoneyExchangeRates = JSON.stringify(this.exchangeRates);
             }
@@ -3649,7 +3652,7 @@
                 checkAddresses.push({ address, ...addressData });
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
+            // console.log(moment().format("HH:mm:ss") + " processData - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
             let rows = 0;
             let done = false;
