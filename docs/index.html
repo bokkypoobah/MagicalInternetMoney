@@ -897,7 +897,7 @@
                         <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
                           <b-col>
                             <span v-if="getTokenType(item.token) == 'eth'">
-                              <font size="-1">{{ formatETH(item.value, 6) + ' ETH'}}</font>
+                              <font size="-1">{{ formatETH(item.value, 9) + ' ETH'}}</font>
                             </span>
                             <span v-else-if="getTokenType(item.token) == 'erc20'">
                               <font size="-1">
@@ -969,7 +969,7 @@
                         <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
                           <b-col>
                             <span v-if="getTokenType(item.token) == 'eth'">
-                              <font size="-1">{{ formatETH(item.value, 6) + ' ETH' }}</font>
+                              <font size="-1">{{ formatETH(item.value, 9) + ' ETH' }}</font>
                             </span>
                             <span v-else-if="getTokenType(item.token) == 'erc20'">
                               <font size="-1">
@@ -4042,7 +4042,7 @@
               if (precision == 0) {
                 return e ? ethers.utils.formatEther(e).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
               } else {
-                return e ? parseFloat(ethers.utils.formatEther(e)).toFixed(precision) : null;
+                return e ? parseFloat(parseFloat(ethers.utils.formatEther(e)).toFixed(precision)) : null;
               }
             } catch (err) {
             }
