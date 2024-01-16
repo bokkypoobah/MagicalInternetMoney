@@ -859,9 +859,10 @@
                       </template>
                       <template #cell(timestamp)="data">
                         <font size="-1">
-                          <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                          <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex + ' @ ' + formatTimestamp(data.item.timestamp)" target="_blank">
                             <span v-if="data.item.timestamp">
-                              {{ formatTimestamp(data.item.timestamp) }}
+                              {{ formatTimeDiff(data.item.timestamp) }}
+                              <!-- {{ formatTimestamp(data.item.timestamp) }} -->
                             </span>
                             <span v-else>
                               {{ '#' + commify0(data.item.blockNumber) }}
@@ -912,9 +913,10 @@
                       </template>
                       <template #cell(timestamp)="data">
                         <font size="-1">
-                          <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+                          <b-link :href="chainInfo.explorerTxPrefix + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex + ' @ ' + formatTimestamp(data.item.timestamp)" target="_blank">
                             <span v-if="data.item.timestamp">
-                              {{ formatTimestamp(data.item.timestamp) }}
+                              {{ formatTimeDiff(data.item.timestamp) }}
+                              <!-- {{ formatTimestamp(data.item.timestamp) }} -->
                             </span>
                             <span v-else>
                               {{ '#' + commify0(data.item.blockNumber) }}
