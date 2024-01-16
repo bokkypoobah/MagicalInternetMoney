@@ -844,7 +844,7 @@
 
 
               <!-- :TRANSFERS -->
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="announcementsFields" :items="pagedFilteredSortedAnnouncements" show-empty empty-html="Click Sync above to retrieve stealth address announcements" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="announcementsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='announcementRowSelected' :fields="announcementsFields" :items="pagedFilteredSortedAnnouncements" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.announcementsTable.currentPage - 1) * settings.announcementsTable.pageSize) + 1 }}
@@ -943,7 +943,7 @@
               </b-table>
 
               <!-- :DIRECTORY -->
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve stealth address registrations" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registrationsTable.currentPage - 1) * settings.registrationsTable.pageSize) + 1 }}
@@ -1003,7 +1003,7 @@
               </b-table>
 
               <!-- :ADDRESSES -->
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve stealth address from announcements and registrations" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve addresses from ERC-5564: Stealth Addresses announcement and ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
@@ -1072,7 +1072,7 @@
               </b-table>
 
               <!-- :TOKENS -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve stealth address announcement events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve your ERC-20 and ERC-721 token events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.tokenContractsTable.currentPage - 1) * settings.tokenContractsTable.pageSize) + 1 }}
