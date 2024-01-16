@@ -2739,12 +2739,16 @@
             // console.log(moment().format("HH:mm:ss") + " viewAddress: " + JSON.stringify(address, null, 2));
             if (address && address.length > 0) {
               const addressData = this.addresses[address];
+              const linkedAddress = addressData.linkedTo && addressData.linkedTo.address || null;
+              const linkedAddressData = this.addresses[linkedAddress] || {};
               if (address.substring(0, 3) == "st:") {
-                this.modalStealthMetaAddress.item = { address, ...addressData };
+                this.modalStealthMetaAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type };
                 this.modalStealthMetaAddress.name = addressData.name;
                 this.$bvModal.show('modal-stealthmetaaddress');
               } else {
-                this.modalAddress.item = { address, ...addressData };
+                const linkedStealthMetaAddress = addressData.linkedTo && addressData.linkedTo.stealthMetaAddress || null;
+                const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+                this.modalAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type };
                 this.modalAddress.name = addressData.name;
                 this.$bvModal.show('modal-address');
               }
