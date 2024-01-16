@@ -41,4 +41,11 @@ const CUSTOMNAMES = {
     write: true,
     blockNumber: 5037096,
   },
+  "0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1": {
+    type: "helper",
+    name: "MagicalInternetMoney v0.8.2 on Sepolia",
+    read: true,
+    write: true,
+    blockNumber: 5098167,
+  },
 };

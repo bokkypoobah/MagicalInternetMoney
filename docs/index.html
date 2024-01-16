@@ -769,7 +769,7 @@
               <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h4>Welcome</h4>
-                  Stealth Chad is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>).
+                  Magical Internet Money is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>).
 
                   <h5 class="mt-4">How The ERC-5564: Stealth Addresses Protocol Works</h5>
                   <ul>
@@ -801,7 +801,7 @@
                   <ul>
                     <li><b-link href="https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code" target="_blank">ERC5564Announcer v0.8.1</b-link></li>
                     <li><b-link href="https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code" target="_blank">ERC5564Registry v0.8.1</b-link></li>
-                    <li><b-link href="https://sepolia.etherscan.io/address/0xA745760E9f1E425215CCD7735F932FdDE3276344#code" target="_blank">StealthChad v0.8.1</b-link></li>
+                    <li><b-link href="https://sepolia.etherscan.io/address/0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1#code" target="_blank">MagicalInternetMoney v0.8.2</b-link></li>
                   </ul>
 
                   <h5 class="mt-3">References</h5>
@@ -1608,13 +1608,13 @@
                 "blockNumber": 5037496,
                 "timestamp": 1704598464
               },
-              "0xA745760E9f1E425215CCD7735F932FdDE3276344": {
+              "0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1": {
                 "type": "caller",
-                "name": "StealthChad v0.8.1 on Sepolia",
+                "name": "MagicalInternetMoney v0.8.2 on Sepolia",
                 "read": true,
                 "write": true,
-                "blockNumber": 5037208,
-                "timestamp": 1704594648
+                "blockNumber": 5098167,
+                "timestamp": 1705396884
               },
             }
           },
@@ -2563,12 +2563,12 @@
                 const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
                 const balance = await contract.balanceOf(this.coinbase);
                 Vue.set(this.modalAddTokensToNewTransfer, 'balance', this.formatDecimals(balance.toString(), decimals));
-                const allowance = await contract.allowance(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
+                const allowance = await contract.allowance(this.coinbase, MAGICALINTERNETMONEYADDRESS_SEPOLIA);
                 Vue.set(this.modalAddTokensToNewTransfer, 'approved', this.formatDecimals(allowance.toString(), decimals));
                 Vue.set(this.modalAddTokensToNewTransfer, 'approvedInput', this.formatDecimals(allowance.toString(), decimals));
               } else if (tokenContract.type == "erc721") {
                 const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC721ABI, provider);
-                const isApprovedForAll = await contract.isApprovedForAll(this.coinbase, STEALTHCHADADDRESS_SEPOLIA);
+                const isApprovedForAll = await contract.isApprovedForAll(this.coinbase, MAGICALINTERNETMONEYADDRESS_SEPOLIA);
                 Vue.set(this.modalAddTokensToNewTransfer, 'isApprovedForAll', isApprovedForAll.toString());
                 Vue.set(this.modalAddTokensToNewTransfer, 'isApprovedForAllInput', isApprovedForAll.toString());
               }
@@ -2943,7 +2943,7 @@
               const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
               const contractWithSigner = contract.connect(provider.getSigner());
               try {
-                const tx = await contractWithSigner.approve(STEALTHCHADADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToNewTransfer.approvedInput, this.modalNewTransfer.decimals));
+                const tx = await contractWithSigner.approve(MAGICALINTERNETMONEYADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToNewTransfer.approvedInput, this.modalNewTransfer.decimals));
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
                 console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
@@ -2952,7 +2952,7 @@
               const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC721ABI, provider);
               const contractWithSigner = contract.connect(provider.getSigner());
               try {
-                const tx = await contractWithSigner.setApprovalForAll(STEALTHCHADADDRESS_SEPOLIA, this.modalAddTokensToNewTransfer.isApprovedForAllInput);
+                const tx = await contractWithSigner.setApprovalForAll(MAGICALINTERNETMONEYADDRESS_SEPOLIA, this.modalAddTokensToNewTransfer.isApprovedForAllInput);
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
                 console.log("updateApproval - ERC721.setApprovalForAll(...) error: " + JSON.stringify(e));
@@ -3002,26 +3002,22 @@
             }
 
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const contract = new ethers.Contract(STEALTHCHADADDRESS_SEPOLIA, STEALTHCHADABI_SEPOLIA, provider);
+            const contract = new ethers.Contract(MAGICALINTERNETMONEYADDRESS_SEPOLIA, MAGICALINTERNETMONEYABI_SEPOLIA, provider);
             const contractWithSigner = contract.connect(provider.getSigner());
             const schemeId = 0;
             const value = ethers.utils.parseEther(this.modalNewTransfer.amount);
-            const tokens = [];
-            const values = [];
+            const tokenInfos = [];
             for (const item of this.modalNewTransfer.items) {
               console.log(JSON.stringify(item));
-              tokens.push(item.token);
               if (item.type == "erc20") {
-                values.push(ethers.utils.parseUnits(item.amount, item.decimals).toString());
+                tokenInfos.push([false, item.token, ethers.utils.parseUnits(item.amount, item.decimals).toString()]);
               } else {
-                values.push(item.tokenId.toString());
+                tokenInfos.push([true, item.token, item.tokenId.toString()]);
               }
             }
-            console.log("tokens: " + JSON.stringify(tokens));
-            console.log("values: " + JSON.stringify(values));
+            console.log("tokenInfos: " + JSON.stringify(tokenInfos));
             try {
-              // const tx = await contractWithSigner.transferEthAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, { value });
-              const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokens, values, { value });
+              const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokenInfos, { value });
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("executeNewTransfer StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
