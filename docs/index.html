@@ -1694,10 +1694,10 @@
           },
           iSentIReceivedOptions: [
             { value: null, text: 'All Transfers' },
-            { value: "iSent", text: 'I Sent' },
-            { value: "iReceived", text: 'I Received' },
-            { value: "iSentOrIReceived", text: 'I Sent OR I Received' },
-            { value: "iSentAndIReceived", text: 'I Sent AND I Received' },
+            { value: "iReceived", text: 'Received' },
+            { value: "iSent", text: 'Sent' },
+            { value: "iReceivedOrSent", text: 'Received OR Sent' },
+            { value: "iReceivedAndSent", text: 'Received AND Sent' },
           ],
           // As supported by https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000
           reportingCurrencyOptions: [
@@ -2060,11 +2060,11 @@
                   if (!transfer.iReceived) {
                     include = false;
                   }
-                } else if (this.settings.transfersTable.iSentIReceived == 'iSentOrIReceived') {
+                } else if (this.settings.transfersTable.iSentIReceived == 'iReceivedOrSent') {
                   if (!transfer.iSent && !transfer.iReceived) {
                     include = false;
                   }
-                } else if (this.settings.transfersTable.iSentIReceived == 'iSentAndIReceived') {
+                } else if (this.settings.transfersTable.iSentIReceived == 'iReceivedAndSent') {
                   if (!transfer.iSent || !transfer.iReceived) {
                     include = false;
                   }
