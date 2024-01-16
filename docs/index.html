@@ -212,23 +212,8 @@
           <!-- :MODALFAUCETS -->
           <b-modal ref="modalsync" id="modal-faucets" hide-footer size="md">
             <template #modal-title>ERC-20 & ERC-721 Faucets</template>
-            <!-- <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1">ERC-20 & ERC-721 transfers for my address set</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full ERC-20 & ERC-721 rescan, after my address set changes</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
-            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange rates</b-form-checkbox>
-            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Do It!</b-button>
-            </b-form-group> -->
-            <font size="-1">
-              <pre>
-<!-- {{ chains[chainId] && chains[chainId].faucets }} -->
-{{ faucets }}
-{{ modalFaucet }}
-              </pre>
-            </font>
+            <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" @change="saveSettings" :options="faucetsOptions" v-b-popover.hover.bottom="'Select faucet'"></b-form-select>
+            <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
           </b-modal>
 
           <!-- :MODALTRANSFER -->
@@ -1928,7 +1913,20 @@
         // --- COMPUTED ---
         computed: {
           faucets() {
-            return FAUCETS;
+            return FAUCETS && FAUCETS[this.chainId];
+          },
+          faucetsOptions() {
+            const results = [];
+            if (FAUCETS && FAUCETS[this.chainId]) {
+              results.push({ value: null, text: '(select a faucet)' });
+              for (const item of FAUCETS[this.chainId]) {
+                results.push({
+                  value: item.address,
+                  text: item.drip + " x " + (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + (item.type == "erc20" ? " (" + item.decimals + " dp)" : "") + ' @ ' + item.address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + item.address.slice(-this.ADDRESS_SEGMENT_LENGTH),
+                });
+              }
+            }
+            return results;
           },
           additionalERC20TokensOptions() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
@@ -2970,6 +2968,33 @@
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
             localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             console.log(moment().format("HH:mm:ss") + " addStealthMetaAddressToAddresses - addresses: " + JSON.stringify(this.addresses, null, 2));
+          },
+
+          async drip() {
+            console.log(moment().format("HH:mm:ss") + " drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const faucetInfo = FAUCETS[this.chainId] && FAUCETS[this.chainId].filter(e => e.address == this.modalFaucet.selectedFaucet)[0] || null;
+            if (faucetInfo) {
+              console.log("faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
+              if (faucetInfo.type == "erc20") {
+                try {
+                  const tx = await signer.sendTransaction({ to: faucetInfo.address, value: "0" });
+                  console.log("tx: " + JSON.stringify(tx));
+                } catch (e) {
+                  console.log("drip ERC-20 - error: " + JSON.stringify(e));
+                }
+              } else {
+                const testToadzContract = new ethers.Contract(faucetInfo.address, TESTTOADZABI, provider);
+                const testToadzContractWithSigner = testToadzContract.connect(provider.getSigner());
+                try {
+                  const tx = await testToadzContractWithSigner.mint(3);
+                  console.log("tx: " + JSON.stringify(tx));
+                } catch (e) {
+                  console.log("drip ERC-721 - error: " + JSON.stringify(e));
+                }
+              }
+            }
           },
 
           async updateApproval() {
