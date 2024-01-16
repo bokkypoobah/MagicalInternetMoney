@@ -146,7 +146,7 @@ Click on the [>] button to send ETH/ERC-20/ERC-721 tokens to that Stealth Meta-A
 
 * [ERC5564Announcer.sol v0.8.1](deployed/ERC5564Announcer_v0.8.1_Sepolia_0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365.sol) on Sepolia [0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365](https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code)
 * [ERC5564Registry.sol v0.8.1](deployed/ERC5564Registry_v0.8.1_Sepolia_0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde.sol) on Sepolia [0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde](https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code)
-* [StealthChad.sol v0.8.1](deployed/StealthChad_v0.8.1_Sepolia_0xA745760E9f1E425215CCD7735F932FdDE3276344.sol) on Sepolia [0xA745760E9f1E425215CCD7735F932FdDE3276344](https://sepolia.etherscan.io/address/0xA745760E9f1E425215CCD7735F932FdDE3276344#code)
+* [MagicInternetMoney.sol v0.8.2](deployed/MagicalInternetMoney_v0.8.2_Sepolia_0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1.sol) on Sepolia [0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1](https://sepolia.etherscan.io/address/0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1#code)
 
 
 <br />
