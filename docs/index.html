@@ -673,7 +673,7 @@
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.tokenContractsTable.activeOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display Active items'">Active Only</b-form-checkbox>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon-heart-fill v-if="settings.tokenContractsTable.activeOnly" shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart-fill><b-icon-heart v-else shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1288,7 +1288,7 @@
                   <font size="-1">{{ data.item.name }}</font>
                 </template>
                 <template #cell(active)="data">
-                  <font size="-1"><b-form-checkbox size="sm" value="1" :checked="data.item.active ? 1 : 0" @change="toggleTokenContractActive(data.item)" class="mt-1 ml-2"></b-form-checkbox></font>
+                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon-heart-fill v-if="data.item.active" shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart-fill><b-icon-heart v-else shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart></b-button>
                 </template>
                 <template #cell(firstEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
@@ -1853,8 +1853,8 @@
             { key: 'typeAndSource', label: 'Type & Source', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           tokenContractsFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'active', label: 'Active', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
+            { key: 'active', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
