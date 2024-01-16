@@ -883,12 +883,21 @@
                           </div>
                         </div>
                       </template>
+                      <template #cell(to)="data">
+                        <b-link @click="viewAddress(data.item.stealthAddress)">
+                          <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
+                        </b-link>
+                        <span v-if="data.item.iReceived"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.receiverInfo.type].name" :variant="addressTypeInfo[data.item.receiverInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                        <div v-if="formatAddressNameSecondary(data.item.stealthAddress)">
+                          <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.stealthAddress) }}</font>
+                        </div>
+                      </template>
                     </b-table>
-                    <font size="-2">
+                    <!-- <font size="-2">
                       <pre>
 {{ received }}
                       </pre>
-                    </font>
+                    </font> -->
                   </b-card>
                 </b-col>
                 <b-col class="m-0 p-0 pt-1 pl-1">
@@ -913,6 +922,17 @@
                           </b-link>
                         </font>
                       </template>
+                      <template #cell(from)="data">
+                        <div v-if="data.item.tx && data.item.tx.from">
+                          <b-link @click="viewAddress(data.item.tx.from)">
+                            <font size="-1" v-b-popover.hover="addressDescription(data.item.tx.from)">{{ formatAddressNamePrimary(data.item.tx.from) }}</font>
+                          </b-link>
+                          <span v-if="data.item.iSent"><b-icon-star-fill v-b-popover.hover.right="addressTypeInfo[data.item.senderInfo.type].name" :variant="addressTypeInfo[data.item.senderInfo.type].variant" shift-v="+7" font-scale="0.6"></b-icon-star-fill></span>
+                          <div v-if="formatAddressNameSecondary(data.item.tx.from)">
+                            <font size="-1" class="text-muted">{{ formatAddressNameSecondary(data.item.tx.from) }}</font>
+                          </div>
+                        </div>
+                      </template>
                       <template #cell(to)="data">
                         <b-link @click="viewAddress(data.item.stealthAddress)">
                           <font size="-1" v-b-popover.hover="addressDescription(data.item.stealthAddress)">{{ formatAddressNamePrimary(data.item.stealthAddress) }}</font>
@@ -923,11 +943,11 @@
                         </div>
                       </template>
                     </b-table>
-                    <font size="-2">
+                    <!-- <font size="-2">
                       <pre>
 {{ sent }}
                       </pre>
-                    </font>
+                    </font> -->
                   </b-card>
                 </b-col>
               </b-row>
@@ -1704,12 +1724,16 @@
           receivedFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'from', label: 'From', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'from', label: 'From', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'to', label: 'To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           sentFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'to', label: 'To', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'from', label: 'From', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'to', label: 'To', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
           ],
           transfersFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
