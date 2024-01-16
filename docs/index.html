@@ -23,6 +23,7 @@
     <script src="js/noble-curves.js"></script>
     <script src="globals.js"></script>
     <script src="customNames.js"></script>
+    <script src="faucets.js"></script>
     <script src="deploymentData.js"></script>
 
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
@@ -206,6 +207,28 @@
             <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc721'" label="" label-for="newtransfer-additionaltokens-transfer-erc721" label-size="sm" label-cols-sm="4" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="!modalAddTokensToNewTransfer.token || Object.keys(modalAddTokensToNewTransfer.selectedERC721TokenIds) == 0" id="newtransfer-additionaltokens-transfer-erc721" @click="addERC721TokenToTransfer()" variant="primary">Add To Transfer List</b-button>
             </b-form-group>
+          </b-modal>
+
+          <!-- :MODALFAUCETS -->
+          <b-modal ref="modalsync" id="modal-faucets" hide-footer size="md">
+            <template #modal-title>ERC-20 & ERC-721 Faucets</template>
+            <!-- <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1">ERC-20 & ERC-721 transfers for my address set</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full ERC-20 & ERC-721 rescan, after my address set changes</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
+            <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange rates</b-form-checkbox>
+            <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" id="sync-go" @click="syncIt()" variant="primary">Do It!</b-button>
+            </b-form-group> -->
+            <font size="-1">
+              <pre>
+<!-- {{ chains[chainId] && chains[chainId].faucets }} -->
+{{ faucets }}
+{{ modalFaucet }}
+              </pre>
+            </font>
           </b-modal>
 
           <!-- :MODALTRANSFER -->
@@ -672,7 +695,7 @@
                 <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
                   <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.activeOnly ? 'heart-fill' : 'heart'" font-scale="1.0" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
@@ -694,6 +717,9 @@
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                  <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.bottom="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
                 <div class="mt-0 pl-1">
                   <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
@@ -1577,38 +1603,6 @@
                 explorerTxPrefix: "https://etherscan.io/tx/",
                 explorerBlockPrefix: "https://etherscan.io/block/",
                 nftTokenPrefix: "https://opensea.io/assets/ethereum/",
-                faucets: [{
-                  address: "0x2823589Ae095D99bD64dEeA80B4690313e2fB519",
-                    symbol: "WEENUS",
-                    name: "Weenus 💪",
-                    decimals: 18,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0xeEf5E2d8255E973d587217f9509B416b41CA5870",
-                    symbol: "XEENUS",
-                    name: "Xeenus 💪",
-                    decimals: 18,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0x187E63F9eBA692A0ac98d3edE6fEb870AF0079e1",
-                    symbol: "YEENUS",
-                    name: "Yeenus 💪",
-                    decimals: 8,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0x0693c3a780A0a757E803a4BD76bCf43d438f8806",
-                    symbol: "ZEENUS",
-                    name: "Zeenus 💪",
-                    decimals: 0,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-                    symbol: "WETH9",
-                    name: "Wrapped Ether",
-                    decimals: 18,
-                    type: "sendeth",
-                  },
-                ],
               },
               "11155111": {
                 name: "Sepolia Testnet",
@@ -1618,43 +1612,6 @@
                 explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
                 explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
-                faucets: [{
-                    address: "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9",
-                    symbol: "WEENUS",
-                    name: "Weenus 💪",
-                    decimals: 18,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0xc21d97673B9E0B3AA53a06439F71fDc1facE393B",
-                    symbol: "XEENUS",
-                    name: "Xeenus 💪",
-                    decimals: 18,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0x93fCA4c6E2525C09c95269055B46f16b1459BF9d",
-                    symbol: "YEENUS",
-                    name: "Yeenus 💪",
-                    decimals: 8,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0xe9EF74A6568E9f0e42a587C9363C9BcC582dcC6c",
-                    symbol: "ZEENUS",
-                    name: "Zeenus 💪",
-                    decimals: 0,
-                    type: "erc20mint1k",
-                  }, {
-                    address: "0x07391dbE03e7a0DEa0fce6699500da081537B6c3",
-                    symbol: "WETH9",
-                    name: "Wrapped Ether",
-                    decimals: 18,
-                    type: "sendeth",
-                  }, {
-                    address: "0x8b73448426797099b6b9a96c4343f528bbAfc55e",
-                    symbol: "TESTTOADZ",
-                    name: "TestToadz",
-                    type: "erc721mint3",
-                  },
-                ],
               },
             },
             version: 7,
@@ -1749,6 +1706,9 @@
             viewingPublicKey: null,
             stealthMetaAddress: null,
             status: null,
+          },
+          modalFaucet: {
+            selectedFaucet: null,
           },
           modalContract: {
             item: null,
@@ -1967,6 +1927,9 @@
 
         // --- COMPUTED ---
         computed: {
+          faucets() {
+            return FAUCETS;
+          },
           additionalERC20TokensOptions() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
@@ -2846,6 +2809,10 @@
           addTokensForTransfer() {
             console.log(moment().format("HH:mm:ss") + " addTokensForTransfer");
             this.$bvModal.show('modal-addtokensfortransfer');
+          },
+          viewFaucets() {
+            console.log(moment().format("HH:mm:ss") + " viewFaucets");
+            this.$bvModal.show('modal-faucets');
           },
 
           newStealthMetaAddress() {
