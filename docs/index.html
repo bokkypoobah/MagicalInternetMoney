@@ -673,7 +673,7 @@
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-1 pr-1">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon-heart-fill v-if="settings.tokenContractsTable.activeOnly" shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart-fill><b-icon-heart v-else shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.activeOnly ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -735,7 +735,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenContracts.length) + '/' + commify0(filteredTokenContracts.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenContracts.length) + '/' + commify0(totalTokenContracts) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.transfersTable.currentPage" @input="saveSettings" :total-rows="filteredTransfers.length" :per-page="settings.transfersTable.pageSize" style="height: 0;"></b-pagination>
@@ -1288,7 +1288,7 @@
                   <font size="-1">{{ data.item.name }}</font>
                 </template>
                 <template #cell(active)="data">
-                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon-heart-fill v-if="data.item.active" shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart-fill><b-icon-heart v-else shift-v="+1" font-scale="0.9" variant="danger"></b-icon-heart></b-button>
+                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon :icon="data.item.active ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </template>
                 <template #cell(firstEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
@@ -2280,6 +2280,13 @@
             return this.filteredSortedAddresses.slice((this.settings.addressesTable.currentPage - 1) * this.settings.addressesTable.pageSize, this.settings.addressesTable.currentPage * this.settings.addressesTable.pageSize);
           },
 
+          totalTokenContracts() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+              result++;
+            }
+            return result;
+          },
           filteredTokenContracts() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
