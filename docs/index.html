@@ -1728,8 +1728,37 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const announcement of this.announcements) {
               if (announcement.chainId == this.chainId) {
+                const sender = announcement.tx.from;
+                const senderData = sender && this.addresses[sender] || {};
+                const receiver = announcement.stealthAddress;
+                const receiverData = receiver && this.addresses[receiver] || {};
+                const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
+                const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
+                const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
+                const linkedAddressData = linkedAddress && this.addresses[linkedAddress] || {};
                 // results.push({ ...announcement, senderType: senderData.type, receiverType: receiverData.type, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type /*, _cellVariants */ });
-                results.push({ ...announcement });
+                results.push({
+                  ...announcement,
+                  senderInfo: {
+                    type: senderData.type,
+                    name: senderData.name,
+                    ensName: senderData.ensName,
+                  },
+                  receiverInfo: {
+                    type: receiverData.type,
+                    name: receiverData.name,
+                    ensName: receiverData.ensName,
+                  },
+                  linkedAddressInfo: {
+                    type: linkedAddressData.type,
+                    name: linkedAddressData.name,
+                    ensName: linkedAddressData.ensName,
+                  },
+                  linkedStealthMetaAddressInfo: {
+                    type: linkedStealthMetaAddressData.type,
+                    name: linkedStealthMetaAddressData.name,
+                  },
+                });
               }
             }
             return results;
@@ -1760,9 +1789,9 @@
                   }
                 }
                 const sender = announcement.tx.from;
-                const senderData = this.addresses[sender] || {};
+                const senderData = sender && this.addresses[sender] || {};
                 const receiver = announcement.stealthAddress;
-                const receiverData = this.addresses[receiver] || {};
+                const receiverData = receiver && this.addresses[receiver] || {};
                 const linkedStealthMetaAddress = announcement.linkedTo && announcement.linkedTo.stealthMetaAddress || null;
                 const linkedStealthMetaAddressData = linkedStealthMetaAddress && this.addresses[linkedStealthMetaAddress] || {};
                 const linkedAddress = announcement.linkedTo && announcement.linkedTo.address || null;
