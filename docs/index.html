@@ -669,11 +669,11 @@
                 <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-1 pr-1">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.activeOnly ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.9" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.activeOnly ? 'heart-fill' : 'heart'" font-scale="1.0" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1288,7 +1288,7 @@
                   <font size="-1">{{ data.item.name }}</font>
                 </template>
                 <template #cell(active)="data">
-                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon :icon="data.item.active ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.9" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon :icon="data.item.active ? 'heart-fill' : 'heart'" font-scale="1.0" variant="danger"></b-icon></b-button>
                 </template>
                 <template #cell(firstEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
