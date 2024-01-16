@@ -1,14 +1,12 @@
-Compiled 2 Solidity files successfully (evm target: paris).
 
 
-  StealthChad
+  MagicalInternetMoney
     Deployment
       - Test Announcer - ETH Transfer
 ownerBalance: 1000000000000000000000000
-ownerAllowanceToStealthChad: 123456789123456789
+ownerAllowanceToMagicalInternetMoney: 123456789123456789
       owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-      tokens: ["0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"]
-      values: [123]
+      tokenInfos: [[false,"0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",12345]]
       transferAndAnnounceReceipt_1 ERC-20:
         LogDescription {
           fragment: EventFragment {
@@ -23,7 +21,7 @@ ownerAllowanceToStealthChad: 123456789123456789
           args: Result(3) [
             '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
             '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
-            123n
+            12345n
           ]
         }
       transferAndAnnounceReceipt_1 Announcer:
@@ -42,10 +40,10 @@ ownerAllowanceToStealthChad: 123456789123456789
             '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
             '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
             '0x1234',
-            '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000000000000000007b23b872ddcf7ed3acca5a467e9e704c703e8d87f634fb0fc9000000000000000000000000000000000000000000000000000000000000007b'
+            '0xffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000000000000000007b23b872ddcf7ed3acca5a467e9e704c703e8d87f634fb0fc90000000000000000000000000000000000000000000000000000000000003039'
           ]
         }
-      ✔ Test Announcer - ETH & Tokens Transfer (923ms)
+      ✔ Test Announcer - ETH & Tokens Transfer (819ms)
       owner: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       registerKeysReceipt_1:
         LogDescription {
@@ -68,6 +66,6 @@ ownerAllowanceToStealthChad: 123456789123456789
       ✔ Test Registry
 
 
-  2 passing (933ms)
+  2 passing (830ms)
   1 pending
 

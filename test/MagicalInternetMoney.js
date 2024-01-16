@@ -4,17 +4,17 @@ const { expect } = require("chai");
 // const { BigNumber } = require("ethers");
 const util = require('util');
 
-describe("StealthChad", function () {
+describe("MagicalInternetMoney", function () {
   async function deployContractsFixture() {
     const [owner, otherAccount] = await ethers.getSigners();
     const ERC5564Announcer = await ethers.getContractFactory("ERC5564Announcer");
     const ERC5564Registry = await ethers.getContractFactory("ERC5564Registry");
-    const StealthChad = await ethers.getContractFactory("StealthChad");
+    const MagicalInternetMoney = await ethers.getContractFactory("MagicalInternetMoney");
     const ERC20Token = await ethers.getContractFactory("ERC20Token");
     const ERC721Token = await ethers.getContractFactory("ERC721Token");
     const erc5564Announcer = await ERC5564Announcer.deploy();
     const erc5564Registry = await ERC5564Registry.deploy();
-    const stealthChad = await StealthChad.deploy(erc5564Announcer);
+    const stealthChad = await MagicalInternetMoney.deploy(erc5564Announcer);
     const erc20Token = await ERC20Token.deploy("ERC-20", "ERC-20 Token", 18, 1000000000000000000000000n);
     const erc721Token = await ERC721Token.deploy();
 
@@ -24,8 +24,8 @@ describe("StealthChad", function () {
     const approveTx_1 = await erc20Token.approve(stealthChad, 123456789123456789n);
     const approveReceipt_1 = await approveTx_1.wait();
 
-    const ownerAllowanceToStealthChad = await erc20Token.allowance(owner, stealthChad);
-    console.log("ownerAllowanceToStealthChad: " + ownerAllowanceToStealthChad);
+    const ownerAllowanceToMagicalInternetMoney = await erc20Token.allowance(owner, stealthChad);
+    console.log("ownerAllowanceToMagicalInternetMoney: " + ownerAllowanceToMagicalInternetMoney);
 
     // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
     // const ONE_GWEI = 1_000_000_000;
@@ -60,13 +60,9 @@ describe("StealthChad", function () {
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
       const viewTag = 0xff;
-      const tokens = [erc20Token.target];
-      // const tokens = [];
-      const values = [123];
-      // const values = [];
-      console.log("      tokens: " + JSON.stringify(tokens));
-      console.log("      values: " + JSON.stringify(values));
-      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokens, values, { value: 123n });
+      const tokenInfos = [[false, erc20Token.target, 12345]];
+      console.log("      tokenInfos: " + JSON.stringify(tokenInfos));
+      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokenInfos, { value: 123n });
       const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
       transferAndAnnounceReceipt_1.logs.forEach((log) => {
         if (log.address == erc5564Announcer.target) {

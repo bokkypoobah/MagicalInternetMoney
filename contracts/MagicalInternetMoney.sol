@@ -1,11 +1,11 @@
 pragma solidity ^0.8.19;
 
 // ----------------------------------------------------------------------------
-// StealthChad v0.8.2 - Experiments in ERC-5564: Stealth Addresses
+// MagicalInternetMoney v0.8.2 - Experiments in ERC-5564: Stealth Addresses
 //
 // Deployed to Sepolia
 //
-// https://github.com/bokkypoobah/StealthChad
+// https://github.com/bokkypoobah/MagicalInternetMoney
 //
 // SPDX-License-Identifier: MIT
 //
@@ -58,9 +58,23 @@ interface ITransferFrom {
     function transferFrom(address from, address to, uint256 tokensOrTokenId) external;
 }
 
+interface IERC20Allowance {
+    function allowance(address tokenOwner, address spender) external view returns (uint remaining);
+}
 
-/// @notice Stealth Chad things
-contract StealthChad {
+interface IERC721OwnerOf {
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+}
+
+struct TokenInfo {
+    bool isERC721;
+    address token;
+    uint value;
+}
+
+
+/// @notice Magical Internet Money things
+contract MagicalInternetMoney {
     // 0x23b872dd transferFrom(address,address,uint256)
     bytes4 private constant TRANSFERFROM_SELECTOR = 0x23b872dd;
 
@@ -68,7 +82,8 @@ contract StealthChad {
 
     error NothingToTransfer();
     error TransferFailure();
-    error ArrayLengthsMismatch();
+    error NotERC721TokenOwner();
+    error InsufficientERC20Allowance();
 
     constructor(address payable _announcer) {
         announcer = IERC5564Announcer(_announcer);
@@ -106,16 +121,12 @@ contract StealthChad {
     /// @param recipient The computed stealth address for the recipient.
     /// @param ephemeralPubKey Ephemeral public key used by the sender.
     /// @param viewTag The view tag derived from the shared secret.
-    /// @param tokens Array of ERC-20/ERC-721 addresses to transfer
-    /// @param values Array of ERC-20 tokens or ERC-721 tokenId to transfer
-    function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, address[] calldata tokens, uint256[] calldata values) external payable {
-        if (tokens.length != values.length) {
-            revert ArrayLengthsMismatch();
-        }
-        if (tokens.length == 0 && msg.value == 0) {
+    /// @param tokenInfo Array of [isERC721, tokenAddress, tokenValue] to transfer
+    function transferAndAnnounce(uint256 schemeId, address recipient, bytes memory ephemeralPubKey, uint8 viewTag, TokenInfo[] calldata tokenInfo) external payable {
+        if (tokenInfo.length == 0 && msg.value == 0) {
             revert NothingToTransfer();
         }
-        bytes memory metadata = new bytes(1 + (56 * (tokens.length + (msg.value > 0 ? 1 : 0))));
+        bytes memory metadata = new bytes(1 + (56 * (tokenInfo.length + (msg.value > 0 ? 1 : 0))));
         uint i;
         uint j;
         metadata[j++] = bytes1(viewTag);
@@ -132,18 +143,31 @@ contract StealthChad {
                 revert TransferFailure();
             }
         }
-        for (i = 0; i < tokens.length; i = onePlus(i)) {
-            bytes memory selectorAndTokenContractInBytes = abi.encodePacked(TRANSFERFROM_SELECTOR, tokens[i]);
+        for (i = 0; i < tokenInfo.length; i = onePlus(i)) {
+            bytes memory selectorAndTokenContractInBytes = abi.encodePacked(TRANSFERFROM_SELECTOR, tokenInfo[i].token);
             uint k;
             for (k = 0; k < 24; k = onePlus(k)) {
                 metadata[j++] = selectorAndTokenContractInBytes[k];
             }
-            bytes32 valueInBytes = bytes32(values[i]);
+            bytes32 valueInBytes = bytes32(tokenInfo[i].value);
             for (k = 0; k < 32; k = onePlus(k)) {
                 metadata[j++] = valueInBytes[k];
             }
-            // TODO: May have to check ERC721.ownerOf() for ownerof, and check ERC20.allowance() to ensure that ERC721.ownerOf() checks are not skipped
-            ITransferFrom(tokens[i]).transferFrom(msg.sender, recipient, values[i]);
+
+            // msg.sender can only transfer their own ERC-721 tokens
+            if (tokenInfo[i].isERC721) {
+                address owner = IERC721OwnerOf(tokenInfo[i].token).ownerOf(tokenInfo[i].value);
+                if (owner != msg.sender) {
+                    revert NotERC721TokenOwner();
+                }
+            // Check ERC-20 allowance to prevent the ERC-721 ownership check above being bypassed
+            } else {
+                uint allowance = IERC20Allowance(tokenInfo[i].token).allowance(msg.sender, address(this));
+                if (allowance < tokenInfo[i].value) {
+                    revert InsufficientERC20Allowance();
+                }
+            }
+            ITransferFrom(tokenInfo[i].token).transferFrom(msg.sender, recipient, tokenInfo[i].value);
         }
         announcer.announce(schemeId, recipient, ephemeralPubKey, metadata);
     }
