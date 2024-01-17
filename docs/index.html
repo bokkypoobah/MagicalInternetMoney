@@ -700,13 +700,13 @@
                   <b-button size="sm" :pressed.sync="settings.registrationsTable.mineOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Only display my items'"><b-icon :icon="settings.registrationsTable.mineOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
+                  <b-button size="sm" :pressed.sync="settings.addressesTable.mineOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Only display my items'"><b-icon :icon="settings.addressesTable.mineOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-0">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show non-zero balances only'"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show non-zero balances only'"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
