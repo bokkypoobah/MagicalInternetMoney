@@ -687,6 +687,12 @@
                 <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.tokenContractsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by symbol, name or address regex'" placeholder="🔍 symbol, name or addr regex"></b-form-input>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                  <b-form-select size="sm" v-model="settings.tokenContractsTable.tokenType" @change="saveSettings" :options="tokenTypeOptions" v-b-popover.hover.bottom="'ERC-20 and/or ERC-721'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.transfersTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
@@ -1583,6 +1589,7 @@
               favouritesOnly: false,
               withBalancesOnly: false,
               filter: null,
+              tokenType: null,
               currentPage: 1,
               pageSize: 25,
               sortOption: 'typenameasc',
@@ -1619,7 +1626,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 10,
+            version: 11,
           },
           contracts: {
             "11155111": {
@@ -1816,6 +1823,11 @@
             { value: 'namedsc', text: '▼ Name' },
             { value: 'addressasc', text: '▲ Address' },
             { value: 'addressdsc', text: '▼ Address' },
+          ],
+          tokenTypeOptions: [
+            { value: null, text: '(All)' },
+            { value: 'erc20', text: 'ERC-20' },
+            { value: 'erc721', text: 'ERC-721' },
           ],
           additionalTokensOptions: [
             { value: null, text: '(select ERC-20 or ERC-721 tokens)' },
@@ -2357,6 +2369,15 @@
           },
           filteredTokenContracts() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
+            let regex = null;
+            if (this.settings.tokenContractsTable.filter != null && this.settings.tokenContractsTable.filter.length > 0) {
+              try {
+                regex = new RegExp(this.settings.tokenContractsTable.filter, 'i');
+              } catch (e) {
+                console.log("filteredTokenContracts - regex error: " + e.message);
+                regex = new RegExp(/lksafjdlksjfdaklsfjdskajh/, 'i');
+              }
+            }
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
               let include = true;
               if (this.settings.tokenContractsTable.favouritesOnly) {
@@ -2373,6 +2394,16 @@
                 }
                 if (this.settings.tokenContractsTable.withBalancesOnly) {
                   if (!contractData.balances[this.coinbase] && tokenIds.length == 0) {
+                    include = false;
+                  }
+                }
+                if (this.settings.tokenContractsTable.tokenType) {
+                  if (this.settings.tokenContractsTable.tokenType != contractData.type) {
+                    include = false;
+                  }
+                }
+                if (include && regex) {
+                  if (!(regex.test(contractData.symbol) || regex.test(contractData.name) || regex.test(contract))) {
                     include = false;
                   }
                 }
