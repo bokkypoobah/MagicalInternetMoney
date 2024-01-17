@@ -158,7 +158,7 @@
             <template #modal-title>Add Tokens For Transfer</template>
             <b-form-select size="sm" v-model="modalAddTokensToNewTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
             <div v-if="additionalERC20TokensOptions.length == 1">
-              <b-alert size="sm" show variant="warning" class="mt-2">Select active tokens in the Tokens tab first</b-alert>
+              <b-alert size="sm" show variant="warning" class="mt-2">Select favourite tokens in the Tokens tab first</b-alert>
             </div>
             <b-form-group v-if="modalAddTokensToNewTransfer.token && modalAddTokensToNewTransfer.type =='erc20'" label="Balance:" label-for="newtransfer-additionaltokens-erc20-balance" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
               <font size="-1">{{ modalAddTokensToNewTransfer.balance }}</font>
@@ -697,7 +697,7 @@
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.activeOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.activeOnly ? 'heart-fill' : 'heart'" font-scale="1.0" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="1.0" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1577,7 +1577,7 @@
               sortOption: 'typenameasc',
             },
             tokenContractsTable: {
-              activeOnly: false,
+              favouritesOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 25,
@@ -1615,7 +1615,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 8,
+            version: 9,
           },
           contracts: {
             "11155111": {
@@ -1635,6 +1635,22 @@
                 "blockNumber": 5037496,
                 "timestamp": 1704598464
               },
+              // "0x3834bcA9093e375893D65975ad765179A149D017": {
+              //   "type": "caller",
+              //   "name": "StealthChad v0.8.0 on Sepolia",
+              //   "read": true,
+              //   "write": false,
+              //   "blockNumber": 5098167,
+              //   "timestamp": 1705396884
+              // },
+              // "0xA745760E9f1E425215CCD7735F932FdDE3276344": {
+              //   "type": "caller",
+              //   "name": "StealthChad v0.8.1 on Sepolia",
+              //   "read": true,
+              //   "write": false,
+              //   "blockNumber": 5037096,
+              //   "timestamp": 1705396884
+              // },
               "0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1": {
                 "type": "caller",
                 "name": "MagicalInternetMoney v0.8.2 on Sepolia",
@@ -2339,7 +2355,7 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
               let include = true;
-              if (this.settings.tokenContractsTable.activeOnly) {
+              if (this.settings.tokenContractsTable.favouritesOnly) {
                 if (!contractData.active) {
                   include = false;
                 }
@@ -2422,7 +2438,7 @@
             return results;
           },
           pagedFilteredSortedTokenContracts() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedTokenContracts - results[0..9]: " + JSON.stringify(this.pagedFilteredSortedTokenContracts.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedTokenContracts - results[0..9]: " + JSON.stringify(this.filteredSortedTokenContracts.slice(0, 10), null, 2));
             return this.filteredSortedTokenContracts.slice((this.settings.tokenContractsTable.currentPage - 1) * this.settings.tokenContractsTable.pageSize, this.settings.tokenContractsTable.currentPage * this.settings.tokenContractsTable.pageSize);
           },
 
@@ -3292,6 +3308,7 @@
                   const contract = log.address;
                   const caller = logData.args[2];
                   if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
+                    console.log("  Processing: " + JSON.stringify(log));
                     const transfers = [];
                     const metadata = logData.args[4];
                     let segment = 0;
@@ -3377,11 +3394,12 @@
                 }
               }
             }
+            console.log("selectedCallers: " + JSON.stringify(selectedCallers, null, 2));
             if (selectedContracts.length > 0) {
               const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
               const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-              const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-              // TODO Dev const startBlock = 0;
+              // const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+              const startBlock = 0;
               await getLogs(startBlock, latestBlockNumber, selectedContracts, selectedCallers, processLogs);
             }
             console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
