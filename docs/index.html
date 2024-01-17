@@ -696,8 +696,8 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.transfersTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.registrationsTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
+                  <b-button size="sm" :pressed.sync="settings.registrationsTable.mineOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Only display my items'"><b-icon :icon="settings.registrationsTable.mineOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
@@ -2128,7 +2128,15 @@
 
           filteredTransfers() {
             let results = [];
-            const regex = this.settings.transfersTable.filter != null && this.settings.transfersTable.filter.length > 0 ? new RegExp(this.settings.transfersTable.filter, 'i') : null;
+            let regex = null;
+            if (this.settings.transfersTable.filter != null && this.settings.transfersTable.filter.length > 0) {
+              try {
+                regex = new RegExp(this.settings.transfersTable.filter, 'i');
+              } catch (e) {
+                console.log("filteredTransfers - regex error: " + e.message);
+                regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+              }
+            }
             for (const transfer of this.transfers) {
               let include = true;
               if (this.settings.transfersTable.iSentIReceived) {
@@ -2202,7 +2210,15 @@
 
           filteredRegistrations() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            const regex = this.settings.registrationsTable.filter != null && this.settings.registrationsTable.filter.length > 0 ? new RegExp(this.settings.registrationsTable.filter, 'i') : null;
+            let regex = null;
+            if (this.settings.registrationsTable.filter != null && this.settings.registrationsTable.filter.length > 0) {
+              try {
+                regex = new RegExp(this.settings.registrationsTable.filter, 'i');
+              } catch (e) {
+                console.log("filteredTransfers - regex error: " + e.message);
+                regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+              }
+            }
             for (const item of this.registrations) {
               if (item.chainId == this.chainId) {
                 const registrantData = this.addresses[item.registrant] || {};
@@ -2375,7 +2391,7 @@
                 regex = new RegExp(this.settings.tokenContractsTable.filter, 'i');
               } catch (e) {
                 console.log("filteredTokenContracts - regex error: " + e.message);
-                regex = new RegExp(/lksafjdlksjfdaklsfjdskajh/, 'i');
+                regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
               }
             }
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
