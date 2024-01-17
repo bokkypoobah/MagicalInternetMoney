@@ -697,10 +697,10 @@
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-0">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
-                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.9" variant="warning"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show non-zero balances only'"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1317,8 +1317,8 @@
                 <template #cell(name)="data">
                   <font size="-1">{{ data.item.name }}</font>
                 </template>
-                <template #cell(active)="data">
-                  <b-button size="sm" @click="toggleTokenContractActive(data.item);" variant="transparent"><b-icon :icon="data.item.active ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                <template #cell(favourite)="data">
+                  <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </template>
                 <template #cell(firstEventBlockNumber)="data">
                   <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
@@ -1906,7 +1906,7 @@
           ],
           tokenContractsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
-            { key: 'active', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -1970,7 +1970,7 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
             for (const item of this.filteredSortedTokenContracts) {
-              if (item.active) {
+              if (item.favourite) {
                 results.push({ value: item.contract, text: (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + ' @ ' + item.contract.substring(0, 10) })
               }
             }
@@ -2360,7 +2360,7 @@
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
               let include = true;
               if (this.settings.tokenContractsTable.favouritesOnly) {
-                if (!contractData.active) {
+                if (!contractData.favourite) {
                   include = false;
                 }
               }
@@ -2379,7 +2379,7 @@
                 if (include) {
                   results.push({
                     contract,
-                    active: contractData.active,
+                    favourite: contractData.favourite,
                     symbol: contractData.symbol,
                     name: contractData.name,
                     type: contractData.type,
@@ -2852,9 +2852,9 @@
               localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
             }
           },
-          toggleTokenContractActive(item) {
+          toggleTokenContractFavourite(item) {
             if (item && item.contract) {
-              Vue.set(this.tokenContracts[this.chainId][item.contract], 'active', !this.tokenContracts[this.chainId][item.contract].active);
+              Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
               Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
               localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
             }
@@ -3940,7 +3940,7 @@
                     // }
 
                     tokenContracts[item.chainId][item.contract] = {
-                      active: false,
+                      favourite: false,
                       symbol: symbol && symbol.trim() || null,
                       name: name && name.trim() || null,
                       decimals: parseInt(decimals || 0),
