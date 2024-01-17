@@ -696,8 +696,11 @@
                 <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.addressesTable.mineOnly" @input="saveSettings" v-b-popover.hover.bottom="'Only display my items'">Mine Only</b-form-checkbox>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-0">
                   <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                </div>
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                  <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.9" variant="warning"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -1578,6 +1581,7 @@
             },
             tokenContractsTable: {
               favouritesOnly: false,
+              withBalancesOnly: false,
               filter: null,
               currentPage: 1,
               pageSize: 25,
@@ -1615,7 +1619,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 9,
+            version: 10,
           },
           contracts: {
             "11155111": {
@@ -2367,19 +2371,26 @@
                     tokenIds.push(tokenId);
                   }
                 }
-                results.push({
-                  contract,
-                  active: contractData.active,
-                  symbol: contractData.symbol,
-                  name: contractData.name,
-                  type: contractData.type,
-                  decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
-                  balances: contractData.balances || undefined,
-                  tokenIds,
-                  totalSupply: contractData.totalSupply || undefined,
-                  firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
-                  lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
-                });
+                if (this.settings.tokenContractsTable.withBalancesOnly) {
+                  if (!contractData.balances[this.coinbase] && tokenIds.length == 0) {
+                    include = false;
+                  }
+                }
+                if (include) {
+                  results.push({
+                    contract,
+                    active: contractData.active,
+                    symbol: contractData.symbol,
+                    name: contractData.name,
+                    type: contractData.type,
+                    decimals: contractData.type == "erc20" ? contractData.decimals : undefined,
+                    balances: contractData.balances || undefined,
+                    tokenIds,
+                    totalSupply: contractData.totalSupply || undefined,
+                    firstEventBlockNumber: contractData.firstEventBlockNumber || undefined,
+                    lastEventBlockNumber: contractData.lastEventBlockNumber || undefined,
+                  });
+                }
               }
             }
             return results;
