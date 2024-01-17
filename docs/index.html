@@ -430,6 +430,14 @@
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group v-if="modalAddress.item" label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-textarea size="sm" id="address-notes" v-model.trim="modalAddress.notes" rows="3"></b-form-textarea>
+                <b-input-group-append>
+                  <b-button :disabled="modalAddress.notes == modalAddress.item.notes" @click="saveModalAddressNotes();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
             <b-form-group v-if="modalAddress.item && modalAddress.item.viewingPrivateKey" label="Spending Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
                 <b-form-input :type="modalAddress.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
@@ -529,6 +537,14 @@
                 <b-form-input type="text" size="sm" id="address-name" v-model.trim="modalStealthMetaAddress.name"></b-form-input>
                 <b-input-group-append>
                   <b-button :disabled="modalStealthMetaAddress.name == modalStealthMetaAddress.item.name" @click="saveModalStealthMetaAddressName();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
+            <b-form-group v-if="modalStealthMetaAddress.item" label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-textarea size="sm" id="address-notes" v-model.trim="modalStealthMetaAddress.notes" rows="3"></b-form-textarea>
+                <b-input-group-append>
+                  <b-button :disabled="modalStealthMetaAddress.notes == modalStealthMetaAddress.item.notes" @click="saveModalStealthMetaAddressNotes();" variant="link" class="m-0 ml-2 p-0"><b-icon-pencil-square shift-v="+1" font-scale="1.1"></b-icon-pencil-square></b-button>
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
@@ -1599,7 +1615,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 7,
+            version: 8,
           },
           contracts: {
             "11155111": {
@@ -1676,10 +1692,12 @@
           modalAddress: {
             item: null,
             name: null,
+            notes: null,
           },
           modalStealthMetaAddress: {
             item: null,
             name: null,
+            notes: null,
             spendingPrivateKey: null,
           },
           modalNewStealthMetaAddress: {
@@ -1899,7 +1917,7 @@
             { value: 1, text: 'UTC Time' },
           ],
           db: {
-            name: "magicalinternetmoneydata080b",
+            name: "magicalinternetmoneydata080c",
             version: 1,
             schemaDefinition: {
               announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
@@ -2751,10 +2769,26 @@
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
 
+          saveModalAddressNotes() {
+            console.log(moment().format("HH:mm:ss") + " saveModalAddressNotes: " + JSON.stringify(this.modalAddress));
+            this.modalAddress.item.notes = this.modalAddress.notes;
+            Vue.set(this.addresses[this.modalAddress.item.address], 'notes', this.modalAddress.notes);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+          },
+
           saveModalStealthMetaAddressName() {
             console.log(moment().format("HH:mm:ss") + " saveModalStealthMetaAddressName: " + JSON.stringify(this.modalStealthMetaAddress));
             this.modalStealthMetaAddress.item.name = this.modalStealthMetaAddress.name;
             Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'name', this.modalStealthMetaAddress.name);
+            localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+            Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+          },
+
+          saveModalStealthMetaAddressNotes() {
+            console.log(moment().format("HH:mm:ss") + " saveModalStealthMetaAddressNotes: " + JSON.stringify(this.modalStealthMetaAddress));
+            this.modalStealthMetaAddress.item.notes = this.modalStealthMetaAddress.notes;
+            Vue.set(this.addresses[this.modalStealthMetaAddress.item.address], 'notes', this.modalStealthMetaAddress.notes);
             localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
           },
@@ -2948,6 +2982,7 @@
                 Vue.set(this.addresses, this.modalNewStealthMetaAddress.linkedTo.address, {
                   type: "address",
                   name: null,
+                  notes: null,
                   mine: true,
                   source: "attached.signed",
                 });
@@ -2955,6 +2990,7 @@
               Vue.set(this.addresses, this.modalNewStealthMetaAddress.stealthMetaAddress, {
                 type: "stealthMetaAddress",
                 name: this.modalNewStealthMetaAddress.name,
+                notes: null,
                 linkedTo: this.modalNewStealthMetaAddress.linkedTo,
                 phrase: this.modalNewStealthMetaAddress.phrase,
                 viewingPrivateKey: this.modalNewStealthMetaAddress.viewingPrivateKey,
@@ -3081,7 +3117,7 @@
               const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokenInfos, { value });
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
-              console.log("executeNewTransfer StealthChad.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
+              console.log("executeNewTransfer MagicalInternetMoney.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
             }
             console.log(moment().format("HH:mm:ss") + " executeNewTransfer END");
           },
@@ -3131,6 +3167,7 @@
               if (address.substring(0, 3) == "st:") {
                 this.modalStealthMetaAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type };
                 this.modalStealthMetaAddress.name = addressData.name;
+                this.modalStealthMetaAddress.notes = addressData.notes || null;
                 this.modalStealthMetaAddress.spendingPrivateKey = null;
                 this.$bvModal.show('modal-stealthmetaaddress');
               } else {
@@ -3138,6 +3175,7 @@
                 const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
                 this.modalAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type };
                 this.modalAddress.name = addressData.name;
+                this.modalAddress.notes = addressData.notes || null;
                 this.$bvModal.show('modal-address');
               }
               this.$refs.addressesTable.clearSelected();
@@ -3192,8 +3230,11 @@
             const network = await provider.getNetwork();
             localStorage.magicalInternetMoneyChainId = network.chainId;
             if (!(this.coinbase in this.addresses)) {
-              Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null });
+              Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null, notes: null });
               localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+            } else if (!this.addresses[this.coinbase].mine) {
+              Vue.set(this.addresses[this.coinbase], 'mine', true);
+              localStorage.magicalInternetMoneyAddresses = JSON.stringify(tthis.addresses);
             }
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
@@ -3570,17 +3611,17 @@
               for (const item of data) {
                 if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name };
+                  addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name, notes: null };
                 }
                 if (!(item.stealthAddress in addresses)) {
-                  addresses[item.stealthAddress] = { type: "stealthAddress", source: "announcer.stealthAddress", mine: false, name: null };
+                  addresses[item.stealthAddress] = { type: "stealthAddress", source: "announcer.stealthAddress", mine: false, name: null, notes: null };
                 }
                 if (!(item.caller in addresses)) {
                   const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-                  addresses[item.caller] = { type: "address", source: "announcer.caller", mine: false, name };
+                  addresses[item.caller] = { type: "address", source: "announcer.caller", mine: false, name, notes: null };
                 }
                 if (!(item.tx.from in addresses)) {
-                  addresses[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null };
+                  addresses[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null, notes: null };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -3595,13 +3636,13 @@
               for (const item of data) {
                 if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  addresses[item.contract] = { type: "address", source: "registry.contract", mine: false, name };
+                  addresses[item.contract] = { type: "address", source: "registry.contract", mine: false, name, notes: null };
                 }
                 if (!(item.registrant in addresses)) {
-                  addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null };
+                  addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null, notes: null };
                 }
                 if (!(item.stealthMetaAddress in addresses)) {
-                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: { address: item.registrant }, mine: false };
+                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: { address: item.registrant }, mine: false, notes: null };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -4340,7 +4381,7 @@
             var encodedUri = encodeURI(tsvContent);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
-            link.setAttribute("download", "stealthchad_transfers-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            link.setAttribute("download", "magicalinternetmoney_transfers-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
             document.body.appendChild(link); // Required for FF
             link.click(); // This will download the data with the specified file name
           },
@@ -4356,7 +4397,7 @@
             var encodedUri = encodeURI(tsvContent);
             var link = document.createElement("a");
             link.setAttribute("href", encodedUri.replaceAll('#', '%23'));
-            link.setAttribute("download", "stealthchad_addresses-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
+            link.setAttribute("download", "magicalinternetmoney_addresses-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
             document.body.appendChild(link); // Required for FF
             link.click(); // This will download the data with the specified file name
           },
