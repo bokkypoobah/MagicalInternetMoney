@@ -3501,10 +3501,10 @@
             if (network.chainId == CHAINID_SEPOLIA) {
               await this.processData(db, provider, latestBlockNumber);
             }
-            if (this.settings.sync.tokens && !devMode /*&& network.chainId == CHAINID_SEPOLIA*/) {
+            if (this.settings.sync.tokens && !devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.syncTokenEvents(db, provider, latestBlockNumber);
             }
-            if (this.settings.sync.tokens && !devMode /*&& network.chainId == CHAINID_SEPOLIA*/) {
+            if (this.settings.sync.tokens && !devMode && network.chainId == CHAINID_SEPOLIA) {
               await this.collateTokens(db, provider, latestBlockNumber);
             }
             if (this.settings.sync.exchangeRates && network.chainId == CHAINID_SEPOLIA) {
