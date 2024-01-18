@@ -4,6 +4,12 @@ const Config = {
       <b-card no-body no-header class="border-0">
         <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
           <b-card-body class="m-1 p-1">
+          <b-form-group label-cols-lg="2" label="Date & Time" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Used in https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000'" class="mx-0 my-1 p-0">
+              <b-form-select size="sm" id="reporting-datetime" :value="settings.reportingDateTime" @change="setReportingDateTime($event)" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
+            </b-form-group>
+          </b-form-group>
+
             <b-form-group label-cols-lg="2" label="Import Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="false" label="Etherscan API Key:" label-for="etherscan-apikey" label-size="sm" label-cols-sm="2" label-align-sm="right" description="This key is stored in your local browser storage and is sent with Etherscan API requests. If not supplied, imports from Etherscan will be rate limited to 1 request every 5 seconds" class="mx-0 my-1 p-0">
                 <b-form-input type="text" size="sm" id="etherscan-apikey" :value="settings.etherscanAPIKey" @change="setEtherscanAPIKey($event)" placeholder="See https://docs.etherscan.io/ to obtain an API key" class="w-75"></b-form-input>
@@ -113,6 +119,11 @@ const Config = {
       restoreAccountsData: [],
       restoreIntermediateData: {},
       unlock: null,
+      reportingDateTimeOptions: [
+        { value: 0, text: 'Local Time' },
+        { value: 1, text: 'UTC Time' },
+      ],
+      // TODO: Delete
       etherscanBatchSizeOptions: [
         { value: 250_000, text: '250,000 blocks' },
         { value: 500_000, text: '500,000 blocks' },
@@ -126,6 +137,7 @@ const Config = {
         { value: 10, text: '10 blocks' },
         { value: 20, text: '20 blocks' },
       ],
+      // TODO: To use
       periodStartOptions: [
         { value: 'jan', text: 'January' },
         { value: 'feb', text: 'February' },
@@ -188,6 +200,9 @@ const Config = {
     },
   },
   methods: {
+    setReportingDateTime(reportingDateTime) {
+      store.dispatch('config/setReportingDateTime', reportingDateTime);
+    },
     setEtherscanAPIKey(apiKey) {
       store.dispatch('config/setEtherscanAPIKey', apiKey);
     },
@@ -372,6 +387,7 @@ const configModule = {
   namespaced: true,
   state: {
     settings: {
+      reportingDateTime: 0,
       etherscanAPIKey: null,
       cryptoCompareAPIKey: null,
       etherscanBatchSize: 10_000_000,
@@ -468,6 +484,10 @@ const configModule = {
     },
   },
   mutations: {
+    setReportingDateTime(state, reportingDateTime) {
+      console.log("mutations.setReportingDateTime: " + reportingDateTime);
+      state.settings.reportingDateTime = reportingDateTime;
+    },
     setEtherscanAPIKey(state, apiKey) {
       state.settings.etherscanAPIKey = apiKey;
     },
@@ -510,6 +530,10 @@ const configModule = {
           context.state.settings = tempSettings;
         }
       }
+    },
+    setReportingDateTime(context, reportingDateTime) {
+      context.commit('setReportingDateTime', reportingDateTime);
+      localStorage.configSettings = JSON.stringify(context.state.settings);
     },
     setEtherscanAPIKey(context, apiKey) {
       context.commit('setEtherscanAPIKey', apiKey);
