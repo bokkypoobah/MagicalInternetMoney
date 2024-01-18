@@ -142,6 +142,7 @@ const Config = {
       ],
       // As supported by https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000
       reportingCurrencyOptions: [
+        { value: null, text: '(none)' },
         { value: 'AUD', text: 'AUD' },
         { value: 'CAD', text: 'CAD' },
         { value: 'CHF', text: 'CHF' },
