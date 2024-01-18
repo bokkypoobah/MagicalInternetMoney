@@ -12,9 +12,15 @@ const Welcome = {
                 <h5>Welcome</h5>
 
                 Magical Internet Money is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>). Status: <b>WIP</b>
+
+                <br />
+                <br />
+
+                Sync It: <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+
               </b-card-text>
 
-              <b-card-text class="mt-3 mb-2">
+              <b-card-text v-if="false" class="mt-3 mb-2">
                 <strike>
                   <h6>Usage</h6>
                   <ul>
@@ -59,7 +65,7 @@ const Welcome = {
                 </strike>
               </b-card-text>
 
-              <b-card-text class="mt-3 mb-2">
+              <b-card-text v-if="false" class="mt-3 mb-2">
                 <strike>
                   <h6>Your Data</h6>
                   <ul>
@@ -127,6 +133,9 @@ const Welcome = {
     },
   },
   methods: {
+    async syncIt(info) {
+      store.dispatch('data/syncIt', info);
+    },
     async timeoutCallback() {
       logDebug("Welcome", "timeoutCallback() count: " + this.count);
 

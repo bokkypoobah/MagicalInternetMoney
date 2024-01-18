@@ -587,6 +587,11 @@ const dataModule = {
       for (const [sectionIndex, section] of info.sections.entries()) {
         console.log(sectionIndex + "." + section);
         const parameter = { accountsToSync, confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey, cryptoCompareAPIKey, etherscanBatchSize, OVERLAPBLOCKS, processFilters };
+
+        if (section == "syncAnnouncements" || section == "all") {
+          await context.dispatch('syncAnnouncements', parameter);
+        }
+
         if (section == "syncTransferEvents" || section == "all") {
           await context.dispatch('syncTransferEvents', parameter);
         }
@@ -627,6 +632,9 @@ const dataModule = {
       context.dispatch('saveData', ['accounts', 'accountsInfo', 'blocks', 'txs', 'ensMap']);
       context.commit('setSyncSection', { section: null, total: null });
       context.commit('setSyncHalt', false);
+    },
+    async syncAnnouncements(context, parameter) {
+      logInfo("dataModule", "actions.syncAnnouncements: " + JSON.stringify(parameter));
     },
     async syncTransferEvents(context, parameter) {
       logInfo("dataModule", "actions.syncTransferEvents: " + JSON.stringify(parameter));
