@@ -596,6 +596,10 @@ const dataModule = {
         if (section == "syncAnnouncements" || section == "all") {
           await context.dispatch('syncAnnouncements', parameter);
         }
+        if (section == "syncRegistrations" || section == "all") {
+          await context.dispatch('syncRegistrations', parameter);
+        }
+
 
         if (section == "syncTransferEvents" || section == "all") {
           await context.dispatch('syncTransferEvents', parameter);
@@ -755,6 +759,100 @@ const dataModule = {
       // }
       console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
     },
+
+    async syncRegistrations(context, parameter) {
+      logInfo("dataModule", "actions.syncRegistrations: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
+      // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+      // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+      // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+      // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
+      const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+      let total = 0;
+      let t = this;
+      async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
+        total = parseInt(total) + logs.length;
+        console.log(moment().format("HH:mm:ss") + " syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        const records = [];
+        for (const log of logs) {
+          if (!log.removed) {
+            const logData = erc5564RegistryContract.interface.parseLog(log);
+            const contract = log.address;
+            // if (selectedContracts.includes(contract)) {
+              records.push( {
+                chainId: store.getters['connection/chainId'],
+                blockNumber: parseInt(log.blockNumber),
+                logIndex: parseInt(log.logIndex),
+                txIndex: parseInt(log.transactionIndex),
+                txHash: log.transactionHash,
+                contract,
+                name: logData.name,
+                registrant: ethers.utils.getAddress(logData.args[0]),
+                schemeId: parseInt(logData.args[1]),
+                stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                mine: false,
+                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+                timestamp: null,
+                tx: null,
+              });
+            // }
+          }
+        }
+        if (records.length) {
+          await db.registrations.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncRegistrations.bulkPut error: " + error);
+          });
+        }
+      }
+      async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
+        console.log(moment().format("HH:mm:ss") + " syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
+        try {
+          const filter = {
+            address: null,
+            fromBlock,
+            toBlock,
+            topics: [
+              '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
+              null,
+              null
+            ]
+          };
+          const eventLogs = await provider.getLogs(filter);
+          await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
+        } catch (e) {
+          const mid = parseInt((fromBlock + toBlock) / 2);
+          await getLogs(fromBlock, mid, selectedContracts, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
+        }
+      }
+      console.log(moment().format("HH:mm:ss") + " syncRegistrations BEGIN");
+      // this.sync.completed = 0;
+      // this.sync.total = 0;
+      // this.sync.section = 'Stealth Address Registry';
+      const selectedContracts = [];
+      // for (const [chainId, chainData] of Object.entries(this.contracts)) {
+      //   for (const [contract, contractData] of Object.entries(chainData)) {
+      //     if (contractData.type == "registry" && contractData.read) {
+      //       selectedContracts.push(contract);
+      //     }
+      //   }
+      // }
+      // if (selectedContracts.length > 0) {
+        // const deleteCall = await db.registrations.where("confirmations").below(this.CONFIRMATIONS).delete();
+        // const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        // const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        const startBlock = 0;
+        await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, processLogs);
+      // }
+      console.log(moment().format("HH:mm:ss") + " syncRegistrations END");
+    },
+
+
     async syncTransferEvents(context, parameter) {
       logInfo("dataModule", "actions.syncTransferEvents: " + JSON.stringify(parameter));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
