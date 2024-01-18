@@ -749,11 +749,11 @@
                 <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-button size="sm" @click="downloadAddresses" variant="link" v-b-popover.hover.bottom="'Download addresses'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
                 </div>
-                <div class="mt-0 flex-grow-1">
+                <!-- <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex != 0 && settings.tabIndex != 1" class="mt-0 pl-1">
                   <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><b-icon :icon="settings.showInfo ? 'info-circle-fill' : 'info-circle'" shift-v="+1" font-scale="1.0"></b-icon></b-button>
-                </div>
+                </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
@@ -815,40 +815,117 @@
                     <h5 class="mt-2">Welcome</h5>
                     Magical Internet Money (work in progress) is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>).
 
-                    <h6 class="mt-4">How To Test This App?</h6>
-                    <ul>
-                      <li>Browse <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link> in a web3 enabled browser connected to the Sepolia test network</li>
-                      <li>Get some Sepolia testnet ETH from one of the faucets at <b-link href="https://ethereum.org/developers/docs/networks#sepolia" target="_blank">https://ethereum.org/developers/docs/networks#sepolia</b-link></li>
-                      <li>
-                        Click <b-link @click="newStealthMetaAddress" variant="link"><b-icon-plus font-scale="1.0"></b-icon-plus></b-link> in the Addresses tab to generate a new Stealth Meta-Address
-                        <ul>
-                          <li>Enter a name, e.g., <i>My First Stealth Meta-Address</i></li>
-                          <li>Click <strong>[Generate]</strong></li>
-                          <li>Sign the phrase with your attached web3 wallet</li>
-                          <li>Click <strong>[Add]</strong> to save your newly created Stealth Meta-Address</li>
-                        </ul>
-                      </li>
-                      <li>Click <b-link size="sm" @click="newTransfer(null);" variant="link" ><b-icon-caret-right font-scale="1.0"></b-icon-caret-right></b-link> beside your new Stealth Meta-Address in the Addresses tab
-                        <ul>
-                          <li>Enter an amount, e.g., <i>0.001</i></li>
-                          <li>Click <strong>[Transfer]</strong></li>
-                          <li>Sign and send the transaction in your attached web3 wallet</li>
-                        </ul>
-                      </li>
-                      <li>Click <b-link size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="link" v-b-popover.hover.bottom="'Sync dapp to blockchain'"><b-icon-arrow-repeat font-scale="1.0"></b-icon-arrow-repeat></b-link> in the Dashboard tab
-                        <ul>
-                          <li>Your new Stealth Transfer should appear in the list. Click on this item</li>
-                          <li>Click <b-icon-eye font-scale="1.0" variant="primary"></b-icon-eye> to reveal the private key for your newly computed Stealth Address</li>
-                          <li>Import this private key into your web3 wallet to transfer these funds</li>
-                        </ul>
-                      </li>
-                      <li>See <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens</b-link> for sample screenshots</li>
-                    </ul>
+                    <h6 class="mt-3">
+                      How The ERC-5564: Stealth Addresses Protocol Works
+                      <b-button size="sm" :pressed.sync="settings.docs.howthestealthaddressprotocolworks" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.howthestealthaddressprotocolworks ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.howthestealthaddressprotocolworks">
+                      <ul>
+                        <li>Alice wants to pay Bob in ETH/ERC-20/ERC-721 tokens</li>
+                        <li>Bob generates a <i>Stealth Meta-Address</i> and provides this to Alice</li>
+                        <li>Alice uses Bob's <i>Stealth Meta-Address</i> to compute a random <i>Stealth Address</i> that can be accessed only by Bob</li>
+                        <li>Alice transfers the tokens to this address and announces the transfers in the <i>ERC-5564: Stealth Address Announcer</i> contract</li>
+                        <li>Bob can access the private keys to their computed <i>Stealth Addresses</i> using information included in the announcements</li>
+                        <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows an address to publish their associated <i>Stealth Meta-Addresses</i></li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      How This Dapp Works
+                      <b-button size="sm" :pressed.sync="settings.docs.howthisdappworks" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.howthisdappworks ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.howthisdappworks">
+                      This dapp:
+                      <ul>
+                        <li>Allows Bob's web3 attached account to generate a unique <i>Stealth Meta-Address</i> for each unique associated <i>phrase</i></li>
+                        <li>Allows Bob to publish one or more <i>Stealth Meta-Addresses</i> associated with thier web3 attached accounts and unique <i>phrase</i></li>
+                        <li>Allows Alice to compute a random <i>Stealth Address</i> using Bob's <i>Stealth Meta-Address</i></li>
+                        <li>Allows Alice to then execute the transfer to Bob's <i>Stealth Address</i> and announce the transfer to the <i>Announcer</i></li>
+                        <li>Retrieve all event logs published to the <i>Announcer</i>. Alice's transfer to Bob will appear in this data</li>
+                        <li>Retrieves all event logs published to the <i>Registry</i></li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      How To Test This App?
+                      <b-button size="sm" :pressed.sync="settings.docs.howtotest" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.howtotest ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.howtotest">
+                      <ul>
+                        <li>Browse <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link> in a web3 enabled browser connected to the Sepolia test network</li>
+                        <li>Get some Sepolia testnet ETH from one of the faucets at <b-link href="https://ethereum.org/developers/docs/networks#sepolia" target="_blank">https://ethereum.org/developers/docs/networks#sepolia</b-link></li>
+                        <li>
+                          Click <b-link @click="newStealthMetaAddress" variant="link"><b-icon-plus font-scale="1.0"></b-icon-plus></b-link> in the Addresses tab to generate a new Stealth Meta-Address
+                          <ul>
+                            <li>Enter a name, e.g., <i>My First Stealth Meta-Address</i></li>
+                            <li>Click <strong>[Generate]</strong></li>
+                            <li>Sign the phrase with your attached web3 wallet</li>
+                            <li>Click <strong>[Add]</strong> to save your newly created Stealth Meta-Address</li>
+                          </ul>
+                        </li>
+                        <li>Click <b-link size="sm" @click="newTransfer(null);" variant="link" ><b-icon-caret-right font-scale="1.0"></b-icon-caret-right></b-link> beside your new Stealth Meta-Address in the Addresses tab
+                          <ul>
+                            <li>Enter an amount, e.g., <i>0.001</i></li>
+                            <li>Click <strong>[Transfer]</strong></li>
+                            <li>Sign and send the transaction in your attached web3 wallet</li>
+                          </ul>
+                        </li>
+                        <li>Click <b-link size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="link" v-b-popover.hover.bottom="'Sync dapp to blockchain'"><b-icon-arrow-repeat font-scale="1.0"></b-icon-arrow-repeat></b-link> in the Dashboard tab
+                          <ul>
+                            <li>Your new Stealth Transfer should appear in the list. Click on this item</li>
+                            <li>Click <b-icon-eye font-scale="1.0" variant="primary"></b-icon-eye> to reveal the private key for your newly computed Stealth Address</li>
+                            <li>Import this private key into your web3 wallet to transfer these funds</li>
+                          </ul>
+                        </li>
+                        <li>See <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens</b-link> for sample screenshots</li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      Contracts on Sepolia
+                      <b-button size="sm" :pressed.sync="settings.docs.contractsonsepolia" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.contractsonsepolia ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.contractsonsepolia">
+                      <ul>
+                        <li><b-link href="https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code" target="_blank">ERC5564Announcer v0.8.1</b-link></li>
+                        <li><b-link href="https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code" target="_blank">ERC5564Registry v0.8.1</b-link></li>
+                        <li><b-link href="https://sepolia.etherscan.io/address/0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1#code" target="_blank">MagicalInternetMoney v0.8.2</b-link></li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      References
+                      <b-button size="sm" :pressed.sync="settings.docs.references" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.references ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.references">
+                      <ul>
+                        <li><b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link></li>
+                        <li><b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link></li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      This Dapp
+                      <b-button size="sm" :pressed.sync="settings.docs.thisdapp" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.thisdapp ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.thisdapp">
+                      <ul>
+                        <li>Dapp: <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link></li>
+                        <li>GitHub: <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney</b-link></li>
+                        <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney/blob/main/docs/index.html" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney/blob/main/docs/index.html</b-link></li>
+                      </ul>
+                    </div>
+                    <h6 class="mt-3">
+                      Troubleshooting
+                      <b-button size="sm" :pressed.sync="settings.docs.troubleshooting" @click="saveSettings" variant="link"><b-icon :icon="settings.docs.troubleshooting ? 'chevron-up' : 'chevron-down'" shift-v="+1" font-scale="1.0" class="m-0 p-0"></b-icon></b-button>
+                    </h6>
+                    <div v-if="settings.docs.troubleshooting">
+                      <ul>
+                        <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
+                        <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>MagicalInternetMoney</b></li>
+                      </ul>
+                    </div>
                   </b-card-text>
                 </b-card-body>
               </b-card>
 
               <!-- :INFO -->
+              <!-- TODO: DELETE -->
               <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h4>Welcome</h4>
@@ -860,8 +937,8 @@
                     <li>Bob generates a <i>Stealth Meta-Address</i> and provides this to Alice</li>
                     <li>Alice uses Bob's <i>Stealth Meta-Address</i> to compute a random <i>Stealth Address</i> that can be accessed only by Bob</li>
                     <li>Alice transfers the tokens to this address and announces the transfers in the <i>ERC-5564: Stealth Address Announcer</i> contract</li>
-                    <li>Bob can access the private keys to their computed <i>Stealth Addresses</i>, using information included in the announcements</li>
-                    <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows any account to publish their associated <i>Stealth Meta-Addresses</i></li>
+                    <li>Bob can access the private keys to their computed <i>Stealth Addresses</i> using information included in the announcements</li>
+                    <li>The <i>ERC-6538: Stealth Meta-Address Registry</i> allows an address to publish their associated <i>Stealth Meta-Addresses</i></li>
                   </ul>
 
                   <h5 class="mt-4">How This Dapp Works</h5>
@@ -1045,11 +1122,11 @@
                       <div class="mt-0 pl-1">
                         <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                       </div>
-                      <div class="mt-0 flex-grow-1">
-                      </div>
-                      <div class="mt-0 pl-1">
+                      <!-- <div class="mt-0 flex-grow-1">
+                      </div> -->
+                      <!-- <div class="mt-0 pl-1">
                         <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><b-icon :icon="settings.showInfo ? 'info-circle-fill' : 'info-circle'" shift-v="+1" font-scale="1.0"></b-icon></b-button>
-                      </div>
+                      </div> -->
                       <div class="mt-0 flex-grow-1">
                       </div>
                       <div class="mt-0 pl-1">
@@ -1613,6 +1690,15 @@
             showDetails: false,
             cryptoCompareAPIKey: null,
             reportingCurrency: "USD",
+            docs: {
+              howthestealthaddressprotocolworks: false,
+              howthisdappworks: false,
+              howtotest: true,
+              contractsonsepolia: false,
+              references: false,
+              thisdapp: false,
+              troubleshooting: false,
+            },
             sync: {
               transfers: true,
               directory: true,
@@ -1696,7 +1782,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 12,
+            version: 13,
           },
           contracts: {
             "11155111": {
