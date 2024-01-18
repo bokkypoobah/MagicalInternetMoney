@@ -16,7 +16,8 @@ const Welcome = {
                 <br />
                 <br />
 
-                Sync It: <b-button size="sm" @click="syncIt({ sections: ['syncRegistrations'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+                Sync All: <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+                Tokens: <b-button size="sm" @click="syncIt({ sections: ['syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
 
               </b-card-text>
 

@@ -589,15 +589,20 @@ const dataModule = {
             accountsToSync.push(account);
         }
       }
+      const chainId = store.getters['connection/chainId'];
+      const coinbase = store.getters['connection/coinbase'];
       for (const [sectionIndex, section] of info.sections.entries()) {
         console.log(sectionIndex + "." + section);
-        const parameter = { accountsToSync, confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey, cryptoCompareAPIKey, etherscanBatchSize, OVERLAPBLOCKS, processFilters };
+        const parameter = { chainId, coinbase, accountsToSync, confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey, cryptoCompareAPIKey, etherscanBatchSize, OVERLAPBLOCKS, processFilters };
 
         if (section == "syncAnnouncements" || section == "all") {
           await context.dispatch('syncAnnouncements', parameter);
         }
         if (section == "syncRegistrations" || section == "all") {
           await context.dispatch('syncRegistrations', parameter);
+        }
+        if (section == "syncTokens" || section == "all") {
+          await context.dispatch('syncTokens', parameter);
         }
 
 
@@ -659,6 +664,7 @@ const dataModule = {
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
+            console.log(JSON.stringify(log, null, 2));
             const logData = erc5564AnnouncerContract.interface.parseLog(log);
             const contract = log.address;
             const caller = logData.args[2];
@@ -680,7 +686,7 @@ const dataModule = {
                 segment++;
               } while (part.length == 112);
               records.push( {
-                chainId: store.getters['connection/chainId'],
+                chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
                 logIndex: parseInt(log.logIndex),
                 txIndex: parseInt(log.transactionIndex),
@@ -784,7 +790,7 @@ const dataModule = {
             const contract = log.address;
             // if (selectedContracts.includes(contract)) {
               records.push( {
-                chainId: store.getters['connection/chainId'],
+                chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
                 logIndex: parseInt(log.logIndex),
                 txIndex: parseInt(log.transactionIndex),
@@ -852,6 +858,166 @@ const dataModule = {
       console.log(moment().format("HH:mm:ss") + " syncRegistrations END");
     },
 
+    async syncTokens(context, parameter) {
+      logInfo("dataModule", "actions.syncTokens: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
+      // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
+      // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
+
+      // WETH Deposit (index_topic_1 address dst, uint256 wad)
+      // 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
+      // WETH Withdrawal (index_topic_1 address src, uint256 wad)
+      // 0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65
+
+      // // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+      // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+      // // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+      // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+      // // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+      // // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+      let total = 0;
+      let t = this;
+      async function processLogs(fromBlock, toBlock, section, logs) {
+        total = parseInt(total) + logs.length;
+        console.log(moment().format("HH:mm:ss") + " syncTokenEvents.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
+        const records = [];
+        for (const log of logs) {
+          if (!log.removed) {
+            const contract = log.address;
+            let eventRecord = null;
+            if (log.topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
+              let from = null;
+              let to = null;
+              let tokensOrTokenId = null;
+              let tokens = null;
+              let tokenId = null;
+              if (log.topics.length == 4) {
+                from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                tokensOrTokenId = ethers.BigNumber.from(log.topics[3]).toString();
+              } else if (log.topics.length == 3) {
+                from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                tokensOrTokenId = ethers.BigNumber.from(log.data).toString();
+              // TODO: Handle 2
+              } else if (log.topics.length == 1) {
+                from = ethers.utils.getAddress('0x' + log.data.substring(26, 66));
+                to = ethers.utils.getAddress('0x' + log.data.substring(90, 130));
+                tokensOrTokenId = ethers.BigNumber.from('0x' + log.data.substring(130, 193)).toString();
+              }
+              if (from) {
+                if (log.topics.length == 4) {
+                  eventRecord = { type: "Transfer", from, to, tokenId: tokensOrTokenId, eventType: "erc721" };
+                } else {
+                  eventRecord = { type: "Transfer", from, to, tokens: tokensOrTokenId, eventType: "erc20" };
+                }
+              }
+            } else if (log.topics[0] == "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c") {
+              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+              tokens = ethers.BigNumber.from(log.data).toString();
+              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
+            } else if (log.topics[0] == "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65") {
+              const from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+              tokens = ethers.BigNumber.from(log.data).toString();
+              eventRecord = { type: "Transfer", from, to: ADDRESS0, tokens, eventType: "erc20" };
+            } else if (log.topics[0] == "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925") {
+              if (log.topics.length == 4) {
+                const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                const approved = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                tokenId = ethers.BigNumber.from(log.topics[3]).toString();
+                eventRecord = { type: "Approval", owner, approved, tokenId, eventType: "erc721" };
+              } else {
+                const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+                const spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+                tokens = ethers.BigNumber.from(log.data).toString();
+                eventRecord = { type: "Approval", owner, spender, tokens, eventType: "erc20" };
+              }
+            } else if (log.topics[0] == "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31") {
+              const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+              const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
+              approved = ethers.BigNumber.from(log.data).toString();
+              eventRecord = { type: "ApprovalForAll", owner, operator, approved, eventType: "erc721" };
+            } else {
+              console.log("NOT HANDLED: " + JSON.stringify(log));
+            }
+            // TODO: Testing if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
+            if (eventRecord) {
+              records.push( {
+                chainId: parameter.chainId,
+                blockNumber: parseInt(log.blockNumber),
+                logIndex: parseInt(log.logIndex),
+                txIndex: parseInt(log.transactionIndex),
+                txHash: log.transactionHash,
+                contract,
+                ...eventRecord,
+                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+              });
+            }
+          }
+        }
+        if (records.length) {
+          await db.tokenEvents.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncTokenEvents.bulkPut error: " + error);
+          });
+        }
+      }
+      async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
+        console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock + " " + section);
+        try {
+          let topics = null;
+          if (section == 0) {
+            topics = [[
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+                '0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c',
+                '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
+                '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
+                '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31',
+              ],
+              selectedAddresses,
+              null
+            ];
+          } else if (section == 1) {
+            topics = [ ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'], null, selectedAddresses ];
+          }
+          const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+          await processLogs(fromBlock, toBlock, section, logs);
+        } catch (e) {
+          const mid = parseInt((fromBlock + toBlock) / 2);
+          await getLogs(fromBlock, mid, section, selectedAddresses, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
+        }
+      }
+      console.log(moment().format("HH:mm:ss") + " syncTokenEvents BEGIN");
+      // this.sync.completed = 0;
+      // this.sync.total = 0;
+      // this.sync.section = 'ERC-20 & ERC-721 Tokens';
+      const selectedAddresses = ['0x000000000000000000000000' + parameter.coinbase.substring(2, 42).toLowerCase()];
+      // console.log(selectedAddresses);
+      // const selectedAddresses = [];
+      // for (const [address, addressData] of Object.entries(this.addresses)) {
+      //   if (address.substring(0, 2) == "0x" && addressData.mine) {
+      //     selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
+      //   }
+      // }
+      if (selectedAddresses.length > 0) {
+        // const deleteCall = await db.tokenEvents.where("confirmations").below(this.CONFIRMATIONS).delete();
+        // const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        // TODO Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        // TODO Need to rescan when address set changed
+        const startBlock = 0;
+        // const startBlock = this.settings.sync.rescanTokens ? 0 : (latest ? parseInt(latest.blockNumber) + 1: 0);
+        for (let section = 0; section < 2; section++) {
+          await getLogs(startBlock, parameter.confirmedBlockNumber, section, selectedAddresses, processLogs);
+        }
+      }
+
+      console.log(moment().format("HH:mm:ss") + " syncTokens END");
+    },
 
     async syncTransferEvents(context, parameter) {
       logInfo("dataModule", "actions.syncTransferEvents: " + JSON.stringify(parameter));
