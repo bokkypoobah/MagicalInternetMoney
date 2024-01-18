@@ -45,12 +45,13 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">Magical Internet Money</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Your Magical Internet Money Dashboard'">Dashboard</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Stealth Transfers - ERC-5564: Stealth Addresses'">Transfers</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Directory - ERC-6538: Stealth Meta-Address Registry'">Directory</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Home'">Home</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Your Magical Internet Money Dashboard'">Dashboard</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Stealth Transfers - ERC-5564: Stealth Addresses'">Transfers</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Directory - ERC-6538: Stealth Meta-Address Registry'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 6; saveSettings();" :active="settings.tabIndex == 6" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
             <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -678,39 +679,45 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.transfersTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.registrationsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.addressesTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by name, ENS name or address regex'" placeholder="🔍 name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pr-1">
                   <b-form-input type="text" size="sm" v-model.trim="settings.tokenContractsTable.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by symbol, name or address regex'" placeholder="🔍 symbol, name or addr regex"></b-form-input>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.tokenContractsTable.tokenType" @change="saveSettings" :options="tokenTypeOptions" v-b-popover.hover.bottom="'ERC-20 and/or ERC-721'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
                   <b-form-select size="sm" v-model="settings.transfersTable.iSentIReceived" @change="saveSettings" :options="iSentIReceivedOptions" v-b-popover.hover.bottom="'Transfer type'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
                   <b-button size="sm" :pressed.sync="settings.registrationsTable.mineOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Only display my items'"><b-icon :icon="settings.registrationsTable.mineOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
                   <b-button size="sm" :pressed.sync="settings.addressesTable.mineOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Only display my items'"><b-icon :icon="settings.addressesTable.mineOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pr-0">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pr-0">
                   <b-button size="sm" :pressed.sync="settings.tokenContractsTable.withBalancesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show non-zero balances only'"><b-icon :icon="settings.tokenContractsTable.withBalancesOnly ? 'star-fill' : 'star'" font-scale="0.95" variant="warning"></b-icon></b-button>
                 </div>
+                <div v-if="settings.tabIndex == 3" class="mt-0 pr-1">
+                  <b-button size="sm" :pressed.sync="settings.registrationsTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.registrationsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                </div>
                 <div v-if="settings.tabIndex == 4" class="mt-0 pr-1">
+                  <b-button size="sm" :pressed.sync="settings.addressesTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.addressesTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+                </div>
+                <div v-if="settings.tabIndex == 5" class="mt-0 pr-1">
                   <b-button size="sm" :pressed.sync="settings.tokenContractsTable.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.tokenContractsTable.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
+                <div v-if="!sync.section && settings.tabIndex != 0" class="mt-0 pr-1">
                   <b-button size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
@@ -725,82 +732,122 @@
                 </div> -->
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.bottom="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
-                <div class="mt-0 pl-1">
+                <div v-if="settings.tabIndex != 0" class="mt-0 pl-1">
                   <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 1 || settings.tabIndex == 3" class="mt-0 flex-grow-1">
+                <div v-if="settings.tabIndex == 2 || settings.tabIndex == 4" class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-button size="sm" @click="downloadTransfers" variant="link" v-b-popover.hover.bottom="'Download transfers'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-button size="sm" @click="downloadAddresses" variant="link" v-b-popover.hover.bottom="'Download addresses'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div class="mt-0 pl-1">
+                <div v-if="settings.tabIndex != 0" class="mt-0 pl-1">
                   <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><b-icon :icon="settings.showInfo ? 'info-circle-fill' : 'info-circle'" shift-v="+1" font-scale="1.0"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.transfersTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registrationsTable.sortOption" @change="saveSettings" :options="registrationsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.sortOption" @change="saveSettings" :options="addressesSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.tokenContractsTable.sortOption" @change="saveSettings" :options="tokenContractsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredTransfers.length) + '/' + commify0(transfers.length) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# registrations'">{{ commify0(filteredRegistrations.length) + '/' + commify0(registrations.length) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# addresses'">{{ commify0(filteredAddresses.length) + '/' + commify0(totalAddresses) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# token events'">{{ commify0(filteredTokenContracts.length) + '/' + commify0(totalTokenContracts) }}</font>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.transfersTable.currentPage" @input="saveSettings" :total-rows="filteredTransfers.length" :per-page="settings.transfersTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.registrationsTable.currentPage" @input="saveSettings" :total-rows="filteredRegistrations.length" :per-page="settings.registrationsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.addressesTable.currentPage" @input="saveSettings" :total-rows="filteredAddresses.length" :per-page="settings.addressesTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.tokenContractsTable.currentPage" @input="saveSettings" :total-rows="filteredTokenContracts.length" :per-page="settings.tokenContractsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.transfersTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.registrationsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 3" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.addressesTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
-                <div v-if="settings.tabIndex == 4" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.tokenContractsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
 
             <b-card-text class="m-0 p-0">
+              <!-- :HOME -->
+              <b-card v-if="settings.tabIndex == 0 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1 border-0">
+                <b-card-body class="mt-1 p-1">
+                  <b-card-text>
+                    <h5 class="mt-2">Welcome</h5>
+                    Magical Internet Money (work in progress) is an implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>).
+
+                    <h6 class="mt-4">How To Test This App?</h6>
+                    <ul>
+                      <li>Browse <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link> in a web3 enabled browser connected to the Sepolia test network</li>
+                      <li>Get some Sepolia testnet ETH from one of the faucets at <b-link href="https://ethereum.org/developers/docs/networks#sepolia" target="_blank">https://ethereum.org/developers/docs/networks#sepolia</b-link></li>
+                      <li>
+                        Generate a new Stealth Meta-Address using the <b-link @click="newStealthMetaAddress" variant="link"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-link> button on the Addresses tab
+                        <ul>
+                          <li>Enter a name, e.g., <strong>My First Stealth Meta-Address</strong></li>
+                          <li>Click <strong>[Generate]</strong></li>
+                          <li>Sign the phrase with your attached web3 wallet</li>
+                          <li>Click <strong>[Add]</strong> to save your newly created Stealth Meta-Address</li>
+                        </ul>
+                      </li>
+                      <li>Click on the transfer button <b-link size="sm" @click="newTransfer(null);" variant="link" ><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-link> beside your new Stealth Meta-Address in the Addresses tab
+                        <ul>
+                          <li>Enter an amount, e.g., <strong>0.001</strong></li>
+                          <li>Click <strong>[Transfer]</strong></li>
+                          <li>Sign and send the transaction in your attached web3 wallet</li>
+                        </ul>
+                      </li>
+                      <li>Click <strong>[Sync]</strong> in the Dashboard tab
+                        <ul>
+                          <li>Your new Stealth Transfer should appear in the list. Click on this item</li>
+                          <li>Click on <font size="-1"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></font> to reveal the private key for your newly computed Stealth Address</li>
+                          <li>Import this private key into your web3 wallet to transfer these funds</li>
+                        </ul>
+                      </li>
+                      <li>See <b-link href="https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens" target="_blank">https://github.com/bokkypoobah/MagicalInternetMoney#sample-screens</b-link> for sample screenshots</li>
+                    </ul>
+                  </b-card-text>
+                </b-card-body>
+              </b-card>
+
               <!-- :INFO -->
               <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
@@ -879,7 +926,7 @@
               </b-card>
 
               <!-- :DASHBOARD -->
-              <b-row v-if="settings.tabIndex == 0 && !settings.showInfo && coinbase != null" class="m-0 p-0">
+              <b-row v-if="settings.tabIndex == 1 && !settings.showInfo && coinbase != null" class="m-0 p-0">
                 <b-col class="m-0 p-0 pt-1 pr-1">
                   <!-- :RECEIVED -->
                   <b-card no-body class="m-0 p-1">
@@ -1069,7 +1116,7 @@
               </b-row>
 
               <!-- :TRANSFERS -->
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='transferRowSelected' :fields="transfersFields" :items="pagedFilteredSortedTransfers" show-empty empty-html="Click Sync above to retrieve ERC-5564: Stealth Addresses announcement events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.transfersTable.currentPage - 1) * settings.transfersTable.pageSize) + 1 }}
@@ -1174,7 +1221,7 @@
               </b-table>
 
               <!-- :DIRECTORY -->
-              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="registrationsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='registrationRowSelected' :fields="registrationsFields" :items="pagedFilteredSortedRegistrations" show-empty empty-html="Click Sync above to retrieve ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.registrationsTable.currentPage - 1) * settings.registrationsTable.pageSize) + 1 }}
@@ -1234,16 +1281,17 @@
               </b-table>
 
               <!-- :ADDRESSES -->
-              <b-table v-if="settings.tabIndex == 3 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve addresses from ERC-5564: Stealth Addresses announcement and ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='addressesRowSelected' :fields="addressesFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click Sync above to retrieve addresses from ERC-5564: Stealth Addresses announcement and ERC-6538: Stealth Meta-Address Registry events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.addressesTable.currentPage - 1) * settings.addressesTable.pageSize) + 1 }}
                   </font>
                 </template>
                 <template #cell(transfer)="data">
-                  <div v-if="data.item.address.substring(0, 2) == 'st'">
+                  <span v-if="data.item.address.substring(0, 2) == 'st'">
                     <b-button size="sm" @click="newTransfer(data.item.address);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.address" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
-                  </div>
+                  </span>
+                  <b-button size="sm" @click="toggleAddressFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
                 </template>
                 <template #cell(address)="data">
                   <b-link @click="viewAddress(data.item.address)" v-b-popover.hover="addressDescription(data.item.address)">
@@ -1303,7 +1351,7 @@
               </b-table>
 
               <!-- :TOKENS -->
-              <b-table v-if="settings.tabIndex == 4 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve your ERC-20 and ERC-721 token events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 5 && !settings.showInfo" ref="tokenContractsTable" small fixed striped responsive hover :fields="tokenContractsFields" :items="pagedFilteredSortedTokenContracts" show-empty empty-html="Click Sync above to retrieve your ERC-20 and ERC-721 token events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.tokenContractsTable.currentPage - 1) * settings.tokenContractsTable.pageSize) + 1 }}
@@ -1388,7 +1436,7 @@
               </b-table>
 
               <!-- :CONFIG -->
-              <b-card v-if="settings.tabIndex == 5 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
+              <b-card v-if="settings.tabIndex == 6 && !settings.showInfo && coinbase != null" no-body class="my-1 p-1">
                 <b-card-body class="mt-1 p-1">
                   <h5>Settings</h5>
                   <b-form-group label="Local or UTC Time:" label-for="config-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="formatTimestamp(timestamp)" class="mx-0 my-1 p-0">
@@ -1574,6 +1622,7 @@
             registrationsTable: {
               filter: null,
               mineOnly: false,
+              favouritesOnly: false,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
@@ -1581,15 +1630,16 @@
             addressesTable: {
               filter: null,
               mineOnly: false,
+              favouritesOnly: false,
               currentPage: 1,
               pageSize: 25,
               sortOption: 'typenameasc',
             },
             tokenContractsTable: {
-              favouritesOnly: false,
-              withBalancesOnly: false,
               filter: null,
               tokenType: null,
+              withBalancesOnly: false,
+              favouritesOnly: false,
               currentPage: 1,
               pageSize: 25,
               sortOption: 'typenameasc',
@@ -1626,7 +1676,7 @@
                 nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
               },
             },
-            version: 11,
+            version: 12,
           },
           contracts: {
             "11155111": {
@@ -1907,9 +1957,9 @@
             { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           addressesFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             // { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 2%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'transfer', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -2292,6 +2342,9 @@
               const linkedAddressData = this.addresses[linkedAddress] || {};
               const linkedStealthMetaAddress = data.linkedTo && data.linkedTo.stealthMetaAddress || null;
               const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+              if (include && this.settings.addressesTable.favouritesOnly && !data.favourite) {
+                include = false;
+              }
               if (include && regex) {
                 if (!(
                   regex.test(data.name) || regex.test(data.ensName) || regex.test(address) ||
@@ -2396,10 +2449,8 @@
             }
             for (const [contract, contractData] of Object.entries(this.tokenContracts[this.chainId] || {})) {
               let include = true;
-              if (this.settings.tokenContractsTable.favouritesOnly) {
-                if (!contractData.favourite) {
-                  include = false;
-                }
+              if (this.settings.tokenContractsTable.favouritesOnly && !contractData.favourite) {
+                include = false;
               }
               if (include) {
                 const tokenIds = [];
@@ -2899,6 +2950,14 @@
               localStorage.magicalInternetMoneyContracts = JSON.stringify(this.contracts);
             }
           },
+          toggleAddressFavourite(item) {
+            console.log(moment().format("HH:mm:ss") + " toggleAddressFavourite: " + JSON.stringify(item));
+            if (item && item.address) {
+              Vue.set(this.addresses[item.address], 'favourite', !this.addresses[item.address].favourite);
+              Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+              localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+            }
+          },
           toggleTokenContractFavourite(item) {
             if (item && item.contract) {
               Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
@@ -3058,6 +3117,7 @@
                   name: null,
                   notes: null,
                   mine: true,
+                  favourite: false,
                   source: "attached.signed",
                 });
               }
@@ -3071,6 +3131,7 @@
                 spendingPublicKey: this.modalNewStealthMetaAddress.spendingPublicKey,
                 viewingPublicKey: this.modalNewStealthMetaAddress.viewingPublicKey,
                 mine: true,
+                favourite: false,
                 source: "attached.signed",
               });
             }
@@ -3304,7 +3365,7 @@
             const network = await provider.getNetwork();
             localStorage.magicalInternetMoneyChainId = network.chainId;
             if (!(this.coinbase in this.addresses)) {
-              Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null, notes: null });
+              Vue.set(this.addresses, this.coinbase, { type: "address", source: "attached", mine: true, name: null, notes: null, favourite: false, });
               localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
             } else if (!this.addresses[this.coinbase].mine) {
               Vue.set(this.addresses[this.coinbase], 'mine', true);
@@ -3687,17 +3748,17 @@
               for (const item of data) {
                 if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name, notes: null };
+                  addresses[item.contract] = { type: "address", source: "announcer.contract", mine: false, name, notes: null, favourite: false };
                 }
                 if (!(item.stealthAddress in addresses)) {
-                  addresses[item.stealthAddress] = { type: "stealthAddress", source: "announcer.stealthAddress", mine: false, name: null, notes: null };
+                  addresses[item.stealthAddress] = { type: "stealthAddress", source: "announcer.stealthAddress", mine: false, name: null, notes: null, favourite: false };
                 }
                 if (!(item.caller in addresses)) {
                   const name = CUSTOMNAMES[item.caller] && CUSTOMNAMES[item.caller].name || null;
-                  addresses[item.caller] = { type: "address", source: "announcer.caller", mine: false, name, notes: null };
+                  addresses[item.caller] = { type: "address", source: "announcer.caller", mine: false, name, notes: null, favourite: false };
                 }
                 if (!(item.tx.from in addresses)) {
-                  addresses[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null, notes: null };
+                  addresses[item.tx.from] = { type: "address", source: "announcer.sender", mine: item.tx.from == this.coinbase, name: null, notes: null, favourite: false };
                 }
               }
               rows = parseInt(rows) + data.length;
@@ -3712,13 +3773,13 @@
               for (const item of data) {
                 if (!(item.contract in addresses)) {
                   const name = CUSTOMNAMES[item.contract] && CUSTOMNAMES[item.contract].name || null;
-                  addresses[item.contract] = { type: "address", source: "registry.contract", mine: false, name, notes: null };
+                  addresses[item.contract] = { type: "address", source: "registry.contract", mine: false, name, notes: null, favourite: false };
                 }
                 if (!(item.registrant in addresses)) {
-                  addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null, notes: null };
+                  addresses[item.registrant] = { type: "address", source: "registry.registrant", mine: false, name: null, notes: null, favourite: false };
                 }
                 if (!(item.stealthMetaAddress in addresses)) {
-                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: { address: item.registrant }, mine: false, notes: null };
+                  addresses[item.stealthMetaAddress] = { type: "stealthMetaAddress", source: "registry.stealthMetaAddress", linkedTo: { address: item.registrant }, mine: false, notes: null, favourite: false };
                 }
               }
               rows = parseInt(rows) + data.length;
