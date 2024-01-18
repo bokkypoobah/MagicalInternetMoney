@@ -46,11 +46,11 @@
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Home'">Home</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Your Magical Internet Money Dashboard'">Dashboard</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Stealth Transfers - ERC-5564: Stealth Addresses'">Transfers</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'Directory - ERC-6538: Stealth Meta-Address Registry'">Registry</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'List of Regular Addresses and Stealth Meta-Addresses'">Addresses</b-nav-item>
-            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'My Magical Internet Money Dashboard'">Dashboard</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'All ERC-5564: Stealth Addresses announcements of transfers'">Stealth Transfers</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings();" :active="settings.tabIndex == 3" active-class="active" v-b-popover.hover="'All ERC-6538: Stealth Meta-Address Registry'">Registry</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 4; saveSettings();" :active="settings.tabIndex == 4" active-class="active" v-b-popover.hover="'All Addresses, Stealth Meta-Addresses and computed Stealth Addresses'">Addresses</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 5; saveSettings();" :active="settings.tabIndex == 5" active-class="active" v-b-popover.hover="'My ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 6; saveSettings();" :active="settings.tabIndex == 6" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
             <b-avatar v-if="ensName(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName(coinbase)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="addressDescription(coinbase, 100)">{{ coinbase ? ensNameOrAddress(coinbase, 30) : 'Connect' }}</b-button>
@@ -717,8 +717,8 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="!sync.section && settings.tabIndex != 0" class="mt-0 pr-1">
-                  <b-button size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="primary" v-b-popover.hover.bottom="'Sync stealth address announcement events'">Sync</b-button>
+                <div v-if="!sync.section && settings.tabIndex != 0 && settings.tabIndex != 1" class="mt-1 pr-1">
+                  <b-link @click="saveSettings(); viewModalSyncOptions();" variant="primary" v-b-popover.hover.bottom="'Sync dapp to blockchain'"><b-icon-arrow-repeat shift-v="+0" font-scale="1.1"></b-icon-arrow-repeat></b-link>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
@@ -738,7 +738,7 @@
                 <div v-if="settings.tabIndex == 5" class="mt-0 pl-1">
                   <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.bottom="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
                 </div>
-                <div v-if="settings.tabIndex != 0" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex != 0 && settings.tabIndex != 1" class="mt-0 pl-1">
                   <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 2 || settings.tabIndex == 4" class="mt-0 flex-grow-1">
@@ -751,7 +751,7 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex != 0" class="mt-0 pl-1">
+                <div v-if="settings.tabIndex != 0 && settings.tabIndex != 1" class="mt-0 pl-1">
                   <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><b-icon :icon="settings.showInfo ? 'info-circle-fill' : 'info-circle'" shift-v="+1" font-scale="1.0"></b-icon></b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
@@ -820,25 +820,25 @@
                       <li>Browse <b-link href="https://bokkypoobah.github.io/MagicalInternetMoney/" target="_blank">https://bokkypoobah.github.io/MagicalInternetMoney/</b-link> in a web3 enabled browser connected to the Sepolia test network</li>
                       <li>Get some Sepolia testnet ETH from one of the faucets at <b-link href="https://ethereum.org/developers/docs/networks#sepolia" target="_blank">https://ethereum.org/developers/docs/networks#sepolia</b-link></li>
                       <li>
-                        Generate a new Stealth Meta-Address using the <b-link @click="newStealthMetaAddress" variant="link"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-link> button on the Addresses tab
+                        Click <b-link @click="newStealthMetaAddress" variant="link"><b-icon-plus font-scale="1.0"></b-icon-plus></b-link> in the Addresses tab to generate a new Stealth Meta-Address
                         <ul>
-                          <li>Enter a name, e.g., <strong>My First Stealth Meta-Address</strong></li>
+                          <li>Enter a name, e.g., <i>My First Stealth Meta-Address</i></li>
                           <li>Click <strong>[Generate]</strong></li>
                           <li>Sign the phrase with your attached web3 wallet</li>
                           <li>Click <strong>[Add]</strong> to save your newly created Stealth Meta-Address</li>
                         </ul>
                       </li>
-                      <li>Click on the transfer button <b-link size="sm" @click="newTransfer(null);" variant="link" ><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-link> beside your new Stealth Meta-Address in the Addresses tab
+                      <li>Click <b-link size="sm" @click="newTransfer(null);" variant="link" ><b-icon-caret-right font-scale="1.0"></b-icon-caret-right></b-link> beside your new Stealth Meta-Address in the Addresses tab
                         <ul>
-                          <li>Enter an amount, e.g., <strong>0.001</strong></li>
+                          <li>Enter an amount, e.g., <i>0.001</i></li>
                           <li>Click <strong>[Transfer]</strong></li>
                           <li>Sign and send the transaction in your attached web3 wallet</li>
                         </ul>
                       </li>
-                      <li>Click <strong>[Sync]</strong> in the Dashboard tab
+                      <li>Click <b-link size="sm" @click="saveSettings(); viewModalSyncOptions();" variant="link" v-b-popover.hover.bottom="'Sync dapp to blockchain'"><b-icon-arrow-repeat font-scale="1.0"></b-icon-arrow-repeat></b-link> in the Dashboard tab
                         <ul>
                           <li>Your new Stealth Transfer should appear in the list. Click on this item</li>
-                          <li>Click on <font size="-1"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></font> to reveal the private key for your newly computed Stealth Address</li>
+                          <li>Click <b-icon-eye font-scale="1.0" variant="primary"></b-icon-eye> to reveal the private key for your newly computed Stealth Address</li>
                           <li>Import this private key into your web3 wallet to transfer these funds</li>
                         </ul>
                       </li>
@@ -936,6 +936,16 @@
                       </div>
                       <div class="mt-0 flex-grow-1">
                       </div>
+                      <div v-if="!sync.section" class="mt-1 pr-1">
+                        <b-link @click="saveSettings(); viewModalSyncOptions();" variant="primary" v-b-popover.hover.bottom="'Sync dapp to blockchain'"><b-icon-arrow-repeat shift-v="+0" font-scale="1.1"></b-icon-arrow-repeat></b-link>
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" @click="newStealthMetaAddress" variant="link" v-b-popover.hover.bottom="'Generate new Stealth Meta-Address'"><b-icon-plus shift-v="+0" font-scale="1.0"></b-icon-plus></b-button>
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
                       <div class="mt-0 pl-1">
                         <b-form-select size="sm" v-model="settings.receivedTable.sortOption" @change="saveSettings" :options="transfersSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                       </div>
@@ -1029,6 +1039,16 @@
                     <div class="d-flex flex-wrap m-0 p-0">
                       <div class="mt-1 pl-1 pr-1">
                         <strong>Sent</strong>
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" @click="newTransfer(null);" variant="link" v-b-popover.hover.bottom="'Transfer to Stealth Meta-Address'"><b-icon-caret-right shift-v="+1" font-scale="1.0"></b-icon-caret-right></b-button>
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" :pressed.sync="settings.showInfo" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show info'"><b-icon :icon="settings.showInfo ? 'info-circle-fill' : 'info-circle'" shift-v="+1" font-scale="1.0"></b-icon></b-button>
                       </div>
                       <div class="mt-0 flex-grow-1">
                       </div>
