@@ -107,9 +107,12 @@ const dataModule = {
       halt: false,
     },
     db: {
-      name: "txs093c",
+      name: "magicalinternetmoneydata081a",
       version: 1,
       schemaDefinition: {
+        announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+        registrations: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+        tokenEvents: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
         cache: '&objectName',
       },
       updated: null,
@@ -565,6 +568,8 @@ const dataModule = {
     },
     async syncIt(context, info) {
       logInfo("dataModule", "actions.syncIt - sections: " + JSON.stringify(info.sections) + ", parameters: " + JSON.stringify(info.parameters).substring(0, 1000));
+      // const db = new Dexie(context.state.db.name);
+      // db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const block = await provider.getBlock();
       const confirmations = store.getters['config/settings'].confirmations && parseInt(store.getters['config/settings'].confirmations) || 10;
@@ -635,6 +640,120 @@ const dataModule = {
     },
     async syncAnnouncements(context, parameter) {
       logInfo("dataModule", "actions.syncAnnouncements: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
+      // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
+      const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
+      let total = 0;
+      let t = this;
+      async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
+        total = parseInt(total) + logs.length;
+        console.log(moment().format("HH:mm:ss") + " syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        const records = [];
+        for (const log of logs) {
+          if (!log.removed) {
+            const logData = erc5564AnnouncerContract.interface.parseLog(log);
+            const contract = log.address;
+            const caller = logData.args[2];
+            // if (selectedContracts.includes(contract) && selectedCallers.includes(caller)) {
+              // console.log("  Processing: " + JSON.stringify(log));
+              const transfers = [];
+              const metadata = logData.args[4];
+              let segment = 0;
+              let part;
+              do {
+                part = metadata.substring(4 + (segment * 112), 4 + (segment * 112) + 112);
+                if (part.length == 112) {
+                  const functionSelector = "0x" + part.substring(0, 8);
+                  const token = ethers.utils.getAddress("0x" + part.substring(8, 48));
+                  const valueString = part.substring(48, 112)
+                  const value = ethers.BigNumber.from("0x" + valueString).toString();
+                  transfers.push({ functionSelector, token, value });
+                }
+                segment++;
+              } while (part.length == 112);
+              records.push( {
+                chainId: store.getters['connection/chainId'],
+                blockNumber: parseInt(log.blockNumber),
+                logIndex: parseInt(log.logIndex),
+                txIndex: parseInt(log.transactionIndex),
+                txHash: log.transactionHash,
+                contract,
+                name: logData.name,
+                schemeId: parseInt(logData.args[0]),
+                stealthAddress: logData.args[1],
+                linkedTo: {
+                  stealthMetaAddress: null,
+                  address: null,
+                },
+                caller,
+                ephemeralPublicKey: logData.args[3],
+                metadata: logData.args[4],
+                transfers,
+                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+                timestamp: null,
+                tx: null,
+              });
+            // }
+          }
+        }
+        console.log("records: " + JSON.stringify(records, null, 2));
+        if (records.length) {
+          await db.announcements.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncAnnouncements.bulkPut error: " + error);
+          });
+        }
+      }
+      async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
+        console.log(moment().format("HH:mm:ss") + " syncAnnouncements.getLogs: " + fromBlock + " - " + toBlock);
+        try {
+          const filter = {
+            address: null,
+            fromBlock,
+            toBlock,
+            topics: [
+              '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+              null,
+              null
+            ]
+          };
+          const eventLogs = await provider.getLogs(filter);
+          await processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, eventLogs);
+        } catch (e) {
+          const mid = parseInt((fromBlock + toBlock) / 2);
+          await getLogs(fromBlock, mid, selectedContracts, selectedCallers, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
+        }
+      }
+      console.log(moment().format("HH:mm:ss") + " syncAnnouncements BEGIN");
+      // this.sync.completed = 0;
+      // this.sync.total = 0;
+      // this.sync.section = 'Stealth Address Announcements';
+      const selectedContracts = [];
+      const selectedCallers = [];
+      // for (const [chainId, chainData] of Object.entries(this.contracts)) {
+      //   for (const [contract, contractData] of Object.entries(chainData)) {
+      //     if (contractData.type == "announcer" && contractData.read) {
+      //       selectedContracts.push(contract);
+      //     }
+      //     if (contractData.type == "caller" && contractData.read) {
+      //       selectedCallers.push(contract);
+      //     }
+      //   }
+      // }
+      // console.log("selectedCallers: " + JSON.stringify(selectedCallers, null, 2));
+      // if (selectedContracts.length > 0) {
+        // const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
+        // const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        // const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        const startBlock = 0;
+        await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, selectedCallers, processLogs);
+      // }
+      console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
     },
     async syncTransferEvents(context, parameter) {
       logInfo("dataModule", "actions.syncTransferEvents: " + JSON.stringify(parameter));
