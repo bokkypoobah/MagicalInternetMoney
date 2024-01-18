@@ -13,7 +13,7 @@
     <meta property="og:url" content="https://github.com/bokkypoobah/MagicalInternetMoney/" />
     <meta property="og:title" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
     <meta property="og:description" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
-    <meta property="og:image" content="https://bokkypoobah.github.io/txs/images/ZombieBaby_001_gp2_3871_8601_10786.gif" />
+    <meta property="og:image" content="https://bokkypoobah.github.io/MagicalInternetMoney/images/LarvaChad_1532_zoomed.png" />
     <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="css/bootstrap-vue.min.css"/>
     <link type="text/css" rel="stylesheet" href="css/bootstrap-vue-icons.min.css"/>
@@ -107,11 +107,12 @@
             <b-navbar-nav class="ml-auto">
               <!-- <b-nav-item size="sm" to="/account" active-class="active" v-b-popover.hover="'View transactions by account'">Account</b-nav-item> -->
               <!-- <b-nav-item size="sm" to="/transactions" active-class="active" v-b-popover.hover="'View/edit transactions'">Transactions</b-nav-item> -->
-              <b-nav-item size="sm" to="/accounts" active-class="active" v-b-popover.hover="'View/edit accounts'">Accounts</b-nav-item>
-              <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'">Report</b-nav-item>
-              <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'">Assets</b-nav-item>
-              <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'">Mappings</b-nav-item>
-              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
+              <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover="'Welcome'">Home</b-nav-item>
+              <b-nav-item size="sm" to="/accounts" active-class="active" v-b-popover.hover="'View/edit accounts'"><strike>Accounts</strike></b-nav-item>
+              <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'"><strike>Report</strike></b-nav-item>
+              <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'"><strike>Assets</strike></b-nav-item>
+              <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'"><strike>Mappings</strike></b-nav-item>
+              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'"><strike>Config</strike></b-nav-item>
               <b-nav-form>
                 <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
                 <b-button size="sm" variant="link" v-b-popover.hover="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
@@ -144,8 +145,8 @@
         <div class="mt-5 pt-2">
           <b-card no-header no-body class="m-0 p-0 border-0">
             <b-card-body class="m-0 p-0">
-              <b-alert v-if="chainId && chainId != 1" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
-                Please install the MetaMask extension, connect to Ethereum Mainnet and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button> on the top right.
+              <b-alert v-if="chainId && chainId != 1 && chainId != 11155111" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
+                Please install the MetaMask extension, connect to the Sepolia testnet and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button> on the top right. <br />You will be able to sync your testnet addresses to Ethereum mainnet ENS names shortly.
               </b-alert>
             </b-card-body>
           </b-card>
