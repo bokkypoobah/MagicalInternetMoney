@@ -5,20 +5,20 @@ const Config = {
         <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
           <b-card-body class="m-1 p-1">
             <b-form-group label-cols-lg="2" label="Import Settings" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Etherscan API Key:" label-for="etherscan-apikey" label-size="sm" label-cols-sm="2" label-align-sm="right" description="This key is stored in your local browser storage and is sent with Etherscan API requests. If not supplied, imports from Etherscan will be rate limited to 1 request every 5 seconds" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Etherscan API Key:" label-for="etherscan-apikey" label-size="sm" label-cols-sm="2" label-align-sm="right" description="This key is stored in your local browser storage and is sent with Etherscan API requests. If not supplied, imports from Etherscan will be rate limited to 1 request every 5 seconds" class="mx-0 my-1 p-0">
                 <b-form-input type="text" size="sm" id="etherscan-apikey" :value="settings.etherscanAPIKey" @change="setEtherscanAPIKey($event)" placeholder="See https://docs.etherscan.io/ to obtain an API key" class="w-75"></b-form-input>
               </b-form-group>
               <b-form-group label="CryptoCompare API Key:" label-for="cryptocompare-apikey" label-size="sm" label-cols-sm="2" label-align-sm="right" description="This key is stored in your local browser storage and is sent with CryptoCompare API requests. If not supplied, imports from CryptoCompare may fail if you reach your free quota" class="mx-0 my-1 p-0">
                 <b-form-input type="text" size="sm" id="cryptocompare-apikey" :value="settings.cryptoCompareAPIKey" @change="setCryptoCompareAPIKey($event)" placeholder="See https://www.cryptocompare.com/ to obtain an API key" class="w-75"></b-form-input>
               </b-form-group>
-              <b-form-group label="Batch Size:" label-for="import-batchsize" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Batch size for Etherscan transactions and internal transactions API calls, and web3 event filter calls. Use the smaller values if the web3 event filter call returns more than 10k results as the RPC calls will fail'" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Batch Size:" label-for="import-batchsize" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Batch size for Etherscan transactions and internal transactions API calls, and web3 event filter calls. Use the smaller values if the web3 event filter call returns more than 10k results as the RPC calls will fail'" class="mx-0 my-1 p-0">
                 <b-form-select size="sm" id="import-batchsize" :value="settings.etherscanBatchSize" @change="setEtherscanBatchSize($event)" :options="etherscanBatchSizeOptions" class="w-25"></b-form-select>
               </b-form-group>
-              <b-form-group label="Confirmations:" label-for="import-confirmations" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Number of blocks before including a transaction in this dapp'" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Confirmations:" label-for="import-confirmations" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Number of blocks before including a transaction in this dapp'" class="mx-0 my-1 p-0">
                 <b-form-select size="sm" id="import-confirmations" :value="settings.confirmations" @change="setConfirmations($event)" :options="confirmationsOptions" class="w-25"></b-form-select>
               </b-form-group>
             </b-form-group>
-            <b-form-group label-cols-lg="2" label="Reporting Period" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group v-if="false" label-cols-lg="2" label="Reporting Period" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Period Start:" label-for="period-start" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reporting periods: [' + periodOptions.map(e => e.text).join(', ') + ']'" class="mx-0 my-1 p-0">
                 <b-form-select size="sm" id="period-start" :value="settings.periodStart" @change="setPeriodStart($event)" :options="periodStartOptions" class="w-25"></b-form-select>
               </b-form-group>
@@ -35,14 +35,14 @@ const Config = {
               </b-form-group>
             </b-form-group>
             -->
-            <b-form-group label-cols-lg="2" label="Pre ERC-721 NFTs" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0" description="Pre ERC-721 NFTs with ERC-20 Transfer events">
+            <b-form-group v-if="false" label-cols-lg="2" label="Pre ERC-721 NFTs" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0" description="Pre ERC-721 NFTs with ERC-20 Transfer events">
               <!-- TODO: Edit table -->
                 <!-- <b-table small fixed striped responsive hover :fields="transactionsFields" :items="pagedFilteredSortedTransactions" show-empty empty-html="Add [Accounts] then sync" head-variant="light" class="m-0 mt-1"> -->
                 <b-table small fixed striped responsive hover id="preerc721-list" :items="preERC721TableData" show-empty empty-html="Add [Accounts] then sync" head-variant="light" class="m-0 mt-1">
                 </b-table>
               <!-- </b-form-group> -->
             </b-form-group>
-            <b-form-group label-cols-lg="2" label="Processing Filters" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group v-if="false" label-cols-lg="2" label="Processing Filters" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Period:" label-for="process-period" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Only process transactions within this selected period (approximate atm)'" class="mx-0 my-1 p-0">
                 <b-form-select size="sm" id="process-period" :value="settings.processPeriod" @change="setProcessPeriod($event)" :options="processPeriods" class="w-50"></b-form-select>
               </b-form-group>
@@ -61,7 +61,7 @@ const Config = {
                 <b-form-textarea size="sm" id="process-transactions" :value="settings.processTransactions" @change="setProcessTransactions($event)" rows="3" max-rows="5" placeholder="0x1234... 0x2345..., 0xabcd..."></b-form-textarea>
               </b-form-group>
             </b-form-group>
-            <b-form-group label-cols-lg="2" label="User Data Backup & Restore" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group v-if="false" label-cols-lg="2" label="User Data Backup & Restore" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Backup:" label-for="download-backup" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Download a backup of user entered information. File name txs_backup*.tsv'" class="mx-0 my-1 p-0">
                 <b-button size="sm" id="download-backup" @click="downloadBackup()" variant="primary">Download</b-button>
               </b-form-group>
@@ -72,7 +72,7 @@ const Config = {
                 <b-button size="sm" id="restore-from-backup" :disabled="restoreAccountsData.length == 0" @click="restoreFromBackup()" variant="primary">Restore</b-button>
               </b-form-group>
             </b-form-group>
-            <b-form-group label-cols-lg="2" label="Intermediate Data Backup & Restore" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+            <b-form-group v-if="false" label-cols-lg="2" label="Intermediate Data Backup & Restore" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group label="Backup:" label-for="download-intermediate-backup" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Download a backup of blocks and tx data. File name txs_intermediate*.json'" class="mx-0 my-1 p-0">
                 <b-button size="sm" id="download-intermediate-backup" @click="downloadIntermediateBackup()" variant="primary">Download</b-button>
               </b-form-group>
@@ -84,13 +84,13 @@ const Config = {
               </b-form-group>
             </b-form-group>
             <b-form-group label-cols-lg="2" label="Reset Data" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Tokens:" label-for="reset-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset tokens for regeneration. DEV function'" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Tokens:" label-for="reset-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset tokens for regeneration. DEV function'" class="mx-0 my-1 p-0">
                 <b-button size="sm" id="reset-tokens" @click="resetTokens()" variant="primary">Reset</b-button>
               </b-form-group>
-              <b-form-group label="Temporary Data:" label-for="reset-localstorage" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage'" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Temporary Data:" label-for="reset-localstorage" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage'" class="mx-0 my-1 p-0">
                 <b-button size="sm" id="reset-localstorage" @click="reset(['localStorage'])" variant="primary">Reset</b-button>
               </b-form-group>
-              <b-form-group label="Intermediate Data:" label-for="reset-intermediate" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage, plus assets, transactions and ENS names stored in your browser IndexedDB'" class="mx-0 my-1 p-0">
+              <b-form-group v-if="false" label="Intermediate Data:" label-for="reset-intermediate" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage, plus assets, transactions and ENS names stored in your browser IndexedDB'" class="mx-0 my-1 p-0">
                 <b-button size="sm" id="reset-intermediate" @click="reset(['localStorage', 'txs', 'assets', 'ensMap'])" variant="primary">Reset</b-button>
               </b-form-group>
               <b-form-group label="All Data:" label-for="reset-unlock" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Type 'gm' three times above, no spaces, to unlock the button below" class="mx-0 my-1 p-0">

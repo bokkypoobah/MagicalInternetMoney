@@ -104,7 +104,7 @@
               <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'"><strike>Report</strike></b-nav-item>
               <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'"><strike>Assets</strike></b-nav-item>
               <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'"><strike>Mappings</strike></b-nav-item>
-              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'"><strike>Config</strike></b-nav-item>
+              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
               <b-nav-form>
                 <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
                 <b-button size="sm" variant="link" v-b-popover.hover="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
