@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Magical Internet Money</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
+    <meta name="author" content="BokkyPooBah" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@BokkyPooBah" />
+    <meta name="twitter:creator" content="@BokkyPooBah" />
+    <meta property="og:url" content="https://github.com/bokkypoobah/MagicalInternetMoney/" />
+    <meta property="og:title" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
+    <meta property="og:description" content="Magical Internet Money (c) Bok Consulting Pty Ltd 2024" />
+    <meta property="og:image" content="https://bokkypoobah.github.io/txs/images/ZombieBaby_001_gp2_3871_8601_10786.gif" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap-vue-icons.min.css"/>
+    <link type="text/css" rel="stylesheet" href="css/app.css"/>
+    <script src="js/vue.js"></script>
+    <script src="js/bootstrap-vue.min.js"></script>
+    <script src="js/bootstrap-vue-icons.min.js"></script>
+    <script src="js/vue-router.min.js"></script>
+    <script src="js/vuex.js"></script>
+    <script src="js/vuex-router-sync.js"></script>
+    <!-- <script src="js/apexcharts.js"></script> -->
+    <!-- <script src="js/vue-apexcharts.js"></script> -->
+
+    <!-- <script src="js/html2canvas.min.js"></script> -->
+    <!-- <script src="js/html2canvas.js"></script> -->
+
+    <script src="js/ethers-5.7.umd.min.js" type="application/javascript"></script>
+
+    <script src="js/bignumber.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <!-- <script src="js/web3.js"></script> -->
+    <script src="js/sha3.js"></script>
+
+    <!-- <script src="js/fabric.min.js"></script> -->
+    <!-- <script src="js/fabric.js"></script> -->
+    <!-- <script src="js/exif.js"></script> -->
+    <script src="js/dexie.js"></script>
+    <!-- <script src="js/libgif.js"></script> -->
+
+    <!-- ENS stuff -->
+    <script src="js/punycode.js"></script>
+    <script src="js/idna-map.js"></script>
+    <script src="js/idna-uts46-hx.js"></script>
+    <script src="js/js-sha3.js"></script>
+    <script src="js/eth-ens-namehash.js"></script>
+
+    <!-- <script src="js/vue-apollo.umd.min.js"></script> -->
+
+    <!-- <script src="js/highlight.min.js"></script> -->
+    <!-- <script src="js/highlight-solidity.js"></script> -->
+
+    <script src="deploymentData.js"></script>
+    <script src="moonCatRescueData.js"></script>
+    <script src="functions.js"></script>
+    <script src="config.js"></script>
+    <script src="mappings.js"></script>
+    <script src="dataHelper.js"></script>
+    <script src="data.js"></script>
+    <script src="accountInfo.js"></script>
+    <script src="functionSelectorHandler.js"></script>
+    <script src="customAccounts.js"></script>
+    <script src="account.js"></script>
+    <script src="accounts.js"></script>
+    <script src="assets.js"></script>
+    <script src="parseTx.js"></script>
+    <script src="report.js"></script>
+    <script src="txInfo.js"></script>
+    <script src="transactions.js"></script>
+
+    <script src="connectionModule.js"></script>
+    <script src="welcome.js"></script>
+    <script src="routes.js"></script>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="images/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="images/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+  <body>
+    <div id="app">
+      <b-container fluid class="m-0 p-1">
+        <div>
+          <b-navbar variant="light" fixed="top" class="mx-1 my-0 p-0">
+            <b-navbar-brand to="https://bokkypoobah.github.io/MagicalInternetMoney/" variant="primary">
+              <b-avatar rounded variant="light" size="3.0rem" src="images/LarvaChad_1532_zoomed_transparentbg.png" v-b-popover.hover.bottom="'gm'" class="ml-0"></b-avatar>
+              <em v-b-popover.hover.bottom="'gm gm gm'">Magical Internet Money</em>
+            </b-navbar-brand>
+            <b-navbar-nav class="ml-auto">
+              <!-- <b-nav-item size="sm" to="/account" active-class="active" v-b-popover.hover="'View transactions by account'">Account</b-nav-item> -->
+              <!-- <b-nav-item size="sm" to="/transactions" active-class="active" v-b-popover.hover="'View/edit transactions'">Transactions</b-nav-item> -->
+              <b-nav-item size="sm" to="/accounts" active-class="active" v-b-popover.hover="'View/edit accounts'">Accounts</b-nav-item>
+              <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'">Report</b-nav-item>
+              <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'">Assets</b-nav-item>
+              <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'">Mappings</b-nav-item>
+              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
+              <b-nav-form>
+                <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
+                <b-button size="sm" variant="link" v-b-popover.hover="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
+                <b-sidebar id="sidebar-status" v-model="statusSidebar" title="Status" width="400px" right shadow no-header-close header-class="m-0 p-0">
+                  <template v-slot:title="{ hide }">
+                    <div class="d-flex flex-row justify-content-between m-0 p-0" style="height: 37px;">
+                      <div class="m-0 p-0">
+                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Close sidebar'" @click="hide"><b-icon-x shift-v="-1" font-scale="1.7"></b-icon-x></b-button>
+                      </div>
+                      <div class="m-0 p-0">
+                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power down this app'" @click="setPowerOff();" v-if="powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
+                      </div>
+                      <div class="m-0 p-0 pl-4">
+                        Status
+                      </div>
+                    </div>
+                  </template>
+                  <b-card no-body class="m-2 p-1">
+                    <b-card-body class="m-1 p-0">
+                      <connection></connection>
+                      <br />
+                      <coreData></coreData>
+                    </b-card-body>
+                  </b-card>
+                </b-sidebar>
+              </b-nav-form>
+            </b-navbar-nav>
+          </b-navbar>
+        </div>
+        <div class="mt-5 pt-2">
+          <b-card no-header no-body class="m-0 p-0 border-0">
+            <b-card-body class="m-0 p-0">
+              <b-alert v-if="chainId && chainId != 1" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
+                Please install the MetaMask extension, connect to Ethereum Mainnet and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button> on the top right.
+              </b-alert>
+            </b-card-body>
+          </b-card>
+        </div>
+        <div style="min-height: 600px;">
+          <router-view></router-view>
+        </div>
+        <hr />
+        <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
+          <b-card-text class="text-right">
+            gm, and enjoy! <i>Magical Internet Money</i> &copy; Bok Consulting Pty Ltd 2024
+          </b-card-text>
+        </b-card>
+      </b-container>
+    </div>
+    <div>
+    </div>
+    <script src="index.js"></script>
+  </body>
+</html>
