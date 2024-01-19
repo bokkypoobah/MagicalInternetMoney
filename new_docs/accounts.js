@@ -183,15 +183,62 @@ const Accounts = {
 
         <b-card v-if="settings.editAccounts || totalAccounts == 0" no-body no-header bg-variant="light" class="m-1 p-1 w-75">
           <b-card-body class="m-1 p-1">
-            <b-form-group label-cols-lg="2" label="Add New Accounts" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-              <b-form-group label="Accounts:" label-for="newaccounts-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" id="newaccounts-accounts" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea>
+            <b-form-group label-cols-lg="2" label="Add New Account" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
+
+              <b-form-group label="Action: " label-for="newaccount-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-select size="sm" id="newaccount-type" v-model="settings.addAccountType" @change="saveSettings" :options="addAccountTypes" class="w-50"></b-form-select>
+                <!-- <b-form-textarea size="sm" id="newaccount-type" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea> -->
               </b-form-group>
-              <b-form-group label="" label-for="newaccounts-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Only valid accounts will be added" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="newaccounts-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button>
+
+              <b-form-group v-if="settings.addAccountType == 'generateStealthMetaAddress'" label="Phrase:" label-for="newaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the attached address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" id="newaccount-phrase" v-model.trim="settings.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
               </b-form-group>
-              <b-form-group label="Connected Account:" label-for="newaccounts-coinbase-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="coinbase == null ? '' : (coinbaseIncluded ? (coinbase + ' already added') : ('Add ' + coinbase + '?'))" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="newaccounts-coinbase-submit" :disabled="block == null || coinbaseIncluded" @click="addCoinbase" variant="primary">Add</b-button>
+
+              <b-form-group label="" label-for="newaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
+                <!-- <b-button size="sm" id="newaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
+                <b-button size="sm" id="newaccount-generate" @click="addNewAccounts" variant="primary">Generate</b-button>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="newaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" id="newaccount-stealthmetaaddress" v-model.trim="settings.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="newaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" readonly id="newaccount-generatedstealthmetaaddress" v-model.trim="settings.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'addCoinbase'" label="Attached Web3 Address:" label-for="newaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" readonly id="newaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'addAddress'" label="Address:" label-for="newaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" id="newaccount-address" v-model.trim="settings.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'addStealthMetaAddress'" label="Linked To Address:" label-for="newaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" id="newaccount-linkedtoaddress" v-model.trim="settings.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
+              </b-form-group>
+
+              <b-form-group v-if="settings.addAccountType == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="newaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" readonly id="newaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
+              </b-form-group>
+
+
+              <!-- <b-form-group v-if="false && settings.addAccountType != 'addCoinbase'" label="Accounts:" label-for="newaccount-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" id="newaccount-accounts" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea>
+              </b-form-group> -->
+
+              <b-form-group label="Name:" label-for="newaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input size="sm" id="newaccount-name" v-model.trim="settings.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
+              </b-form-group>
+
+
+              <b-form-group label="" label-for="newaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Only valid accounts will be added" class="mx-0 my-1 p-0">
+                <!-- <b-button size="sm" id="newaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
+                <b-button size="sm" id="newaccount-submit" @click="addNewAccounts" variant="primary">Add</b-button>
+              </b-form-group>
+              <b-form-group v-if="false" label="Connected Account:" label-for="newaccount-coinbase-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="coinbase == null ? '' : (coinbaseIncluded ? (coinbase + ' already added') : ('Add ' + coinbase + '?'))" class="mx-0 my-1 p-0">
+                <b-button size="sm" id="newaccount-coinbase-submit" :disabled="block == null || coinbaseIncluded" @click="addCoinbase" variant="primary">Add</b-button>
               </b-form-group>
             </b-form-group>
           </b-card-body>
@@ -394,6 +441,14 @@ const Accounts = {
         junkFilter: null,
         showAdditionalFilters: false,
         editAccounts: false,
+
+        defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
+        addAccountType: 'addCoinbase',
+        address: null,
+        stealthMetaAddress: null,
+        phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
+        name: null,
+
         newAccounts: null,
         selectedAccounts: {},
         currentPage: 1,
@@ -401,6 +456,12 @@ const Accounts = {
         sortOption: 'accountasc',
         version: 5,
       },
+      addAccountTypes: [
+        { value: 'addCoinbase', text: 'Add Attached Web3 Address' },
+        { value: 'addAddress', text: 'Add Address' },
+        { value: 'addStealthMetaAddress', text: 'Add Stealth Meta-Address' },
+        { value: 'generateStealthMetaAddress', text: 'Generate Stealth Meta-Address' },
+      ],
       accountTypes: [
         { value: null, text: '(unknown)' },
         { value: 'eoa', text: 'EOA' },
@@ -633,6 +694,7 @@ const Accounts = {
       store.dispatch('data/addNewAccounts', this.settings.newAccounts);
     },
     addCoinbase() {
+      logInfo("Accounts", "addCoinbase - coinbase: " + this.coinbase);
       store.dispatch('data/addNewAccounts', this.coinbase);
     },
     toggleSelectedAccounts(items) {

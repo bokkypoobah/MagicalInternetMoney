@@ -537,11 +537,11 @@ const dataModule = {
           };
           context.commit('addNewAccountInfo', accountInfo);
         }
-        const names = await ensReverseRecordsContract.getNames([account]);
-        const name = names.length == 1 ? names[0] : account;
-        if (!(account in context.state.ensMap)) {
-          context.commit('addENSName', { account, name });
-        }
+        // const names = await ensReverseRecordsContract.getNames([account]);
+        // const name = names.length == 1 ? names[0] : account;
+        // if (!(account in context.state.ensMap)) {
+        //   context.commit('addENSName', { account, name });
+        // }
       }
       context.dispatch('saveData', ['accountsInfo', 'accounts', 'ensMap']);
     },
