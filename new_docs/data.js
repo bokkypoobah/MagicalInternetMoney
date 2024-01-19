@@ -181,7 +181,7 @@ const dataModule = {
         Vue.set(state.accounts[address], 'type', type);
         if (type == "stealthMetaAddress") {
           Vue.set(state.accounts[address], 'linkedToAddress', linkedToAddress);
-          Vue.set(state.accounts[address], 'phrase', newAccount.phrase);
+          Vue.set(state.accounts[address], 'phrase', newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined);
           Vue.set(state.accounts[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
           Vue.set(state.accounts[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
           Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
@@ -203,7 +203,7 @@ const dataModule = {
           Vue.set(state.accounts, address, {
             type,
             linkedToAddress,
-            phrase: newAccount.phrase,
+            phrase: newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined,
             viewingPrivateKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined,
             spendingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined,
             viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
@@ -489,6 +489,7 @@ const dataModule = {
   },
   actions: {
     async restoreState(context) {
+      console.log("data.actions.restoreState");
       const CHAIN_ID = 1;
       if (Object.keys(context.state.txs) == 0) {
         const db0 = new Dexie(context.state.db.name);
@@ -570,6 +571,7 @@ const dataModule = {
     async addNewAccount(context, newAccount) {
       logInfo("dataModule", "actions.addNewAccount - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
       context.commit('addNewAccount', newAccount);
+      await context.dispatch('saveData', ['accounts']);
       // const accounts = newAccounts == null ? [] : newAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
       // const provider = new ethers.providers.Web3Provider(window.ethereum);
       // const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
