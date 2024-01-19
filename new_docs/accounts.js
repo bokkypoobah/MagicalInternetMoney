@@ -196,7 +196,7 @@ const Accounts = {
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
                 <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
-                <b-button size="sm" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
+                <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
@@ -220,7 +220,7 @@ const Accounts = {
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
+                <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="settings.newAccount.linkedToAddress" class="w-75"></b-form-input>
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'addAddress' || settings.newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -456,6 +456,9 @@ const Accounts = {
           phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           mine: true,
           name: null,
+          viewingPrivateKey: null,
+          spendingPublicKey: null,
+          viewingPublicKey: null,
         },
 
         newAccounts: null,
@@ -783,7 +786,7 @@ const Accounts = {
       localStorage.accountsSettings = JSON.stringify(this.settings);
     },
     async generateNewStealthMetaAddress() {
-      logInfo("Accounts", "methods.generateNewStealthMetaAddress: " + JSON.stringify(this.settings.newAccount, null, 2));
+      logInfo("Accounts", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
       logInfo("Accounts", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.newAccount.phrase));
       logInfo("Accounts", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
@@ -802,12 +805,18 @@ const Accounts = {
       const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
       const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
       const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+      this.settings.newAccount.viewingPrivateKey = keyPair2.privateKey;
       console.log("viewingPrivateKey: " + keyPair2.privateKey);
       // Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
       const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
       const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
       const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
       console.log("stealthMetaAddress: " + stealthMetaAddress);
+      this.settings.newAccount.spendingPublicKey = spendingPublicKey;
+      this.settings.newAccount.viewingPublicKey = viewingPublicKey;
+      this.settings.newAccount.linkedToAddress = this.coinbase;
+      // Vue.set(this.settings.newAccount, 'linkedToAddress', this.coinbase + 'x');
+      this.settings.newAccount.stealthMetaAddress = stealthMetaAddress;
       // Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
       // Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
       // Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
@@ -820,7 +829,7 @@ const Accounts = {
       // }
       // Vue.set(this.modalNewStealthMetaAddress, 'status', status);
       // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
-
+      logInfo("Accounts", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
     },
     addNewAccounts() {
       logInfo("Accounts", "methods.addNewAccounts: " + this.coinbase);
