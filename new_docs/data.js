@@ -171,40 +171,23 @@ const dataModule = {
     },
     addNewAccount(state, newAccount) {
       logInfo("dataModule", "mutations.addNewAccount(" + JSON.stringify(newAccount, null, 2) + ")");
-
-      // 17:20:06 INFO dataModule:mutations.addNewAccount({
-      //   "action": "addAddress",
-      //   "address": "0x000001f568875F378Bf6d170B790967FE429C81A",
-      //   "stealthMetaAddress": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-      //   "linkedToAddress": "0x000001f568875F378Bf6d170B790967FE429C81A",
-      //   "phrase": "I want to login into my stealth wallet on Ethereum mainnet.",
-      //   "mine": true,
-      //   "name": "",
-      //   "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
-      //   "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
-      //   "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96"
-      // })
-
       const address = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? newAccount.address : newAccount.stealthMetaAddress;
-      // logInfo("dataModule", "mutations.addNewAccount - address: " + address);
-
       const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
       const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
       const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
       const mine = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? true : newAccount.mine;
       // const block = store.getters['connection/block'];
       if (address in state.accounts) {
-        Vue.set(state.accounts[address], 'type', type + ' 1');
+        Vue.set(state.accounts[address], 'type', type);
         if (type == "stealthMetaAddress") {
-          Vue.set(state.accounts[address], 'linkedToAddress', linkedToAddress + ' 3');
-          Vue.set(state.accounts[address], 'phrase', newAccount.phrase + ' 4');
-          Vue.set(state.accounts[address], 'viewingPrivateKey', newAccount.viewingPrivateKey + ' 5');
-          Vue.set(state.accounts[address], 'spendingPublicKey', newAccount.spendingPublicKey + ' 6');
-          Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.viewingPublicKey + ' 7');
+          Vue.set(state.accounts[address], 'linkedToAddress', linkedToAddress);
+          Vue.set(state.accounts[address], 'phrase', newAccount.phrase);
+          Vue.set(state.accounts[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
+          Vue.set(state.accounts[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
+          Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
         }
-        Vue.set(state.accounts[address], 'mine', mine + ' 2');
-        Vue.set(state.accounts[address], 'name', newAccount.name + ' 3');
-        // Vue.set(state.accounts[address], 'junk', junk + ' 4');
+        Vue.set(state.accounts[address], 'mine', mine);
+        Vue.set(state.accounts[address], 'name', newAccount.name);
       } else {
         if (type == "address") {
           Vue.set(state.accounts, address, {
@@ -221,9 +204,9 @@ const dataModule = {
             type,
             linkedToAddress,
             phrase: newAccount.phrase,
-            viewingPrivateKey: newAccount.viewingPrivateKey,
-            spendingPublicKey: newAccount.spendingPublicKey,
-            viewingPublicKey: newAccount.viewingPublicKey,
+            viewingPrivateKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined,
+            spendingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined,
+            viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
             source,
             mine,
             name: newAccount.name,
