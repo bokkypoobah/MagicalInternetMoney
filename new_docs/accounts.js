@@ -190,7 +190,7 @@ const Accounts = {
                 <!-- <b-form-textarea size="sm" id="addnewaccount-type" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea> -->
               </b-form-group>
 
-              <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the attached address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
+              <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
                 <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="settings.newAccount.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
               </b-form-group>
 
@@ -207,8 +207,8 @@ const Accounts = {
                 <b-form-input size="sm" id="addnewaccount-address" v-model.trim="settings.newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
               </b-form-group>
 
-              <b-form-group v-if="settings.newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!settings.newAccount.address || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="settings.newAccount.address" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+              <b-form-group v-if="settings.newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!settings.newAccount.stealthMetaAddress || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
+                <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="settings.newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!settings.newAccount.linkedToAddress || addNewAccountLinkedToFeedback == null" :invalid-feedback="addNewAccountLinkedToFeedback" class="mx-0 my-1 p-0">
@@ -216,7 +216,7 @@ const Accounts = {
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="settings.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+                <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="settings.newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
@@ -451,6 +451,7 @@ const Accounts = {
         newAccount: {
           action: 'addCoinbase',
           address: null,
+          stealthMetaAddress: null,
           linkedToAddress: null,
           phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
           mine: true,
@@ -597,10 +598,10 @@ const Accounts = {
 
     addNewAccountStealthMetaAddressFeedback() {
       if (this.settings.newAccount.action == 'addStealthMetaAddress') {
-        if (!this.settings.newAccount.address) {
+        if (!this.settings.newAccount.stealthMetaAddress) {
           return "Enter Stealth Meta-Address";
         }
-        if (!this.settings.newAccount.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+        if (!this.settings.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
           return "Invalid Stealth Meta-Address";
         }
       }
@@ -634,10 +635,10 @@ const Accounts = {
         }
         return null;
       } else if (this.settings.newAccount.action == 'addStealthMetaAddress') {
-        if (!this.settings.newAccount.address) {
+        if (!this.settings.newAccount.stealthMetaAddress) {
           return "Enter Stealth Meta-Address";
         }
-        if (!this.settings.newAccount.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+        if (!this.settings.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
           return "Invalid Stealth Meta-Address";
         }
         if (!this.settings.newAccount.linkedToAddress) {
