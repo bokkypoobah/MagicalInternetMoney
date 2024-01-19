@@ -196,7 +196,7 @@ const Accounts = {
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
                 <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
-                <b-button size="sm" id="addnewaccount-generate" @click="addNewAccounts" variant="primary">Generate</b-button>
+                <b-button size="sm" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
@@ -781,6 +781,46 @@ const Accounts = {
   methods: {
     saveSettings() {
       localStorage.accountsSettings = JSON.stringify(this.settings);
+    },
+    async generateNewStealthMetaAddress() {
+      logInfo("Accounts", "methods.generateNewStealthMetaAddress: " + JSON.stringify(this.settings.newAccount, null, 2));
+      logInfo("Accounts", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
+      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.settings.newAccount.phrase));
+      logInfo("Accounts", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
+      const signature = await ethereum.request({
+        method: 'personal_sign',
+        params: [phraseInHex, this.coinbase],
+      });
+      const signature1 = signature.slice(2, 66);
+      const signature2 = signature.slice(66, 130);
+      // Hash "v" and "r" values using SHA-256
+      const hashedV = ethers.utils.sha256("0x" + signature1);
+      const hashedR = ethers.utils.sha256("0x" + signature2);
+      const n = ethers.BigNumber.from(SECP256K1_N);
+      // Calculate the private keys by taking the hash values modulo the curve order
+      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+      console.log("viewingPrivateKey: " + keyPair2.privateKey);
+      // Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
+      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+      const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
+      console.log("stealthMetaAddress: " + stealthMetaAddress);
+      // Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
+      // Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
+      // Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
+      // Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', { address: this.coinbase });
+      // let status;
+      // if (stealthMetaAddress in this.addresses) {
+      //   status = this.addresses[stealthMetaAddress].mine ? "mine" : "notmine";
+      // } else {
+      //   status = "doesnotexist";
+      // }
+      // Vue.set(this.modalNewStealthMetaAddress, 'status', status);
+      // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
+
     },
     addNewAccounts() {
       logInfo("Accounts", "methods.addNewAccounts: " + this.coinbase);
