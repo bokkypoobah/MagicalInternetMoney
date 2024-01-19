@@ -195,7 +195,7 @@ const Accounts = {
               </b-form-group>
 
               <b-form-group v-if="settings.newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
-                <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
+                <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
                 <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
               </b-form-group>
 
@@ -237,8 +237,8 @@ const Accounts = {
 
 
               <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccounts" variant="primary">Add</b-button> -->
-                <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccounts" variant="primary">Add</b-button>
+                <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
+                <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add</b-button>
               </b-form-group>
 
               <!-- <b-form-group v-if="false" label="Connected Account:" label-for="addnewaccount-coinbase-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="coinbase == null ? '' : (coinbaseIncluded ? (coinbase + ' already added') : ('Add ' + coinbase + '?'))" class="mx-0 my-1 p-0">
@@ -652,7 +652,19 @@ const Accounts = {
         }
         return null;
       } else if (this.settings.newAccount.action == 'generateStealthMetaAddress') {
-        return "Generate your address first";
+        if (!this.settings.newAccount.stealthMetaAddress) {
+          return "Enter Stealth Meta-Address";
+        }
+        if (!this.settings.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+          return "Invalid Stealth Meta-Address";
+        }
+        if (!this.settings.newAccount.linkedToAddress) {
+          return "Enter Linked To Address";
+        }
+        if (!this.settings.newAccount.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+          return "Invalid Linked To Address";
+        }
+        return null;
       }
       return "Aaargh";
     },
@@ -831,13 +843,13 @@ const Accounts = {
       // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
       logInfo("Accounts", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
     },
-    addNewAccounts() {
-      logInfo("Accounts", "methods.addNewAccounts: " + this.coinbase);
-      store.dispatch('data/addNewAccounts', this.settings.newAccounts);
+    addNewAccount() {
+      logInfo("Accounts", "methods.addNewAccount: " + JSON.stringify(this.settings.newAccount, null, 2));
+      store.dispatch('data/addNewAccount', this.settings.newAccount);
     },
     addCoinbase() {
       logInfo("Accounts", "methods.addCoinbase - coinbase: " + this.coinbase);
-      store.dispatch('data/addNewAccounts', this.coinbase);
+      store.dispatch('data/addNewAccount', this.coinbase);
     },
     toggleSelectedAccounts(items) {
       let someFalse = false;

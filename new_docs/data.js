@@ -169,32 +169,49 @@ const dataModule = {
         });
       }
     },
-    addNewAccount(state, info) {
-      logInfo("dataModule", "mutations.addNewAccount(" + JSON.stringify(info) + ")");
-      const block = store.getters['connection/block'];
-      if (!(info.account in state.accounts)) {
-        Vue.set(state.accounts, info.account, {
-          type: info.type || null,
-          name: info.name || null, // ERC-20, ERC-721 & ERC-1155
-          ensName: null,
-          symbol: info.symbol || null, // ERC-20, ERC-721 & ERC-1155
-          decimals: info.decimals || null, // ERC-20
-          slug: info.slug || null, // ERC-721 & ERC-1155
-          image: info.image || null, // ?ERC-20, ERC-721 & ERC-1155
-          created: {
-            timestamp: block && block.timestamp || null,
-            blockNumber: block && block.number || null,
-          },
-          updated: {
-            timestamp: null,
-            blockNumber: null,
-          },
-          transactions: {},
-          internalTransactions: {},
-          events: {},
-          assets: {},
-        });
-      }
+    addNewAccount(state, newAccount) {
+      logInfo("dataModule", "mutations.addNewAccount(" + JSON.stringify(newAccount, null, 2) + ")");
+
+      // 17:20:06 INFO dataModule:mutations.addNewAccount({
+      //   "action": "addAddress",
+      //   "address": "0x000001f568875F378Bf6d170B790967FE429C81A",
+      //   "stealthMetaAddress": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
+      //   "linkedToAddress": "0x000001f568875F378Bf6d170B790967FE429C81A",
+      //   "phrase": "I want to login into my stealth wallet on Ethereum mainnet.",
+      //   "mine": true,
+      //   "name": "",
+      //   "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
+      //   "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
+      //   "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96"
+      // })
+
+      const address = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? newAccount.address : newAccount.stealthMetaAddress;
+      logInfo("dataModule", "mutations.addNewAccount - address: " + address);
+
+      // const block = store.getters['connection/block'];
+      // if (!(info.account in state.accounts)) {
+      //   Vue.set(state.accounts, info.account, {
+      //     type: info.type || null,
+      //     name: info.name || null, // ERC-20, ERC-721 & ERC-1155
+      //     ensName: null,
+      //     symbol: info.symbol || null, // ERC-20, ERC-721 & ERC-1155
+      //     decimals: info.decimals || null, // ERC-20
+      //     slug: info.slug || null, // ERC-721 & ERC-1155
+      //     image: info.image || null, // ?ERC-20, ERC-721 & ERC-1155
+      //     created: {
+      //       timestamp: block && block.timestamp || null,
+      //       blockNumber: block && block.number || null,
+      //     },
+      //     updated: {
+      //       timestamp: null,
+      //       blockNumber: null,
+      //     },
+      //     transactions: {},
+      //     internalTransactions: {},
+      //     events: {},
+      //     assets: {},
+      //   });
+      // }
     },
     deleteAccountAndAccountInfo(state, account) {
       Vue.delete(state.accounts, account);
@@ -520,30 +537,32 @@ const dataModule = {
       console.log("status: " + JSON.stringify(status));
       db0.close();
     },
-    async addNewAccounts(context, newAccounts) {
-      const accounts = newAccounts == null ? [] : newAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-      for (let account of accounts) {
-        const accountData = await getAccountInfo(account, provider);
-        if (accountData.account) {
-          context.commit('addNewAccount', accountData);
-          const isMyAccount = true; // account == store.getters['connection/coinbase'];
-          const accountInfo = {
-            account,
-            mine: isMyAccount,
-            sync: isMyAccount,
-            report: isMyAccount,
-          };
-          context.commit('addNewAccountInfo', accountInfo);
-        }
-        // const names = await ensReverseRecordsContract.getNames([account]);
-        // const name = names.length == 1 ? names[0] : account;
-        // if (!(account in context.state.ensMap)) {
-        //   context.commit('addENSName', { account, name });
-        // }
-      }
-      context.dispatch('saveData', ['accountsInfo', 'accounts', 'ensMap']);
+    async addNewAccount(context, newAccount) {
+      logInfo("dataModule", "actions.addNewAccount - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
+      context.commit('addNewAccount', newAccount);
+      // const accounts = newAccounts == null ? [] : newAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
+      // const provider = new ethers.providers.Web3Provider(window.ethereum);
+      // const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+      // for (let account of accounts) {
+      //   const accountData = await getAccountInfo(account, provider);
+      //   if (accountData.account) {
+      //     context.commit('addNewAccount', accountData);
+      //     const isMyAccount = true; // account == store.getters['connection/coinbase'];
+      //     const accountInfo = {
+      //       account,
+      //       mine: isMyAccount,
+      //       sync: isMyAccount,
+      //       report: isMyAccount,
+      //     };
+      //     context.commit('addNewAccountInfo', accountInfo);
+      //   }
+      //   // const names = await ensReverseRecordsContract.getNames([account]);
+      //   // const name = names.length == 1 ? names[0] : account;
+      //   // if (!(account in context.state.ensMap)) {
+      //   //   context.commit('addENSName', { account, name });
+      //   // }
+      // }
+      // context.dispatch('saveData', ['accountsInfo', 'accounts', 'ensMap']);
     },
     async restoreAccount(context, accountData) {
       logInfo("dataModule", "actions.restoreAccount - accountData: " + JSON.stringify(accountData));
