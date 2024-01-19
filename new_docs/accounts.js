@@ -224,7 +224,7 @@ const Accounts = {
               </b-form-group>
 
               <b-form-group v-if="settings.addAccountType == 'addAddress' || settings.addAccountType == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="settings.mine" @change="saveSettings" class="mt-1"></b-form-checkbox>
+                <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="settings.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox>
               </b-form-group>
 
               <!-- <b-form-group v-if="false && settings.addAccountType != 'addCoinbase'" label="Accounts:" label-for="addnewaccount-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
