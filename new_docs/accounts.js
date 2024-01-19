@@ -238,7 +238,7 @@ const Accounts = {
 
               <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
                 <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
-                <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add</b-button>
+                <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add/Update</b-button>
               </b-form-group>
 
               <!-- <b-form-group v-if="false" label="Connected Account:" label-for="addnewaccount-coinbase-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="coinbase == null ? '' : (coinbaseIncluded ? (coinbase + ' already added') : ('Add ' + coinbase + '?'))" class="mx-0 my-1 p-0">

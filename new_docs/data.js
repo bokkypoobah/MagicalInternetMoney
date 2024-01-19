@@ -186,11 +186,57 @@ const dataModule = {
       // })
 
       const address = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? newAccount.address : newAccount.stealthMetaAddress;
-      logInfo("dataModule", "mutations.addNewAccount - address: " + address);
+      // logInfo("dataModule", "mutations.addNewAccount - address: " + address);
 
+      const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
+      const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
+      const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
+      const mine = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? true : newAccount.mine;
       // const block = store.getters['connection/block'];
-      // if (!(info.account in state.accounts)) {
-      //   Vue.set(state.accounts, info.account, {
+      if (address in state.accounts) {
+        Vue.set(state.accounts[address], 'type', type + ' 1');
+        if (type == "stealthMetaAddress") {
+          Vue.set(state.accounts[address], 'linkedToAddress', linkedToAddress + ' 3');
+          Vue.set(state.accounts[address], 'phrase', newAccount.phrase + ' 4');
+          Vue.set(state.accounts[address], 'viewingPrivateKey', newAccount.viewingPrivateKey + ' 5');
+          Vue.set(state.accounts[address], 'spendingPublicKey', newAccount.spendingPublicKey + ' 6');
+          Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.viewingPublicKey + ' 7');
+        }
+        Vue.set(state.accounts[address], 'mine', mine + ' 2');
+        Vue.set(state.accounts[address], 'name', newAccount.name + ' 3');
+        // Vue.set(state.accounts[address], 'junk', junk + ' 4');
+      } else {
+        if (type == "address") {
+          Vue.set(state.accounts, address, {
+            type,
+            source,
+            mine,
+            name: newAccount.name,
+            ensName: null,
+            favourite: false,
+            notes: null,
+          });
+        } else {
+          Vue.set(state.accounts, address, {
+            type,
+            linkedToAddress,
+            phrase: newAccount.phrase,
+            viewingPrivateKey: newAccount.viewingPrivateKey,
+            spendingPublicKey: newAccount.spendingPublicKey,
+            viewingPublicKey: newAccount.viewingPublicKey,
+            source,
+            mine,
+            name: newAccount.name,
+            favourite: false,
+            notes: null,
+          });
+        }
+
+        // Vue.set(state.accounts, address, {
+        //   type,
+        //   source,
+        //   mine,
+        //   name,
       //     type: info.type || null,
       //     name: info.name || null, // ERC-20, ERC-721 & ERC-1155
       //     ensName: null,
@@ -210,8 +256,9 @@ const dataModule = {
       //     internalTransactions: {},
       //     events: {},
       //     assets: {},
-      //   });
-      // }
+        // });
+      }
+      logInfo("dataModule", "mutations.addNewAccount AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
     },
     deleteAccountAndAccountInfo(state, account) {
       Vue.delete(state.accounts, account);
