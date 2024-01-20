@@ -549,11 +549,55 @@ const Accounts = {
       },
 
       account: {
-        hi: "ho",
+        account: null,
+        type: null,
+        source: null,
+        mine: null,
+        favourite: null,
+        ensName: null,
+        name: null,
+        notes: null,
+        // {
+        //   "account": "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362",
+        //   "type": "address",
+        //   "source": "attached",
+        //   "mine": true,
+        //   "favourite": false,
+        //   "ensName": null,
+        //   "name": null,
+        //   "notes": null
+        // }
       },
 
       stealthMetaAccount: {
-        yo: "there",
+          account: null,
+          type: null,
+          linkedToAddress: null,
+          phrase: null,
+          spendingPrivateKey: null,
+          viewingPrivateKey: null,
+          spendingPublicKey: null,
+          viewingPublicKey: null,
+          source: null,
+          mine: null,
+          favourite: null,
+          name: null,
+          notes: null,
+
+        // {
+        //   "account": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
+        //   "type": "stealthMetaAddress",
+        //   "linkedToAddress": "0x000001f568875F378Bf6d170B790967FE429C81A",
+        //   "phrase": "I want to login into my stealth wallet on Ethereum mainnet.",
+        //   "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
+        //   "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
+        //   "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
+        //   "source": "attached",
+        //   "mine": true,
+        //   "favourite": false,
+        //   "name": null,
+        //   "notes": null
+        // }
       },
 
       newAccountActions: [
@@ -917,21 +961,29 @@ const Accounts = {
       logInfo("Accounts", "methods.accountsRowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         const account = item[0].account;
-      //   const addressData = this.addresses[address];
-      //   const linkedAddress = addressData.linkedTo && addressData.linkedTo.address || null;
-      //   const linkedAddressData = this.addresses[linkedAddress] || {};
         if (account.substring(0, 3) == "st:") {
-      //     this.modalStealthMetaAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type };
-      //     this.modalStealthMetaAddress.name = addressData.name;
-      //     this.modalStealthMetaAddress.notes = addressData.notes || null;
-      //     this.modalStealthMetaAddress.spendingPrivateKey = null;
+          this.stealthMetaAccount.account = item[0].account;
+          this.stealthMetaAccount.type = item[0].type;
+          this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
+          this.stealthMetaAccount.phrase = item[0].phrase;
+          this.stealthMetaAccount.spendingPrivateKey = null;
+          this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey;
+          this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey;
+          this.stealthMetaAccount.source = item[0].source;
+          this.stealthMetaAccount.mine = item[0].mine;
+          this.stealthMetaAccount.favourite = item[0].favourite;
+          this.stealthMetaAccount.name = item[0].name;
+          this.stealthMetaAccount.notes = item[0].notes;
           this.$bvModal.show('modal-stealthmetaccount');
         } else {
-      //     const linkedStealthMetaAddress = addressData.linkedTo && addressData.linkedTo.stealthMetaAddress || null;
-      //     const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
-      //     this.modalAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type };
-      //     this.modalAddress.name = addressData.name;
-      //     this.modalAddress.notes = addressData.notes || null;
+          this.account.account = item[0].account;
+          this.account.type = item[0].type;
+          this.account.source = item[0].source;
+          this.account.mine = item[0].mine;
+          this.account.favourite = item[0].favourite;
+          this.account.ensName = item[0].ensName;
+          this.account.name = item[0].name;
+          this.account.notes = item[0].notes;
           this.$bvModal.show('modal-account');
         }
         this.$refs.accountsTable.clearSelected();
