@@ -9,7 +9,7 @@ const Accounts = {
             <b-form-select size="sm" id="addnewaccount-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
           </b-form-group>
           <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
+            <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="enter phrase" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
             <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
@@ -27,7 +27,7 @@ const Accounts = {
             <b-form-input size="sm" id="addnewaccount-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+            <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
@@ -48,8 +48,8 @@ const Accounts = {
           <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="account-address" v-model.trim="account.account" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="w-25"></b-form-input>
+          <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="account-name" v-model.trim="account.name" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="saveSettings" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
@@ -57,38 +57,52 @@ const Accounts = {
           <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group>
+          <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" class="w-75"></b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="w-25"></b-form-input>
+          </b-form-group>
           <b-form-group label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="account-ensname" v-model.trim="account.ensName" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="account-name" v-model.trim="account.name" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" class="w-100"></b-form-textarea>
           </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
-          <template #modal-title>Stealth Meta-Address</template>
-
-          <!-- this.stealthMetaAccount.account = item[0].account;
-          this.stealthMetaAccount.type = item[0].type;
-          this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
-          this.stealthMetaAccount.phrase = item[0].phrase;
-          this.stealthMetaAccount.spendingPrivateKey = null;
-          this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey;
-          this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey;
-          this.stealthMetaAccount.source = item[0].source;
-          this.stealthMetaAccount.mine = item[0].mine;
-          this.stealthMetaAccount.favourite = item[0].favourite;
-          this.stealthMetaAccount.name = item[0].name;
-          this.stealthMetaAccount.notes = item[0].notes; -->
-
-          <font size="-1">
-            <pre>
-{{ stealthMetaAccount }}
-            </pre>
-          </font>
+          <template #modal-title>Stealth Meta-Address Account</template>
+          <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          </b-form-group>
+          <b-form-group label="Favourite:" label-for="stealthmetaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+          </b-form-group>
+          <b-form-group label="Notes:" label-for="stealthmetaccount-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" class="w-75"></b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Source:" label-for="stealthmetaccount-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="w-25"></b-form-input>
+          </b-form-group>
+          <b-form-group label="Linked To Address:" label-for="stealthmetaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaccount-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Public Key:" label-for="stealthmetaccount-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaccount-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="stealthmetaccount-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="w-75"></b-form-input>
+          </b-form-group>
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
@@ -562,22 +576,12 @@ const Accounts = {
       account: {
         account: null,
         type: null,
-        source: null,
+        name: null,
         mine: null,
         favourite: null,
-        ensName: null,
-        name: null,
         notes: null,
-        // {
-        //   "account": "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362",
-        //   "type": "address",
-        //   "source": "attached",
-        //   "mine": true,
-        //   "favourite": false,
-        //   "ensName": null,
-        //   "name": null,
-        //   "notes": null
-        // }
+        source: null,
+        ensName: null,
       },
 
       stealthMetaAccount: {
@@ -585,30 +589,15 @@ const Accounts = {
           type: null,
           linkedToAddress: null,
           phrase: null,
+          name: null,
+          mine: null,
+          favourite: null,
+          notes: null,
+          source: null,
           spendingPrivateKey: null,
           viewingPrivateKey: null,
           spendingPublicKey: null,
           viewingPublicKey: null,
-          source: null,
-          mine: null,
-          favourite: null,
-          name: null,
-          notes: null,
-
-        // {
-        //   "account": "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-        //   "type": "stealthMetaAddress",
-        //   "linkedToAddress": "0x000001f568875F378Bf6d170B790967FE429C81A",
-        //   "phrase": "I want to login into my stealth wallet on Ethereum mainnet.",
-        //   "viewingPrivateKey": "0x55aa48e46439668c9c3ef187e444cd3ffcf39b6d5d39adbb14741307d02f7cf0",
-        //   "spendingPublicKey": "0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c4",
-        //   "viewingPublicKey": "0x03ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96",
-        //   "source": "attached",
-        //   "mine": true,
-        //   "favourite": false,
-        //   "name": null,
-        //   "notes": null
-        // }
       },
 
       newAccountActions: [
@@ -978,8 +967,9 @@ const Accounts = {
           this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
           this.stealthMetaAccount.phrase = item[0].phrase;
           this.stealthMetaAccount.spendingPrivateKey = null;
-          this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey;
-          this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey;
+          this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
+          this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
+          this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
           this.stealthMetaAccount.source = item[0].source;
           this.stealthMetaAccount.mine = item[0].mine;
           this.stealthMetaAccount.favourite = item[0].favourite;
