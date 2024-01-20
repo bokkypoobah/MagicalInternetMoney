@@ -1074,11 +1074,11 @@ const Accounts = {
     },
     async toggleAccountField(account, field) {
       logInfo("Accounts", "methods.toggleAccountField - account: " + account + ", field: " + field);
-      <!-- store.dispatch('data/toggleAccountInfoField', { account, field }); -->
+      store.dispatch('data/toggleAccountField', { account, field });
     },
     async setAccountField(account, field, value) {
       logInfo("Accounts", "methods.setAccountField - account: " + account + ", field: " + field + ", value: " + value);
-      <!-- store.dispatch('data/setAccountInfoField', { account, field, value }); -->
+      store.dispatch('data/setAccountField', { account, field, value });
     },
     async setAccountInfoField(account, field, value) {
       store.dispatch('data/setAccountInfoField', { account, field, value });

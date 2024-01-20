@@ -137,6 +137,23 @@ const dataModule = {
     setState(state, info) {
       Vue.set(state, info.name, info.data);
     },
+    toggleAccountField(state, info) {
+      Vue.set(state.accounts[info.account], info.field, !state.accounts[info.account][info.field]);
+      logInfo("dataModule", "mutations.toggleAccountField: " + JSON.stringify(state.accounts[info.account]));
+    },
+    setAccountField(state, info) {
+      logInfo("dataModule", "mutations.setAccountField: " + JSON.stringify(info));
+      Vue.set(state.accounts[info.account], info.field, info.value);
+      logInfo("dataModule", "mutations.setAccountField: " + JSON.stringify(state.accounts[info.account]));
+      //
+      // console.log("mutations.setAccountInfoField: " + JSON.stringify(info));
+      // console.log("state.accountsInfo: " + JSON.stringify(state.accountsInfo, null, 2));
+      // if (!(info.account in state.accountsInfo)) {
+      //   Vue.set(state.accountsInfo, info.account, {});
+      // }
+      // console.log("state.accountsInfo[info.account]: " + JSON.stringify(state.accountsInfo[info.account], null, 2));
+      // Vue.set(state.accountsInfo[info.account], info.field, info.value);
+    },
     toggleAccountInfoField(state, info) {
       Vue.set(state.accountsInfo[info.account], info.field, !state.accountsInfo[info.account][info.field]);
     },
@@ -513,6 +530,16 @@ const dataModule = {
         });
       }
       db0.close();
+    },
+    async toggleAccountField(context, info) {
+      logInfo("dataModule", "actions.toggleAccountField - info: " + JSON.stringify(info));
+      await context.commit('toggleAccountField', info);
+      await context.dispatch('saveData', ['accounts']);
+    },
+    async setAccountField(context, info) {
+      logInfo("dataModule", "actions.setAccountField - info: " + JSON.stringify(info));
+      await context.commit('setAccountField', info);
+      await context.dispatch('saveData', ['accounts']);
     },
     async toggleAccountInfoField(context, info) {
       await context.commit('toggleAccountInfoField', info);
