@@ -35,6 +35,9 @@ const Accounts = {
           <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="addnewaccount-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group>
+          <b-form-group label="Favourite:" label-for="addnewaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="addnewaccount-favourite" :pressed.sync="newAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+          </b-form-group>
           <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
           </b-form-group>
@@ -591,7 +594,8 @@ const Accounts = {
         stealthMetaAddress: null,
         linkedToAddress: null,
         phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
-        mine: true,
+        mine: false,
+        favourite: false,
         name: null,
         viewingPrivateKey: null,
         spendingPublicKey: null,
@@ -959,26 +963,17 @@ const Accounts = {
     },
     viewModalAddAccount() {
       logInfo("Accounts", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-
       this.newAccount.action = 'addCoinbase';
       this.newAccount.address = null;
       this.newAccount.stealthMetaAddress = null;
       this.newAccount.linkedToAddress = this.coinbase;
       this.newAccount.phrase = this.defaultPhrase;
       this.newAccount.mine = false;
+      this.newAccount.favourite = false;
       this.newAccount.name = null;
       this.newAccount.viewingPrivateKey = null;
       this.newAccount.spendingPublicKey = null;
       this.newAccount.viewingPublicKey = null;
-
-      // this.modalNewStealthMetaAddress.name = null;
-      // this.modalNewStealthMetaAddress.linkedTo = this.coinbase;
-      // this.modalNewStealthMetaAddress.phrase = this.defaultPhrase;
-      // this.modalNewStealthMetaAddress.viewingPrivateKey = null;
-      // this.modalNewStealthMetaAddress.spendingPublicKey = null;
-      // this.modalNewStealthMetaAddress.viewingPublicKey = null;
-      // this.modalNewStealthMetaAddress.stealthMetaAddress = null;
-      // this.modalNewStealthMetaAddress.status = null;
       this.$bvModal.show('modal-newaccount');
     },
 

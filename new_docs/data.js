@@ -196,6 +196,7 @@ const dataModule = {
           Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
         }
         Vue.set(state.accounts[address], 'mine', mine);
+        Vue.set(state.accounts[address], 'favourite', newAccount.favourite);
         Vue.set(state.accounts[address], 'name', newAccount.name);
       } else {
         if (type == "address") {
@@ -203,7 +204,7 @@ const dataModule = {
             type,
             source,
             mine,
-            favourite: false,
+            favourite: newAccount.favourite,
             ensName: null,
             name: newAccount.name,
             notes: null,
@@ -218,7 +219,7 @@ const dataModule = {
             viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
             source,
             mine,
-            favourite: false,
+            favourite: newAccount.favourite,
             name: newAccount.name,
             notes: null,
           });
@@ -534,7 +535,7 @@ const dataModule = {
       await context.commit('setAccountField', info);
       await context.dispatch('saveData', ['accounts']);
     },
-    
+
     async toggleAccountInfoField(context, info) {
       await context.commit('toggleAccountInfoField', info);
       await context.dispatch('saveData', ['accounts', 'accountsInfo']);
