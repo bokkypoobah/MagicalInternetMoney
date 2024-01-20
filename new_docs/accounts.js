@@ -46,42 +46,58 @@ const Accounts = {
         <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Account</template>
           <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2 w-75"></b-form-input>
+            <b-input-group size="sm" class="w-100">
+              <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2"></b-form-input>
+              <b-input-group-append>
+                <div>
+                  <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                </div>
+              </b-input-group-append>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="account-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <!-- <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-          </b-form-group>
-          <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          </b-form-group> -->
+          <!-- <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-          </b-form-group>
+          </b-form-group> -->
           <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" plaintext id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
-          <b-form-group label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="account-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
-          </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Stealth Meta-Address Account</template>
           <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2 w-75"></b-form-textarea>
+            <b-input-group size="sm" class="w-100">
+              <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+              <b-input-group-append>
+                <div>
+                  <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                </div>
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <!-- <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-          </b-form-group>
-          <b-form-group label="Favourite:" label-for="stealthmetaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          </b-form-group> -->
+          <!-- <b-form-group label="Favourite:" label-for="stealthmetaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-          </b-form-group>
+          </b-form-group> -->
           <b-form-group label="Notes:" label-for="stealthmetaccount-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
@@ -585,12 +601,12 @@ const Accounts = {
       account: {
         account: null,
         type: null,
-        name: null,
+        ensName: null,
         mine: null,
         favourite: null,
+        name: null,
         notes: null,
         source: null,
-        ensName: null,
       },
 
       stealthMetaAccount: {
@@ -598,15 +614,15 @@ const Accounts = {
           type: null,
           linkedToAddress: null,
           phrase: null,
-          name: null,
           mine: null,
           favourite: null,
+          name: null,
           notes: null,
-          source: null,
           spendingPrivateKey: null,
           viewingPrivateKey: null,
           spendingPublicKey: null,
           viewingPublicKey: null,
+          source: null,
       },
 
       newAccountActions: [
@@ -975,25 +991,25 @@ const Accounts = {
           this.stealthMetaAccount.type = item[0].type;
           this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
           this.stealthMetaAccount.phrase = item[0].phrase;
+          this.stealthMetaAccount.mine = item[0].mine;
+          this.stealthMetaAccount.favourite = item[0].favourite;
+          this.stealthMetaAccount.name = item[0].name;
+          this.stealthMetaAccount.notes = item[0].notes;
           this.stealthMetaAccount.spendingPrivateKey = null;
           this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
           this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
           this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
           this.stealthMetaAccount.source = item[0].source;
-          this.stealthMetaAccount.mine = item[0].mine;
-          this.stealthMetaAccount.favourite = item[0].favourite;
-          this.stealthMetaAccount.name = item[0].name;
-          this.stealthMetaAccount.notes = item[0].notes;
           this.$bvModal.show('modal-stealthmetaccount');
         } else {
           this.account.account = item[0].account;
           this.account.type = item[0].type;
-          this.account.source = item[0].source;
+          this.account.ensName = item[0].ensName;
           this.account.mine = item[0].mine;
           this.account.favourite = item[0].favourite;
-          this.account.ensName = item[0].ensName;
           this.account.name = item[0].name;
           this.account.notes = item[0].notes;
+          this.account.source = item[0].source;
           this.$bvModal.show('modal-account');
         }
         this.$refs.accountsTable.clearSelected();
