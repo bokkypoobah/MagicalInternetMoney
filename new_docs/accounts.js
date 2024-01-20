@@ -53,8 +53,9 @@ const Accounts = {
               <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-                  <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -86,8 +87,8 @@ const Accounts = {
               <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-                  <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -108,7 +109,14 @@ const Accounts = {
             <b-form-input size="sm" plaintext id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
           <b-form-group label="Linked To Address:" label-for="stealthmetaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2 w-75"></b-form-input>
+            <b-input-group size="sm" class="w-100">
+              <b-form-input size="sm" plaintext id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2"></b-form-input>
+              <b-input-group-append>
+                <div>
+                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + stealthMetaAccount.linkedToAddress" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                </div>
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" plaintext id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="px-2 w-100"></b-form-input>
