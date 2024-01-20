@@ -676,53 +676,54 @@ const Accounts = {
       const results = [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
       for (const [account, accountData] of Object.entries(this.accounts)) {
-        const accountInfo = this.accountsInfo[account] || {};
-        const ensName = this.ensMap[account] || null;
-        const accountName = accountInfo.name || accountData.name || null;
+        // const accountInfo = this.accountsInfo[account] || {};
+        // const ensName = this.ensMap[account] || null;
+        const accountName = accountData.name || null;
         let include = filterLower == null ||
           (account.toLowerCase().includes(filterLower)) ||
-          (accountName && accountName.toLowerCase().includes(filterLower)) ||
-          (accountInfo.group && accountInfo.group.toLowerCase().includes(filterLower)) ||
-          (accountInfo.notes && accountInfo.notes.toLowerCase().includes(filterLower)) ||
-          (ensName != null && ensName.toLowerCase().includes(filterLower));
+          (accountName && accountName.toLowerCase().includes(filterLower)); // ||
+          // (accountInfo.group && accountInfo.group.toLowerCase().includes(filterLower)) ||
+          // (accountInfo.notes && accountInfo.notes.toLowerCase().includes(filterLower)) ||
+          // (ensName != null && ensName.toLowerCase().includes(filterLower));
         if (include && this.settings.myAccountsFilter != null) {
-          if (this.settings.myAccountsFilter == 'mine' && accountInfo.mine) {
-          } else if (this.settings.myAccountsFilter == 'notmine' && !accountInfo.mine) {
+          if (this.settings.myAccountsFilter == 'mine' && accountData.mine) {
+          } else if (this.settings.myAccountsFilter == 'notmine' && !accountData.mine) {
           } else {
             include = false;
           }
         }
-        if (include && this.settings.accountTypeFilter != null) {
-          const accountType = accountInfo.type || accountData.type || null;
-          if (this.settings.accountTypeFilter == 'unknown' && accountInfo.type == null) {
-          } else if (this.settings.accountTypeFilter == accountType) {
-          } else {
-            include = false;
-          }
-        }
-        if (include && this.settings.junkFilter) {
-          if (this.settings.junkFilter == 'junk' && !accountInfo.junk) {
-            include = false;
-          } else if (this.settings.junkFilter == 'excludejunk' && accountInfo.junk) {
-            include = false;
-          }
-        }
+        // if (include && this.settings.accountTypeFilter != null) {
+        //   const accountType = accountInfo.type || accountData.type || null;
+        //   if (this.settings.accountTypeFilter == 'unknown' && accountInfo.type == null) {
+        //   } else if (this.settings.accountTypeFilter == accountType) {
+        //   } else {
+        //     include = false;
+        //   }
+        // }
+        // if (include && this.settings.junkFilter) {
+        //   if (this.settings.junkFilter == 'junk' && !accountInfo.junk) {
+        //     include = false;
+        //   } else if (this.settings.junkFilter == 'excludejunk' && accountInfo.junk) {
+        //     include = false;
+        //   }
+        // }
         if (include) {
           results.push({
             account,
-            group: accountInfo.group,
-            name: accountName,
-            type: accountInfo.type || accountData.type,
-            slug: accountInfo.slug || accountData.slug,
-            image: accountInfo.image || accountData.image,
-            mine: accountInfo.mine,
-            sync: accountInfo.sync,
-            report: accountInfo.report,
-            junk: accountInfo.junk,
-            tags: accountInfo.tags,
-            notes: accountInfo.notes,
-            created: accountData.created,
-            updated: accountData.updated,
+            ...accountData,
+            // // group: accountInfo.group,
+            // name: accountName,
+            // type: accountData.type,
+            // // slug: accountInfo.slug || accountData.slug,
+            // // image: accountInfo.image || accountData.image,
+            // mine: accountData.mine,
+            // // sync: accountInfo.sync,
+            // // report: accountInfo.report,
+            // // junk: accountInfo.junk,
+            // // tags: accountInfo.tags,
+            // notes: accountData.notes,
+            // // created: accountData.created,
+            // // updated: accountData.updated,
           });
         }
       }

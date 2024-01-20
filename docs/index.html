@@ -70,7 +70,7 @@
           </b-card>
 
           <!-- :MODALSYNC -->
-          <b-modal ref="modalsync" id="modal-sync" hide-footer size="md">
+          <b-modal ref="modalsync" id="modal-sync" hide-footer body-bg-variant="light" size="md">
             <template #modal-title>Sync</template>
             <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
             <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
@@ -85,7 +85,7 @@
           </b-modal>
 
           <!-- :MODALNEWTRANSFER -->
-          <b-modal id="modal-newtransfer" hide-footer size="lg">
+          <b-modal id="modal-newtransfer" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Transfer To Stealth Meta-Address</template>
             <b-form-group label="From:" label-for="newtransfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <template slot="label">
@@ -155,7 +155,7 @@
           </b-modal>
 
           <!-- :MODALADDTOKENSTOTRANSFER -->
-          <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer size="md">
+          <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer body-bg-variant="light" size="md">
             <template #modal-title>Add Tokens For Transfer</template>
             <b-form-select size="sm" v-model="modalAddTokensToNewTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.bottom="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
             <div v-if="additionalERC20TokensOptions.length == 1">
@@ -211,14 +211,14 @@
           </b-modal>
 
           <!-- :MODALFAUCETS -->
-          <b-modal ref="modalsync" id="modal-faucets" hide-footer size="md">
+          <b-modal ref="modalsync" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
             <template #modal-title>ERC-20 & ERC-721 Faucets</template>
             <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" @change="saveSettings" :options="faucetsOptions" v-b-popover.hover.bottom="'Select faucet'"></b-form-select>
             <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
           </b-modal>
 
           <!-- :MODALTRANSFER -->
-          <b-modal id="modal-transfer" hide-footer size="lg">
+          <b-modal id="modal-transfer" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Stealth Transfer</template>
             <b-form-group v-if="modalTransfer.item" label="Transaction:" label-for="transfer-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -355,7 +355,7 @@
           </b-modal>
 
           <!-- :MODALREGISTRATION -->
-          <b-modal id="modal-registration" hide-footer size="lg">
+          <b-modal id="modal-registration" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Registration</template>
             <b-form-group v-if="modalRegistration.item" label="Transaction:" label-for="registration-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -406,7 +406,7 @@
           </b-modal>
 
           <!-- :MODALADDRESS -->
-          <b-modal id="modal-address" hide-footer size="lg">
+          <b-modal id="modal-address" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Address</template>
             <b-form-group v-if="modalAddress.item && (modalAddress.item.type == 'address' || modalAddress.item.type == 'stealthAddress')" label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -483,7 +483,7 @@
           </b-modal>
 
           <!-- :MODALSTEALTHMETAADDRESS -->
-          <b-modal id="modal-stealthmetaaddress" hide-footer size="lg">
+          <b-modal id="modal-stealthmetaaddress" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Stealth Meta-Address</template>
             <b-form-group v-if="modalStealthMetaAddress.item && modalStealthMetaAddress.item.type == 'stealthMetaAddress'" label="Stealth Meta-Address:" label-for="address-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -591,7 +591,7 @@
           </b-modal>
 
           <!-- :MODALNEWSTEALTHMETAADDRESS -->
-          <b-modal id="modal-newstealthmetaaddress" hide-footer size="lg">
+          <b-modal id="modal-newstealthmetaaddress" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>Generate New Stealth Meta-Address</template>
             <b-form-group label="Attached Address:" label-for="newsma-attachedaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <div class="d-flex justify-content-between">
@@ -638,7 +638,7 @@
           </b-modal>
 
           <!-- :MODALCONTRACT -->
-          <b-modal id="modal-contract" hide-footer size="lg">
+          <b-modal id="modal-contract" hide-footer body-bg-variant="light" size="lg">
             <template #modal-title>{{ contractTypeOptions.filter(e => e.value == modalContract.item.type)[0] && contractTypeOptions.filter(e => e.value == modalContract.item.type)[0].text || ("Unknown: " + modalContract.item.type) }}</template>
             <b-form-group v-if="modalContract.item && modalContract.item.chainId" label="Chain:" label-for="contract-chain" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" variant="transparent" id="contract-chain">{{ settings.chains[modalContract.item.chainId] && settings.chains[modalContract.item.chainId].name || ("Unconfigured ChainId: " + modalContract.item.chainId) }}</b-button>
