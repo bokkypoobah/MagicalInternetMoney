@@ -46,20 +46,13 @@ const Accounts = {
             </b-form-group>
 
             <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-
               <b-button size="sm" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-
               <!-- <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox> -->
             </b-form-group>
-
-            <!-- <b-form-group v-if="false && newAccount.action != 'addCoinbase'" label="Accounts:" label-for="addnewaccount-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
-              <b-form-textarea size="sm" id="addnewaccount-accounts" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea>
-            </b-form-group> -->
 
             <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
             </b-form-group>
-
 
             <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
@@ -67,6 +60,24 @@ const Accounts = {
             </b-form-group>
 
           <!-- </b-form-group> -->
+        </b-modal>
+
+        <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
+          <template #modal-title>Account</template>
+          <font size="-1">
+            <pre>
+{{ account }}
+            </pre>
+          </font>
+        </b-modal>
+
+        <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
+          <template #modal-title>Stealth Meta-Address</template>
+          <font size="-1">
+            <pre>
+{{ stealthMetaAccount }}
+            </pre>
+          </font>
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
@@ -319,7 +330,7 @@ const Accounts = {
           </b-card-body>
         </b-card>
 
-        <b-table small fixed striped responsive hover :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
+        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div v-if="totalAccounts == 0">
@@ -536,6 +547,15 @@ const Accounts = {
         spendingPublicKey: null,
         viewingPublicKey: null,
       },
+
+      account: {
+        hi: "ho",
+      },
+
+      stealthMetaAccount: {
+        yo: "there",
+      },
+
       newAccountActions: [
         { value: 'addCoinbase', text: 'Add Attached Web3 Address' },
         { value: 'addAddress', text: 'Add Address' },
@@ -892,6 +912,32 @@ const Accounts = {
       // this.modalNewStealthMetaAddress.status = null;
       this.$bvModal.show('modal-newaccount');
     },
+
+    accountsRowSelected(item) {
+      logInfo("Accounts", "methods.accountsRowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      if (item && item.length > 0) {
+        const account = item[0].account;
+      //   const addressData = this.addresses[address];
+      //   const linkedAddress = addressData.linkedTo && addressData.linkedTo.address || null;
+      //   const linkedAddressData = this.addresses[linkedAddress] || {};
+        if (account.substring(0, 3) == "st:") {
+      //     this.modalStealthMetaAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type };
+      //     this.modalStealthMetaAddress.name = addressData.name;
+      //     this.modalStealthMetaAddress.notes = addressData.notes || null;
+      //     this.modalStealthMetaAddress.spendingPrivateKey = null;
+          this.$bvModal.show('modal-stealthmetaccount');
+        } else {
+      //     const linkedStealthMetaAddress = addressData.linkedTo && addressData.linkedTo.stealthMetaAddress || null;
+      //     const linkedStealthMetaAddressData = this.addresses[linkedStealthMetaAddress] || {};
+      //     this.modalAddress.item = { address, ...addressData, linkedAddressType: linkedAddressData.type, linkedStealthMetaAddressType: linkedStealthMetaAddressData.type };
+      //     this.modalAddress.name = addressData.name;
+      //     this.modalAddress.notes = addressData.notes || null;
+          this.$bvModal.show('modal-account');
+        }
+        this.$refs.accountsTable.clearSelected();
+      }
+    },
+
     async generateNewStealthMetaAddress() {
       logInfo("Accounts", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
       logInfo("Accounts", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
