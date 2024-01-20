@@ -145,7 +145,7 @@ const dataModule = {
       Vue.set(state.accounts[info.account], info.field, info.value);
       logInfo("dataModule", "mutations.setAccountField - accounts[" + info.account + "]." + info.field + " = " + state.accounts[info.account][info.field]);
     },
-    
+
     toggleAccountInfoField(state, info) {
       Vue.set(state.accountsInfo[info.account], info.field, !state.accountsInfo[info.account][info.field]);
     },
@@ -523,6 +523,7 @@ const dataModule = {
       }
       db0.close();
     },
+
     async toggleAccountField(context, info) {
       // logInfo("dataModule", "actions.toggleAccountField - info: " + JSON.stringify(info));
       await context.commit('toggleAccountField', info);
@@ -533,6 +534,7 @@ const dataModule = {
       await context.commit('setAccountField', info);
       await context.dispatch('saveData', ['accounts']);
     },
+    
     async toggleAccountInfoField(context, info) {
       await context.commit('toggleAccountInfoField', info);
       await context.dispatch('saveData', ['accounts', 'accountsInfo']);

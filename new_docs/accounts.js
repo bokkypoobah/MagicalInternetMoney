@@ -94,6 +94,9 @@ const Accounts = {
           <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="w-75"></b-form-input>
           </b-form-group>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Private Key:" label-for="stealthmetaccount-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" readonly id="stealthmetaccount-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'" class="w-75"></b-form-input>
+          </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaccount-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="stealthmetaccount-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="w-75"></b-form-input>
           </b-form-group>
