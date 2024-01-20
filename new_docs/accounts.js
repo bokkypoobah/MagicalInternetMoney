@@ -49,16 +49,16 @@ const Accounts = {
             <b-form-input size="sm" readonly id="account-address" v-model.trim="account.account" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="account-name" v-model.trim="account.name" class="w-75"></b-form-input>
+            <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="saveSettings" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group>
           <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+            <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group>
           <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" class="w-75"></b-form-textarea>
+            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="w-25"></b-form-input>
@@ -74,16 +74,16 @@ const Accounts = {
             <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" class="w-75"></b-form-input>
+            <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" class="w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group>
           <b-form-group label="Favourite:" label-for="stealthmetaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+            <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group>
           <b-form-group label="Notes:" label-for="stealthmetaccount-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" class="w-75"></b-form-textarea>
+            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="stealthmetaccount-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="w-25"></b-form-input>
@@ -1071,6 +1071,14 @@ const Accounts = {
     },
     async toggleAccountInfoField(account, field) {
       store.dispatch('data/toggleAccountInfoField', { account, field });
+    },
+    async toggleAccountField(account, field) {
+      logInfo("Accounts", "methods.toggleAccountField - account: " + account + ", field: " + field);
+      <!-- store.dispatch('data/toggleAccountInfoField', { account, field }); -->
+    },
+    async setAccountField(account, field, value) {
+      logInfo("Accounts", "methods.setAccountField - account: " + account + ", field: " + field + ", value: " + value);
+      <!-- store.dispatch('data/setAccountInfoField', { account, field, value }); -->
     },
     async setAccountInfoField(account, field, value) {
       store.dispatch('data/setAccountInfoField', { account, field, value });
