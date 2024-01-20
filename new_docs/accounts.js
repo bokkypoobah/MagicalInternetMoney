@@ -46,7 +46,10 @@ const Accounts = {
             </b-form-group>
 
             <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox>
+
+              <b-button size="sm" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+
+              <!-- <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox> -->
             </b-form-group>
 
             <!-- <b-form-group v-if="false && newAccount.action != 'addCoinbase'" label="Accounts:" label-for="addnewaccount-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
