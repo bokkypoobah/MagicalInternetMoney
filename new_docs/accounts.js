@@ -5,102 +5,67 @@ const Accounts = {
 
         <b-modal ref="modalnewaccount" id="modal-newaccount" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>New Account</template>
-          <!-- <b-form-group label-cols-lg="2" label="Add New Account" label-size="md" label-class="font-weight-bold pt-0" class="mb-0"> -->
-
-            <b-form-group label="Action: " label-for="addnewaccount-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-select size="sm" id="addnewaccount-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
-              <!-- <b-form-textarea size="sm" id="addnewaccount-type" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea> -->
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
-              <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
-              <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAccountAddressFeedback == null" :invalid-feedback="addNewAccountAddressFeedback" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" id="addnewaccount-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
-              <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAccountLinkedToFeedback == null" :invalid-feedback="addNewAccountLinkedToFeedback" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" id="addnewaccount-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
-            </b-form-group>
-
-            <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-button size="sm" id="addnewaccount-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-              <!-- <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox> -->
-            </b-form-group>
-
-            <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
-            </b-form-group>
-
-            <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-              <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
-              <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add/Update</b-button>
-            </b-form-group>
-
-          <!-- </b-form-group> -->
+          <b-form-group label="Action: " label-for="addnewaccount-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-select size="sm" id="addnewaccount-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
+            <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAccountAddressFeedback == null" :invalid-feedback="addNewAccountAddressFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaccount-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAccountLinkedToFeedback == null" :invalid-feedback="addNewAccountLinkedToFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaccount-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="addnewaccount-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          </b-form-group>
+          <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
+          </b-form-group>
+          <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add/Update</b-button>
+          </b-form-group>
         </b-modal>
 
         <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Account</template>
-
           <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="account-address" v-model.trim="account.account" class="w-75"></b-form-input>
           </b-form-group>
-
           <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" readonly id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="w-25"></b-form-input>
           </b-form-group>
-
           <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="saveSettings" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-            <!-- <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox> -->
           </b-form-group>
-
           <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-            <!-- <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox> -->
           </b-form-group>
-
           <b-form-group label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="account-ensname" v-model.trim="account.ensName" class="w-75"></b-form-input>
+            <b-form-input size="sm" readonly id="account-ensname" v-model.trim="account.ensName" class="w-75"></b-form-input>
           </b-form-group>
-
-          <!-- this.account.account = item[0].account;
-          this.account.type = item[0].type;
-          this.account.source = item[0].source;
-          this.account.mine = item[0].mine;
-          this.account.favourite = item[0].favourite;
-          this.account.ensName = item[0].ensName;
-          this.account.name = item[0].name;
-          this.account.notes = item[0].notes; -->
-
-          <font size="-1">
-            <pre>
-{{ account }}
-            </pre>
-          </font>
+          <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="account-name" v-model.trim="account.name" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" class="w-100"></b-form-textarea>
+          </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
