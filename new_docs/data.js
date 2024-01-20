@@ -171,7 +171,8 @@ const dataModule = {
     },
     addNewAccount(state, newAccount) {
       logInfo("dataModule", "mutations.addNewAccount(" + JSON.stringify(newAccount, null, 2) + ")");
-      const address = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? newAccount.address : newAccount.stealthMetaAddress;
+      console.log("newAccount.action: " + newAccount.action);
+      const address = newAccount.action == "addCoinbase" ? store.getters['connection/coinbase'] : (newAccount.action == "addAddress" ? ethers.utils.getAddress(newAccount.address) : newAccount.stealthMetaAddress);
       const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
       const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
       const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
