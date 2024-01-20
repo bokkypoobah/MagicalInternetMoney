@@ -46,7 +46,7 @@ const Accounts = {
         <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Account</template>
           <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="account-address" v-model.trim="account.account" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2 w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional" class="w-75"></b-form-input>
@@ -61,17 +61,17 @@ const Accounts = {
             <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="w-25"></b-form-input>
+            <b-form-input size="sm" plaintext id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
           <b-form-group label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="account-ensname" v-model.trim="account.ensName" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="account-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Stealth Meta-Address Account</template>
           <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2 w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" class="w-75"></b-form-input>
@@ -86,17 +86,17 @@ const Accounts = {
             <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" class="w-75"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="stealthmetaccount-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="w-25"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
           <b-form-group label="Linked To Address:" label-for="stealthmetaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2 w-75"></b-form-input>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="px-2 w-100"></b-form-input>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Private Key:" label-for="stealthmetaccount-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-75">
-              <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" readonly id="stealthmetaccount-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'"></b-form-input>
+            <b-input-group size="sm" class="w-100">
+              <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="stealthmetaccount-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'" class="px-2"></b-form-input>
               <b-input-group-append>
                 <b-button v-if="!stealthMetaAccount.spendingPrivateKey" :disabled="stealthMetaAccount.linkedToAddress != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
                 <!-- <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button> -->
@@ -104,13 +104,13 @@ const Accounts = {
             </b-input-group>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaccount-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Public Key:" label-for="stealthmetaccount-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaccount-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="stealthmetaccount-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="w-75"></b-form-input>
+            <b-form-input size="sm" plaintext id="stealthmetaccount-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
         </b-modal>
 
@@ -1046,6 +1046,31 @@ const Accounts = {
       // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
       logInfo("Accounts", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
     },
+
+    async revealModalAddressSpendingPrivateKey() {
+      console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.stealthMetaAccount.phrase);
+      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.stealthMetaAccount.phrase));
+      const signature = await ethereum.request({
+        method: 'personal_sign',
+        params: [phraseInHex, this.coinbase],
+      });
+      const signature1 = signature.slice(2, 66);
+      const signature2 = signature.slice(66, 130);
+      // Hash "v" and "r" values using SHA-256
+      const hashedV = ethers.utils.sha256("0x" + signature1);
+      const hashedR = ethers.utils.sha256("0x" + signature2);
+      const n = ethers.BigNumber.from(SECP256K1_N);
+      // Calculate the private keys by taking the hash values modulo the curve order
+      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+      Vue.set(this.stealthMetaAccount, 'spendingPrivateKey', keyPair1.privateKey);
+      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+      const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
+    },
+
     addNewAccount() {
       logInfo("Accounts", "methods.addNewAccount: " + JSON.stringify(this.newAccount, null, 2));
       this.$refs['modalnewaccount'].hide();
