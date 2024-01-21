@@ -205,7 +205,6 @@ const dataModule = {
             source,
             mine,
             favourite: newAccount.favourite,
-            ensName: null,
             name: newAccount.name,
             notes: null,
           });
