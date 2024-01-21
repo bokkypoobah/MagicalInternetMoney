@@ -89,7 +89,8 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    accounts: {}, // account => Account(type, name, symbol, decimals, transactions, internalTransactions, events, ...)
+    accounts: {}, // Address => Account
+    registry: {}, // Address => StealthMetaAddress
     accountsInfo: {}, // account => Account Info(type, name, symbol, decimals)
     mappings: {}, // Various mappings
     txs: {}, // account => Txs(timestamp, tx, txReceipt)
@@ -135,6 +136,7 @@ const dataModule = {
   },
   mutations: {
     setState(state, info) {
+      // logInfo("dataModule", "mutations.setState - info: " + JSON.stringify(info, null, 2));
       Vue.set(state, info.name, info.data);
     },
     toggleAccountField(state, info) {
@@ -503,9 +505,10 @@ const dataModule = {
       if (Object.keys(context.state.txs) == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['accountsInfo', 'accounts', 'mappings', 'txs', 'txsInfo', 'blocks', 'functionSelectors', 'eventSelectors', 'ensMap', 'assets', 'exchangeRates']) {
+        for (let type of ['accounts', 'registry', 'ensMap', 'exchangeRates']) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
+            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
@@ -947,20 +950,20 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         rows = parseInt(rows) + data.length;
         done = data.length < DB_PROCESSING_BATCH_SIZE;
         done = true;
       } while (!done);
       const total = rows;
-      console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - total: " + total);
+      logInfo("dataModule", "actions.syncRegistrationsData - total: " + total);
       // this.sync.completed = 0;
       // this.sync.total = rows;
       // this.sync.section = 'Registrations Tx Data';
       rows = 0;
       do {
         let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
           // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
@@ -1008,12 +1011,38 @@ const dataModule = {
     },
 
     async collateRegistrations(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      const chainId = store.getters['connection/chainId'];
       logInfo("dataModule", "actions.collateRegistrations: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
+      const registry = context.state.registry;
+      console.log("registry BEFORE: " + JSON.stringify(registry, null, 2));
+      let rows = 0;
+      let done = false;
+      do {
+        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        for (const item of data) {
+          // console.log(JSON.stringify(context.state.registry));
+          if (item.chainId == chainId && item.schemeId == 0) {
+            // logInfo("dataModule", "actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
+            const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
+            // logInfo("dataModule", "actions.collateRegistrations - registrant: " + item.registrant + ", stealthMetaAddress: " + item.stealthMetaAddress + " => " + stealthMetaAddress);
+            registry[item.registrant] = stealthMetaAddress;
+          }
+        }
+        rows = parseInt(rows) + data.length;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = true;
+      } while (!done);
+      console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
+      context.commit('setState', { name: 'registry', data: registry });
 
+      console.log("context.state.registry: " + JSON.stringify(context.state.registry, null, 2));
+      await context.dispatch('saveData', ['registry']);
       logInfo("dataModule", "actions.collateRegistrations END");
     },
 
