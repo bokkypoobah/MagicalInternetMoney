@@ -2,8 +2,27 @@ const Registry = {
   template: `
     <div class="m-0 p-0">
 
-      <b-card no-body no-header class="border-0" header-class="p-1">
-        <b-card no-body class="border-0 m-0 mt-2">
+      <b-card no-body no-header class="border-0">
+
+
+        <!-- :TOOLBAR -->
+        <div class="d-flex flex-wrap m-0 p-0">
+          <div class="mt-0 flex-grow-1">
+          </div>
+
+          <!-- <div v-if="sync.section == null" class="mt-0 pr-1"> -->
+          <div class="mt-0 pr-1">
+            <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+          </div>
+          <div class="mt-0 pr-1">
+            <b-button size="sm" @click="syncIt({ sections: ['syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync some'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+          </div>
+
+          <div class="mt-0 flex-grow-1">
+          </div>
+        </div>
+
+        <b-card v-if="false" no-body class="border-0 m-0 mt-2">
 
           <b-card-body class="p-0">
             <b-card class="mb-2 border-0">
