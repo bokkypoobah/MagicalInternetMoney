@@ -1095,7 +1095,7 @@ const Accounts = {
     store.dispatch('data/restoreState');
     if ('accountsSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.accountsSettings);
-      if ('version' in tempSettings && tempSettings.version == 5) {
+      if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
       }
