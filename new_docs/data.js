@@ -963,7 +963,7 @@ const dataModule = {
         console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
-          console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
+          // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
           if (item.timestamp == null && item.chainId == chainId) {
             const block = await provider.getBlock(item.blockNumber);
             item.timestamp = block.timestamp;
