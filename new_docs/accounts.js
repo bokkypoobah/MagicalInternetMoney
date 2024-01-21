@@ -153,11 +153,12 @@ const Accounts = {
           </b-form-group>
         </b-modal>
 
+        <!-- :TOOLBAR -->
         <div class="d-flex flex-wrap m-0 p-0">
-          <div class="mt-0 pr-1">
+          <div v-if="false" class="mt-0 pr-1">
             <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Filter by address or ENS name fragment'" placeholder="🔍 address / ens name"></b-form-input>
           </div>
-          <div class="mt-0 pr-1" style="max-width: 8.0rem;">
+          <div v-if="false" class="mt-0 pr-1" style="max-width: 8.0rem;">
             <b-form-select size="sm" v-model="settings.accountTypeFilter" @change="saveSettings" :options="accountTypeFilters" v-b-popover.hover.top="'Filter by account types'"></b-form-select>
           </div>
           <!--
@@ -165,7 +166,7 @@ const Accounts = {
             <b-form-select size="sm" v-model="settings.myAccountsFilter" @change="saveSettings" :options="myAccountsFilterOptions" v-b-popover.hover.top="'My accounts filter'"></b-form-select>
           </div>
           -->
-          <div class="mt-0 pr-1">
+          <div v-if="false" class="mt-0 pr-1">
             <b-dropdown size="sm" variant="link" v-b-popover.hover="settings.myAccountsFilter == null ? 'All accounts' : (settings.myAccountsFilter == 'mine' ? 'My accounts' : 'Other accounts')">
               <template #button-content>
                 <span v-if="settings.myAccountsFilter == null">
@@ -216,7 +217,7 @@ const Accounts = {
               </b-dropdown-item>
             </b-dropdown>
           </div>
-          <div class="mt-0 pr-1">
+          <div v-if="false" class="mt-0 pr-1">
             <b-dropdown size="sm" variant="link" v-b-popover.hover="settings.junkFilter == 'excludejunk' ? 'Junk excluded' : (settings.junkFilter == null ? 'Junk included' : 'Junk')">
               <template #button-content>
                 <span v-if="settings.junkFilter == null">
@@ -273,20 +274,20 @@ const Accounts = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
-          <div v-if="sync.section == null" class="mt-0 pr-1">
+          <div v-if="false && sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['all'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'Import Etherscan transactions and web3 transfer events for accounts configured to be synced, or all selected accounts'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
-          <div v-if="sync.section == null" class="mt-0 pr-1">
+          <div v-if="false && sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['syncBuildTokens', 'syncBuildTokenEvents'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'DEV BUTTON 1'"><b-icon-lightning shift-v="+1" font-scale="1.2"></b-icon-lightning></b-button>
           </div>
-          <div v-if="sync.section == null" class="mt-0 pr-1">
+          <div v-if="false && sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['syncBlocksAndBalances'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'DEV BUTTON 2'"><b-icon-lightning shift-v="+1" font-scale="1.2"></b-icon-lightning></b-button>
           </div>
-          <div v-if="sync.section == null" class="mt-0 pr-1">
+          <div v-if="false && sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" @click="exportAccounts" variant="link" v-b-popover.hover.top="'Export accounts'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
           </div>
           <div class="mt-1" style="width: 200px;">
-            <b-progress v-if="sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+            <b-progress v-if="false && sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
@@ -297,7 +298,7 @@ const Accounts = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
-          <div class="mt-0 pr-1" style="max-width: 8.0rem;">
+          <div class="mt-0 pr-1">
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
@@ -353,7 +354,7 @@ const Accounts = {
               You will be able to backup and restore in the Config tab.
             </div>
           </template>
-          <template #head(number)="data">
+          <!-- <template #head(number)="data">
             <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
               <template #button-content>
                 <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
@@ -362,11 +363,11 @@ const Accounts = {
               <b-dropdown-item href="#" @click="toggleSelectedAccounts(filteredSortedAccounts)">Toggle selection for all accounts on all pages</b-dropdown-item>
               <b-dropdown-item href="#" @click="clearSelectedAccounts()">Clear selection</b-dropdown-item>
             </b-dropdown>
-          </template>
+          </template> -->
           <template #cell(number)="data">
-            <b-form-checkbox size="sm" :checked="settings.selectedAccounts[data.item.account] ? 1 : 0" value="1" @change="toggleSelectedAccounts([data.item])">
+            <!-- <b-form-checkbox size="sm" :checked="settings.selectedAccounts[data.item.account] ? 1 : 0" value="1" @change="toggleSelectedAccounts([data.item])"> -->
               {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
-            </b-form-checkbox>
+            <!-- </b-form-checkbox> -->
           </template>
           <template #cell(image)="data">
             <!-- <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
@@ -415,7 +416,7 @@ const Accounts = {
         selectedAccounts: {},
         currentPage: 1,
         pageSize: 10,
-        sortOption: 'accountasc',
+        sortOption: 'typenameasc',
         version: 0,
       },
       defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
@@ -499,12 +500,12 @@ const Accounts = {
         { value: 'notmine', text: 'Not My Accounts' },
       ],
       sortOptions: [
-        { value: 'accountasc', text: '▲ Account' },
-        { value: 'accountdsc', text: '▼ Account' },
-        { value: 'groupasc', text: '▲ Group, ▲ Name' },
-        { value: 'groupdsc', text: '▼ Group, ▲ Name' },
-        { value: 'nameasc', text: '▲ Name, ▲ Group' },
-        { value: 'namedsc', text: '▼ Name, ▲ Group' },
+        { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+        { value: 'typenamedsc', text: '▼ Type, ▲ Name' },
+        { value: 'nameaddressasc', text: '▲ Name, ▲ Address' },
+        { value: 'nameaddressdsc', text: '▼ Name, ▲ Address' },
+        { value: 'addressasc', text: '▲ Address' },
+        { value: 'addressdsc', text: '▼ Address' },
       ],
       pageSizes: [
         { value: 1, text: '1' },
@@ -725,66 +726,69 @@ const Accounts = {
     },
     filteredSortedAccounts() {
       const results = this.filteredAccounts;
-      if (this.settings.sortOption == 'accountasc') {
+
+      // sortOptions: [
+      //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+      //   { value: 'typenamedsc', text: '▼ Type, ▲ Name' },
+      //   { value: 'nameasc', text: '▲ Name, ▲ Address' },
+      //   { value: 'namedsc', text: '▼ Name, ▲ Address' },
+      //   { value: 'addressasc', text: '▲ Address' },
+      //   { value: 'addressdsc', text: '▼ Address' },
+      // ],
+
+      if (this.settings.sortOption == 'typenameasc') {
         results.sort((a, b) => {
-          return ('' + a.account).localeCompare(b.account);
-        });
-      } else if (this.settings.sortOption == 'accountdsc') {
-        results.sort((a, b) => {
-          return ('' + b.account).localeCompare(a.account);
-        });
-      } else if (this.settings.sortOption == 'groupasc') {
-        results.sort((a, b) => {
-          if (('' + a.group).localeCompare(b.group) == 0) {
+          if (('' + a.type).localeCompare(b.type) == 0) {
             if (('' + a.name).localeCompare(b.name) == 0) {
               return ('' + a.account).localeCompare(b.account);
             } else {
               return ('' + a.name).localeCompare(b.name);
             }
           } else {
-            return ('' + a.group).localeCompare(b.group);
+            return ('' + b.type).localeCompare(a.type);
           }
         });
-      } else if (this.settings.sortOption == 'groupdsc') {
+      } else if (this.settings.sortOption == 'typenamedsc') {
         results.sort((a, b) => {
-          if (('' + a.group).localeCompare(b.group) == 0) {
+          if (('' + a.type).localeCompare(b.type) == 0) {
             if (('' + a.name).localeCompare(b.name) == 0) {
               return ('' + a.account).localeCompare(b.account);
             } else {
               return ('' + a.name).localeCompare(b.name);
             }
           } else {
-            return ('' + b.group).localeCompare(a.group);
+            return ('' + a.type).localeCompare(b.type);
           }
         });
-      } else if (this.settings.sortOption == 'nameasc') {
+      } else if (this.settings.sortOption == 'nameaddressasc') {
         results.sort((a, b) => {
           if (('' + a.name).localeCompare(b.name) == 0) {
-            if (('' + a.group).localeCompare(b.group) == 0) {
-              return ('' + a.account).localeCompare(b.account);
-            } else {
-              return ('' + a.group).localeCompare(b.group);
-            }
+            return ('' + a.account).localeCompare(b.account);
           } else {
             return ('' + a.name).localeCompare(b.name);
           }
         });
-      } else if (this.settings.sortOption == 'namedsc') {
+      } else if (this.settings.sortOption == 'nameaddressdsc') {
         results.sort((a, b) => {
           if (('' + a.name).localeCompare(b.name) == 0) {
-            if (('' + a.group).localeCompare(b.group) == 0) {
-              return ('' + a.account).localeCompare(b.account);
-            } else {
-              return ('' + a.group).localeCompare(b.group);
-            }
+            return ('' + b.account).localeCompare(a.account);
           } else {
             return ('' + b.name).localeCompare(a.name);
           }
+        });
+      } else if (this.settings.sortOption == 'addressasc') {
+        results.sort((a, b) => {
+          return ('' + a.account).localeCompare(b.account);
+        });
+      } else if (this.settings.sortOption == 'addressdsc') {
+        results.sort((a, b) => {
+          return ('' + b.account).localeCompare(a.account);
         });
       }
       return results;
     },
     pagedFilteredSortedAccounts() {
+      console.log(JSON.stringify(this.filteredSortedAccounts, null, 2));
       return this.filteredSortedAccounts.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
   },
@@ -805,6 +809,7 @@ const Accounts = {
     },
 
     saveSettings() {
+      logInfo("Accounts", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.accountsSettings = JSON.stringify(this.settings);
     },
     viewModalAddAccount() {
