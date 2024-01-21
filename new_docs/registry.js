@@ -152,10 +152,12 @@ const Registry = {
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
+    registry() {
+      return store.getters['data/registry'];
+    },
 
     totalRegistryEntries() {
-      // return Object.keys(this.accounts).length;
-      return 123;
+      return Object.keys(this.registry).length;
     },
     filteredRegistryEntries() {
       const results = [];

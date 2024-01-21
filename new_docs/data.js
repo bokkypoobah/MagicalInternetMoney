@@ -121,6 +121,7 @@ const dataModule = {
   },
   getters: {
     accounts: state => state.accounts,
+    registry: state => state.registry,
     accountsInfo: state => state.accountsInfo,
     mappings: state => state.mappings,
     txs: state => state.txs,
