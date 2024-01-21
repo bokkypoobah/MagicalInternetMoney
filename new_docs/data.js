@@ -937,12 +937,73 @@ const dataModule = {
     },
 
     async syncRegistrationsData(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      const chainId = store.getters['connection/chainId'];
       logInfo("dataModule", "actions.syncRegistrationsData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-
+      let rows = 0;
+      let done = false;
+      do {
+        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        rows = parseInt(rows) + data.length;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = true;
+      } while (!done);
+      const total = rows;
+      console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - total: " + total);
+      // this.sync.completed = 0;
+      // this.sync.total = rows;
+      // this.sync.section = 'Registrations Tx Data';
+      rows = 0;
+      do {
+        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        console.log(moment().format("HH:mm:ss") + " syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        const records = [];
+        for (const item of data) {
+          console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
+          if (item.timestamp == null && item.chainId == chainId) {
+            const block = await provider.getBlock(item.blockNumber);
+            item.timestamp = block.timestamp;
+            const tx = await provider.getTransaction(item.txHash);
+            const txReceipt = await provider.getTransactionReceipt(item.txHash);
+            item.tx = {
+              type: tx.type,
+              blockHash: tx.blockHash,
+              from: tx.from,
+              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+              to: tx.to,
+              value: ethers.BigNumber.from(tx.value).toString(),
+              nonce: tx.nonce,
+              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+              chainId: tx.chainId,
+              contractAddress: txReceipt.contractAddress,
+              transactionIndex: txReceipt.transactionIndex,
+              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+              blockHash: txReceipt.blockHash,
+              logs: txReceipt.logs,
+              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+              status: txReceipt.status,
+              type: txReceipt.type,
+            };
+            records.push(item);
+          }
+        }
+        if (records.length > 0) {
+          console.log("records: " + JSON.stringify(records, null, 2));
+          await db.registrations.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncRegistrationsData.bulkPut error: " + error);
+          });
+        }
+        rows = parseInt(rows) + data.length;
+        // this.sync.completed = rows;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
       logInfo("dataModule", "actions.syncRegistrationsData END");
     },
 
