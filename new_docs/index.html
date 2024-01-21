@@ -75,6 +75,7 @@
 
     <script src="connectionModule.js"></script>
     <script src="registry.js"></script>
+    <script src="transfers.js"></script>
     <script src="welcome.js"></script>
     <script src="routes.js"></script>
 
@@ -102,10 +103,11 @@
               <!-- <b-nav-item size="sm" to="/transactions" active-class="active" v-b-popover.hover="'View/edit transactions'">Transactions</b-nav-item> -->
               <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover="'Welcome'">Home</b-nav-item>
               <b-nav-item size="sm" to="/accounts" active-class="active" v-b-popover.hover="'View/edit accounts'">Accounts</b-nav-item>
-              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'Registry of Stealth Meta-Addresses associated with ENS names and addresses'">Registry</b-nav-item>
-              <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'"><strike>Report</strike></b-nav-item>
-              <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'"><strike>Assets</strike></b-nav-item>
-              <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'"><strike>Mappings</strike></b-nav-item>
+              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'Registry of Addresses to Stealth Meta-Addresses'">Registry</b-nav-item>
+              <b-nav-item size="sm" to="/transfers" active-class="active" v-b-popover.hover="'Stealth Transfers'">Transfers</b-nav-item>
+              <!-- <b-nav-item size="sm" to="/report" active-class="active" v-b-popover.hover="'View report'"><strike>Report</strike></b-nav-item> -->
+              <!-- <b-nav-item size="sm" to="/assets" active-class="active" v-b-popover.hover="'View assets'"><strike>Assets</strike></b-nav-item> -->
+              <!-- <b-nav-item size="sm" to="/mappings" active-class="active" v-b-popover.hover="'Mappings'"><strike>Mappings</strike></b-nav-item> -->
               <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
               <b-nav-form>
                 <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>

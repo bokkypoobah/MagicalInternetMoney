@@ -55,6 +55,7 @@ const store = new Vuex.Store({
     connection: connectionModule,
     welcome: welcomeModule,
     registry: registryModule,
+    transfers: transfersModule,
     config: configModule,
     mappings: mappingsModule,
     data: dataModule,

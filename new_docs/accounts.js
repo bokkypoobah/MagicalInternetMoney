@@ -340,18 +340,15 @@ const Accounts = {
             <div v-if="totalAccounts == 0">
               <ul>
                 <li>
-                  Enter your account(s) above. Use <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-pencil shift-v="+1" font-scale="1.0"></b-icon-pencil></b-button> to edit your accounts
-                </li>
-                <li>
-                  Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button> above to sync your account data
-                </li>
-                <li>
-                  Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-newspaper shift-v="+1" font-scale="1.0"></b-icon-newspaper></b-button> in the Report tab to generate a report from your account data
+                  Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-plus shift-v="+1" font-scale="1.2"></b-icon-plus></b-button> above to either:
+                  <ul>
+                    <li>Add your attached web3 address</li>
+                    <li>Add an address</li>
+                    <li>Add a Stealth Meta-Address</li>
+                    <li>Generate a Stealth Meta-Address</li>
+                  </ul>
                 </li>
               </ul>
-              This could your first use of this dapp, or this dapp's database structure has been updated during this WIP dapp development phase.
-              <br />
-              You will be able to backup and restore in the Config tab.
             </div>
           </template>
           <!-- <template #head(number)="data">
