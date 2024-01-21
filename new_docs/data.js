@@ -673,6 +673,9 @@ const dataModule = {
         if (section == "syncRegistrations" || section == "all") {
           await context.dispatch('syncRegistrations', parameter);
         }
+        if (section == "syncRegistrationsData" || section == "all") {
+          await context.dispatch('syncRegistrationsData', parameter);
+        }
         if (section == "collateRegistrations" || section == "all") {
           await context.dispatch('collateRegistrations', parameter);
         }
@@ -933,11 +936,23 @@ const dataModule = {
       logInfo("dataModule", "actions.syncRegistrations END");
     },
 
+    async syncRegistrationsData(context, parameter) {
+      logInfo("dataModule", "actions.syncRegistrationsData: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+
+      logInfo("dataModule", "actions.syncRegistrationsData END");
+    },
+
     async collateRegistrations(context, parameter) {
       logInfo("dataModule", "actions.collateRegistrations: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+
       logInfo("dataModule", "actions.collateRegistrations END");
     },
 
