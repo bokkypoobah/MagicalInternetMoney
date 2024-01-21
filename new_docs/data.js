@@ -498,7 +498,7 @@ const dataModule = {
   },
   actions: {
     async restoreState(context) {
-      console.log("data.actions.restoreState");
+      logInfo("dataModule", "actions.restoreState");
       const CHAIN_ID = 1;
       if (Object.keys(context.state.txs) == 0) {
         const db0 = new Dexie(context.state.db.name);
@@ -664,7 +664,7 @@ const dataModule = {
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
       for (const [sectionIndex, section] of info.sections.entries()) {
-        console.log(sectionIndex + "." + section);
+        logInfo("dataModule", "actions.syncIt: " + sectionIndex + "." + section);
         const parameter = { chainId, coinbase, accountsToSync, confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey, cryptoCompareAPIKey, etherscanBatchSize, OVERLAPBLOCKS, processFilters };
 
         if (section == "syncAnnouncements" || section == "all") {
@@ -672,6 +672,9 @@ const dataModule = {
         }
         if (section == "syncRegistrations" || section == "all") {
           await context.dispatch('syncRegistrations', parameter);
+        }
+        if (section == "collateRegistrations" || section == "all") {
+          await context.dispatch('collateRegistrations', parameter);
         }
         if (section == "syncTokens" || section == "all") {
           await context.dispatch('syncTokens', parameter);
@@ -719,7 +722,7 @@ const dataModule = {
       context.commit('setSyncHalt', false);
     },
     async syncAnnouncements(context, parameter) {
-      logInfo("dataModule", "actions.syncAnnouncements: " + JSON.stringify(parameter));
+      logInfo("dataModule", "actions.syncAnnouncements BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -731,11 +734,12 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
         total = parseInt(total) + logs.length;
-        console.log(moment().format("HH:mm:ss") + " syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+
+        logInfo("dataModule", "actions.syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
-            console.log(JSON.stringify(log, null, 2));
+            // console.log(JSON.stringify(log, null, 2));
             const logData = erc5564AnnouncerContract.interface.parseLog(log);
             const contract = log.address;
             const caller = logData.args[2];
@@ -781,7 +785,7 @@ const dataModule = {
             // }
           }
         }
-        console.log("records: " + JSON.stringify(records, null, 2));
+        // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
           await db.announcements.bulkPut(records).then (function() {
           }).catch(function(error) {
@@ -790,7 +794,7 @@ const dataModule = {
         }
       }
       async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " syncAnnouncements.getLogs: " + fromBlock + " - " + toBlock);
+        logInfo("dataModule", "actions.syncAnnouncements.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
             address: null,
@@ -810,7 +814,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " syncAnnouncements BEGIN");
+      logInfo("dataModule", "actions.syncAnnouncements BEGIN");
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'Stealth Address Announcements';
@@ -834,11 +838,11 @@ const dataModule = {
         const startBlock = 0;
         await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, selectedCallers, processLogs);
       // }
-      console.log(moment().format("HH:mm:ss") + " syncAnnouncements END");
+      logInfo("dataModule", "actions.syncAnnouncements END");
     },
 
     async syncRegistrations(context, parameter) {
-      logInfo("dataModule", "actions.syncRegistrations: " + JSON.stringify(parameter));
+      logInfo("dataModule", "actions.syncRegistrations BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -853,7 +857,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
         total = parseInt(total) + logs.length;
-        console.log(moment().format("HH:mm:ss") + " syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        logInfo("dataModule", "actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -887,7 +891,7 @@ const dataModule = {
         }
       }
       async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
+        logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
             address: null,
@@ -907,7 +911,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " syncRegistrations BEGIN");
+      logInfo("dataModule", "actions.syncRegistrations BEGIN");
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'Stealth Address Registry';
@@ -926,7 +930,15 @@ const dataModule = {
         const startBlock = 0;
         await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, processLogs);
       // }
-      console.log(moment().format("HH:mm:ss") + " syncRegistrations END");
+      logInfo("dataModule", "actions.syncRegistrations END");
+    },
+
+    async collateRegistrations(context, parameter) {
+      logInfo("dataModule", "actions.collateRegistrations: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      logInfo("dataModule", "actions.collateRegistrations END");
     },
 
     async syncTokens(context, parameter) {
@@ -954,7 +966,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
-        console.log(moment().format("HH:mm:ss") + " syncTokenEvents.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
+        logInfo("dataModule", "actions.syncTokens.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1033,12 +1045,12 @@ const dataModule = {
         if (records.length) {
           await db.tokenEvents.bulkPut(records).then (function() {
           }).catch(function(error) {
-            console.log("syncTokenEvents.bulkPut error: " + error);
+            console.log("syncTokens.bulkPut error: " + error);
           });
         }
       }
       async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " syncTokenEvents.getLogs: " + fromBlock + " - " + toBlock + " " + section);
+        logInfo("dataModule", "actions.syncTokens.getLogs: " + fromBlock + " - " + toBlock + " " + section);
         try {
           let topics = null;
           if (section == 0) {
@@ -1063,7 +1075,8 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " syncTokenEvents BEGIN");
+      logInfo("dataModule", "actions.syncTokens BEGIN");
+
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'ERC-20 & ERC-721 Tokens';
@@ -1087,7 +1100,7 @@ const dataModule = {
         }
       }
 
-      console.log(moment().format("HH:mm:ss") + " syncTokens END");
+      logInfo("dataModule", "actions.syncTokens END");
     },
 
     // async syncTransferEvents(context, parameter) {

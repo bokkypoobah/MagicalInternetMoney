@@ -12,10 +12,10 @@ const Registry = {
 
           <!-- <div v-if="sync.section == null" class="mt-0 pr-1"> -->
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+            <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'collateRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="syncIt({ sections: ['syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync some'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+            <b-button size="sm" @click="syncIt({ sections: ['collateRegistrations'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync some'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
 
           <div class="mt-0 flex-grow-1">
