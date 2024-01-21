@@ -20,6 +20,15 @@ const Registry = {
 
           <div class="mt-0 flex-grow-1">
           </div>
+          <div class="mt-0 pr-1">
+            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedRegistryEntries.length + '/' + totalRegistryEntries }}</font>
+          </div>
+          <div class="mt-0 pr-1">
+            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedRegistryEntries.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
+          </div>
+          <div class="mt-0 pl-1">
+            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Page size'"></b-form-select>
+          </div>
         </div>
 
         <b-card v-if="false" no-body class="border-0 m-0 mt-2">
@@ -115,6 +124,13 @@ const Registry = {
     return {
       count: 0,
       reschedule: true,
+      settings: {
+        filter: null,
+        currentPage: 1,
+        pageSize: 10,
+        sortOption: 'nameaddressasc',
+        version: 0,
+      },
     }
   },
   computed: {
@@ -133,8 +149,145 @@ const Registry = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    pageSizes() {
+      return store.getters['config/pageSizes'];
+    },
+
+    totalRegistryEntries() {
+      // return Object.keys(this.accounts).length;
+      return 123;
+    },
+    filteredRegistryEntries() {
+      const results = [];
+      // const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
+      // for (const [account, accountData] of Object.entries(this.accounts)) {
+      //   // const accountInfo = this.accountsInfo[account] || {};
+      //   // const ensName = this.ensMap[account] || null;
+      //   const accountName = accountData.name || null;
+      //   let include = filterLower == null ||
+      //     (account.toLowerCase().includes(filterLower)) ||
+      //     (accountName && accountName.toLowerCase().includes(filterLower)); // ||
+      //     // (accountInfo.group && accountInfo.group.toLowerCase().includes(filterLower)) ||
+      //     // (accountInfo.notes && accountInfo.notes.toLowerCase().includes(filterLower)) ||
+      //     // (ensName != null && ensName.toLowerCase().includes(filterLower));
+      //   if (include && this.settings.myAccountsFilter != null) {
+      //     if (this.settings.myAccountsFilter == 'mine' && accountData.mine) {
+      //     } else if (this.settings.myAccountsFilter == 'notmine' && !accountData.mine) {
+      //     } else {
+      //       include = false;
+      //     }
+      //   }
+      //   // if (include && this.settings.accountTypeFilter != null) {
+      //   //   const accountType = accountInfo.type || accountData.type || null;
+      //   //   if (this.settings.accountTypeFilter == 'unknown' && accountInfo.type == null) {
+      //   //   } else if (this.settings.accountTypeFilter == accountType) {
+      //   //   } else {
+      //   //     include = false;
+      //   //   }
+      //   // }
+      //   // if (include && this.settings.junkFilter) {
+      //   //   if (this.settings.junkFilter == 'junk' && !accountInfo.junk) {
+      //   //     include = false;
+      //   //   } else if (this.settings.junkFilter == 'excludejunk' && accountInfo.junk) {
+      //   //     include = false;
+      //   //   }
+      //   // }
+      //   if (include) {
+      //     results.push({
+      //       account,
+      //       ...accountData,
+      //       // // group: accountInfo.group,
+      //       // name: accountName,
+      //       // type: accountData.type,
+      //       // // slug: accountInfo.slug || accountData.slug,
+      //       // // image: accountInfo.image || accountData.image,
+      //       // mine: accountData.mine,
+      //       // // sync: accountInfo.sync,
+      //       // // report: accountInfo.report,
+      //       // // junk: accountInfo.junk,
+      //       // // tags: accountInfo.tags,
+      //       // notes: accountData.notes,
+      //       // // created: accountData.created,
+      //       // // updated: accountData.updated,
+      //     });
+      //   }
+      // }
+      return results;
+    },
+    filteredSortedRegistryEntries() {
+      const results = this.filteredRegistryEntries;
+
+      // sortOptions: [
+      //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+      //   { value: 'typenamedsc', text: '▼ Type, ▲ Name' },
+      //   { value: 'nameasc', text: '▲ Name, ▲ Address' },
+      //   { value: 'namedsc', text: '▼ Name, ▲ Address' },
+      //   { value: 'addressasc', text: '▲ Address' },
+      //   { value: 'addressdsc', text: '▼ Address' },
+      // ],
+
+      if (this.settings.sortOption == 'typenameasc') {
+        results.sort((a, b) => {
+          if (('' + a.type).localeCompare(b.type) == 0) {
+            if (('' + a.name).localeCompare(b.name) == 0) {
+              return ('' + a.account).localeCompare(b.account);
+            } else {
+              return ('' + a.name).localeCompare(b.name);
+            }
+          } else {
+            return ('' + b.type).localeCompare(a.type);
+          }
+        });
+      } else if (this.settings.sortOption == 'typenamedsc') {
+        results.sort((a, b) => {
+          if (('' + a.type).localeCompare(b.type) == 0) {
+            if (('' + a.name).localeCompare(b.name) == 0) {
+              return ('' + a.account).localeCompare(b.account);
+            } else {
+              return ('' + a.name).localeCompare(b.name);
+            }
+          } else {
+            return ('' + a.type).localeCompare(b.type);
+          }
+        });
+      } else if (this.settings.sortOption == 'nameaddressasc') {
+        results.sort((a, b) => {
+          if (('' + a.name).localeCompare(b.name) == 0) {
+            return ('' + a.account).localeCompare(b.account);
+          } else {
+            return ('' + a.name).localeCompare(b.name);
+          }
+        });
+      } else if (this.settings.sortOption == 'nameaddressdsc') {
+        results.sort((a, b) => {
+          if (('' + a.name).localeCompare(b.name) == 0) {
+            return ('' + b.account).localeCompare(a.account);
+          } else {
+            return ('' + b.name).localeCompare(a.name);
+          }
+        });
+      } else if (this.settings.sortOption == 'addressasc') {
+        results.sort((a, b) => {
+          return ('' + a.account).localeCompare(b.account);
+        });
+      } else if (this.settings.sortOption == 'addressdsc') {
+        results.sort((a, b) => {
+          return ('' + b.account).localeCompare(a.account);
+        });
+      }
+      return results;
+    },
+    pagedFilteredSortedRegistryEntries() {
+      console.log(JSON.stringify(this.filteredSortedRegistryEntries, null, 2));
+      return this.filteredSortedRegistryEntries.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
+    },
+
   },
   methods: {
+    saveSettings() {
+      logInfo("Registry", "methods.saveSettings - registrySettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.registrySettings = JSON.stringify(this.settings);
+    },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
     },
@@ -155,10 +308,17 @@ const Registry = {
   },
   mounted() {
     logDebug("Registry", "mounted() $route: " + JSON.stringify(this.$route.params));
+    store.dispatch('data/restoreState');
+    if ('registrySettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.registrySettings);
+      if ('version' in tempSettings && tempSettings.version == 0) {
+        this.settings = tempSettings;
+        this.settings.currentPage = 1;
+      }
+    }
     this.reschedule = true;
     logDebug("Registry", "Calling timeoutCallback()");
     this.timeoutCallback();
-    // this.loadNFTs();
   },
   destroyed() {
     this.reschedule = false;

@@ -507,18 +507,6 @@ const Accounts = {
         { value: 'addressasc', text: '▲ Address' },
         { value: 'addressdsc', text: '▼ Address' },
       ],
-      pageSizes: [
-        { value: 1, text: '1' },
-        { value: 5, text: '5' },
-        { value: 10, text: '10' },
-        { value: 25, text: '25' },
-        { value: 50, text: '50' },
-        { value: 100, text: '100' },
-        { value: 500, text: '500' },
-        { value: 1000, text: '1k' },
-        { value: 2500, text: '2.5k' },
-        { value: 10000, text: '10k' },
-      ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         // { key: 'image', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -551,6 +539,9 @@ const Accounts = {
     },
     accounts() {
       return store.getters['data/accounts'];
+    },
+    pageSizes() {
+      return store.getters['config/pageSizes'];
     },
     accountsInfo() {
       return store.getters['data/accountsInfo'];
@@ -793,6 +784,10 @@ const Accounts = {
     },
   },
   methods: {
+    saveSettings() {
+      logInfo("Accounts", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.accountsSettings = JSON.stringify(this.settings);
+    },
 
     formatAddress(address) {
       const STEALTHMETAADDRESS_SEGMENT_LENGTH = 20;
@@ -808,10 +803,6 @@ const Accounts = {
       return null;
     },
 
-    saveSettings() {
-      logInfo("Accounts", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.accountsSettings = JSON.stringify(this.settings);
-    },
     viewModalAddAccount() {
       logInfo("Accounts", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
       this.newAccount.action = 'addCoinbase';
