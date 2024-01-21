@@ -1020,6 +1020,9 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       const registry = context.state.registry;
+      if (!(chainId in registry)) {
+        registry[chainId] = {};
+      }
       console.log("registry BEFORE: " + JSON.stringify(registry, null, 2));
       let rows = 0;
       let done = false;
@@ -1027,19 +1030,17 @@ const dataModule = {
         let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          // console.log(JSON.stringify(context.state.registry));
           if (item.chainId == chainId && item.schemeId == 0) {
             // logInfo("dataModule", "actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
             const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
-            // logInfo("dataModule", "actions.collateRegistrations - registrant: " + item.registrant + ", stealthMetaAddress: " + item.stealthMetaAddress + " => " + stealthMetaAddress);
-            registry[item.registrant] = stealthMetaAddress;
+            registry[chainId][item.registrant] = stealthMetaAddress;
           }
         }
         rows = parseInt(rows) + data.length;
         done = data.length < DB_PROCESSING_BATCH_SIZE;
         done = true;
       } while (!done);
-      console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
+      // console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
       context.commit('setState', { name: 'registry', data: registry });
 
       console.log("context.state.registry: " + JSON.stringify(context.state.registry, null, 2));
