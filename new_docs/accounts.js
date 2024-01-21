@@ -54,8 +54,6 @@ const Accounts = {
               <b-input-group-append>
                 <div>
                   <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -64,7 +62,15 @@ const Accounts = {
             <b-form-input size="sm" plaintext id="account-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group>
           <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
+            <b-input-group size="sm" class="w-50">
+              <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
+              <b-input-group-append>
+                <div>
+                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                </div>
+              </b-input-group-append>
+            </b-input-group>
           </b-form-group>
           <!-- <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
@@ -73,28 +79,31 @@ const Accounts = {
             <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group> -->
           <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" class="w-100"></b-form-textarea>
+            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" plaintext id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
+          </b-form-group>
+          <b-form-group label="" label-for="account-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" @click="deleteAccountAndAccountInfo(account.account, 'modalaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Stealth Meta-Address Account</template>
           <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-100">
-              <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-input-group size="sm" class="w-50">
+              <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
                   <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
-          </b-form-group>
-          <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" class="w-50"></b-form-input>
           </b-form-group>
           <!-- <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
@@ -103,7 +112,7 @@ const Accounts = {
             <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group> -->
           <b-form-group label="Notes:" label-for="stealthmetaccount-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" class="w-100"></b-form-textarea>
+            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
           </b-form-group>
           <b-form-group label="Source:" label-for="stealthmetaccount-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" plaintext id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
@@ -138,6 +147,9 @@ const Accounts = {
           </b-form-group>
           <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaccount-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-input size="sm" plaintext id="stealthmetaccount-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="px-2 w-100"></b-form-input>
+          </b-form-group>
+          <b-form-group label="" label-for="account-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" @click="deleteAccountAndAccountInfo(stealthMetaAccount.account, 'modalstealthmetaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group>
         </b-modal>
 
@@ -254,9 +266,6 @@ const Accounts = {
           -->
           <div class="mt-0 flex-grow-1">
           </div>
-          <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.editAccounts" @click="saveSettings" :variant="settings.editAccounts ? 'danger' : 'link'" v-b-popover.hover.top="settings.editAccounts ? 'End adding/editing accounts' : 'Add/Edit accounts'"><b-icon-pencil shift-v="+1" font-scale="1.0"></b-icon-pencil></b-button>
-          </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
@@ -324,73 +333,6 @@ const Accounts = {
           </div>
         </b-card>
 
-        <b-card v-if="false && (settings.editAccounts || totalAccounts == 0)" no-body no-header bg-variant="light" class="m-1 p-1 w-75">
-          <b-card-body class="m-1 p-1">
-            <b-form-group label-cols-lg="2" label="Add New Account" label-size="md" label-class="font-weight-bold pt-0" class="mb-0">
-
-              <b-form-group label="Action: " label-for="addnewaccount-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-select size="sm" id="addnewaccount-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
-                <!-- <b-form-textarea size="sm" id="addnewaccount-type" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea> -->
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-input>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
-                <!-- <b-button size="sm" id="addnewaccount-generate" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
-                <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAccountAddressFeedback == null" :invalid-feedback="addNewAccountAddressFeedback" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" id="addnewaccount-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAccountLinkedToFeedback == null" :invalid-feedback="addNewAccountLinkedToFeedback" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" id="addnewaccount-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-100"></b-form-textarea>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
-              </b-form-group>
-
-              <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-checkbox size="sm" id="addnewaccount-mine" v-model.trim="newAccount.mine" @change="saveSettings" class="mt-1 ml-2"></b-form-checkbox>
-              </b-form-group>
-
-              <!-- <b-form-group v-if="false && newAccount.action != 'addCoinbase'" label="Accounts:" label-for="addnewaccount-accounts" label-size="sm" label-cols-sm="3" label-align-sm="right" description="List of Ethereum accounts. These are saved in your local browser storage and are used to request information via your web3 connection, or via Etherscan and Reservoir API calls" class="mx-0 my-1 p-0">
-                <b-form-textarea size="sm" id="addnewaccount-accounts" v-model.trim="settings.newAccounts" @change="saveSettings" rows="1" max-rows="5" placeholder="0x1234... 0x2345..., 0xAbCd..."></b-form-textarea>
-              </b-form-group> -->
-
-              <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
-              </b-form-group>
-
-
-              <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-                <!-- <b-button size="sm" id="addnewaccount-submit" :disabled="settings.newAccounts == null || settings.newAccounts.length == 0 || block == null" @click="addNewAccount" variant="primary">Add</b-button> -->
-                <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add/Update</b-button>
-              </b-form-group>
-
-              <!-- <b-form-group v-if="false" label="Connected Account:" label-for="addnewaccount-coinbase-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="coinbase == null ? '' : (coinbaseIncluded ? (coinbase + ' already added') : ('Add ' + coinbase + '?'))" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="addnewaccount-coinbase-submit" :disabled="block == null || coinbaseIncluded" @click="addCoinbase" variant="primary">Add</b-button>
-              </b-form-group> -->
-            </b-form-group>
-          </b-card-body>
-        </b-card>
-
         <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
@@ -427,7 +369,7 @@ const Accounts = {
             </b-form-checkbox>
           </template>
           <template #cell(image)="data">
-            <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
+            <!-- <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
               <b-avatar rounded variant="light" size="3.0rem" :src="data.item.image" v-b-popover.hover="'ERC-721 collection'"></b-avatar>
             </div>
             <div v-else-if="data.item.type == 'eoa' && data.item.account != ensOrAccount(data.item.account)">
@@ -435,143 +377,26 @@ const Accounts = {
             </div>
             <div v-else-if="data.item.type == 'erc20'">
               <b-avatar rounded variant="light" size="3.0rem" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.account + '/logo.png'" v-b-popover.hover="'ERC-20 logo if available'"></b-avatar>
-            </div>
+            </div> -->
+          </template>
+          <template #cell(icons)="data">
+            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAccountField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="data.item.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAccountField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </template>
           <template #cell(account)="data">
-            <b-link class="sm" :id="'popover-target-' + data.item.account">
-              {{ data.item.account }}
-            </b-link>
-            <br />
-            <font size="-1">
-              <div class="d-flex flex-row">
-                <div class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-select size="sm" v-model="data.item.type" @change="setAccountInfoField(data.item.account, 'type', $event)" :options="accountTypes" v-b-popover.hover.top="'Select type'"></b-form-select>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge variant="info" v-b-popover.hover="'Account type'">{{ data.item.type }}</b-badge>
-                  </span>
-                </div>
-                <div v-if="data.item.mine || settings.editAccounts" class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-checkbox size="sm" :checked="data.item.mine ? 1 : 0" value="1" @change="toggleAccountInfoField(data.item.account, 'mine')" v-b-popover.hover="'My account?'">Mine</b-form-checkbox>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge v-if="data.item.mine" variant="primary" v-b-popover.hover="'My account'">Mine</b-badge>
-                  </span>
-                </div>
-                <div v-if="data.item.sync || settings.editAccounts" class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-checkbox size="sm" :checked="data.item.sync ? 1 : 0" value="1" @change="toggleAccountInfoField(data.item.account, 'sync')" v-b-popover.hover="'Include in sync process?'">Sync</b-form-checkbox>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge v-if="data.item.sync" variant="primary" v-b-popover.hover="'Will be included in the sync process'">Sync</b-badge>
-                  </span>
-                </div>
-                <div v-if="data.item.report || settings.editAccounts" class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-checkbox size="sm" :checked="data.item.report ? 1 : 0" value="1" @change="toggleAccountInfoField(data.item.account, 'report')" v-b-popover.hover="'Include in report?'">Report</b-form-checkbox>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge v-if="data.item.report" variant="primary" v-b-popover.hover="'Will be included in the report'">Report</b-badge>
-                  </span>
-                </div>
-                <div v-if="data.item.junk || settings.editAccounts" class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-checkbox size="sm" :checked="data.item.junk ? 1 : 0" value="1" @change="toggleAccountInfoField(data.item.account, 'junk')" v-b-popover.hover="'Junk?'">Junk</b-form-checkbox>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge v-if="data.item.junk" pill variant="warning" v-b-popover.hover="'Account and transactions will be marked as junk for filtering'">junk</b-badge>
-                  </span>
-                </div>
-                <div class="m-0 pt-1 pr-1">
-                  <span v-if="data.item.type != 'preerc721' && data.item.type != 'erc721' && data.item.type != 'erc1155'">
-                    <b-badge v-if="hasENS(data.item.account)" variant="secondary" v-b-popover.hover="'ENS name if set'">{{ ensOrNull(data.item.account) }}</b-badge>
-                  </span>
-                  <span v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
-                    <b-badge variant="secondary" v-b-popover.hover="'ERC-721 collection name'">{{ data.item.name }}</b-badge>
-                  </span>
-                  <span v-if="data.item.type == 'erc20'">
-                    <b-badge variant="secondary" v-b-popover.hover="'ERC-20 collection name'">{{ data.item.contract && (data.item.contract.symbol + ' - ' + data.item.contract.name) || '???' }}</b-badge>
-                  </span>
-                </div>
-                <div class="m-0 pt-1 pr-1">
-                  <span v-if="settings.editAccounts">
-                    <b-form-input type="text" size="sm" v-model.trim="data.item.group" @change="setAccountInfoField(data.item.account, 'group', data.item.group)" debounce="600" placeholder="group"></b-form-input>
-                  </span>
-                  <span v-if="!settings.editAccounts">
-                    <b-badge v-if="data.item.group && data.item.group.length > 0" variant="dark" v-b-popover.hover="'Group'">{{ data.item.group }}</b-badge>
-                  </span>
-                </div>
-              </div>
-            </font>
-            <b-popover :target="'popover-target-' + data.item.account" placement="right" custom-class="popover-max-width">
-              <template #title>
-                <span v-if="data.item.type != 'erc721' && data.item.type != 'erc1155'">
-                  {{ ensOrAccount(data.item.account) }}
-                </span>
-                <span v-if="data.item.type == 'erc721' || data.item.type == 'erc1155'">
-                  {{ data.item.name }}
-                </span>
-              </template>
-              <span v-if="data.item.type != 'erc721' && data.item.type != 'erc1155'">
-                <b-link @click="copyToClipboard(data.item.account);">Copy account to clipboard</b-link>
-                <br />
-                <span v-if="ensOrNull(data.item.account) != null && ensOrNull(data.item.account).length > 0">
-                  <b-link @click="copyToClipboard(ensOrNull(data.item.account));">Copy ENS name to clipboard</b-link>
-                  <br />
-                  <b-link :href="'https://app.ens.domains/name/' + ensOrNull(data.item.account)" target="_blank">View ENS name in app.ens.domains</b-link>
-                  <br />
-                </span>
-                <b-link :href="'https://etherscan.io/address/' + data.item.account" target="_blank">View account in etherscan.io</b-link>
-                <br />
-                <b-link :href="'https://opensea.io/' + data.item.account" target="_blank">View account in opensea.io</b-link>
-                <br />
-                <b-link :href="'https://opensea.io/' + data.item.account + '?tab=bids'" target="_blank">View offers received in opensea.io</b-link>
-                <br />
-                <b-link :href="'https://looksrare.org/accounts/' + data.item.account + '#owned'" target="_blank">View account in looksrare.org</b-link>
-                <br />
-                <b-link :href="'https://x2y2.io/user/' + data.item.account + '/items'" target="_blank">View account in x2y2.io</b-link>
-                <br />
-                <b-link :href="'https://www.gem.xyz/profile/' + data.item.account" target="_blank">View account in gem.xyz</b-link>
-                <br />
-                <b-link :href="'https://blur.io/' + data.item.account" target="_blank">View account in blur.io</b-link>
-                <br />
-              </span>
-              <span v-if="data.item.type == 'erc721' || data.item.type == 'erc1155'">
-                <b-link @click="copyToClipboard(data.item.account);">Copy ERC-721 NFT collection address to clipboard</b-link>
-                <br />
-                <b-link :href="'https://etherscan.io/token/' + data.item.account + '#balances'" target="_blank">View ERC-721 NFT collection in etherscan.io</b-link>
-                <br />
-                <b-link :href="'https://opensea.io/collection/' + data.item.slug" target="_blank">View ERC-721 NFT collection in opensea.io</b-link>
-                <br />
-                <b-link :href="'https://looksrare.org/collections/' + data.item.account" target="_blank">View ERC-721 NFT collection in looksrare.org</b-link>
-                <br />
-                <b-link :href="'https://x2y2.io/collection/' + data.item.slug + '/items'" target="_blank">View ERC-721 NFT collection in x2y2.io</b-link>
-                <br />
-                <b-link :href="'https://www.gem.xyz/collection/' + data.item.slug" target="_blank">View ERC-721 NFT collection in gem.xyz</b-link>
-                <br />
-                <b-link :href="'https://blur.io/collection/' + data.item.slug" target="_blank">View ERC-721 NFT collection in blur.io</b-link>
-                <br />
-              </span>
-            </b-popover>
-            <span v-if="settings.editAccounts">
-              <br />
-              <b-button size="sm" @click="deleteAccountAndAccountInfo(data.item.account);" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.2"></b-icon-trash></b-button>
-            </span>
+            <div v-if="data.item.account.substring(0, 3) == 'st:'">
+              {{ formatAddress(data.item.account) }}
+            </div>
+            <div v-else>
+              <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + data.item.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
+            </div>
           </template>
           <template #cell(name)="data">
-            <span v-if="settings.editAccounts">
-              <b-form-input type="text" size="sm" v-model.trim="data.item.name" @change="setAccountInfoField(data.item.account, 'name', data.item.name)" debounce="600" placeholder="name"></b-form-input>
-              <b-form-textarea size="sm" v-model.trim="data.item.notes" @change="setAccountInfoField(data.item.account, 'notes', data.item.notes)" placeholder="notes" rows="2" max-rows="20" class="mt-1"></b-form-textarea>
-            </span>
-            <span v-if="!settings.editAccounts">
-              {{ data.item.name }}
-              <br />
-              <font size="-1">
-                {{ data.item.notes }}
-              </font>
-            </span>
+            {{ data.item.name }}
+            <br />
+            <font size="-1">
+              {{ data.item.notes || '&nbsp;' }}
+            </font>
           </template>
         </b-table>
       </b-card>
@@ -587,8 +412,6 @@ const Accounts = {
         myAccountsFilter: null,
         junkFilter: null,
         showAdditionalFilters: false,
-        editAccounts: false,
-        newAccounts: null,
         selectedAccounts: {},
         currentPage: 1,
         pageSize: 10,
@@ -697,15 +520,15 @@ const Accounts = {
       ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'image', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 35%;', tdClass: 'text-truncate' },
+        // { key: 'image', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'icons', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
         // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
         // { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
         // { key: 'ens', label: 'ENS', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
         // { key: 'group', label: 'Group', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-truncate' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 50%;', tdClass: 'text-truncate' },
         // { key: 'notes', label: 'Notes', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
-        { key: 'end', label: 'Info', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -966,6 +789,21 @@ const Accounts = {
     },
   },
   methods: {
+
+    formatAddress(address) {
+      const STEALTHMETAADDRESS_SEGMENT_LENGTH = 20;
+      <!-- const ADDRESS_SEGMENT_LENGTH = 8; -->
+      if (address) {
+        if (address.substring(0, 3) == "st:") {
+          return address.substring(0, STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-STEALTHMETAADDRESS_SEGMENT_LENGTH);
+        } else {
+          return address;
+          <!-- return address.substring(0, ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-ADDRESS_SEGMENT_LENGTH); -->
+        }
+      }
+      return null;
+    },
+
     saveSettings() {
       localStorage.accountsSettings = JSON.stringify(this.settings);
     },
@@ -1136,8 +974,17 @@ const Accounts = {
     async setAccountInfoField(account, field, value) {
       store.dispatch('data/setAccountInfoField', { account, field, value });
     },
-    async deleteAccountAndAccountInfo(account) {
-      store.dispatch('data/deleteAccountAndAccountInfo', account);
+    async deleteAccountAndAccountInfo(account, modalRef) {
+      this.$bvModal.msgBoxConfirm('Are you sure?')
+        .then(value => {
+          if (value) {
+            store.dispatch('data/deleteAccountAndAccountInfo', account);
+            this.$refs[modalRef].hide();
+          }
+        })
+        .catch(err => {
+          // An error occurred
+        })
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
