@@ -66,7 +66,7 @@ const Accounts = {
               <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
                   <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
@@ -99,7 +99,7 @@ const Accounts = {
               <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo['stealthMetaAddress'].name" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo['stealthMetaAddress'].variant"></b-icon></b-button>
                   <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
@@ -378,7 +378,7 @@ const Accounts = {
             </div> -->
           </template>
           <template #cell(icons)="data">
-            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAccountField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="'Mine?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="data.item.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAccountField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
             <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAccountField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </template>
           <template #cell(account)="data">
@@ -464,6 +464,11 @@ const Accounts = {
         { value: 'addStealthMetaAddress', text: 'Add Stealth Meta-Address' },
         { value: 'generateStealthMetaAddress', text: 'Generate Stealth Meta-Address' },
       ],
+      addressTypeInfo: {
+        "address": { variant: "warning", name: "My Address" },
+        "stealthAddress": { variant: "dark", name: "My Stealth Address" },
+        "stealthMetaAddress": { variant: "success", name: "My Stealth Meta-Address" },
+      },
       accountTypes: [
         { value: null, text: '(unknown)' },
         { value: 'address', text: 'Address' },

@@ -6,10 +6,10 @@ const Transfers = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'syncRegistrationsData', 'collateRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncAnnouncements', 'syncAnnouncementsData', 'syncRegistrations', 'syncRegistrationsData', 'collateRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="syncIt({ sections: ['syncRegistrationsData', 'collateRegistrations'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync some'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncIdentifyMyStealthTransfers'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync some'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -27,11 +27,14 @@ const Transfers = {
           </div>
         </div>
 
-        <b-table ref="registryTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedRegistryEntries" show-empty head-variant="light" class="m-0 mt-1">
+        <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedRegistryEntries" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
               <ul>
+                <li>
+                  Check you are correctly connected to the Sepolia testnet
+                </li>
                 <li>
                   Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button> above to sync this app to the blockchain
                 </li>

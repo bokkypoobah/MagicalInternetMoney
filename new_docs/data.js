@@ -674,6 +674,12 @@ const dataModule = {
         if (section == "syncAnnouncements" || section == "all") {
           await context.dispatch('syncAnnouncements', parameter);
         }
+        if (section == "syncAnnouncementsData" || section == "all") {
+          await context.dispatch('syncAnnouncementsData', parameter);
+        }
+        if (section == "syncIdentifyMyStealthTransfers" || section == "all") {
+          await context.dispatch('syncIdentifyMyStealthTransfers', parameter);
+        }
         if (section == "syncRegistrations" || section == "all") {
           await context.dispatch('syncRegistrations', parameter);
         }
@@ -940,9 +946,182 @@ const dataModule = {
       logInfo("dataModule", "actions.syncRegistrations END");
     },
 
+    async syncAnnouncementsData(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      logInfo("dataModule", "actions.syncAnnouncementsData: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      let rows = 0;
+      let done = false;
+      do {
+        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        rows = parseInt(rows) + data.length;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
+      const total = rows;
+      logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
+      // this.sync.completed = 0;
+      // this.sync.total = rows;
+      // this.sync.section = 'Announcements Tx Data';
+      rows = 0;
+      do {
+        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        const records = [];
+        for (const item of data) {
+          console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
+          if (/*item.timestamp == null &&*/ item.chainId == parameter.chainId) {
+            const block = await provider.getBlock(item.blockNumber);
+            item.timestamp = block.timestamp;
+            const tx = await provider.getTransaction(item.txHash);
+            const txReceipt = await provider.getTransactionReceipt(item.txHash);
+            item.tx = {
+              type: tx.type,
+              blockHash: tx.blockHash,
+              from: tx.from,
+              gasPrice: ethers.BigNumber.from(tx.gasPrice).toString(),
+              gasLimit: ethers.BigNumber.from(tx.gasLimit).toString(),
+              to: tx.to,
+              value: ethers.BigNumber.from(tx.value).toString(),
+              nonce: tx.nonce,
+              data: tx.to && tx.data || null, // Remove contract creation data to reduce memory footprint
+              chainId: tx.chainId,
+              contractAddress: txReceipt.contractAddress,
+              transactionIndex: txReceipt.transactionIndex,
+              gasUsed: ethers.BigNumber.from(txReceipt.gasUsed).toString(),
+              blockHash: txReceipt.blockHash,
+              logs: txReceipt.logs,
+              cumulativeGasUsed: ethers.BigNumber.from(txReceipt.cumulativeGasUsed).toString(),
+              effectiveGasPrice: ethers.BigNumber.from(txReceipt.effectiveGasPrice).toString(),
+              status: txReceipt.status,
+              type: txReceipt.type,
+            };
+            records.push(item);
+          }
+        }
+        if (records.length > 0) {
+          await db.announcements.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncAnnouncementsData.bulkPut error: " + error);
+          });
+        }
+        rows = parseInt(rows) + data.length;
+        // this.sync.completed = rows;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
+
+      logInfo("dataModule", "actions.syncAnnouncementsData END");
+    },
+
+    async syncIdentifyMyStealthTransfers(context, parameter) {
+
+      function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
+        const result = {};
+        // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+        // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+        result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
+        result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
+        result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
+        result.stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(spendingPublicKey.substring(2)).add(result.hashedSharedSecretPoint);
+        result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
+        result.match = result.stealthAddress == stealthAddress;
+        return result;
+      }
+
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // const accounts = store.getters['data/accounts'];
+      const accounts = context.state.accounts;
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers accounts BEFORE: " + JSON.stringify(accounts, null, 2));
+      const checkAccounts = [];
+      for (const [address, accountData] of Object.entries(accounts)) {
+        if (accountData.type == "stealthMetaAddress" && accountData.mine && accountData.viewingPrivateKey) {
+          checkAccounts.push({ address, ...accountData });
+        }
+      }
+      console.log(moment().format("HH:mm:ss") + " processData - checkAccounts: " + JSON.stringify(checkAccounts.map(e => e.address)));
+
+      let rows = 0;
+      let done = false;
+      do {
+        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        const writeRecords = [];
+        for (const item of data) {
+          const sender = item.tx && item.tx.from || null;
+          const senderData = sender && accounts[sender] || {};
+          console.log("sender: " + sender + " => " + JSON.stringify(senderData));
+          item.iSent = senderData.mine || false;
+          item.iReceived = false;
+          delete item.linkedTo;
+          const stealthAddress = item.stealthAddress;
+          // const stealthAddressData = this.addresses[stealthAddress];
+          const ephemeralPublicKey = item.ephemeralPublicKey;
+          for (const account of checkAccounts) {
+            console.log("Checking account: " + JSON.stringify(account));
+            const viewingPrivateKey = account.viewingPrivateKey;
+            const viewingPublicKey = account.viewingPublicKey;
+            const spendingPublicKey = account.spendingPublicKey;
+            const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
+            if (status && status.match) {
+              item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
+              item.iReceived = true;
+              if (stealthAddress in accounts) {
+                if (accounts[stealthAddress].type != "stealthAddress") {
+                  accounts[stealthAddress].type = "stealthAddress";
+                  accounts[stealthAddress].linkedTo = {
+                    stealthMetaAddress: account.address,
+                    address: account.linkedToAddress,
+                  };
+                  accounts[stealthAddress].mine = true;
+                }
+              } else {
+                accounts[stealthAddress] = {
+                  type: "stealthAddress",
+                  linkedTo: {
+                    stealthMetaAddress: account.address,
+                    address: account.linkedToAddress,
+                  },
+                  source: "announcer",
+                  mine: true,
+                  favourite: false,
+                  name: null,
+                  notes: null,
+                };
+              }
+              // Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
+              // Vue.set(this.addresses[stealthAddress], 'mine', true);
+              break;
+            }
+          }
+          writeRecords.push(item);
+        }
+        if (writeRecords.length > 0) {
+          await db.announcements.bulkPut(writeRecords).then (function() {
+          }).catch(function(error) {
+            console.log("processData.bulkPut error: " + error);
+          });
+        }
+        rows = parseInt(rows) + data.length;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
+      // rows = 0;
+      // localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers accounts END: " + JSON.stringify(accounts, null, 2));
+      context.commit('setState', { name: 'accounts', data: accounts });
+      await context.dispatch('saveData', ['accounts']);
+
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers END");
+    },
+
     async syncRegistrationsData(context, parameter) {
       const DB_PROCESSING_BATCH_SIZE = 123;
-      const chainId = store.getters['connection/chainId'];
       logInfo("dataModule", "actions.syncRegistrationsData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -954,7 +1133,7 @@ const dataModule = {
         logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         rows = parseInt(rows) + data.length;
         done = data.length < DB_PROCESSING_BATCH_SIZE;
-        done = true;
+        // done = true;
       } while (!done);
       const total = rows;
       logInfo("dataModule", "actions.syncRegistrationsData - total: " + total);
@@ -968,7 +1147,7 @@ const dataModule = {
         const records = [];
         for (const item of data) {
           // console.log(moment().format("HH:mm:ss") + " syncRegistrationsData: " + JSON.stringify(item));
-          if (item.timestamp == null && item.chainId == chainId) {
+          if (item.timestamp == null && item.chainId == parameter.chainId) {
             const block = await provider.getBlock(item.blockNumber);
             item.timestamp = block.timestamp;
             const tx = await provider.getTransaction(item.txHash);
@@ -1013,15 +1192,14 @@ const dataModule = {
 
     async collateRegistrations(context, parameter) {
       const DB_PROCESSING_BATCH_SIZE = 123;
-      const chainId = store.getters['connection/chainId'];
       logInfo("dataModule", "actions.collateRegistrations: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       const registry = context.state.registry;
-      if (!(chainId in registry)) {
-        registry[chainId] = {};
+      if (!(parameter.chainId in registry)) {
+        registry[parameter.chainId] = {};
       }
       console.log("registry BEFORE: " + JSON.stringify(registry, null, 2));
       let rows = 0;
@@ -1030,10 +1208,10 @@ const dataModule = {
         let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (item.chainId == chainId && item.schemeId == 0) {
+          if (item.chainId == parameter.chainId && item.schemeId == 0) {
             // logInfo("dataModule", "actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
             const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
-            registry[chainId][item.registrant] = stealthMetaAddress;
+            registry[parameter.chainId][item.registrant] = stealthMetaAddress;
           }
         }
         rows = parseInt(rows) + data.length;
