@@ -9,17 +9,21 @@ const Data = {
           <b-col class="small truncate" cols="8">{{ Object.keys(addresses).length }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="4" class="small">Transactions</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(txs).length }}</b-col>
+          <b-col cols="4" class="small">Registry</b-col>
+          <b-col class="small truncate" cols="8">{{ Object.keys(registry[chainId] || {}).length }}</b-col>
         </b-row>
         <b-row>
+          <b-col cols="4" class="small">Transfers</b-col>
+          <b-col class="small truncate" cols="8">{{ transfers.length }}</b-col>
+        </b-row>
+        <!-- <b-row>
           <b-col cols="4" class="small">Assets</b-col>
           <b-col class="small truncate" cols="8">{{ Object.keys(assets).length }}</b-col>
-        </b-row>
-        <b-row>
+        </b-row> -->
+        <!-- <b-row>
           <b-col cols="4" class="small">ENS Map</b-col>
           <b-col class="small truncate" cols="8">{{ Object.keys(ensMap).length }}</b-col>
-        </b-row>
+        </b-row> -->
       </b-card>
     </b-collapse>
   </div>
@@ -43,21 +47,30 @@ const Data = {
     network() {
       return store.getters['connection/network'];
     },
+    chainId() {
+      return store.getters['connection/chainId'];
+    },
     addresses() {
       return store.getters['data/addresses'];
     },
-    mappings() {
-      return store.getters['data/mappings'];
+    registry() {
+      return store.getters['data/registry'];
     },
-    txs() {
-      return store.getters['data/txs'];
+    transfers() {
+      return store.getters['data/transfers'];
     },
-    assets() {
-      return store.getters['data/assets'];
-    },
-    ensMap() {
-      return store.getters['data/ensMap'];
-    },
+    // mappings() {
+    //   return store.getters['data/mappings'];
+    // },
+    // txs() {
+    //   return store.getters['data/txs'];
+    // },
+    // assets() {
+    //   return store.getters['data/assets'];
+    // },
+    // ensMap() {
+    //   return store.getters['data/ensMap'];
+    // },
   },
   methods: {
     async timeoutCallback() {
@@ -89,15 +102,16 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    addresses: {}, // Address => Account
+    addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
-    mappings: {}, // Various mappings
-    txs: {}, // account => Txs(timestamp, tx, txReceipt)
-    txsInfo: {}, // account => Txs Info
-    blocks: {}, // blockNumber => timestamp and account balances
-    functionSelectors: {}, // selector => [functions]
-    eventSelectors: {}, // selector => [events]
-    assets: {},
+    transfers: [],
+    // mappings: {}, // Various mappings
+    // txs: {}, // account => Txs(timestamp, tx, txReceipt)
+    // txsInfo: {}, // account => Txs Info
+    // blocks: {}, // blockNumber => timestamp and account balances
+    // functionSelectors: {}, // selector => [functions]
+    // eventSelectors: {}, // selector => [events]
+    // assets: {},
     ensMap: {},
     exchangeRates: {},
     sync: {
@@ -121,13 +135,14 @@ const dataModule = {
   getters: {
     addresses: state => state.addresses,
     registry: state => state.registry,
-    mappings: state => state.mappings,
-    txs: state => state.txs,
-    txsInfo: state => state.txsInfo,
-    blocks: state => state.blocks,
-    functionSelectors: state => state.functionSelectors,
-    eventSelectors: state => state.eventSelectors,
-    assets: state => state.assets,
+    transfers: state => state.transfers,
+    // mappings: state => state.mappings,
+    // txs: state => state.txs,
+    // txsInfo: state => state.txsInfo,
+    // blocks: state => state.blocks,
+    // functionSelectors: state => state.functionSelectors,
+    // eventSelectors: state => state.eventSelectors,
+    // assets: state => state.assets,
     ensMap: state => state.ensMap,
     exchangeRates: state => state.exchangeRates,
     sync: state => state.sync,
@@ -468,7 +483,7 @@ const dataModule = {
     async restoreState(context) {
       logInfo("dataModule", "actions.restoreState");
       const CHAIN_ID = 1;
-      if (Object.keys(context.state.txs) == 0) {
+      if (context.state.transfers.length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
         for (let type of ['addresses', 'registry' /*, 'ensMap', 'exchangeRates'*/]) {
@@ -689,7 +704,7 @@ const dataModule = {
         //   await context.dispatch('syncRefreshENS', parameter);
         // }
       }
-      context.dispatch('saveData', ['accounts', 'accountsInfo', 'blocks', 'txs', 'ensMap']);
+      context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
       context.commit('setSyncSection', { section: null, total: null });
       context.commit('setSyncHalt', false);
     },
