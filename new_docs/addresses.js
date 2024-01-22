@@ -274,7 +274,7 @@ const Addresses = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
-          <div v-if="false && sync.section == null" class="mt-0 pr-1">
+          <div v-if="sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['all'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'Import Etherscan transactions and web3 transfer events for accounts configured to be synced, or all selected accounts'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
           <div v-if="false && sync.section == null" class="mt-0 pr-1">
@@ -302,10 +302,10 @@ const Addresses = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# accounts'">{{ filteredSortedAccounts.length + '/' + totalAccounts }}</font>
+            <font size="-2" v-b-popover.hover.top="'# accounts'">{{ filteredSortedAddresses.length + '/' + totalAddresses }}</font>
           </div>
           <div class="mt-0 pr-1">
-            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
+            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedAddresses.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
             <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Page size'"></b-form-select>
@@ -334,10 +334,10 @@ const Addresses = {
           </div>
         </b-card>
 
-        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
+        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
-            <div v-if="totalAccounts == 0">
+            <div v-if="totalAddresses == 0">
               <ul>
                 <li>
                   Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-plus shift-v="+1" font-scale="1.2"></b-icon-plus></b-button> above to either:
@@ -356,8 +356,8 @@ const Addresses = {
               <template #button-content>
                 <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
               </template>
-              <b-dropdown-item href="#" @click="toggleSelectedAccounts(pagedFilteredSortedAccounts)">Toggle selection for all accounts on this page</b-dropdown-item>
-              <b-dropdown-item href="#" @click="toggleSelectedAccounts(filteredSortedAccounts)">Toggle selection for all accounts on all pages</b-dropdown-item>
+              <b-dropdown-item href="#" @click="toggleSelectedAccounts(pagedFilteredSortedAddresses)">Toggle selection for all accounts on this page</b-dropdown-item>
+              <b-dropdown-item href="#" @click="toggleSelectedAccounts(filteredSortedAddresses)">Toggle selection for all accounts on all pages</b-dropdown-item>
               <b-dropdown-item href="#" @click="clearSelectedAccounts()">Clear selection</b-dropdown-item>
             </b-dropdown>
           </template> -->
@@ -657,10 +657,10 @@ const Addresses = {
       return "Aaargh";
     },
 
-    totalAccounts() {
+    totalAddresses() {
       return Object.keys(this.addresses).length;
     },
-    filteredAccounts() {
+    filteredAddresses() {
       const results = [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
       for (const [account, accountData] of Object.entries(this.addresses)) {
@@ -717,8 +717,8 @@ const Addresses = {
       }
       return results;
     },
-    filteredSortedAccounts() {
-      const results = this.filteredAccounts;
+    filteredSortedAddresses() {
+      const results = this.filteredAddresses;
 
       // sortOptions: [
       //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
@@ -780,9 +780,9 @@ const Addresses = {
       }
       return results;
     },
-    pagedFilteredSortedAccounts() {
-      console.log(JSON.stringify(this.filteredSortedAccounts, null, 2));
-      return this.filteredSortedAccounts.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
+    pagedFilteredSortedAddresses() {
+      logInfo("Addresses", "filteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+      return this.filteredSortedAddresses.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
   },
   methods: {
@@ -1048,7 +1048,7 @@ const Addresses = {
           ["No", "Account", "Type", "Mine", "ENSName", "Group", "Name", "Notes"],
       ];
       let i = 1;
-      for (const result of this.filteredSortedAccounts) {
+      for (const result of this.filteredSortedAddresses) {
         rows.push([
           i,
           result.account,

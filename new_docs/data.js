@@ -226,17 +226,17 @@ const dataModule = {
     },
     addAccountEvent(state, info) {
       const [account, eventRecord] = [info.account, info.eventRecord];
-      const accountData = state.addresses[account];
-      if (!(eventRecord.txHash in accountData.events)) {
-        accountData.events[eventRecord.txHash] = eventRecord.blockNumber;
+      const addressData = state.addresses[account];
+      if (!(eventRecord.txHash in addressData.events)) {
+        addressData.events[eventRecord.txHash] = eventRecord.blockNumber;
       }
     },
     addAccountInternalTransactions(state, info) {
       const [account, results] = [info.account, info.results];
-      const accountData = state.addresses[account];
+      const addressData = state.addresses[account];
       const groupByHashes = {};
       for (const result of results) {
-        if (!(result.hash in accountData.internalTransactions)) {
+        if (!(result.hash in addressData.internalTransactions)) {
           if (!(result.hash in groupByHashes)) {
             groupByHashes[result.hash] = [];
           }
@@ -246,19 +246,19 @@ const dataModule = {
       for (const [txHash, results] of Object.entries(groupByHashes)) {
         for (let resultIndex in results) {
           const result = results[resultIndex];
-          if (!(txHash in accountData.internalTransactions)) {
-            accountData.internalTransactions[txHash] = {};
+          if (!(txHash in addressData.internalTransactions)) {
+            addressData.internalTransactions[txHash] = {};
           }
-          accountData.internalTransactions[txHash][resultIndex] = { ...result, hash: undefined };
+          addressData.internalTransactions[txHash][resultIndex] = { ...result, hash: undefined };
         }
       }
     },
     addAccountTransactions(state, info) {
       const [account, results] = [info.account, info.results];
-      const accountData = state.addresses[account];
+      const addressData = state.addresses[account];
       for (const result of results) {
-        if (!(result.hash in accountData.transactions)) {
-          accountData.transactions[result.hash] = result.blockNumber;
+        if (!(result.hash in addressData.transactions)) {
+          addressData.transactions[result.hash] = result.blockNumber;
         }
       }
     },
@@ -343,8 +343,8 @@ const dataModule = {
       }
     },
     resetTokens(state) {
-      for (const [account, accountData] of Object.entries(state.accounts)) {
-        if (['preerc721', 'erc721', 'erc1155'].includes(accountData.type)) {
+      for (const [account, addressData] of Object.entries(state.accounts)) {
+        if (['preerc721', 'erc721', 'erc1155'].includes(addressData.type)) {
           Vue.set(state.addresses[account], 'assets', {});
         }
       }
@@ -471,10 +471,10 @@ const dataModule = {
       if (Object.keys(context.state.txs) == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'ensMap', 'exchangeRates']) {
+        for (let type of ['addresses', 'registry' /*, 'ensMap', 'exchangeRates'*/]) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
-            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
@@ -558,9 +558,9 @@ const dataModule = {
       // const provider = new ethers.providers.Web3Provider(window.ethereum);
       // const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
       // for (let account of accounts) {
-      //   const accountData = await getAccountInfo(account, provider);
-      //   if (accountData.account) {
-      //     context.commit('addNewAddress', accountData);
+      //   const addressData = await getAccountInfo(account, provider);
+      //   if (addressData.account) {
+      //     context.commit('addNewAddress', addressData);
       //     const isMyAccount = true; // account == store.getters['connection/coinbase'];
       //     const accountInfo = {
       //       account,
@@ -578,19 +578,19 @@ const dataModule = {
       // }
       // context.dispatch('saveData', ['accountsInfo', 'accounts', 'ensMap']);
     },
-    async restoreAccount(context, accountData) {
-      logInfo("dataModule", "actions.restoreAccount - accountData: " + JSON.stringify(accountData));
+    async restoreAccount(context, addressData) {
+      logInfo("dataModule", "actions.restoreAccount - addressData: " + JSON.stringify(addressData));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-      const accountInfo = await getAccountInfo(accountData.account, provider)
+      const accountInfo = await getAccountInfo(addressData.account, provider)
       if (accountInfo.account) {
         context.commit('addNewAddress', accountInfo);
-        context.commit('addNewAccountInfo', accountData);
+        context.commit('addNewAccountInfo', addressData);
       }
-      const names = await ensReverseRecordsContract.getNames([accountData.account]);
-      const name = names.length == 1 ? names[0] : accountData.account;
-      if (!(accountData.account in context.state.ensMap)) {
-        context.commit('addENSName', { account: accountData.account, name });
+      const names = await ensReverseRecordsContract.getNames([addressData.account]);
+      const name = names.length == 1 ? names[0] : addressData.account;
+      if (!(addressData.account in context.state.ensMap)) {
+        context.commit('addENSName', { account: addressData.account, name });
       }
     },
     async restoreIntermediateData(context, info) {
@@ -606,17 +606,18 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const block = await provider.getBlock();
       const confirmations = store.getters['config/settings'].confirmations && parseInt(store.getters['config/settings'].confirmations) || 10;
-      const confirmedBlockNumber = block && block.number && (block.number - confirmations) || null;
-      const confirmedBlock = await provider.getBlock(confirmedBlockNumber);
-      const confirmedTimestamp = confirmedBlock && confirmedBlock.timestamp || null;
-      const etherscanAPIKey = store.getters['config/settings'].etherscanAPIKey && store.getters['config/settings'].etherscanAPIKey.length > 0 && store.getters['config/settings'].etherscanAPIKey || "YourApiKeyToken";
+      const blockNumber = block && block.number || null;
+      // const confirmedBlockNumber = block && block.number && (block.number - confirmations) || null;
+      // const confirmedBlock = await provider.getBlock(confirmedBlockNumber);
+      // const confirmedTimestamp = confirmedBlock && confirmedBlock.timestamp || null;
+      // const etherscanAPIKey = store.getters['config/settings'].etherscanAPIKey && store.getters['config/settings'].etherscanAPIKey.length > 0 && store.getters['config/settings'].etherscanAPIKey || "YourApiKeyToken";
       const cryptoCompareAPIKey = store.getters['config/settings'].cryptoCompareAPIKey && store.getters['config/settings'].cryptoCompareAPIKey.length > 0 && store.getters['config/settings'].cryptoCompareAPIKey || null;
-      const etherscanBatchSize = store.getters['config/settings'].etherscanBatchSize && parseInt(store.getters['config/settings'].etherscanBatchSize) || 5_000_000;
-      const OVERLAPBLOCKS = 10000;
+      // const etherscanBatchSize = store.getters['config/settings'].etherscanBatchSize && parseInt(store.getters['config/settings'].etherscanBatchSize) || 5_000_000;
+      // const OVERLAPBLOCKS = 10000;
       const processFilters = store.getters['config/processFilters'];
 
       const accountsToSync = [];
-      // for (const [account, accountData] of Object.entries(context.state.accounts)) {
+      // for (const [account, addressData] of Object.entries(context.state.accounts)) {
       //   const accountsInfo = context.state.accountsInfo[account] || {};
       //   if ((info.parameters.length == 0 && accountsInfo.sync) || info.parameters.includes(account)) {
       //       accountsToSync.push(account);
@@ -626,7 +627,7 @@ const dataModule = {
       const coinbase = store.getters['connection/coinbase'];
       for (const [sectionIndex, section] of info.sections.entries()) {
         logInfo("dataModule", "actions.syncIt: " + sectionIndex + "." + section);
-        const parameter = { chainId, coinbase, accountsToSync, confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey, cryptoCompareAPIKey, etherscanBatchSize, OVERLAPBLOCKS, processFilters };
+        const parameter = { chainId, coinbase, /*accountsToSync,*/ blockNumber, confirmations, /*confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey,*/ cryptoCompareAPIKey/*, etherscanBatchSize, OVERLAPBLOCKS, processFilters*/ };
 
         if (section == "syncAnnouncements" || section == "all") {
           await context.dispatch('syncAnnouncements', parameter);
@@ -680,12 +681,13 @@ const dataModule = {
         // if (section == "syncBuildTokenEvents" || section == "all") {
         //   await context.dispatch('syncBuildTokenEvents', parameter);
         // }
-        if (section == "syncImportExchangeRates" || section == "all") {
-          await context.dispatch('syncImportExchangeRates', parameter);
-        }
-        if (section == "syncRefreshENS" || section == "all") {
-          await context.dispatch('syncRefreshENS', parameter);
-        }
+
+        // if (section == "syncImportExchangeRates" || section == "all") {
+        //   await context.dispatch('syncImportExchangeRates', parameter);
+        // }
+        // if (section == "syncRefreshENS" || section == "all") {
+        //   await context.dispatch('syncRefreshENS', parameter);
+        // }
       }
       context.dispatch('saveData', ['accounts', 'accountsInfo', 'blocks', 'txs', 'ensMap']);
       context.commit('setSyncSection', { section: null, total: null });
@@ -748,7 +750,7 @@ const dataModule = {
                 ephemeralPublicKey: logData.args[3],
                 metadata: logData.args[4],
                 transfers,
-                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+                confirmations: parameter.blockNumber - log.blockNumber,
                 timestamp: null,
                 tx: null,
               });
@@ -802,11 +804,12 @@ const dataModule = {
       // }
       // console.log("selectedCallers: " + JSON.stringify(selectedCallers, null, 2));
       // if (selectedContracts.length > 0) {
-        // const deleteCall = await db.announcements.where("confirmations").below(this.CONFIRMATIONS).delete();
-        // const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        // const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        const startBlock = 0;
-        await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, selectedCallers, processLogs);
+        const deleteCall = await db.announcements.where("confirmations").below(parameter.confirmations).delete();
+        const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        // console.log("latest: " + JSON.stringify(latest, null, 2));
+        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        // const startBlock = 0;
+        await getLogs(startBlock, parameter.blockNumber, selectedContracts, selectedCallers, processLogs);
       // }
       logInfo("dataModule", "actions.syncAnnouncements END");
     },
@@ -846,7 +849,7 @@ const dataModule = {
                 schemeId: parseInt(logData.args[1]),
                 stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
                 mine: false,
-                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+                confirmations: parameter.blockNumber - log.blockNumber,
                 timestamp: null,
                 tx: null,
               });
@@ -894,11 +897,11 @@ const dataModule = {
       //   }
       // }
       // if (selectedContracts.length > 0) {
-        // const deleteCall = await db.registrations.where("confirmations").below(this.CONFIRMATIONS).delete();
-        // const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        // const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        const startBlock = 0;
-        await getLogs(startBlock, parameter.confirmedBlockNumber, selectedContracts, processLogs);
+        const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
+        const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        // const startBlock = 0;
+        await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
       // }
       logInfo("dataModule", "actions.syncRegistrations END");
     },
@@ -928,8 +931,8 @@ const dataModule = {
         console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
-          console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
-          if (/*item.timestamp == null &&*/ item.chainId == parameter.chainId) {
+          // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
+          if (item.timestamp == null && item.chainId == parameter.chainId) {
             const block = await provider.getBlock(item.blockNumber);
             item.timestamp = block.timestamp;
             const tx = await provider.getTransaction(item.txHash);
@@ -994,15 +997,15 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       // const accounts = store.getters['data/accounts'];
-      const accounts = context.state.accounts;
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers accounts BEFORE: " + JSON.stringify(accounts, null, 2));
-      const checkAccounts = [];
-      for (const [address, accountData] of Object.entries(accounts)) {
-        if (accountData.type == "stealthMetaAddress" && accountData.mine && accountData.viewingPrivateKey) {
-          checkAccounts.push({ address, ...accountData });
+      const addresses = context.state.addresses;
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers addresses BEFORE: " + JSON.stringify(addresses, null, 2));
+      const checkAddresses = [];
+      for (const [address, addressData] of Object.entries(addresses)) {
+        if (addressData.type == "stealthMetaAddress" && addressData.mine && addressData.viewingPrivateKey) {
+          checkAddresses.push({ address, ...addressData });
         }
       }
-      console.log(moment().format("HH:mm:ss") + " processData - checkAccounts: " + JSON.stringify(checkAccounts.map(e => e.address)));
+      console.log(moment().format("HH:mm:ss") + " processData - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
       let rows = 0;
       let done = false;
@@ -1012,7 +1015,7 @@ const dataModule = {
         const writeRecords = [];
         for (const item of data) {
           const sender = item.tx && item.tx.from || null;
-          const senderData = sender && accounts[sender] || {};
+          const senderData = sender && addresses[sender] || {};
           console.log("sender: " + sender + " => " + JSON.stringify(senderData));
           item.iSent = senderData.mine || false;
           item.iReceived = false;
@@ -1020,7 +1023,7 @@ const dataModule = {
           const stealthAddress = item.stealthAddress;
           // const stealthAddressData = this.addresses[stealthAddress];
           const ephemeralPublicKey = item.ephemeralPublicKey;
-          for (const account of checkAccounts) {
+          for (const account of checkAddresses) {
             console.log("Checking account: " + JSON.stringify(account));
             const viewingPrivateKey = account.viewingPrivateKey;
             const viewingPublicKey = account.viewingPublicKey;
@@ -1029,17 +1032,17 @@ const dataModule = {
             if (status && status.match) {
               item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
               item.iReceived = true;
-              if (stealthAddress in accounts) {
-                if (accounts[stealthAddress].type != "stealthAddress") {
-                  accounts[stealthAddress].type = "stealthAddress";
-                  accounts[stealthAddress].linkedTo = {
+              if (stealthAddress in addresses) {
+                if (addresses[stealthAddress].type != "stealthAddress") {
+                  addresses[stealthAddress].type = "stealthAddress";
+                  addresses[stealthAddress].linkedTo = {
                     stealthMetaAddress: account.address,
                     address: account.linkedToAddress,
                   };
-                  accounts[stealthAddress].mine = true;
+                  addresses[stealthAddress].mine = true;
                 }
               } else {
-                accounts[stealthAddress] = {
+                addresses[stealthAddress] = {
                   type: "stealthAddress",
                   linkedTo: {
                     stealthMetaAddress: account.address,
@@ -1070,9 +1073,9 @@ const dataModule = {
       } while (!done);
       // rows = 0;
       // localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers accounts END: " + JSON.stringify(accounts, null, 2));
-      context.commit('setState', { name: 'accounts', data: accounts });
-      await context.dispatch('saveData', ['accounts']);
+      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
+      context.commit('setState', { name: 'addresses', data: addresses });
+      await context.dispatch('saveData', ['addresses']);
 
       logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers END");
     },
@@ -1158,7 +1161,7 @@ const dataModule = {
       if (!(parameter.chainId in registry)) {
         registry[parameter.chainId] = {};
       }
-      console.log("registry BEFORE: " + JSON.stringify(registry, null, 2));
+      // console.log("registry BEFORE: " + JSON.stringify(registry, null, 2));
       let rows = 0;
       let done = false;
       do {
@@ -1178,7 +1181,7 @@ const dataModule = {
       // console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
       context.commit('setState', { name: 'registry', data: registry });
 
-      console.log("context.state.registry: " + JSON.stringify(context.state.registry, null, 2));
+      // console.log("context.state.registry: " + JSON.stringify(context.state.registry, null, 2));
       await context.dispatch('saveData', ['registry']);
       logInfo("dataModule", "actions.collateRegistrations END");
     },
@@ -1279,7 +1282,7 @@ const dataModule = {
                 txHash: log.transactionHash,
                 contract,
                 ...eventRecord,
-                confirmations: parameter.confirmedBlockNumber - log.blockNumber,
+                confirmations: parameter.blockNumber - log.blockNumber,
               });
             }
           }
@@ -1331,14 +1334,15 @@ const dataModule = {
       //   }
       // }
       if (selectedAddresses.length > 0) {
-        // const deleteCall = await db.tokenEvents.where("confirmations").below(this.CONFIRMATIONS).delete();
-        // const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([this.chainId, Dexie.minKey, Dexie.minKey],[this.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
+        const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
         // TODO Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
         // TODO Need to rescan when address set changed
-        const startBlock = 0;
+        // const startBlock = 0;
         // const startBlock = this.settings.sync.rescanTokens ? 0 : (latest ? parseInt(latest.blockNumber) + 1: 0);
         for (let section = 0; section < 2; section++) {
-          await getLogs(startBlock, parameter.confirmedBlockNumber, section, selectedAddresses, processLogs);
+          await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
         }
       }
 
@@ -1356,13 +1360,13 @@ const dataModule = {
     //     console.log("actions.syncTransferEvents: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Import', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.addresses[account] || {};
-    //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
+    //     const addressData = context.state.addresses[account] || {};
+    //     const startBlock = addressData && addressData.updated && addressData.updated.blockNumber && (parseInt(addressData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
     //
     //     context.commit('setSyncSection', { section: 'Transfer Events', total: parameter.accountsToSync.length });
     //     const accountAs32Bytes = '0x000000000000000000000000' + account.substring(2, 42).toLowerCase();
-    //     for (let startBatch = startBlock; startBatch < parameter.confirmedBlockNumber; startBatch += BATCHSIZE) {
-    //       const endBatch = (parseInt(startBatch) + BATCHSIZE < parameter.confirmedBlockNumber) ? (parseInt(startBatch) + BATCHSIZE) : parameter.confirmedBlockNumber;
+    //     for (let startBatch = startBlock; startBatch < parameter.blockNumber; startBatch += BATCHSIZE) {
+    //       const endBatch = (parseInt(startBatch) + BATCHSIZE < parameter.blockNumber) ? (parseInt(startBatch) + BATCHSIZE) : parameter.blockNumber;
     //       const topicsList = [
     //         // Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
     //         [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
@@ -1469,10 +1473,10 @@ const dataModule = {
     //     console.log("actions.syncImportInternalTransactions: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Etherscan Internal Txs', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.addresses[account] || {};
-    //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
-    //     for (let startBatch = startBlock; startBatch < parameter.confirmedBlockNumber; startBatch += parameter.etherscanBatchSize) {
-    //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.confirmedBlockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.confirmedBlockNumber;
+    //     const addressData = context.state.addresses[account] || {};
+    //     const startBlock = addressData && addressData.updated && addressData.updated.blockNumber && (parseInt(addressData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
+    //     for (let startBatch = startBlock; startBatch < parameter.blockNumber; startBatch += parameter.etherscanBatchSize) {
+    //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.blockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.blockNumber;
     //       console.log("batch: " + startBatch + " to " + endBatch + ", sleepUntil: " + (sleepUntil ? moment.unix(sleepUntil).toString() : 'null'));
     //       do {
     //       } while (sleepUntil && sleepUntil > moment().unix());
@@ -1505,10 +1509,10 @@ const dataModule = {
     //     console.log("actions.syncImportTransactions: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Etherscan Transactions', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.addresses[account] || {};
-    //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
-    //     for (let startBatch = startBlock; startBatch < parameter.confirmedBlockNumber; startBatch += parameter.etherscanBatchSize) {
-    //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.confirmedBlockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.confirmedBlockNumber;
+    //     const addressData = context.state.addresses[account] || {};
+    //     const startBlock = addressData && addressData.updated && addressData.updated.blockNumber && (parseInt(addressData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
+    //     for (let startBatch = startBlock; startBatch < parameter.blockNumber; startBatch += parameter.etherscanBatchSize) {
+    //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.blockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.blockNumber;
     //       console.log("batch: " + startBatch + " to " + endBatch + ", sleepUntil: " + (sleepUntil ? moment.unix(sleepUntil).toString() : 'null'));
     //       do {
     //       } while (sleepUntil && sleepUntil > moment().unix());
@@ -1533,7 +1537,7 @@ const dataModule = {
     //       }
     //     }
     //     // TODO Move elsewhere
-    //     context.commit('updateAccountTimestampAndBlock', { account, timestamp: parameter.confirmedTimestamp, blockNumber: parameter.confirmedBlockNumber });
+    //     context.commit('updateAccountTimestampAndBlock', { account, timestamp: parameter.confirmedTimestamp, blockNumber: parameter.blockNumber });
     //   }
     // },
     // async syncBlocksAndBalances(context, parameter) {
@@ -1542,7 +1546,7 @@ const dataModule = {
     //   const weth = new ethers.Contract(WETHADDRESS, WETHABI, provider);
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBlocksAndBalances: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const blockNumbers = [];
@@ -1599,7 +1603,7 @@ const dataModule = {
     //   const provider = new ethers.providers.Web3Provider(window.ethereum);
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBlocksAndBalances: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const blocks = context.state.blocks;
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     const txHashesToProcess = {};
@@ -1645,7 +1649,7 @@ const dataModule = {
     //   logInfo("dataModule", "actions.syncFunctionSelectors: " + JSON.stringify(parameter));
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncFunctionSelectors: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingFunctionSelectorsMap = {};
@@ -1686,7 +1690,7 @@ const dataModule = {
     //   logInfo("dataModule", "actions.syncEventSelectors: " + JSON.stringify(parameter));
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncEventSelectors: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingEventSelectorsMap = {};
@@ -1731,7 +1735,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokenContractsAndAccounts: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingAccountsMap = {};
@@ -1765,10 +1769,10 @@ const dataModule = {
     //       for (const [accountItemIndex, accountItem] of missingAccounts.entries()) {
     //         context.commit('setSyncCompleted', parseInt(accountItemIndex) + 1);
     //         console.log((parseInt(accountItemIndex) + 1) + "/" + missingAccounts.length + " Processing " + accountItem);
-    //         const accountDataInfo = await getAccountInfo(accountItem, provider);
-    //         if (accountDataInfo.account) {
-    //           context.commit('addNewAccount', accountDataInfo);
-    //           context.commit('addNewAccountInfo', { account: accountDataInfo.account });
+    //         const addressDataInfo = await getAccountInfo(accountItem, provider);
+    //         if (addressDataInfo.account) {
+    //           context.commit('addNewAccount', addressDataInfo);
+    //           context.commit('addNewAccountInfo', { account: addressDataInfo.account });
     //         }
     //         const names = await ensReverseRecordsContract.getNames([accountItem]);
     //         const name = names.length == 1 ? names[0] : accountItem;
@@ -1793,7 +1797,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokens: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingTokensMap = {};
@@ -1939,7 +1943,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokenEvents: " + accountIndex + " " + account);
-    //     const accountData = context.state.addresses[account] || {};
+    //     const addressData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingTokenEventsMap = {};
