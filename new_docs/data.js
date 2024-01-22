@@ -108,10 +108,10 @@ const dataModule = {
       halt: false,
     },
     db: {
-      name: "magicalinternetmoneydata081a",
+      name: "magicalinternetmoneydata081b",
       version: 1,
       schemaDefinition: {
-        announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+        announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations,stealthAddress',
         registrations: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
         tokenEvents: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
         cache: '&objectName',
