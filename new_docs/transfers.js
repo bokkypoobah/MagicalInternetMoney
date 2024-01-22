@@ -28,7 +28,7 @@ const Transfers = {
         </div>
 
         <!-- <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1"> -->
-        <b-table ref="transfersTable" small fixed striped responsive hover :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
+        <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -45,6 +45,17 @@ const Transfers = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
+          <template #cell(timestamp)="data">
+            <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
+              <span v-if="data.item.timestamp">
+                {{ formatTimestamp(data.item.timestamp) }}
+              </span>
+              <span v-else>
+                {{ '#' + commify0(data.item.blockNumber) }}
+              </span>
+            </b-link>
+          </template>
+
         </b-table>
       </b-card>
     </div>
@@ -68,8 +79,12 @@ const Transfers = {
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-left' },
-        { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 60%;', tdClass: 'text-left' },
+        { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+        { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        <!-- { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
+        <!-- { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
+        { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
       ],
     }
   },
@@ -147,6 +162,24 @@ const Transfers = {
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
     },
+
+    formatTimestamp(ts) {
+      if (ts != null) {
+        // if (this.settings.reportingDateTime == 1) {
+          return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
+        // } else {
+        //   return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+        // }
+      }
+      return null;
+    },
+    commify0(n) {
+      if (n != null) {
+        return Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+      return null;
+    },
+
     async timeoutCallback() {
       logDebug("Transfers", "timeoutCallback() count: " + this.count);
 
