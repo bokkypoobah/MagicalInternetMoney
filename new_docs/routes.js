@@ -19,9 +19,9 @@ const routes = [{
     component: Registry,
     name: 'Registry',
   }, {
-    path: '/accounts',
-    component: Accounts,
-    name: 'Accounts',
+    path: '/addresses',
+    component: Addresses,
+    name: 'Addresses',
   }, {
     path: '/assets',
     component: Assets,

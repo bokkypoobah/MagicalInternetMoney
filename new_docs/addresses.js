@@ -1,4 +1,4 @@
-const Accounts = {
+const Addresses = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
@@ -787,7 +787,7 @@ const Accounts = {
   },
   methods: {
     saveSettings() {
-      logInfo("Accounts", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("Addresses", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.accountsSettings = JSON.stringify(this.settings);
     },
 
@@ -806,7 +806,7 @@ const Accounts = {
     },
 
     viewModalAddAccount() {
-      logInfo("Accounts", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
+      logInfo("Addresses", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
       this.newAccount.action = 'addCoinbase';
       this.newAccount.address = null;
       this.newAccount.stealthMetaAddress = null;
@@ -822,7 +822,7 @@ const Accounts = {
     },
 
     accountsRowSelected(item) {
-      logInfo("Accounts", "methods.accountsRowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("Addresses", "methods.accountsRowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         const account = item[0].account;
         if (account.substring(0, 3) == "st:") {
@@ -856,10 +856,10 @@ const Accounts = {
     },
 
     async generateNewStealthMetaAddress() {
-      logInfo("Accounts", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-      logInfo("Accounts", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
+      logInfo("Addresses", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
+      logInfo("Addresses", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.newAccount.phrase));
-      logInfo("Accounts", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
+      logInfo("Addresses", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
       const signature = await ethereum.request({
         method: 'personal_sign',
         params: [phraseInHex, this.coinbase],
@@ -899,7 +899,7 @@ const Accounts = {
       // }
       // Vue.set(this.modalNewStealthMetaAddress, 'status', status);
       // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
-      logInfo("Accounts", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
+      logInfo("Addresses", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
     },
 
     async revealModalAddressSpendingPrivateKey() {
@@ -927,12 +927,12 @@ const Accounts = {
     },
 
     addNewAccount() {
-      logInfo("Accounts", "methods.addNewAccount: " + JSON.stringify(this.newAccount, null, 2));
+      logInfo("Addresses", "methods.addNewAccount: " + JSON.stringify(this.newAccount, null, 2));
       this.$refs['modalnewaccount'].hide();
       store.dispatch('data/addNewAccount', this.newAccount);
     },
     addCoinbase() {
-      logInfo("Accounts", "methods.addCoinbase - coinbase: " + this.coinbase);
+      logInfo("Addresses", "methods.addCoinbase - coinbase: " + this.coinbase);
       store.dispatch('data/addNewAccount', this.coinbase);
     },
     toggleSelectedAccounts(items) {
@@ -962,11 +962,11 @@ const Accounts = {
       store.dispatch('data/toggleAccountInfoField', { account, field });
     },
     async toggleAccountField(account, field) {
-      <!-- logInfo("Accounts", "methods.toggleAccountField - account: " + account + ", field: " + field); -->
+      <!-- logInfo("Addresses", "methods.toggleAccountField - account: " + account + ", field: " + field); -->
       store.dispatch('data/toggleAccountField', { account, field });
     },
     async setAccountField(account, field, value) {
-      <!-- logInfo("Accounts", "methods.setAccountField - account: " + account + ", field: " + field + ", value: " + value); -->
+      <!-- logInfo("Addresses", "methods.setAccountField - account: " + account + ", field: " + field + ", value: " + value); -->
       store.dispatch('data/setAccountField', { account, field, value });
     },
     async setAccountInfoField(account, field, value) {
@@ -1070,7 +1070,7 @@ const Accounts = {
       link.click(); // This will download the data with the specified file name
     },
     async timeoutCallback() {
-      logDebug("Accounts", "timeoutCallback() count: " + this.count);
+      logDebug("Addresses", "timeoutCallback() count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -1081,10 +1081,10 @@ const Accounts = {
     },
   },
   beforeDestroy() {
-    logDebug("Accounts", "beforeDestroy()");
+    logDebug("Addresses", "beforeDestroy()");
   },
   mounted() {
-    logDebug("Accounts", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("Addresses", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('accountsSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.accountsSettings);
@@ -1094,7 +1094,7 @@ const Accounts = {
       }
     }
     this.reschedule = true;
-    logDebug("Accounts", "Calling timeoutCallback()");
+    logDebug("Addresses", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -1102,7 +1102,7 @@ const Accounts = {
   },
 };
 
-const accountsModule = {
+const addressesModule = {
   namespaced: true,
   state: {
   },

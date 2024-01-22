@@ -60,7 +60,7 @@ const store = new Vuex.Store({
     mappings: mappingsModule,
     data: dataModule,
     account: accountModule,
-    accounts: accountsModule,
+    addresses: addressesModule,
     assets: assetsModule,
     report: reportModule,
     transactions: transactionsModule,
