@@ -5,8 +5,8 @@ const Data = {
     <b-collapse id="data-module" visible class="my-2">
       <b-card no-body class="border-0">
         <b-row>
-          <b-col cols="4" class="small">Accounts</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(accounts).length }}</b-col>
+          <b-col cols="4" class="small">Addresses</b-col>
+          <b-col class="small truncate" cols="8">{{ Object.keys(addresses).length }}</b-col>
         </b-row>
         <b-row>
           <b-col cols="4" class="small">Transactions</b-col>
@@ -43,8 +43,8 @@ const Data = {
     network() {
       return store.getters['connection/network'];
     },
-    accounts() {
-      return store.getters['data/accounts'];
+    addresses() {
+      return store.getters['data/addresses'];
     },
     mappings() {
       return store.getters['data/mappings'];
@@ -89,9 +89,8 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    accounts: {}, // Address => Account
+    addresses: {}, // Address => Account
     registry: {}, // Address => StealthMetaAddress
-    accountsInfo: {}, // account => Account Info(type, name, symbol, decimals)
     mappings: {}, // Various mappings
     txs: {}, // account => Txs(timestamp, tx, txReceipt)
     txsInfo: {}, // account => Txs Info
@@ -120,9 +119,8 @@ const dataModule = {
     },
   },
   getters: {
-    accounts: state => state.accounts,
+    addresses: state => state.addresses,
     registry: state => state.registry,
-    accountsInfo: state => state.accountsInfo,
     mappings: state => state.mappings,
     txs: state => state.txs,
     txsInfo: state => state.txsInfo,
@@ -140,70 +138,38 @@ const dataModule = {
       // logInfo("dataModule", "mutations.setState - info: " + JSON.stringify(info, null, 2));
       Vue.set(state, info.name, info.data);
     },
-    toggleAccountField(state, info) {
-      Vue.set(state.accounts[info.account], info.field, !state.accounts[info.account][info.field]);
-      logInfo("dataModule", "mutations.toggleAccountField - accounts[" + info.account + "]." + info.field + " = " + state.accounts[info.account][info.field]);
+    toggleAddressField(state, info) {
+      Vue.set(state.addresses[info.account], info.field, !state.addresses[info.account][info.field]);
+      logInfo("dataModule", "mutations.toggleAddressField - accounts[" + info.account + "]." + info.field + " = " + state.addresses[info.account][info.field]);
     },
-    setAccountField(state, info) {
-      Vue.set(state.accounts[info.account], info.field, info.value);
-      logInfo("dataModule", "mutations.setAccountField - accounts[" + info.account + "]." + info.field + " = " + state.accounts[info.account][info.field]);
+    setAddressField(state, info) {
+      Vue.set(state.addresses[info.account], info.field, info.value);
+      logInfo("dataModule", "mutations.setAddressField - accounts[" + info.account + "]." + info.field + " = " + state.addresses[info.account][info.field]);
     },
 
-    toggleAccountInfoField(state, info) {
-      Vue.set(state.accountsInfo[info.account], info.field, !state.accountsInfo[info.account][info.field]);
-    },
-    setAccountInfoField(state, info) {
-      console.log("mutations.setAccountInfoField: " + JSON.stringify(info));
-      console.log("state.accountsInfo: " + JSON.stringify(state.accountsInfo, null, 2));
-      if (!(info.account in state.accountsInfo)) {
-        Vue.set(state.accountsInfo, info.account, {});
-      }
-      console.log("state.accountsInfo[info.account]: " + JSON.stringify(state.accountsInfo[info.account], null, 2));
-      Vue.set(state.accountsInfo[info.account], info.field, info.value);
-    },
-    addNewAccountInfo(state, info) {
-      logInfo("dataModule", "mutations.addNewAccountInfo(" + JSON.stringify(info) + ")");
-      if (!(info.account in state.accountsInfo)) {
-        Vue.set(state.accountsInfo, info.account, {
-          type: info.type || null,
-          group: info.group || null,
-          name: info.name || null,
-          symbol: info.symbol || null,
-          decimals: info.decimals || null,
-          slug: info.slug || null,
-          image: info.image || null,
-          mine: info.mine || null,
-          sync: info.sync || null,
-          report: info.report || null,
-          junk: info.junk || null,
-          tags: info.tags || [],
-          notes: info.notes || null,
-        });
-      }
-    },
-    addNewAccount(state, newAccount) {
-      logInfo("dataModule", "mutations.addNewAccount(" + JSON.stringify(newAccount, null, 2) + ")");
+    addNewAddress(state, newAccount) {
+      logInfo("dataModule", "mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
       const address = newAccount.action == "addCoinbase" ? store.getters['connection/coinbase'] : (newAccount.action == "addAddress" ? ethers.utils.getAddress(newAccount.address) : newAccount.stealthMetaAddress);
       const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
       const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
       const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
       const mine = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? true : newAccount.mine;
       // const block = store.getters['connection/block'];
-      if (address in state.accounts) {
-        Vue.set(state.accounts[address], 'type', type);
+      if (address in state.addresses) {
+        Vue.set(state.addresses[address], 'type', type);
         if (type == "stealthMetaAddress") {
-          Vue.set(state.accounts[address], 'linkedToAddress', linkedToAddress);
-          Vue.set(state.accounts[address], 'phrase', newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined);
-          Vue.set(state.accounts[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
-          Vue.set(state.accounts[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
-          Vue.set(state.accounts[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
+          Vue.set(state.addresses[address], 'linkedToAddress', linkedToAddress);
+          Vue.set(state.addresses[address], 'phrase', newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined);
+          Vue.set(state.addresses[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
+          Vue.set(state.addresses[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
+          Vue.set(state.addresses[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
         }
-        Vue.set(state.accounts[address], 'mine', mine);
-        Vue.set(state.accounts[address], 'favourite', newAccount.favourite);
-        Vue.set(state.accounts[address], 'name', newAccount.name);
+        Vue.set(state.addresses[address], 'mine', mine);
+        Vue.set(state.addresses[address], 'favourite', newAccount.favourite);
+        Vue.set(state.addresses[address], 'name', newAccount.name);
       } else {
         if (type == "address") {
-          Vue.set(state.accounts, address, {
+          Vue.set(state.addresses, address, {
             type,
             source,
             mine,
@@ -212,7 +178,7 @@ const dataModule = {
             notes: null,
           });
         } else {
-          Vue.set(state.accounts, address, {
+          Vue.set(state.addresses, address, {
             type,
             linkedToAddress,
             phrase: newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined,
@@ -253,22 +219,21 @@ const dataModule = {
       //     assets: {},
         // });
       }
-      logInfo("dataModule", "mutations.addNewAccount AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
+      logInfo("dataModule", "mutations.addNewAddress AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
     },
-    deleteAccountAndAccountInfo(state, account) {
-      Vue.delete(state.accounts, account);
-      Vue.delete(state.accountsInfo, account);
+    deleteAddress(state, address) {
+      Vue.delete(state.addresses, address);
     },
     addAccountEvent(state, info) {
       const [account, eventRecord] = [info.account, info.eventRecord];
-      const accountData = state.accounts[account];
+      const accountData = state.addresses[account];
       if (!(eventRecord.txHash in accountData.events)) {
         accountData.events[eventRecord.txHash] = eventRecord.blockNumber;
       }
     },
     addAccountInternalTransactions(state, info) {
       const [account, results] = [info.account, info.results];
-      const accountData = state.accounts[account];
+      const accountData = state.addresses[account];
       const groupByHashes = {};
       for (const result of results) {
         if (!(result.hash in accountData.internalTransactions)) {
@@ -290,7 +255,7 @@ const dataModule = {
     },
     addAccountTransactions(state, info) {
       const [account, results] = [info.account, info.results];
-      const accountData = state.accounts[account];
+      const accountData = state.addresses[account];
       for (const result of results) {
         if (!(result.hash in accountData.transactions)) {
           accountData.transactions[result.hash] = result.blockNumber;
@@ -299,16 +264,16 @@ const dataModule = {
     },
     updateAccountTimestampAndBlock(state, info) {
       const [account, events] = [info.account, info.events];
-      Vue.set(state.accounts[account], 'updated', {
+      Vue.set(state.addresses[account], 'updated', {
         timestamp: info.timestamp,
         blockNumber: info.blockNumber,
       });
     },
     addAccountToken(state, token) {
       const contract = ethers.utils.getAddress(token.contract);
-      const contractData = state.accounts[contract];
+      const contractData = state.addresses[contract];
       if (!(token.tokenId in contractData.assets)) {
-        Vue.set(state.accounts[contract].assets, token.tokenId, {
+        Vue.set(state.addresses[contract].assets, token.tokenId, {
           name: token.name,
           description: token.description,
           image: token.image,
@@ -320,28 +285,28 @@ const dataModule = {
     },
     updateAccountToken(state, token) {
       const contract = ethers.utils.getAddress(token.contract);
-      const contractData = state.accounts[contract] || {};
+      const contractData = state.addresses[contract] || {};
       if (token.tokenId in contractData.assets) {
         const newData = {
-          ...state.accounts[contract].assets[token.tokenId],
+          ...state.addresses[contract].assets[token.tokenId],
           name: token.name,
           description: token.description,
           image: token.image,
           type: token.kind,
           isFlagged: token.isFlagged,
         };
-        Vue.set(state.accounts[contract].assets, token.tokenId, newData);
+        Vue.set(state.addresses[contract].assets, token.tokenId, newData);
       }
     },
     addAccountERC20Transfers(state, transfer) {
       const contract = ethers.utils.getAddress(transfer.contract);
-      const contractData = state.accounts[contract];
+      const contractData = state.addresses[contract];
       if (!(transfer.txHash in contractData.erc20transfers)) {
-        Vue.set(state.accounts[contract].erc20transfers, transfer.txHash, {});
+        Vue.set(state.addresses[contract].erc20transfers, transfer.txHash, {});
       }
-      if (!(transfer.logIndex in state.accounts[contract].erc20transfers[transfer.txHash])) {
+      if (!(transfer.logIndex in state.addresses[contract].erc20transfers[transfer.txHash])) {
         const tempTransfer = { ...transfer, txHash: undefined, logIndex: undefined };
-        Vue.set(state.accounts[contract].erc20transfers[transfer.txHash], transfer.logIndex, tempTransfer);
+        Vue.set(state.addresses[contract].erc20transfers[transfer.txHash], transfer.logIndex, tempTransfer);
       }
     },
     addAccountTokenEvents(state, info) {
@@ -349,20 +314,20 @@ const dataModule = {
       for (const [eventIndex, event] of info.events.entries()) {
         // console.log("  " + eventIndex + " " + event.type + " " + event.contract + " " + event.tokenId + " " + JSON.stringify(event));
         if (event.type == 'preerc721' || event.type == 'erc721' || event.type == 'erc1155') {
-          const contractData = state.accounts[event.contract] || {};
+          const contractData = state.addresses[event.contract] || {};
           // console.log("contractData: " + JSON.stringify(contractData, null, 2));
           // console.log("contractData.assets[event.tokenId]: " + JSON.stringify(contractData.assets[event.tokenId], null, 2));
           if (contractData.assets[event.tokenId]) {
             if (!(info.txHash in contractData.assets[event.tokenId].events)) {
-              Vue.set(state.accounts[event.contract].assets[event.tokenId].events, info.txHash, {
+              Vue.set(state.addresses[event.contract].assets[event.tokenId].events, info.txHash, {
                 blockNumber: info.blockNumber,
                 transactionIndex: info.transactionIndex,
                 timestamp: info.timestamp,
                 logs: {},
               });
             }
-            if (!(event.logIndex in state.accounts[event.contract].assets[event.tokenId].events[info.txHash].logs)) {
-              Vue.set(state.accounts[event.contract].assets[event.tokenId].events[info.txHash].logs, event.logIndex, {
+            if (!(event.logIndex in state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs)) {
+              Vue.set(state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs, event.logIndex, {
                 // txHash: info.txHash,
                 action: event.action || undefined,
                 type: event.type || undefined,
@@ -380,7 +345,7 @@ const dataModule = {
     resetTokens(state) {
       for (const [account, accountData] of Object.entries(state.accounts)) {
         if (['preerc721', 'erc721', 'erc1155'].includes(accountData.type)) {
-          Vue.set(state.accounts[account], 'assets', {});
+          Vue.set(state.addresses[account], 'assets', {});
         }
       }
     },
@@ -506,7 +471,7 @@ const dataModule = {
       if (Object.keys(context.state.txs) == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['accounts', 'registry', 'ensMap', 'exchangeRates']) {
+        for (let type of ['addresses', 'registry', 'ensMap', 'exchangeRates']) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
             logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -528,28 +493,20 @@ const dataModule = {
       db0.close();
     },
 
-    async toggleAccountField(context, info) {
-      // logInfo("dataModule", "actions.toggleAccountField - info: " + JSON.stringify(info));
-      await context.commit('toggleAccountField', info);
-      await context.dispatch('saveData', ['accounts']);
+    async toggleAddressField(context, info) {
+      // logInfo("dataModule", "actions.toggleAddressField - info: " + JSON.stringify(info));
+      await context.commit('toggleAddressField', info);
+      await context.dispatch('saveData', ['addresses']);
     },
-    async setAccountField(context, info) {
-      // logInfo("dataModule", "actions.setAccountField - info: " + JSON.stringify(info));
-      await context.commit('setAccountField', info);
-      await context.dispatch('saveData', ['accounts']);
+    async setAddressField(context, info) {
+      // logInfo("dataModule", "actions.setAddressField - info: " + JSON.stringify(info));
+      await context.commit('setAddressField', info);
+      await context.dispatch('saveData', ['addresses']);
     },
 
-    async toggleAccountInfoField(context, info) {
-      await context.commit('toggleAccountInfoField', info);
-      await context.dispatch('saveData', ['accounts', 'accountsInfo']);
-    },
-    async setAccountInfoField(context, info) {
-      await context.commit('setAccountInfoField', info);
-      await context.dispatch('saveData', ['accounts', 'accountsInfo']);
-    },
-    async deleteAccountAndAccountInfo(context, account) {
-      await context.commit('deleteAccountAndAccountInfo', account);
-      await context.dispatch('saveData', ['accounts', 'accountsInfo']);
+    async deleteAddress(context, account) {
+      await context.commit('deleteAddress', account);
+      await context.dispatch('saveData', ['addresses']);
     },
     async saveTxTags(context, info) {
       await context.commit('saveTxTags', info);
@@ -593,17 +550,17 @@ const dataModule = {
       console.log("status: " + JSON.stringify(status));
       db0.close();
     },
-    async addNewAccount(context, newAccount) {
-      logInfo("dataModule", "actions.addNewAccount - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
-      context.commit('addNewAccount', newAccount);
-      await context.dispatch('saveData', ['accounts']);
+    async addNewAddress(context, newAccount) {
+      logInfo("dataModule", "actions.addNewAddress - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
+      context.commit('addNewAddress', newAccount);
+      await context.dispatch('saveData', ['addresses']);
       // const accounts = newAccounts == null ? [] : newAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
       // const provider = new ethers.providers.Web3Provider(window.ethereum);
       // const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
       // for (let account of accounts) {
       //   const accountData = await getAccountInfo(account, provider);
       //   if (accountData.account) {
-      //     context.commit('addNewAccount', accountData);
+      //     context.commit('addNewAddress', accountData);
       //     const isMyAccount = true; // account == store.getters['connection/coinbase'];
       //     const accountInfo = {
       //       account,
@@ -611,7 +568,7 @@ const dataModule = {
       //       sync: isMyAccount,
       //       report: isMyAccount,
       //     };
-      //     context.commit('addNewAccountInfo', accountInfo);
+      //     context.commit('addNewAddressInfo', accountInfo);
       //   }
       //   // const names = await ensReverseRecordsContract.getNames([account]);
       //   // const name = names.length == 1 ? names[0] : account;
@@ -627,7 +584,7 @@ const dataModule = {
       const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
       const accountInfo = await getAccountInfo(accountData.account, provider)
       if (accountInfo.account) {
-        context.commit('addNewAccount', accountInfo);
+        context.commit('addNewAddress', accountInfo);
         context.commit('addNewAccountInfo', accountData);
       }
       const names = await ensReverseRecordsContract.getNames([accountData.account]);
@@ -659,12 +616,12 @@ const dataModule = {
       const processFilters = store.getters['config/processFilters'];
 
       const accountsToSync = [];
-      for (const [account, accountData] of Object.entries(context.state.accounts)) {
-        const accountsInfo = context.state.accountsInfo[account] || {};
-        if ((info.parameters.length == 0 && accountsInfo.sync) || info.parameters.includes(account)) {
-            accountsToSync.push(account);
-        }
-      }
+      // for (const [account, accountData] of Object.entries(context.state.accounts)) {
+      //   const accountsInfo = context.state.accountsInfo[account] || {};
+      //   if ((info.parameters.length == 0 && accountsInfo.sync) || info.parameters.includes(account)) {
+      //       accountsToSync.push(account);
+      //   }
+      // }
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
       for (const [sectionIndex, section] of info.sections.entries()) {
@@ -1399,7 +1356,7 @@ const dataModule = {
     //     console.log("actions.syncTransferEvents: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Import', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
     //
     //     context.commit('setSyncSection', { section: 'Transfer Events', total: parameter.accountsToSync.length });
@@ -1512,7 +1469,7 @@ const dataModule = {
     //     console.log("actions.syncImportInternalTransactions: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Etherscan Internal Txs', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
     //     for (let startBatch = startBlock; startBatch < parameter.confirmedBlockNumber; startBatch += parameter.etherscanBatchSize) {
     //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.confirmedBlockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.confirmedBlockNumber;
@@ -1548,7 +1505,7 @@ const dataModule = {
     //     console.log("actions.syncImportTransactions: " + accountIndex + " " + account);
     //     context.commit('setSyncSection', { section: 'Etherscan Transactions', total: parameter.accountsToSync.length });
     //     context.commit('setSyncCompleted', parseInt(accountIndex) + 1);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const startBlock = accountData && accountData.updated && accountData.updated.blockNumber && (parseInt(accountData.updated.blockNumber) - parameter.OVERLAPBLOCKS) || 0;
     //     for (let startBatch = startBlock; startBatch < parameter.confirmedBlockNumber; startBatch += parameter.etherscanBatchSize) {
     //       const endBatch = (parseInt(startBatch) + parameter.etherscanBatchSize < parameter.confirmedBlockNumber) ? (parseInt(startBatch) + parameter.etherscanBatchSize) : parameter.confirmedBlockNumber;
@@ -1585,7 +1542,7 @@ const dataModule = {
     //   const weth = new ethers.Contract(WETHADDRESS, WETHABI, provider);
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBlocksAndBalances: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const blockNumbers = [];
@@ -1642,7 +1599,7 @@ const dataModule = {
     //   const provider = new ethers.providers.Web3Provider(window.ethereum);
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBlocksAndBalances: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const blocks = context.state.blocks;
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     const txHashesToProcess = {};
@@ -1688,7 +1645,7 @@ const dataModule = {
     //   logInfo("dataModule", "actions.syncFunctionSelectors: " + JSON.stringify(parameter));
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncFunctionSelectors: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingFunctionSelectorsMap = {};
@@ -1729,7 +1686,7 @@ const dataModule = {
     //   logInfo("dataModule", "actions.syncEventSelectors: " + JSON.stringify(parameter));
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncEventSelectors: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingEventSelectorsMap = {};
@@ -1774,7 +1731,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokenContractsAndAccounts: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingAccountsMap = {};
@@ -1836,7 +1793,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokens: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingTokensMap = {};
@@ -1849,7 +1806,7 @@ const dataModule = {
     //             for (const [eventIndex, eventItem] of results.myEvents.entries()) {
     //               // TODO: CryptoPunks Transfer tokens -> tokenId
     //               if (eventItem.type == 'preerc721' || eventItem.type == 'erc721' || eventItem.type == 'erc1155') {
-    //                 const tokenContract = context.state.accounts[eventItem.contract] || {};
+    //                 const tokenContract = context.state.addresses[eventItem.contract] || {};
     //                 console.log(blockNumber + " " + txHash + " " + eventItem.type + " " + eventItem.contract + " " + (tokenContract ? tokenContract.type : '') + " " + (tokenContract ? tokenContract.name : '') + " " + (eventItem.tokenId ? eventItem.tokenId : '?'));
     //                 if (tokenContract.assets) {
     //                   if (!(eventItem.tokenId in tokenContract.assets)) {
@@ -1982,7 +1939,7 @@ const dataModule = {
     //   const preERC721s = store.getters['config/settings'].preERC721s;
     //   for (const [accountIndex, account] of parameter.accountsToSync.entries()) {
     //     console.log("actions.syncBuildTokenEvents: " + accountIndex + " " + account);
-    //     const accountData = context.state.accounts[account] || {};
+    //     const accountData = context.state.addresses[account] || {};
     //     const txHashesByBlocks = getTxHashesByBlocks(account, context.state.accounts, context.state.accountsInfo, parameter.processFilters);
     //     if (!context.state.sync.halt) {
     //       const missingTokenEventsMap = {};

@@ -3,54 +3,54 @@ const Addresses = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-        <b-modal ref="modalnewaccount" id="modal-newaccount" hide-footer body-bg-variant="light" size="lg">
-          <template #modal-title>New Account</template>
-          <b-form-group label="Action: " label-for="addnewaccount-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-select size="sm" id="addnewaccount-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
+        <b-modal ref="modalnewaddress" id="modal-newaddress" hide-footer body-bg-variant="light" size="lg">
+          <template #modal-title>New Address</template>
+          <b-form-group label="Action: " label-for="addnewaddress-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-select size="sm" id="addnewaddress-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaccount-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="enter phrase" class="w-75"></b-form-input>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaddress-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaddress-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="enter phrase" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaccount-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
-            <b-button size="sm" :disabled="!coinbase" id="addnewaccount-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaddress-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
+            <b-button size="sm" :disabled="!coinbase" id="addnewaddress-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaccount-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAccountCoinbaseFeedback == null" :invalid-feedback="addNewAccountCoinbaseFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="coinbase" class="w-75"></b-form-input>
+          <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaddress-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAddressCoinbaseFeedback == null" :invalid-feedback="addNewAddressCoinbaseFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="coinbase" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAccountAddressFeedback == null" :invalid-feedback="addNewAccountAddressFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaccount-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
+          <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAddressAddressFeedback == null" :invalid-feedback="addNewAddressAddressFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaddress-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaccount-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAccountStealthMetaAddressFeedback == null" :invalid-feedback="addNewAccountStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="addnewaccount-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaddress-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAddressStealthMetaAddressFeedback == null" :invalid-feedback="addNewAddressStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="addnewaddress-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAccountLinkedToFeedback == null" :invalid-feedback="addNewAccountLinkedToFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaccount-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
+          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAddressLinkedToFeedback == null" :invalid-feedback="addNewAddressLinkedToFeedback" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaddress-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaccount-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" readonly id="addnewaccount-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaddress-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" readonly id="addnewaddress-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-75"></b-form-textarea>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaccount-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="addnewaccount-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
+          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="addnewaccount-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="addnewaddress-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group>
-          <b-form-group label="Favourite:" label-for="addnewaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="addnewaccount-favourite" :pressed.sync="newAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+          <b-form-group label="Favourite:" label-for="addnewaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="newAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group>
-          <b-form-group label="Name:" label-for="addnewaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaccount-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
+          <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" id="addnewaddress-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
           </b-form-group>
-          <b-form-group label="" label-for="addnewaccount-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" :disabled="!!addNewAccountFeedback" id="addnewaccount-submit" @click="addNewAccount" variant="primary">Add/Update</b-button>
+          <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
           </b-form-group>
         </b-modal>
 
-        <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
+        <b-modal ref="modaladdress" id="modal-address" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>{{ account.type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
-          <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
-              <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2"></b-form-input>
+              <b-form-input size="sm" plaintext id="address-address" v-model.trim="account.account" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
                   <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
@@ -58,65 +58,65 @@ const Addresses = {
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <b-form-group v-if="false" label="ENS Name:" label-for="account-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="account-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
+          <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group>
-          <b-form-group label="Name:" label-for="account-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-75">
-              <b-form-input size="sm" type="text" id="account-name" v-model.trim="account.name" @update="setAccountField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
+              <b-form-input size="sm" type="text" id="address-name" v-model.trim="account.name" @update="setAddressField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
-                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <!-- <b-form-group label="Mine:" label-for="account-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="account-mine" :pressed.sync="account.mine" @click="toggleAccountField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          <!-- <b-form-group label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="address-mine" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group> -->
-          <!-- <b-form-group label="Favourite:" label-for="account-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="account-favourite" :pressed.sync="account.favourite" @click="toggleAccountField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+          <!-- <b-form-group label="Favourite:" label-for="address-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="address-favourite" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group> -->
-          <b-form-group label="Notes:" label-for="account-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="account-notes" v-model.trim="account.notes" @update="setAccountField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
+          <b-form-group label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="address-notes" v-model.trim="account.notes" @update="setAddressField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
           </b-form-group>
-          <b-form-group label="Source:" label-for="account-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="account-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
+          <b-form-group label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="address-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
-          <b-form-group label="" label-for="account-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAccountAndAccountInfo(account.account, 'modalaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-form-group label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group>
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
           <template #modal-title>Stealth Meta-Address</template>
-          <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+          <b-form-group label="Address:" label-for="stealthmetaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" plaintext id="stealthmetaddress-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
           </b-form-group>
-          <b-form-group label="Name:" label-for="stealthmetaccount-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-group label="Name:" label-for="stealthmetaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-75">
-              <b-form-input size="sm" id="stealthmetaccount-name" v-model.trim="stealthMetaAccount.name" @update="setAccountField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
+              <b-form-input size="sm" id="stealthmetaddress-name" v-model.trim="stealthMetaAccount.name" @update="setAddressField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo['stealthMetaAddress'].name" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo['stealthMetaAddress'].variant"></b-icon></b-button>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAddressField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo['stealthMetaAddress'].name" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo['stealthMetaAddress'].variant"></b-icon></b-button>
+                  <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAddressField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <!-- <b-form-group label="Mine:" label-for="stealthmetaccount-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaccount-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAccountField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          <!-- <b-form-group label="Mine:" label-for="stealthmetaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="stealthmetaddress-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAddressField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
           </b-form-group> -->
-          <!-- <b-form-group label="Favourite:" label-for="stealthmetaccount-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaccount-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAccountField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+          <!-- <b-form-group label="Favourite:" label-for="stealthmetaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" id="stealthmetaddress-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAddressField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </b-form-group> -->
-          <b-form-group label="Notes:" label-for="stealthmetaccount-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="stealthmetaccount-notes" v-model.trim="stealthMetaAccount.notes" @update="setAccountField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
+          <b-form-group label="Notes:" label-for="stealthmetaddress-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" id="stealthmetaddress-notes" v-model.trim="stealthMetaAccount.notes" @update="setAddressField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
           </b-form-group>
-          <b-form-group label="Linked To Address:" label-for="stealthmetaccount-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-group label="Linked To Address:" label-for="stealthmetaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
-              <b-form-input size="sm" plaintext id="stealthmetaccount-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2"></b-form-input>
+              <b-form-input size="sm" plaintext id="stealthmetaddress-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
                   <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + stealthMetaAccount.linkedToAddress" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
@@ -124,32 +124,32 @@ const Addresses = {
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaccount-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-phrase" v-model.trim="stealthMetaAccount.phrase" class="px-2 w-100"></b-form-input>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaddress-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="stealthmetaddress-phrase" v-model.trim="stealthMetaAccount.phrase" class="px-2 w-100"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Private Key:" label-for="stealthmetaccount-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Private Key:" label-for="stealthmetaddress-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
-              <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="stealthmetaccount-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'" class="px-2"></b-form-input>
+              <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="stealthmetaddress-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'" class="px-2"></b-form-input>
               <b-input-group-append>
                 <b-button v-if="!stealthMetaAccount.spendingPrivateKey" :disabled="stealthMetaAccount.linkedToAddress != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
                 <!-- <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button> -->
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaccount-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="px-2 w-100"></b-form-input>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaddress-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="stealthmetaddress-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Public Key:" label-for="stealthmetaccount-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="px-2 w-100"></b-form-input>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Public Key:" label-for="stealthmetaddress-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="stealthmetaddress-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaccount-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="px-2 w-100"></b-form-input>
+          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaddress-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="stealthmetaddress-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="px-2 w-100"></b-form-input>
           </b-form-group>
-          <b-form-group label="Source:" label-for="stealthmetaccount-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaccount-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
+          <b-form-group label="Source:" label-for="stealthmetaddress-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" plaintext id="stealthmetaddress-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
           </b-form-group>
-          <b-form-group label="" label-for="account-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAccountAndAccountInfo(stealthMetaAccount.account, 'modalstealthmetaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-form-group label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" @click="deleteAddress(stealthMetaAccount.account, 'modalstealthmetaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group>
         </b-modal>
 
@@ -378,8 +378,8 @@ const Addresses = {
             </div> -->
           </template>
           <template #cell(icons)="data">
-            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAccountField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
-            <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAccountField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAddressField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </template>
           <template #cell(account)="data">
             <div v-if="data.item.account.substring(0, 3) == 'st:'">
@@ -539,8 +539,8 @@ const Addresses = {
     block() {
       return store.getters['connection/block'];
     },
-    accounts() {
-      return store.getters['data/accounts'];
+    addresses() {
+      return store.getters['data/addresses'];
     },
     pageSizes() {
       return store.getters['config/pageSizes'];
@@ -561,10 +561,10 @@ const Addresses = {
       return store.getters['data/sync'];
     },
     coinbaseIncluded() {
-      return this.accounts[this.coinbase] && true || false;
+      return this.addresses[this.coinbase] && true || false;
     },
 
-    addNewAccountCoinbaseFeedback() {
+    addNewAddressCoinbaseFeedback() {
       if (this.newAccount.action == 'addCoinbase') {
         if (!this.coinbase) {
           return "Waiting for your web3 attached account connection";
@@ -573,7 +573,7 @@ const Addresses = {
       return null;
     },
 
-    addNewAccountAddressFeedback() {
+    addNewAddressAddressFeedback() {
       if (this.newAccount.action == 'addAddress') {
         if (!this.newAccount.address) {
           return "Enter Address";
@@ -587,7 +587,7 @@ const Addresses = {
       return null;
     },
 
-    addNewAccountStealthMetaAddressFeedback() {
+    addNewAddressStealthMetaAddressFeedback() {
       if (this.newAccount.action == 'addStealthMetaAddress') {
         if (!this.newAccount.stealthMetaAddress) {
           return "Enter Stealth Meta-Address";
@@ -599,7 +599,7 @@ const Addresses = {
       return null;
     },
 
-    addNewAccountLinkedToFeedback() {
+    addNewAddressLinkedToFeedback() {
       if (this.newAccount.action == 'addStealthMetaAddress') {
         if (!this.newAccount.linkedToAddress) {
           return "Enter Linked To Address";
@@ -611,7 +611,7 @@ const Addresses = {
       return null;
     },
 
-    addNewAccountFeedback() {
+    addNewAddressFeedback() {
       if (this.newAccount.action == 'addCoinbase') {
         if (!this.coinbase) {
           return "Waiting for your web3 attached account connection";
@@ -658,12 +658,12 @@ const Addresses = {
     },
 
     totalAccounts() {
-      return Object.keys(this.accounts).length;
+      return Object.keys(this.addresses).length;
     },
     filteredAccounts() {
       const results = [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
-      for (const [account, accountData] of Object.entries(this.accounts)) {
+      for (const [account, accountData] of Object.entries(this.addresses)) {
         // const accountInfo = this.accountsInfo[account] || {};
         // const ensName = this.ensMap[account] || null;
         const accountName = accountData.name || null;
@@ -818,7 +818,7 @@ const Addresses = {
       this.newAccount.viewingPrivateKey = null;
       this.newAccount.spendingPublicKey = null;
       this.newAccount.viewingPublicKey = null;
-      this.$bvModal.show('modal-newaccount');
+      this.$bvModal.show('modal-newaddress');
     },
 
     accountsRowSelected(item) {
@@ -849,7 +849,7 @@ const Addresses = {
           this.account.name = item[0].name;
           this.account.notes = item[0].notes;
           this.account.source = item[0].source;
-          this.$bvModal.show('modal-account');
+          this.$bvModal.show('modal-address');
         }
         this.$refs.accountsTable.clearSelected();
       }
@@ -926,14 +926,14 @@ const Addresses = {
       const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
     },
 
-    addNewAccount() {
-      logInfo("Addresses", "methods.addNewAccount: " + JSON.stringify(this.newAccount, null, 2));
-      this.$refs['modalnewaccount'].hide();
-      store.dispatch('data/addNewAccount', this.newAccount);
+    addNewAddress() {
+      logInfo("Addresses", "methods.addNewAddress: " + JSON.stringify(this.newAccount, null, 2));
+      this.$refs['modalnewaddress'].hide();
+      store.dispatch('data/addNewAddress', this.newAccount);
     },
     addCoinbase() {
       logInfo("Addresses", "methods.addCoinbase - coinbase: " + this.coinbase);
-      store.dispatch('data/addNewAccount', this.coinbase);
+      store.dispatch('data/addNewAddress', this.coinbase);
     },
     toggleSelectedAccounts(items) {
       let someFalse = false;
@@ -958,25 +958,25 @@ const Addresses = {
       this.settings.selectedAccounts = {};
       this.saveSettings();
     },
-    async toggleAccountInfoField(account, field) {
-      store.dispatch('data/toggleAccountInfoField', { account, field });
+    // async toggleAccountInfoField(account, field) {
+    //   store.dispatch('data/toggleAccountInfoField', { account, field });
+    // },
+    async toggleAddressField(account, field) {
+      logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
+      store.dispatch('data/toggleAddressField', { account, field });
     },
-    async toggleAccountField(account, field) {
-      <!-- logInfo("Addresses", "methods.toggleAccountField - account: " + account + ", field: " + field); -->
-      store.dispatch('data/toggleAccountField', { account, field });
+    async setAddressField(account, field, value) {
+      logInfo("Addresses", "methods.setAddressField - account: " + account + ", field: " + field + ", value: " + value);
+      store.dispatch('data/setAddressField', { account, field, value });
     },
-    async setAccountField(account, field, value) {
-      <!-- logInfo("Addresses", "methods.setAccountField - account: " + account + ", field: " + field + ", value: " + value); -->
-      store.dispatch('data/setAccountField', { account, field, value });
-    },
-    async setAccountInfoField(account, field, value) {
-      store.dispatch('data/setAccountInfoField', { account, field, value });
-    },
-    async deleteAccountAndAccountInfo(account, modalRef) {
+    // async setAccountInfoField(account, field, value) {
+    //   store.dispatch('data/setAccountInfoField', { account, field, value });
+    // },
+    async deleteAddress(account, modalRef) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
         .then(value => {
           if (value) {
-            store.dispatch('data/deleteAccountAndAccountInfo', account);
+            store.dispatch('data/deleteAddress', account);
             this.$refs[modalRef].hide();
           }
         })
