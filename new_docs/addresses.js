@@ -781,7 +781,7 @@ const Addresses = {
       return results;
     },
     pagedFilteredSortedAddresses() {
-      logInfo("Addresses", "filteredSortedAddresses - results[0..9]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 10), null, 2));
+      logInfo("Addresses", "filteredSortedAddresses - results[0..1]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 2), null, 2));
       return this.filteredSortedAddresses.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
   },

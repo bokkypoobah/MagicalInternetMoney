@@ -490,7 +490,7 @@ const dataModule = {
         for (let type of ['addresses', 'registry', 'transfers' /*, 'ensMap', 'exchangeRates'*/]) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
-            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }

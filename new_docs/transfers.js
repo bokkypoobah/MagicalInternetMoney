@@ -17,17 +17,18 @@ const Transfers = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedRegistryEntries.length + '/' + totalRegistryEntries }}</font>
+            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalRegistryEntries }}</font>
           </div>
           <div class="mt-0 pr-1">
-            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedRegistryEntries.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
+            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
             <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Page size'"></b-form-select>
           </div>
         </div>
 
-        <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedRegistryEntries" show-empty head-variant="light" class="m-0 mt-1">
+        <!-- <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1"> -->
+        <b-table ref="transfersTable" small fixed striped responsive hover :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -94,19 +95,33 @@ const Transfers = {
     registry() {
       return store.getters['data/registry'];
     },
+    transfers() {
+      return store.getters['data/transfers'];
+    },
 
     totalRegistryEntries() {
-      return Object.keys(this.registry[this.chainId] || {}).length;
+      let result = 0;
+      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+        for (const [logIndex, item] of Object.entries(logIndexes)) {
+          result++;
+        }
+      }
+      return result;
     },
-    filteredRegistryEntries() {
+    filteredTransfers() {
       const results = [];
-      for (const [registrant, stealthMetaAddress] of Object.entries(this.registry[this.chainId] || {})) {
-        results.push({ registrant, stealthMetaAddress });
+      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+        for (const [logIndex, item] of Object.entries(logIndexes)) {
+          // console.log(blockNumber + "." + logIndex + " => " + JSON.stringify(item, null, 2));
+          if (item.schemeId == 0) {
+            results.push(item);
+          }
+        }
       }
       return results;
     },
-    filteredSortedRegistryEntries() {
-      const results = this.filteredRegistryEntries;
+    filteredSortedTransfers() {
+      const results = this.filteredTransfers;
       if (this.settings.sortOption == 'registrantasc') {
         results.sort((a, b) => {
           return ('' + a.registrant).localeCompare(b.registrant);
@@ -118,9 +133,9 @@ const Transfers = {
       }
       return results;
     },
-    pagedFilteredSortedRegistryEntries() {
-      <!-- console.log(JSON.stringify(this.filteredSortedRegistryEntries, null, 2)); -->
-      return this.filteredSortedRegistryEntries.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
+    pagedFilteredSortedTransfers() {
+      logInfo("Addresses", "pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
+      return this.filteredSortedTransfers.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
   },
