@@ -104,7 +104,7 @@ const dataModule = {
   state: {
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
-    transfers: [],
+    transfers: {},
     // mappings: {}, // Various mappings
     // txs: {}, // account => Txs(timestamp, tx, txReceipt)
     // txsInfo: {}, // account => Txs Info
@@ -483,13 +483,14 @@ const dataModule = {
     async restoreState(context) {
       logInfo("dataModule", "actions.restoreState");
       const CHAIN_ID = 1;
-      if (context.state.transfers.length == 0) {
+      // console.log("context.state.transfers: " + JSON.stringify(context.state.transfers));
+      if (Object.keys(context.state.transfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
         for (let type of ['addresses', 'registry', 'transfers' /*, 'ensMap', 'exchangeRates'*/]) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
-            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
@@ -1105,10 +1106,11 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      const transfers = context.state.transfers;
-      // if (!(parameter.chainId in registry)) {
-      //   registry[parameter.chainId] = {};
-      // }
+      const transfers = {}; // context.state.transfers;
+      console.log("parameter.chainId: " + parameter.chainId);
+      if (!(parameter.chainId in transfers)) {
+        transfers[parameter.chainId] = {};
+      }
       console.log("transfers BEFORE: " + JSON.stringify(transfers, null, 2));
       let rows = 0;
       let done = false;
@@ -1120,7 +1122,16 @@ const dataModule = {
       //       // logInfo("dataModule", "actions.collateTransfers - processing: " + JSON.stringify(item, null, 2));
       //       const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
       //       registry[parameter.chainId][item.registrant] = stealthMetaAddress;
-            transfers.push(item);
+            // transfers[parameter.chainId].push(item);
+
+            if (!(item.blockNumber in transfers[parameter.chainId])) {
+              transfers[parameter.chainId][item.blockNumber] = {};
+            }
+            if (!(item.logIndex in transfers[parameter.chainId][item.blockNumber])) {
+              transfers[parameter.chainId][item.blockNumber][item.logIndex] = item;
+            }
+
+
           }
         }
         rows = parseInt(rows) + data.length;
