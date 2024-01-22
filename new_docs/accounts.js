@@ -47,7 +47,7 @@ const Accounts = {
         </b-modal>
 
         <b-modal ref="modalaccount" id="modal-account" hide-footer body-bg-variant="light" size="lg">
-          <template #modal-title>Account</template>
+          <template #modal-title>{{ account.type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
           <b-form-group label="Address:" label-for="account-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
               <b-form-input size="sm" plaintext id="account-address" v-model.trim="account.account" class="px-2"></b-form-input>
@@ -90,7 +90,7 @@ const Accounts = {
         </b-modal>
 
         <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
-          <template #modal-title>Stealth Meta-Address Account</template>
+          <template #modal-title>Stealth Meta-Address</template>
           <b-form-group label="Address:" label-for="stealthmetaccount-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-textarea size="sm" plaintext id="stealthmetaccount-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
           </b-form-group>
