@@ -486,7 +486,7 @@ const dataModule = {
       if (context.state.transfers.length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry' /*, 'ensMap', 'exchangeRates'*/]) {
+        for (let type of ['addresses', 'registry', 'transfers' /*, 'ensMap', 'exchangeRates'*/]) {
           const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -650,8 +650,11 @@ const dataModule = {
         if (section == "syncAnnouncementsData" || section == "all") {
           await context.dispatch('syncAnnouncementsData', parameter);
         }
-        if (section == "syncIdentifyMyStealthTransfers" || section == "all") {
-          await context.dispatch('syncIdentifyMyStealthTransfers', parameter);
+        if (section == "identifyMyStealthTransfers" || section == "all") {
+          await context.dispatch('identifyMyStealthTransfers', parameter);
+        }
+        if (section == "collateTransfers" || section == "all") {
+          await context.dispatch('collateTransfers', parameter);
         }
         if (section == "syncRegistrations" || section == "all") {
           await context.dispatch('syncRegistrations', parameter);
@@ -990,7 +993,7 @@ const dataModule = {
       logInfo("dataModule", "actions.syncAnnouncementsData END");
     },
 
-    async syncIdentifyMyStealthTransfers(context, parameter) {
+    async identifyMyStealthTransfers(context, parameter) {
 
       function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
         const result = {};
@@ -1006,14 +1009,14 @@ const dataModule = {
       }
 
       const DB_PROCESSING_BATCH_SIZE = 123;
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers: " + JSON.stringify(parameter));
+      logInfo("dataModule", "actions.identifyMyStealthTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       // const accounts = store.getters['data/accounts'];
       const addresses = context.state.addresses;
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers addresses BEFORE: " + JSON.stringify(addresses, null, 2));
+      logInfo("dataModule", "actions.identifyMyStealthTransfers addresses BEFORE: " + JSON.stringify(addresses, null, 2));
       const checkAddresses = [];
       for (const [address, addressData] of Object.entries(addresses)) {
         if (addressData.type == "stealthMetaAddress" && addressData.mine && addressData.viewingPrivateKey) {
@@ -1088,11 +1091,48 @@ const dataModule = {
       } while (!done);
       // rows = 0;
       // localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
+      logInfo("dataModule", "actions.identifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
       context.commit('setState', { name: 'addresses', data: addresses });
       await context.dispatch('saveData', ['addresses']);
 
-      logInfo("dataModule", "actions.syncIdentifyMyStealthTransfers END");
+      logInfo("dataModule", "actions.identifyMyStealthTransfers END");
+    },
+
+    async collateTransfers(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      logInfo("dataModule", "actions.collateTransfers: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      const transfers = context.state.transfers;
+      // if (!(parameter.chainId in registry)) {
+      //   registry[parameter.chainId] = {};
+      // }
+      console.log("transfers BEFORE: " + JSON.stringify(transfers, null, 2));
+      let rows = 0;
+      let done = false;
+      do {
+        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        logInfo("dataModule", "actions.collateTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        for (const item of data) {
+          if (item.chainId == parameter.chainId && item.schemeId == 0) {
+      //       // logInfo("dataModule", "actions.collateTransfers - processing: " + JSON.stringify(item, null, 2));
+      //       const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
+      //       registry[parameter.chainId][item.registrant] = stealthMetaAddress;
+            transfers.push(item);
+          }
+        }
+        rows = parseInt(rows) + data.length;
+        done = data.length < DB_PROCESSING_BATCH_SIZE;
+      //   done = true;
+      } while (!done);
+      console.log("transfers AFTER: " + JSON.stringify(transfers, null, 2));
+      context.commit('setState', { name: 'transfers', data: transfers });
+
+      // console.log("context.state.transfers: " + JSON.stringify(context.state.transfers, null, 2));
+      await context.dispatch('saveData', ['transfers']);
+      logInfo("dataModule", "actions.collateTransfers END");
     },
 
     async syncRegistrationsData(context, parameter) {
@@ -1191,7 +1231,7 @@ const dataModule = {
         }
         rows = parseInt(rows) + data.length;
         done = data.length < DB_PROCESSING_BATCH_SIZE;
-        done = true;
+        // done = true;
       } while (!done);
       // console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
       context.commit('setState', { name: 'registry', data: registry });
