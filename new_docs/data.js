@@ -482,13 +482,11 @@ const dataModule = {
   actions: {
     async restoreState(context) {
       logInfo("dataModule", "actions.restoreState");
-      const CHAIN_ID = 1;
-      // console.log("context.state.transfers: " + JSON.stringify(context.state.transfers));
       if (Object.keys(context.state.transfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'transfers' /*, 'ensMap', 'exchangeRates'*/]) {
-          const data = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + type).toArray();
+        for (let type of ['addresses', 'registry', 'transfers']) {
+          const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
@@ -497,11 +495,10 @@ const dataModule = {
       }
     },
     async saveData(context, types) {
-      const CHAIN_ID = 1;
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       for (let type of types) {
-        await db0.cache.put({ objectName: CHAIN_ID + '.' + type, object: context.state[type] }).then (function() {
+        await db0.cache.put({ objectName: type, object: context.state[type] }).then (function() {
         }).catch(function(error) {
           console.log("error: " + error);
         });

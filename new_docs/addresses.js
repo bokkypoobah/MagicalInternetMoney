@@ -476,12 +476,6 @@ const Addresses = {
         { value: 'stealthMetaAddress', text: 'Stealth Meta-Address' },
         { value: 'erc20', text: 'ERC-20 Token Contract' },
         { value: 'erc721', text: 'ERC-721 Token Contract' },
-        // { value: 'erc1155', text: 'ERC-1155 Token Contract' },
-        // { value: 'eoa', text: 'EOA' },
-        // { value: 'contract', text: 'Contract' },
-        // { value: 'exchangewallet', text: 'Exchange Wallet' },
-        // { value: 'erc20exchange', text: 'ERC-20 Exchange' },
-        // { value: 'nftexchange', text: 'NFT Exchange' },
       ],
       accountTypeFilters: [
         { value: null, text: '(all)' },
@@ -511,15 +505,9 @@ const Addresses = {
       ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        // { key: 'image', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'icons', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-        // { key: 'mine', label: 'Mine', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-        // { key: 'ens', label: 'ENS', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-        // { key: 'group', label: 'Group', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 50%;', tdClass: 'text-truncate' },
-        // { key: 'notes', label: 'Notes', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
       ],
     }
   },
@@ -664,15 +652,10 @@ const Addresses = {
       const results = [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
       for (const [account, accountData] of Object.entries(this.addresses)) {
-        // const accountInfo = this.accountsInfo[account] || {};
-        // const ensName = this.ensMap[account] || null;
         const accountName = accountData.name || null;
         let include = filterLower == null ||
           (account.toLowerCase().includes(filterLower)) ||
-          (accountName && accountName.toLowerCase().includes(filterLower)); // ||
-          // (accountInfo.group && accountInfo.group.toLowerCase().includes(filterLower)) ||
-          // (accountInfo.notes && accountInfo.notes.toLowerCase().includes(filterLower)) ||
-          // (ensName != null && ensName.toLowerCase().includes(filterLower));
+          (accountName && accountName.toLowerCase().includes(filterLower));
         if (include && this.settings.myAccountsFilter != null) {
           if (this.settings.myAccountsFilter == 'mine' && accountData.mine) {
           } else if (this.settings.myAccountsFilter == 'notmine' && !accountData.mine) {
@@ -680,38 +663,10 @@ const Addresses = {
             include = false;
           }
         }
-        // if (include && this.settings.accountTypeFilter != null) {
-        //   const accountType = accountInfo.type || accountData.type || null;
-        //   if (this.settings.accountTypeFilter == 'unknown' && accountInfo.type == null) {
-        //   } else if (this.settings.accountTypeFilter == accountType) {
-        //   } else {
-        //     include = false;
-        //   }
-        // }
-        // if (include && this.settings.junkFilter) {
-        //   if (this.settings.junkFilter == 'junk' && !accountInfo.junk) {
-        //     include = false;
-        //   } else if (this.settings.junkFilter == 'excludejunk' && accountInfo.junk) {
-        //     include = false;
-        //   }
-        // }
         if (include) {
           results.push({
             account,
             ...accountData,
-            // // group: accountInfo.group,
-            // name: accountName,
-            // type: accountData.type,
-            // // slug: accountInfo.slug || accountData.slug,
-            // // image: accountInfo.image || accountData.image,
-            // mine: accountData.mine,
-            // // sync: accountInfo.sync,
-            // // report: accountInfo.report,
-            // // junk: accountInfo.junk,
-            // // tags: accountInfo.tags,
-            // notes: accountData.notes,
-            // // created: accountData.created,
-            // // updated: accountData.updated,
           });
         }
       }
@@ -719,16 +674,6 @@ const Addresses = {
     },
     filteredSortedAddresses() {
       const results = this.filteredAddresses;
-
-      // sortOptions: [
-      //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
-      //   { value: 'typenamedsc', text: '▼ Type, ▲ Name' },
-      //   { value: 'nameasc', text: '▲ Name, ▲ Address' },
-      //   { value: 'namedsc', text: '▼ Name, ▲ Address' },
-      //   { value: 'addressasc', text: '▲ Address' },
-      //   { value: 'addressdsc', text: '▼ Address' },
-      // ],
-
       if (this.settings.sortOption == 'typenameasc') {
         results.sort((a, b) => {
           if (('' + a.type).localeCompare(b.type) == 0) {
@@ -787,13 +732,13 @@ const Addresses = {
   },
   methods: {
     saveSettings() {
-      logInfo("Addresses", "methods.saveSettings - accountsSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.accountsSettings = JSON.stringify(this.settings);
+      logInfo("Addresses", "methods.saveSettings - addressesSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.addressesSettings = JSON.stringify(this.settings);
     },
 
     formatAddress(address) {
       const STEALTHMETAADDRESS_SEGMENT_LENGTH = 20;
-      <!-- const ADDRESS_SEGMENT_LENGTH = 8; -->
+      // <!-- const ADDRESS_SEGMENT_LENGTH = 8; -->
       if (address) {
         if (address.substring(0, 3) == "st:") {
           return address.substring(0, STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-STEALTHMETAADDRESS_SEGMENT_LENGTH);
@@ -1086,8 +1031,8 @@ const Addresses = {
   mounted() {
     logDebug("Addresses", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('accountsSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.accountsSettings);
+    if ('addressesSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.addressesSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;

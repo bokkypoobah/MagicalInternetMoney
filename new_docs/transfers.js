@@ -55,6 +55,44 @@ const Transfers = {
               </span>
             </b-link>
           </template>
+          <template #cell(sender)="data">
+            <div v-if="data.item.tx && data.item.tx.from">
+              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.tx.from" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                {{ data.item.tx.from }}
+              </b-link>
+            </div>
+          </template>
+          <template #cell(receiver)="data">
+            <div v-if="data.item.stealthAddress">
+              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.stealthAddress" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                {{ data.item.stealthAddress }}
+              </b-link>
+            </div>
+          </template>
+          <template #cell(tokens)="data">
+            <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
+              <b-col>
+                <!-- {{ index }}.{{ item }} -->
+                <!-- {{ getTokenType(item.token) }} -->
+                <span v-if="getTokenType(item.token) == 'eth'">
+                  <!-- <font size="-1">{{ formatETH(item.value, 9) + ' ETH'}}</font> -->
+                  <font size="-1">{{ item.value + ' ETH'}}</font>
+                </span>
+                <!-- <span v-else-if="getTokenType(item.token) == 'erc20'">
+                  <font size="-1">
+                    {{ formatETH(item.value) }}
+                    <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover.bottom="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
+                  </font>
+                </span> -->
+                <span v-else>
+                  <font size="-1">
+                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.bottom="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
+                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover.bottom="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
+                  </font>
+                </span>
+              </b-col>
+            </b-row>
+          </template>
 
         </b-table>
       </b-card>
@@ -162,7 +200,14 @@ const Transfers = {
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
     },
-
+    getTokenType(address) {
+      if (address == ADDRESS_ETHEREUMS) {
+        return "eth";
+      } else {
+        // TODO: ERC-20 & ERC-721
+        return address.substring(0, 10) + '...' + address.slice(-8);
+      }
+    },
     formatTimestamp(ts) {
       if (ts != null) {
         // if (this.settings.reportingDateTime == 1) {
