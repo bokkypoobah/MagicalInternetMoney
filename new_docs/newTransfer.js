@@ -4,9 +4,8 @@ const NewTransfer = {
       <!-- <b-modal ref="modaltransfer" id="modal-transfer" show hide-footer body-bg-variant="light" size="lg">
         <template #modal-title>Stealth Transfer</template>
       </b-modal> -->
-      Hi Hi!
-      {{ show }}
-
+      <!-- Hi Hi! -->
+      <!-- {{ show }} -->
       <div>
         <b-modal ref="newtransfer" v-model="show" id="modal-newtransfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
           <template #modal-title>New Stealth Transfer</template>
@@ -526,7 +525,7 @@ const NewTransfer = {
 const newTransferModule = {
   namespaced: true,
   state: {
-    show: true,
+    show: false,
     params: null,
     executing: false,
     executionQueue: [],
@@ -537,6 +536,11 @@ const newTransferModule = {
     executionQueue: state => state.executionQueue,
   },
   mutations: {
+
+    newTransfer(state, stealthMetaAddress) {
+      state.show = true;
+      logInfo("newTransferModule", "mutations.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+    },
 
     setShow(state, show) {
       state.show = show;
@@ -559,6 +563,10 @@ const newTransferModule = {
     },
   },
   actions: {
+    async newTransfer(context, stealthMetaAddress) {
+      logInfo("newTransferModule", "actions.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      await context.commit('newTransfer', stealthMetaAddress);
+    },
     async setShow(context, show) {
       logInfo("newTransferModule", "actions.setShow - show: " + show);
       await context.commit('setShow', show);

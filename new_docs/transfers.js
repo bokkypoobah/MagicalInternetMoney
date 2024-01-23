@@ -159,6 +159,11 @@ const Transfers = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
+            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+          </div>
+          <div class="mt-0 flex-grow-1">
+          </div>
+          <div class="mt-0 pr-1">
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
@@ -350,6 +355,9 @@ const Transfers = {
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
+    },
+    newTransfer(stealthMetaAddress = null) {
+      store.dispatch('newTransfer/newTransfer', stealthMetaAddress);
     },
     getTokenType(address) {
       if (address == ADDRESS_ETHEREUMS) {

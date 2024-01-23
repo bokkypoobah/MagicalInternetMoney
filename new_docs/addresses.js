@@ -286,7 +286,7 @@ const Addresses = {
           <div v-if="false && sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" @click="exportAccounts" variant="link" v-b-popover.hover.top="'Export accounts'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
           </div>
-          <div class="mt-1" style="width: 200px;">
+          <div v-if="false" class="mt-1" style="width: 200px;">
             <b-progress v-if="false && sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
@@ -295,6 +295,11 @@ const Addresses = {
           </div>
           <div class="ml-0 mt-1">
             <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+          </div>
+          <div class="mt-0 flex-grow-1">
+          </div>
+          <div class="mt-0 pr-1">
+            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -378,6 +383,9 @@ const Addresses = {
             </div> -->
           </template>
           <template #cell(icons)="data">
+            <span v-if="data.item.account.substring(0, 3) == 'st:'">
+              <b-button size="sm" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.account" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            </span>
             <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
             <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAddressField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
           </template>
@@ -505,9 +513,9 @@ const Addresses = {
       ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'icons', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'icons', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 50%;', tdClass: 'text-truncate' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-truncate' },
       ],
     }
   },
@@ -734,6 +742,11 @@ const Addresses = {
     saveSettings() {
       logInfo("Addresses", "methods.saveSettings - addressesSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.addressesSettings = JSON.stringify(this.settings);
+    },
+
+    newTransfer(stealthMetaAddress = null) {
+      logInfo("Addresses", "methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      store.dispatch('newTransfer/newTransfer', stealthMetaAddress);
     },
 
     formatAddress(address) {

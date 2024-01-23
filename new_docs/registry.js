@@ -14,6 +14,11 @@ const Registry = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
+            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+          </div>
+          <div class="mt-0 flex-grow-1">
+          </div>
+          <div class="mt-0 pr-1">
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
@@ -44,6 +49,15 @@ const Registry = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
+          <template #cell(registrant)="data">
+            {{ data.item.registrant }}
+          </template>
+          <template #cell(transfer)="data">
+            <b-button size="sm" @click="newTransfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+          </template>
+          <template #cell(stealthMetaAddress)="data">
+            {{ data.item.stealthMetaAddress }}
+          </template>
         </b-table>
       </b-card>
     </div>
@@ -68,7 +82,8 @@ const Registry = {
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'registrant', label: 'Registrant', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-left' },
-        { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 60%;', tdClass: 'text-left' },
+        { key: 'transfer', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'stealthMetaAddress', label: 'Stealth Meta-Address', sortable: false, thStyle: 'width: 55%;', tdClass: 'text-left' },
       ],
     }
   },
@@ -131,6 +146,10 @@ const Registry = {
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
+    },
+    newTransfer(stealthMetaAddress = null) {
+      logInfo("Registry", "methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      store.dispatch('newTransfer/newTransfer', stealthMetaAddress);
     },
     async timeoutCallback() {
       logDebug("Registry", "timeoutCallback() count: " + this.count);
