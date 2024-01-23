@@ -40,6 +40,38 @@ const Transfers = {
           </b-input-group>
         </b-form-group>
 
+        <b-form-group v-if="transfer.item && transfer.item.linkedTo && transfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input :type="transfer.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="transfer-spendingprivatekey" :value="transfer.stealthPrivateKey ? transfer.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <b-button v-if="!transfer.stealthPrivateKey" :disabled="transfer.item.linkedTo.address != coinbase" @click="revealTransferSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+              <b-button v-if="transfer.stealthPrivateKey" @click="copyToClipboard(transfer.stealthPrivateKey ? transfer.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+
+
+        <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Linked To Address:" label-for="transfer-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input size="sm" plaintext id="transfer-linkedtoaddress" v-model.trim="transfer.item.linkedTo.address" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <div>
+                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Via Stealth Meta-Address:" label-for="transfer-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <!-- <b-input-group size="sm" class="w-100"> -->
+            <b-form-textarea size="sm" plaintext id="transfer-linkedtostealthmetaaddress" v-model.trim="transfer.item.linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+            <!-- <b-input-group-append>
+              <div>
+                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group> -->
+        </b-form-group>
+
 
         <!-- <b-form-group label="Address:" label-for="transfer-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -227,6 +259,9 @@ const Transfers = {
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
+    addresses() {
+      return store.getters['data/addresses'];
+    },
     registry() {
       return store.getters['data/registry'];
     },
@@ -340,6 +375,50 @@ const Transfers = {
         this.$bvModal.show('modal-transfer');
         this.$refs.transfersTable.clearSelected();
       }
+    },
+
+    async revealTransferSpendingPrivateKey() {
+      function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
+        const result = {};
+        result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
+        result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
+        const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
+        const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
+        result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
+        result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
+        result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
+        return result;
+      }
+
+      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - transfer: " + JSON.stringify(this.transfer, null, 2));
+      const stealthMetaAddressData = this.addresses[this.transfer.item.linkedTo.stealthMetaAddress];
+      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
+      // const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
+      // const signature = await ethereum.request({
+      //   method: 'personal_sign',
+      //   params: [phraseInHex, this.coinbase],
+      // });
+      // const signature1 = signature.slice(2, 66);
+      // const signature2 = signature.slice(66, 130);
+      // // Hash "v" and "r" values using SHA-256
+      // const hashedV = ethers.utils.sha256("0x" + signature1);
+      // const hashedR = ethers.utils.sha256("0x" + signature2);
+      // const n = ethers.BigNumber.from(SECP256K1_N);
+      // // Calculate the private keys by taking the hash values modulo the curve order
+      // const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+      // const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+      // const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+      // const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+      // const spendingPrivateKey = keyPair1.privateKey;
+      // const viewingPrivateKey = keyPair2.privateKey;
+      // const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+      // const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+      // // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
+      // console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+      // const computedStealthKey = computeStealthKey(this.transfer.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
+      // const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
+      // Vue.set(this.transfer, 'stealthPrivateKey', stealthPrivateKey);
+      // console.log("this.transfer: " + JSON.stringify(this.transfer, null, 2));
     },
 
     async timeoutCallback() {
