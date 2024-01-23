@@ -2,6 +2,49 @@ const Transfers = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
+
+      <b-modal ref="modaltransfer" id="modal-transfer" hide-footer body-bg-variant="light" size="lg">
+        <template #modal-title>Stealth Transfer</template>
+        <!-- <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input size="sm" plaintext id="address-address" v-model.trim="account.account" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <div>
+                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-75">
+            <b-form-input size="sm" type="text" id="address-name" v-model.trim="account.name" @update="setAddressField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
+            <b-input-group-append>
+              <div>
+                <b-button size="sm" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
+                <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group> -->
+        <!-- <b-form-group label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" id="address-notes" v-model.trim="account.notes" @update="setAddressField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
+        </b-form-group> -->
+        <!-- <b-form-group label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="address-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+        </b-form-group> -->
+        <font size="-1">
+          <pre>
+{{ transfer }}
+          </pre>
+        </font>
+      </b-modal>
+
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 flex-grow-1">
           </div>
@@ -27,8 +70,7 @@ const Transfers = {
           </div>
         </div>
 
-        <!-- <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1"> -->
-        <b-table ref="transfersTable" small fixed striped responsive hover :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
+        <b-table ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -108,6 +150,9 @@ const Transfers = {
         pageSize: 10,
         sortOption: 'registrantasc',
         version: 0,
+      },
+      transfer: {
+        item: null,
       },
       sortOptions: [
         // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
@@ -223,6 +268,41 @@ const Transfers = {
         return Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
       }
       return null;
+    },
+    rowSelected(item) {
+      logInfo("Transfers", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      if (item && item.length > 0) {
+        this.transfer.item = item[0];
+        // const account = item[0].account;
+        // if (account.substring(0, 3) == "st:") {
+        //   this.stealthMetaAccount.account = item[0].account;
+        //   this.stealthMetaAccount.type = item[0].type;
+        //   this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
+        //   this.stealthMetaAccount.phrase = item[0].phrase;
+        //   this.stealthMetaAccount.mine = item[0].mine;
+        //   this.stealthMetaAccount.favourite = item[0].favourite;
+        //   this.stealthMetaAccount.name = item[0].name;
+        //   this.stealthMetaAccount.notes = item[0].notes;
+        //   this.stealthMetaAccount.spendingPrivateKey = null;
+        //   this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
+        //   this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
+        //   this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
+        //   this.stealthMetaAccount.source = item[0].source;
+        //   this.$bvModal.show('modal-stealthmetaccount');
+        // } else {
+        //   this.account.account = item[0].account;
+        //   this.account.type = item[0].type;
+        //   this.account.ensName = item[0].ensName;
+        //   this.account.mine = item[0].mine;
+        //   this.account.favourite = item[0].favourite;
+        //   this.account.name = item[0].name;
+        //   this.account.notes = item[0].notes;
+        //   this.account.source = item[0].source;
+        //   this.$bvModal.show('modal-address');
+        // }
+        this.$bvModal.show('modal-transfer');
+        this.$refs.transfersTable.clearSelected();
+      }
     },
 
     async timeoutCallback() {

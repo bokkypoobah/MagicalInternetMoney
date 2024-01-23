@@ -334,7 +334,7 @@ const Addresses = {
           </div>
         </b-card>
 
-        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='accountsRowSelected' :fields="accountsFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
+        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="accountsFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div v-if="totalAddresses == 0">
@@ -766,8 +766,8 @@ const Addresses = {
       this.$bvModal.show('modal-newaddress');
     },
 
-    accountsRowSelected(item) {
-      logInfo("Addresses", "methods.accountsRowSelected BEGIN: " + JSON.stringify(item, null, 2));
+    rowSelected(item) {
+      logInfo("Addresses", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         const account = item[0].account;
         if (account.substring(0, 3) == "st:") {
