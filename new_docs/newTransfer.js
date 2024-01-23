@@ -8,11 +8,8 @@ const NewTransfer = {
       {{ show }}
 
       <div>
-        <!-- <b-button v-b-modal.modal-1>Launch demo modal</b-button> -->
-
-        <!-- <b-modal v-model="show">Hello From Modal!</b-modal> -->
-
-        <b-modal v-model="show" id="modal-1" title="BootstrapVue">
+        <b-modal ref="newtransfer" v-model="show" id="modal-newtransfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+          <template #modal-title>New Stealth Transfer</template>
           <p class="my-4">Hello from modal!</p>
         </b-modal>
       </div>

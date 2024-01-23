@@ -3,7 +3,7 @@ const Addresses = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-        <b-modal ref="modalnewaddress" id="modal-newaddress" hide-footer body-bg-variant="light" size="lg">
+        <b-modal ref="modalnewaddress" id="modal-newaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
           <template #modal-title>New Address</template>
           <b-form-group label="Action: " label-for="addnewaddress-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-select size="sm" id="addnewaddress-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
@@ -46,7 +46,7 @@ const Addresses = {
           </b-form-group>
         </b-modal>
 
-        <b-modal ref="modaladdress" id="modal-address" hide-footer body-bg-variant="light" size="lg">
+        <b-modal ref="modaladdress" id="modal-address" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
           <template #modal-title>{{ account.type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
           <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
@@ -89,7 +89,7 @@ const Addresses = {
           </b-form-group>
         </b-modal>
 
-        <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer body-bg-variant="light" size="lg">
+        <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
           <template #modal-title>Stealth Meta-Address</template>
           <b-form-group label="Address:" label-for="stealthmetaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-form-textarea size="sm" plaintext id="stealthmetaddress-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>

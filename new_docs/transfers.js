@@ -3,7 +3,7 @@ const Transfers = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-      <b-modal ref="modaltransfer" id="modal-transfer" hide-footer body-bg-variant="light" size="lg">
+      <b-modal ref="modaltransfer" id="modal-transfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>Stealth Transfer</template>
 
         <b-form-group v-if="transfer.item" label="Tx Hash:" label-for="transfer-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
