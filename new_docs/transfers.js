@@ -78,6 +78,34 @@ const Transfers = {
           </b-input-group>
         </b-form-group>
 
+        <b-form-group v-if="transfer.item && transfer.item.transfers" label="Transfers:" label-for="transfer-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <font size="-1">
+            <b-row v-for="(item, index) of transfer.item.transfers" v-bind:key="item.token">
+              <b-col cols="12" class="text-right px-0 mt-1">
+                {{ item.value + ' ' + item.token }}
+                <!-- <span v-if="getTokenType(item.token) == 'eth'">
+                  <font size="-1">{{ formatETH(item.value) }}</font>
+                </span>
+                <span v-else-if="getTokenType(item.token) == 'erc20'">
+                  <font size="-1">{{ formatETH(item.value) }}</font>
+                </span>
+                <span v-else>
+                  <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button>
+                </span> -->
+              </b-col>
+              <!-- <b-col cols="3" class="px-0 mt-1"> -->
+                <!-- <span v-if="isEthereums(item.token)">
+                  <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
+                </span>
+                <span v-else>
+                  <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button>
+                </span> -->
+              <!-- </b-col> -->
+            </b-row>
+          </font>
+        </b-form-group>
+
+
 
         <!-- <b-form-group label="Address:" label-for="transfer-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
