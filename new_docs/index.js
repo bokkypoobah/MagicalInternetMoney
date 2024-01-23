@@ -57,13 +57,13 @@ const store = new Vuex.Store({
     registry: registryModule,
     transfers: transfersModule,
     config: configModule,
-    mappings: mappingsModule,
+    // mappings: mappingsModule,
     data: dataModule,
-    account: accountModule,
+    // account: accountModule,
     addresses: addressesModule,
-    assets: assetsModule,
-    report: reportModule,
-    transactions: transactionsModule,
+    // assets: assetsModule,
+    // report: reportModule,
+    // transactions: transactionsModule,
   }
 });
 
