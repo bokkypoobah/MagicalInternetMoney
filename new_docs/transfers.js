@@ -17,7 +17,7 @@ const Transfers = {
           </b-input-group>
         </b-form-group>
         <b-form-group v-if="transfer.item" label="Timestamp:" label-for="transfer-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" variant="transparent" id="transfer-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(transfer.item.blockNumber)">{{ formatTimestamp(transfer.item.timestamp) }}</b-button>
+          <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
         </b-form-group>
         <b-form-group v-if="transfer.item && transfer.item.tx" label="Sender:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -39,7 +39,6 @@ const Transfers = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-
         <b-form-group v-if="transfer.item && transfer.item.linkedTo && transfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input :type="transfer.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="transfer-spendingprivatekey" :value="transfer.stealthPrivateKey ? transfer.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
@@ -49,8 +48,6 @@ const Transfers = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-
-
         <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Linked To Address:" label-for="transfer-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="transfer-linkedtoaddress" v-model.trim="transfer.item.linkedTo.address" class="px-2"></b-form-input>
@@ -62,14 +59,23 @@ const Transfers = {
           </b-input-group>
         </b-form-group>
         <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Via Stealth Meta-Address:" label-for="transfer-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <!-- <b-input-group size="sm" class="w-100"> -->
-            <b-form-textarea size="sm" plaintext id="transfer-linkedtostealthmetaaddress" v-model.trim="transfer.item.linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
-            <!-- <b-input-group-append>
+          <b-form-textarea size="sm" plaintext id="transfer-linkedtostealthmetaaddress" v-model.trim="transfer.item.linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+        </b-form-group>
+        <b-form-group v-if="transfer.item" label="Scheme Id:" label-for="transfer-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="transfer-schemeid" v-model.trim="transfer.item.schemeId" class="px-2"></b-form-input>
+        </b-form-group>
+        <b-form-group v-if="transfer.item" label="Ephemeral Public Key:" label-for="transfer-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="transfer-ephemeralpublickey" v-model.trim="transfer.item.ephemeralPublicKey" class="px-2"></b-form-input>
+        </b-form-group>
+        <b-form-group v-if="transfer.item" label="Caller:" label-for="transfer-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input size="sm" plaintext id="transfer-caller" v-model.trim="transfer.item.caller" class="px-2"></b-form-input>
+            <b-input-group-append>
               <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.caller" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
-          </b-input-group> -->
+          </b-input-group>
         </b-form-group>
 
 
