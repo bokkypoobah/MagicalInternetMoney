@@ -6,6 +6,7 @@ Vue.use(Vuex);
 // Vue.component('apexchart', VueApexCharts);
 Vue.component('connection', Connection);
 Vue.component('coredata', Data);
+Vue.component('new-transfer', NewTransfer);
 // Vue.component('flat-pickr', VueFlatpickr);
 
 // hljs.registerLanguage('solidity', window.hljsDefineSolidity);
@@ -56,6 +57,7 @@ const store = new Vuex.Store({
     welcome: welcomeModule,
     registry: registryModule,
     transfers: transfersModule,
+    newTransfer: newTransferModule,
     config: configModule,
     // mappings: mappingsModule,
     data: dataModule,
