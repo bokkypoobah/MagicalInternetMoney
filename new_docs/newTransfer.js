@@ -9,7 +9,16 @@ const NewTransfer = {
       <div>
         <b-modal ref="newtransfer" v-model="show" id="modal-newtransfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
           <template #modal-title>New Stealth Transfer</template>
-          <p class="my-4">Hello from modal!</p>
+          <b-form-group label="Attached Web3 Address:" label-for="newtransfer-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input size="sm" readonly id="newtransfer-coinbase" :value="coinbase" class="w-75"></b-form-input>
+          </b-form-group>
+          <b-form-group v-if="stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+          </b-form-group>
+          <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from favourites'" class="w-100"></b-form-select>
+          </b-form-group>
+          <!-- <p class="my-4">Hello from modal! {{ stealthMetaAddressSpecified }}</p> -->
         </b-modal>
       </div>
 
@@ -317,17 +326,34 @@ const NewTransfer = {
       return store.getters['data/transfers'];
     },
     show: {
-      // return store.getters['newTransfer/show'];
       get: function () {
         return store.getters['newTransfer/show'];
       },
-      // setter
-      set: function (newValue) {
-        console.log("setting show: " + newValue);
-        this.setShow(false);
-        // Note: we are using destructuring assignment syntax here.
-        // [firstName.value, lastName.value] = newValue.split(' ')
+      set: function (show) {
+        store.dispatch('newTransfer/setShow', show);
       },
+    },
+    stealthMetaAddress: {
+      get: function () {
+        return store.getters['newTransfer/stealthMetaAddress'];
+      },
+      set: function (stealthMetaAddress) {
+        store.dispatch('newTransfer/setStealthMetaAddress', stealthMetaAddress);
+      },
+    },
+    stealthMetaAddressSpecified() {
+      return store.getters['newTransfer/stealthMetaAddressSpecified'];
+    },
+
+    stealthMetaAddressesOptions() {
+      const results = [];
+      results.push({ value: null, text: "(Select Stealth Meta-Address from favourites)"})
+      for (const [address, addressData] of Object.entries(this.addresses)) {
+        if (addressData.favourite) {
+          results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) });
+        }
+      }
+      return results;
     },
 
     totalRegistryEntries() {
@@ -526,12 +552,16 @@ const newTransferModule = {
   namespaced: true,
   state: {
     show: false,
+    stealthMetaAddressSpecified: false,
+    stealthMetaAddress: null,
     params: null,
     executing: false,
     executionQueue: [],
   },
   getters: {
     show: state => state.show,
+    stealthMetaAddressSpecified: state => state.stealthMetaAddressSpecified,
+    stealthMetaAddress: state => state.stealthMetaAddress,
     params: state => state.params,
     executionQueue: state => state.executionQueue,
   },
@@ -539,13 +569,18 @@ const newTransferModule = {
 
     newTransfer(state, stealthMetaAddress) {
       state.show = true;
+      state.stealthMetaAddressSpecified = !!stealthMetaAddress;
+      state.stealthMetaAddress = stealthMetaAddress;
       logInfo("newTransferModule", "mutations.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
     },
 
     setShow(state, show) {
       state.show = show;
-      // Vue.set(state.addresses[info.account], info.field, !state.addresses[info.account][info.field]);
       logInfo("newTransferModule", "mutations.setShow - show: " + state.show);
+    },
+    setStealthMetaAddress(state, stealthMetaAddress) {
+      state.stealthMetaAddress = stealthMetaAddress;
+      logInfo("newTransferModule", "mutations.setStealthMetaAddress - stealthMetaAddress: " + state.stealthMetaAddress);
     },
 
 
@@ -570,6 +605,10 @@ const newTransferModule = {
     async setShow(context, show) {
       logInfo("newTransferModule", "actions.setShow - show: " + show);
       await context.commit('setShow', show);
+    },
+    async setStealthMetaAddress(context, stealthMetaAddress) {
+      logInfo("newTransferModule", "actions.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
+      await context.commit('setStealthMetaAddress', stealthMetaAddress);
     },
   },
 };
