@@ -7,6 +7,7 @@ Vue.use(Vuex);
 Vue.component('connection', Connection);
 Vue.component('coredata', Data);
 Vue.component('view-address', ViewAddress);
+Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
 Vue.component('new-transfer', NewTransfer);
 // Vue.component('flat-pickr', VueFlatpickr);
 
@@ -60,6 +61,7 @@ const store = new Vuex.Store({
     transfers: transfersModule,
     newTransfer: newTransferModule,
     viewAddress: viewAddressModule,
+    viewStealthMetaAddress: viewStealthMetaAddressModule,
     config: configModule,
     // mappings: mappingsModule,
     data: dataModule,

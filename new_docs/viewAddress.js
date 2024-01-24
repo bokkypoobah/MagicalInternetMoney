@@ -174,7 +174,6 @@ const ViewAddress = {
 const viewAddressModule = {
   namespaced: true,
   state: {
-    type: null,
     address: null,
     type: null,
     mine: null,
@@ -197,8 +196,7 @@ const viewAddressModule = {
   mutations: {
     viewAddress(state, address) {
       logInfo("viewAddressModule", "mutations.viewAddress - address: " + address);
-      const addresses = store.getters['data/addresses'];
-      const data = addresses[address] || {};
+      const data = store.getters['data/addresses'][address] || {};
       state.address = address;
       state.type = data.type;
       state.mine = data.mine;
