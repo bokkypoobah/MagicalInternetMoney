@@ -6,6 +6,7 @@ Vue.use(Vuex);
 // Vue.component('apexchart', VueApexCharts);
 Vue.component('connection', Connection);
 Vue.component('coredata', Data);
+Vue.component('view-address', ViewAddress);
 Vue.component('new-transfer', NewTransfer);
 // Vue.component('flat-pickr', VueFlatpickr);
 
@@ -58,6 +59,7 @@ const store = new Vuex.Store({
     registry: registryModule,
     transfers: transfersModule,
     newTransfer: newTransferModule,
+    viewAddress: viewAddressModule,
     config: configModule,
     // mappings: mappingsModule,
     data: dataModule,

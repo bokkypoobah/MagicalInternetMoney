@@ -807,7 +807,10 @@ const Addresses = {
           this.account.name = item[0].name;
           this.account.notes = item[0].notes;
           this.account.source = item[0].source;
-          this.$bvModal.show('modal-address');
+          // this.$bvModal.show('modal-address');
+
+          store.dispatch('viewAddress/viewAddress', item[0].account);
+
         }
         this.$refs.accountsTable.clearSelected();
       }
