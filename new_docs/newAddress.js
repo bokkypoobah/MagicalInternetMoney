@@ -2,9 +2,52 @@ const NewAddress = {
   template: `
     <div>
       aaaa
-      
-      <b-modal ref="viewaddress" v-model="show" id="modal-viewaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>{{ type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
+
+      <b-modal ref="viewaddress" v-model="show" id="modal-newaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+        <template #modal-title>New Address</template>
+
+        <b-form-group label="Action: " label-for="addnewaddress-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-select size="sm" id="addnewaddress-type" v-model="action" :options="newAccountActions" class="w-50"></b-form-select>
+        </b-form-group>
+        <!-- <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaddress-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="addnewaddress-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="enter phrase" class="w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaddress-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
+          <b-button size="sm" :disabled="!coinbase" id="addnewaddress-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaddress-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAddressCoinbaseFeedback == null" :invalid-feedback="addNewAddressCoinbaseFeedback" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="coinbase" class="w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAddressAddressFeedback == null" :invalid-feedback="addNewAddressAddressFeedback" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="addnewaddress-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaddress-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAddressStealthMetaAddressFeedback == null" :invalid-feedback="addNewAddressStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" id="addnewaddress-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAddressLinkedToFeedback == null" :invalid-feedback="addNewAddressLinkedToFeedback" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="addnewaddress-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaddress-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" readonly id="addnewaddress-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-75"></b-form-textarea>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="addnewaddress-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
+        </b-form-group> -->
+        <!-- <b-form-group label="Favourite:" label-for="addnewaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="newAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+        </b-form-group> -->
+        <!-- <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="addnewaddress-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
+        </b-form-group> -->
+        <!-- <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
+        </b-form-group> -->
+
+
+        <!--
         <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="address-address" v-model.trim="address" class="px-2"></b-form-input>
@@ -38,6 +81,7 @@ const NewAddress = {
         <b-form-group v-if="address" label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
+        -->
       </b-modal>
     </div>
   `,
@@ -50,6 +94,12 @@ const NewAddress = {
         "stealthAddress": { variant: "dark", name: "My Stealth Address" },
         "stealthMetaAddress": { variant: "success", name: "My Stealth Meta-Address" },
       },
+      newAccountActions: [
+        { value: 'addCoinbase', text: 'Add Attached Web3 Address' },
+        { value: 'addAddress', text: 'Add Address' },
+        { value: 'addStealthMetaAddress', text: 'Add Stealth Meta-Address' },
+        { value: 'generateStealthMetaAddress', text: 'Generate Stealth Meta-Address' },
+      ],
     }
   },
   computed: {
@@ -65,57 +115,67 @@ const NewAddress = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    action: {
+      get: function () {
+        return store.getters['newAddress/action'];
+      },
+      set: function (action) {
+        // store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'action', value: action });
+        store.dispatch('newAddress/setAction', action);
+      },
+    },
+
     address() {
-      return store.getters['viewAddress/address'];
+      return store.getters['newAddress/address'];
     },
     type() {
-      return store.getters['viewAddress/type'];
+      return store.getters['newAddress/type'];
     },
     mine: {
       get: function () {
-        return store.getters['viewAddress/mine'];
+        return store.getters['newAddress/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'mine', value: mine });
-        store.dispatch('viewAddress/setMine', mine);
+        store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'mine', value: mine });
+        store.dispatch('newAddress/setMine', mine);
       },
     },
     favourite: {
       get: function () {
-        return store.getters['viewAddress/favourite'];
+        return store.getters['newAddress/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewAddress/setFavourite', favourite);
+        store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'favourite', value: favourite });
+        store.dispatch('newAddress/setFavourite', favourite);
       },
     },
     name: {
       get: function () {
-        return store.getters['viewAddress/name'];
+        return store.getters['newAddress/name'];
       },
       set: function (name) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'name', value: name });
-        store.dispatch('viewAddress/setName', name);
+        store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'name', value: name });
+        store.dispatch('newAddress/setName', name);
       },
     },
     notes: {
       get: function () {
-        return store.getters['viewAddress/notes'];
+        return store.getters['newAddress/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'notes', value: notes });
-        store.dispatch('viewAddress/setNotes', notes);
+        store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'notes', value: notes });
+        store.dispatch('newAddress/setNotes', notes);
       },
     },
     source() {
-      return store.getters['viewAddress/source'];
+      return store.getters['newAddress/source'];
     },
     show: {
       get: function () {
-        return store.getters['viewAddress/show'];
+        return store.getters['newAddress/show'];
       },
       set: function (show) {
-        store.dispatch('viewAddress/setShow', show);
+        store.dispatch('newAddress/setShow', show);
       },
     },
   },
@@ -125,7 +185,7 @@ const NewAddress = {
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     setShow(show) {
-      store.dispatch('viewAddress/setShow', show);
+      store.dispatch('newAddress/setShow', show);
     },
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
@@ -176,37 +236,55 @@ const NewAddress = {
 const newAddressModule = {
   namespaced: true,
   state: {
+    action: 'addCoinbase',
     address: null,
-    type: null,
+    stealthMetaAddress: null,
+    linkedToAddress: null,
+    phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
     mine: null,
     favourite: null,
     name: null,
     notes: null,
+    viewingPrivateKey: null,
+    spendingPublicKey: null,
+    viewingPublicKey: null,
     source: null,
     show: false,
   },
   getters: {
+    action: state => state.action,
     address: state => state.address,
-    type: state => state.type,
+    stealthMetaAddress: state => state.stealthMetaAddress,
+    linkedToAddress: state => state.linkedToAddress,
+    phrase: state => state.phrase,
     mine: state => state.mine,
     favourite: state => state.favourite,
     name: state => state.name,
     notes: state => state.notes,
+    viewingPrivateKey: state => state.viewingPrivateKey,
+    spendingPublicKey: state => state.spendingPublicKey,
+    viewingPublicKey: state => state.viewingPublicKey,
     source: state => state.source,
     show: state => state.show,
   },
   mutations: {
-    viewAddress(state, address) {
-      logInfo("newAddressModule", "mutations.viewAddress - address: " + address);
-      const data = store.getters['data/addresses'][address] || {};
-      state.address = address;
-      state.type = data.type;
-      state.mine = data.mine;
-      state.favourite = data.favourite;
-      state.name = data.name;
-      state.notes = data.notes;
-      state.source = data.source;
+    newAddress(state, blah) {
+      logInfo("newAddressModule", "mutations.newAddress - blah: " + blah);
+      state.action = 'addCoinbase';
+      state.address = null;
+      state.stealthMetaAddress = null;
+      state.linkedToAddress = null;
+      state.phrase = "I want to login into my stealth wallet on Ethereum mainnet.";
+      state.mine = false;
+      state.favourite = false;
+      state.name = null;
+      state.notes = null;
+      state.source = null;
       state.show = true;
+    },
+    setAction(state, action) {
+      logInfo("newAddressModule", "mutations.setAction - action: " + action);
+      state.action = action;
     },
     setMine(state, mine) {
       logInfo("newAddressModule", "mutations.setMine - mine: " + mine);
@@ -229,9 +307,13 @@ const newAddressModule = {
     },
   },
   actions: {
-    async viewAddress(context, address) {
-      logInfo("newAddressModule", "actions.viewAddress - address: " + address);
-      await context.commit('viewAddress', address);
+    async newAddress(context, blah) {
+      logInfo("newAddressModule", "actions.newAddress - blah: " + blah);
+      await context.commit('newAddress', blah);
+    },
+    async setAction(context, action) {
+      logInfo("newAddressModule", "actions.setAction - action: " + action);
+      await context.commit('setAction', action);
     },
     async setMine(context, mine) {
       logInfo("newAddressModule", "actions.setMine - mine: " + mine);

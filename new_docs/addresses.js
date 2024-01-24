@@ -765,18 +765,21 @@ const Addresses = {
 
     viewModalAddAccount() {
       logInfo("Addresses", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-      this.newAccount.action = 'addCoinbase';
-      this.newAccount.address = null;
-      this.newAccount.stealthMetaAddress = null;
-      this.newAccount.linkedToAddress = this.coinbase;
-      this.newAccount.phrase = this.defaultPhrase;
-      this.newAccount.mine = false;
-      this.newAccount.favourite = false;
-      this.newAccount.name = null;
-      this.newAccount.viewingPrivateKey = null;
-      this.newAccount.spendingPublicKey = null;
-      this.newAccount.viewingPublicKey = null;
-      this.$bvModal.show('modal-newaddress');
+      // this.newAccount.action = 'addCoinbase';
+      // this.newAccount.address = null;
+      // this.newAccount.stealthMetaAddress = null;
+      // this.newAccount.linkedToAddress = this.coinbase;
+      // this.newAccount.phrase = this.defaultPhrase;
+      // this.newAccount.mine = false;
+      // this.newAccount.favourite = false;
+      // this.newAccount.name = null;
+      // this.newAccount.viewingPrivateKey = null;
+      // this.newAccount.spendingPublicKey = null;
+      // this.newAccount.viewingPublicKey = null;
+      // this.$bvModal.show('modal-newaddress');
+
+      store.dispatch('newAddress/newAddress', null);
+
     },
 
     rowSelected(item) {
