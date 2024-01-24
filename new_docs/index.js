@@ -6,6 +6,7 @@ Vue.use(Vuex);
 // Vue.component('apexchart', VueApexCharts);
 Vue.component('connection', Connection);
 Vue.component('coredata', Data);
+Vue.component('new-address', NewAddress);
 Vue.component('view-address', ViewAddress);
 Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
 Vue.component('new-transfer', NewTransfer);
@@ -60,6 +61,7 @@ const store = new Vuex.Store({
     registry: registryModule,
     transfers: transfersModule,
     newTransfer: newTransferModule,
+    newAddress: newAddressModule,
     viewAddress: viewAddressModule,
     viewStealthMetaAddress: viewStealthMetaAddressModule,
     config: configModule,
