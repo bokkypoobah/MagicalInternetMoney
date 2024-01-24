@@ -16,9 +16,14 @@ const NewTransfer = {
             <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
           </b-form-group>
           <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from Favourited Addresses'" class="w-75"></b-form-select>
+            <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from Favourited Addresses'" class="w-100"></b-form-select>
           </b-form-group>
-          <!-- <p class="my-4">Hello from modal! {{ stealthMetaAddressSpecified }}</p> -->
+          <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-form-input type="text" size="sm" id="newtransfer-amount" v-model.trim="amount" placeholder="e.g., 0.01 for 0.01 ETH" debounce="600" class="w-50 text-right"></b-form-input>
+          </b-form-group>
+          <b-form-group label="" label-for="newtransfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-button size="sm" :disabled="!stealthMetaAddress || amount == null" id="newtransfer-transfer" @click="executeNewTransfer()" variant="warning">Transfer</b-button>
+          </b-form-group>
         </b-modal>
       </div>
 
@@ -344,13 +349,21 @@ const NewTransfer = {
     stealthMetaAddressSpecified() {
       return store.getters['newTransfer/stealthMetaAddressSpecified'];
     },
+    amount: {
+      get: function () {
+        return store.getters['newTransfer/amount'];
+      },
+      set: function (amount) {
+        store.dispatch('newTransfer/setAmount', amount);
+      },
+    },
 
     stealthMetaAddressesOptions() {
       const results = [];
       results.push({ value: null, text: "(Select Stealth Meta-Address from Favourited Addresses)"})
       for (const [address, addressData] of Object.entries(this.addresses)) {
         if (addressData.favourite) {
-          results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + '/' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
+          results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + ' / ' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
         }
       }
       return results;
@@ -403,6 +416,53 @@ const NewTransfer = {
     },
     setShow(show) {
       store.dispatch('newTransfer/setShow', show);
+    },
+    async executeNewTransfer() {
+      function generateStealthAddress(stealthMetaAddress) {
+          const result = {};
+          result.stealthMetaAddress = stealthMetaAddress;
+          result.receiverSpendingPublicKey = stealthMetaAddress.slice(9, 75);
+          result.receiverViewingPublicKey = stealthMetaAddress.slice(75);
+          result.ephemeralPrivateKey = nobleCurves.secp256k1.utils.randomPrivateKey();
+          // // TODO: Remove after testing
+          // result.ephemeralPrivateKey = 26997109008263982877621605952415166666118239613620770339187915977330619367704n;
+          result.ephemeralPublicKey = nobleCurves.secp256k1.getPublicKey(result.ephemeralPrivateKey, isCompressed=true);
+          result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(result.ephemeralPrivateKey, result.receiverViewingPublicKey, false);
+          result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
+          result.viewTag = "0x" + result.hashedSharedSecret.substring(2, 4);
+          result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
+          result.stealthPublicKey = nobleCurves.secp256k1.ProjectivePoint.fromHex(result.receiverSpendingPublicKey).add(result.hashedSharedSecretPoint);
+          result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
+          return result;
+      }
+      logInfo("NewTransfer", "methods.executeNewTransfer BEGIN");
+      const result = generateStealthAddress(this.stealthMetaAddress);
+      for (const [k, v] of Object.entries(result)) {
+        console.log("    ", k, "=>", v);
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(MAGICALINTERNETMONEYADDRESS_SEPOLIA, MAGICALINTERNETMONEYABI_SEPOLIA, provider);
+      const contractWithSigner = contract.connect(provider.getSigner());
+      const schemeId = 0;
+      const value = ethers.utils.parseEther(this.amount);
+      const tokenInfos = [];
+      // for (const item of this.modalNewTransfer.items) {
+      //   console.log(JSON.stringify(item));
+      //   if (item.type == "erc20") {
+      //     tokenInfos.push([false, item.token, ethers.utils.parseUnits(item.amount, item.decimals).toString()]);
+      //   } else {
+      //     tokenInfos.push([true, item.token, item.tokenId.toString()]);
+      //   }
+      // }
+      console.log("tokenInfos: " + JSON.stringify(tokenInfos));
+      try {
+        const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokenInfos, { value });
+        console.log("tx: " + JSON.stringify(tx));
+      } catch (e) {
+        console.log("executeNewTransfer MagicalInternetMoney.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
+      }
+      logInfo("NewTransfer", "methods.executeNewTransfer END");
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
@@ -554,6 +614,7 @@ const newTransferModule = {
     show: false,
     stealthMetaAddressSpecified: false,
     stealthMetaAddress: null,
+    amount: null,
     params: null,
     executing: false,
     executionQueue: [],
@@ -562,6 +623,7 @@ const newTransferModule = {
     show: state => state.show,
     stealthMetaAddressSpecified: state => state.stealthMetaAddressSpecified,
     stealthMetaAddress: state => state.stealthMetaAddress,
+    amount: state => state.amount,
     params: state => state.params,
     executionQueue: state => state.executionQueue,
   },
@@ -581,6 +643,10 @@ const newTransferModule = {
     setStealthMetaAddress(state, stealthMetaAddress) {
       state.stealthMetaAddress = stealthMetaAddress;
       logInfo("newTransferModule", "mutations.setStealthMetaAddress - stealthMetaAddress: " + state.stealthMetaAddress);
+    },
+    setAmount(state, amount) {
+      state.amount = amount;
+      logInfo("newTransferModule", "mutations.setAmount - amount: " + state.amount);
     },
 
 
@@ -609,6 +675,10 @@ const newTransferModule = {
     async setStealthMetaAddress(context, stealthMetaAddress) {
       logInfo("newTransferModule", "actions.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       await context.commit('setStealthMetaAddress', stealthMetaAddress);
+    },
+    async setAmount(context, amount) {
+      logInfo("newTransferModule", "actions.setAmount - amount: " + amount);
+      await context.commit('setAmount', amount);
     },
   },
 };
