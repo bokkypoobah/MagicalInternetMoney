@@ -16,7 +16,7 @@ const NewTransfer = {
             <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
           </b-form-group>
           <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from favourites'" class="w-100"></b-form-select>
+            <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from Favourited Addresses'" class="w-75"></b-form-select>
           </b-form-group>
           <!-- <p class="my-4">Hello from modal! {{ stealthMetaAddressSpecified }}</p> -->
         </b-modal>
@@ -347,10 +347,10 @@ const NewTransfer = {
 
     stealthMetaAddressesOptions() {
       const results = [];
-      results.push({ value: null, text: "(Select Stealth Meta-Address from favourites)"})
+      results.push({ value: null, text: "(Select Stealth Meta-Address from Favourited Addresses)"})
       for (const [address, addressData] of Object.entries(this.addresses)) {
         if (addressData.favourite) {
-          results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) });
+          results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + '/' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
         }
       }
       return results;
