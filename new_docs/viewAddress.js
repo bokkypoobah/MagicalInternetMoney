@@ -13,6 +13,19 @@ const ViewAddress = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
+        <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="address-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input size="sm" plaintext id="address-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <div>
+                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+        <b-form-group v-if="type == 'stealthAddress'" label="Via Stealth Meta-Address:" label-for="address-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" plaintext id="address-linkedtostealthmetaaddress" v-model.trim="linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+        </b-form-group>
         <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
         </b-form-group>
@@ -65,6 +78,9 @@ const ViewAddress = {
     },
     address() {
       return store.getters['viewAddress/address'];
+    },
+    linkedTo() {
+      return store.getters['viewAddress/linkedTo'];
     },
     type() {
       return store.getters['viewAddress/type'];
@@ -175,6 +191,10 @@ const viewAddressModule = {
   namespaced: true,
   state: {
     address: null,
+    linkedTo: {
+      address: null,
+      stealthMetaAddress: null,
+    },
     type: null,
     mine: null,
     favourite: null,
@@ -185,6 +205,7 @@ const viewAddressModule = {
   },
   getters: {
     address: state => state.address,
+    linkedTo: state => state.linkedTo,
     type: state => state.type,
     mine: state => state.mine,
     favourite: state => state.favourite,
@@ -198,6 +219,7 @@ const viewAddressModule = {
       logInfo("viewAddressModule", "mutations.viewAddress - address: " + address);
       const data = store.getters['data/addresses'][address] || {};
       state.address = address;
+      state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
       state.type = data.type;
       state.mine = data.mine;
       state.favourite = data.favourite;
