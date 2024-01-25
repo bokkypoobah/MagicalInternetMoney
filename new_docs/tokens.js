@@ -55,6 +55,47 @@ const Tokens = {
             <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
           </template>
 
+          <template #cell(contract)="data">
+            <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" target="_blank">
+              <font size="-1">{{ data.item.address.substring(0, 10) + '...' + data.item.address.slice(-8) }}</font>
+            </b-link>
+          </template>
+          <template #cell(type)="data">
+            <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
+          </template>
+          <template #cell(symbol)="data">
+            <font size="-1">{{ data.item.symbol }}</font>
+          </template>
+          <template #cell(name)="data">
+            <font size="-1">{{ data.item.name }}</font>
+          </template>
+          <template #cell(firstEventBlockNumber)="data">
+            <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
+          </template>
+          <template #cell(lastEventBlockNumber)="data">
+            <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font>
+          </template>
+          <template #cell(decimals)="data">
+            <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
+          </template>
+          <template #cell(balance)="data">
+            <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
+              <b-button size="sm" :href="'https://sepolia.etherscan.io/token/' + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
+            </span>
+            <span v-if="data.item.type == 'erc721'">
+              <font size="-1">
+                <span v-for="tokenId of data.item.tokenIds">
+                  <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + data.item.contract + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
+                </span>
+              </font>
+            </span>
+          </template>
+
+          <template #cell(totalSupply)="data">
+            <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
+          </template>
+
+
           <template #cell(timestamp)="data">
             <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
               <span v-if="data.item.timestamp">
@@ -245,6 +286,9 @@ const Tokens = {
       } catch (err) {
       }
       return e.toFixed(precision);
+    },
+    formatDecimals(e, decimals = 18) {
+      return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
       logInfo("Tokens", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
