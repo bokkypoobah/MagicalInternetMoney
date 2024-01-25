@@ -39,7 +39,7 @@ const Transfers = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-        <b-form-group v-if="transfer.item && transfer.item.linkedTo && transfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the Receiver Stealth Address private key" class="mx-0 my-1 p-0">
+        <b-form-group v-if="transfer.item && transfer.item.linkedTo && transfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input :type="transfer.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="transfer-spendingprivatekey" :value="transfer.stealthPrivateKey ? transfer.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
             <b-input-group-append>
@@ -349,6 +349,9 @@ const Transfers = {
 
   },
   methods: {
+    copyToClipboard(str) {
+      navigator.clipboard.writeText(str);
+    },
     saveSettings() {
       logInfo("Transfers", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);

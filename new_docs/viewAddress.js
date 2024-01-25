@@ -13,6 +13,15 @@ const ViewAddress = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
+        <b-form-group v-if="type == 'stealthAddress'" label="Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input :type="stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="stealthPrivateKey ? stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <b-button v-if="!stealthPrivateKey" :disabled="!linkedTo || linkedTo.address != coinbase" @click="revealSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
+              <b-button v-if="stealthPrivateKey" @click="copyToClipboard(stealthPrivateKey ? stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
         <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="address-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="address-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
@@ -95,6 +104,7 @@ const ViewAddress = {
     return {
       count: 0,
       reschedule: true,
+      stealthPrivateKey: null,
       addressTypeInfo: {
         "address": { variant: "warning", name: "My Address" },
         "stealthAddress": { variant: "dark", name: "My Stealth Address" },
@@ -114,6 +124,9 @@ const ViewAddress = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    addresses() {
+      return store.getters['data/addresses'];
     },
     address() {
       return store.getters['viewAddress/address'];
@@ -176,6 +189,50 @@ const ViewAddress = {
     },
   },
   methods: {
+    copyToClipboard(str) {
+      navigator.clipboard.writeText(str);
+    },
+    async revealSpendingPrivateKey() {
+      function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
+        const result = {};
+        result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
+        result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
+        const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
+        const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
+        result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
+        result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
+        result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
+        return result;
+      }
+
+      logInfo("ViewAddress", "methods.revealSpendingPrivateKey BEGIN");
+      const stealthTransfer = this.stealthTransfers && this.stealthTransfers.length > 0 && this.stealthTransfers[0] || {};
+      const linkedToStealthMetaAddress = this.linkedTo && this.linkedTo.stealthMetaAddress || null;
+      const stealthMetaAddressData = linkedToStealthMetaAddress && this.addresses[linkedToStealthMetaAddress] || {};
+      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
+      const signature = await ethereum.request({
+        method: 'personal_sign',
+        params: [phraseInHex, this.coinbase],
+      });
+      const signature1 = signature.slice(2, 66);
+      const signature2 = signature.slice(66, 130);
+      // Hash "v" and "r" values using SHA-256
+      const hashedV = ethers.utils.sha256("0x" + signature1);
+      const hashedR = ethers.utils.sha256("0x" + signature2);
+      const n = ethers.BigNumber.from(SECP256K1_N);
+      // Calculate the private keys by taking the hash values modulo the curve order
+      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
+      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
+      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
+      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
+      const spendingPrivateKey = keyPair1.privateKey;
+      const viewingPrivateKey = keyPair2.privateKey;
+      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
+      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
+      const computedStealthKey = computeStealthKey(stealthTransfer.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
+      const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
+      Vue.set(this, 'stealthPrivateKey', stealthPrivateKey);
+    },
     getTokenType(address) {
       if (address == ADDRESS_ETHEREUMS) {
         return "eth";
