@@ -83,8 +83,10 @@ const Tokens = {
               <b-button size="sm" :href="'https://sepolia.etherscan.io/token/' + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
             </span>
             <span v-if="data.item.type == 'erc721'">
+              <!-- {{ data.item.tokenIds }} -->
               <font size="-1">
                 <span v-for="tokenId of data.item.tokenIds">
+                  <!-- {{ tokenId }} -->
                   <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + data.item.contract + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
                 </span>
               </font>
