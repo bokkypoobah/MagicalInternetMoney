@@ -3,155 +3,6 @@ const Tokens = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-      <b-modal ref="modaltransfer" id="modal-transfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>Stealth Transfer</template>
-
-        <b-form-group v-if="transfer.item" label="Tx Hash:" label-for="transfer-txhash" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-txhash" v-model.trim="transfer.item.txHash" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + (transfer.item && transfer.item.txHash || '')" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group v-if="transfer.item" label="Timestamp:" label-for="transfer-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
-        </b-form-group>
-        <b-form-group v-if="transfer.item && transfer.item.tx" label="Sender:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-sender" v-model.trim="transfer.item.tx.from" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group v-if="transfer.item" label="Receiver:" label-for="transfer-receiver" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-receiver" v-model.trim="transfer.item.stealthAddress" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.stealthAddress" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group v-if="transfer.item && transfer.item.linkedTo && transfer.item.linkedTo.stealthMetaAddress" label="Receiver Private Key:" label-for="transfer-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input :type="transfer.stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="transfer-spendingprivatekey" :value="transfer.stealthPrivateKey ? transfer.stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <b-button v-if="!transfer.stealthPrivateKey" :disabled="transfer.item.linkedTo.address != coinbase" @click="revealTransferSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-              <b-button v-if="transfer.stealthPrivateKey" @click="copyToClipboard(transfer.stealthPrivateKey ? transfer.stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Linked To Address:" label-for="transfer-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-linkedtoaddress" v-model.trim="transfer.item.linkedTo.address" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group v-if="transfer.item && transfer.item.linkedTo" label="Via Stealth Meta-Address:" label-for="transfer-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" plaintext id="transfer-linkedtostealthmetaaddress" v-model.trim="transfer.item.linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
-        </b-form-group>
-        <b-form-group v-if="transfer.item" label="Scheme Id:" label-for="transfer-schemeid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-schemeid" v-model.trim="transfer.item.schemeId" class="px-2"></b-form-input>
-        </b-form-group>
-        <b-form-group v-if="transfer.item" label="Ephemeral Public Key:" label-for="transfer-ephemeralpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-ephemeralpublickey" v-model.trim="transfer.item.ephemeralPublicKey" class="px-2"></b-form-input>
-        </b-form-group>
-        <b-form-group v-if="transfer.item" label="Caller:" label-for="transfer-caller" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-caller" v-model.trim="transfer.item.caller" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + transfer.item.caller" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-
-        <b-form-group v-if="transfer.item && transfer.item.transfers" label="Transfers:" label-for="transfer-transfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <font size="-1">
-            <b-row v-for="(item, index) of transfer.item.transfers" v-bind:key="item.token">
-              <b-col cols="12" class="text-right px-0 mt-1">
-                <span v-if="getTokenType(item.token) == 'eth'">
-                  <font size="-1">{{ formatETH(item.value) }}</font>
-                </span>
-                <span v-else>
-                  xx {{ item.value + ' ' + item.token }}
-                </span>
-                <!-- <span v-if="getTokenType(item.token) == 'eth'">
-                  <font size="-1">{{ formatETH(item.value) }}</font>
-                </span>
-                <span v-else-if="getTokenType(item.token) == 'erc20'">
-                  <font size="-1">{{ formatETH(item.value) }}</font>
-                </span>
-                <span v-else>
-                  <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button>
-                </span> -->
-              </b-col>
-              <!-- <b-col cols="3" class="px-0 mt-1"> -->
-                <!-- <span v-if="isEthereums(item.token)">
-                  <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
-                </span>
-                <span v-else>
-                  <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button>
-                </span> -->
-              <!-- </b-col> -->
-            </b-row>
-          </font>
-        </b-form-group>
-
-
-
-        <!-- <b-form-group label="Address:" label-for="transfer-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="transfer-address" v-model.trim="account.account" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group> -->
-        <!-- <b-form-group v-if="false" label="ENS Name:" label-for="transfer-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
-        </b-form-group> -->
-        <!-- <b-form-group label="Name:" label-for="transfer-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-75">
-            <b-form-input size="sm" type="text" id="transfer-name" v-model.trim="account.name" @update="setAddressField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
-                <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group> -->
-        <!-- <b-form-group label="Notes:" label-for="transfer-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" id="transfer-notes" v-model.trim="account.notes" @update="setAddressField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
-        </b-form-group> -->
-        <!-- <b-form-group label="Source:" label-for="transfer-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
-        </b-form-group> -->
-        <!-- <b-form-group label="" label-for="transfer-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
-        </b-form-group> -->
-        <font size="-1">
-          <pre>
-{{ transfer }}
-          </pre>
-        </font>
-      </b-modal>
-
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 flex-grow-1">
           </div>
@@ -172,17 +23,17 @@ const Tokens = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalRegistryEntries }}</font>
+            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedItems.length + '/' + totalRows }}</font>
           </div>
           <div class="mt-0 pr-1">
-            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
+            <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
             <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Page size'"></b-form-select>
           </div>
         </div>
 
-        <b-table ref="transfersTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedTransfers" show-empty head-variant="light" class="m-0 mt-1">
+        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -199,6 +50,11 @@ const Tokens = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
+
+          <template #cell(favourite)="data">
+            <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+          </template>
+
           <template #cell(timestamp)="data">
             <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
               <span v-if="data.item.timestamp">
@@ -270,14 +126,25 @@ const Tokens = {
         { value: 'registrantasc', text: '▲ Registrant' },
         { value: 'registrantdsc', text: '▼ Registrant' },
       ],
+      // fields: [
+      //   { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+      //   { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+      //   { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+      //   { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+      //   { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+      // ],
       fields: [
-        { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-        { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        <!-- { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
-        <!-- { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
-        { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
+        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'firstEventBlockNumber', label: 'First Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'lastEventBlockNumber', label: 'Last Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'decimals', label: 'Decs', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -309,48 +176,62 @@ const Tokens = {
     transfers() {
       return store.getters['data/transfers'];
     },
+    tokenContracts() {
+      return store.getters['data/tokenContracts'];
+    },
 
-    totalRegistryEntries() {
+    totalRows() {
       let result = 0;
-      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
-        for (const [logIndex, item] of Object.entries(logIndexes)) {
-          result++;
-        }
+      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+        result++;
       }
       return result;
     },
-    filteredTransfers() {
+    filteredItems() {
       const results = [];
-      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
-        for (const [logIndex, item] of Object.entries(logIndexes)) {
+      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+        // console.log(address + " => " + JSON.stringify(data));
+      // for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+        // for (const [logIndex, item] of Object.entries(logIndexes)) {
           // console.log(blockNumber + "." + logIndex + " => " + JSON.stringify(item, null, 2));
-          if (item.schemeId == 0) {
-            results.push(item);
-          }
-        }
+          // if (item.schemeId == 0) {
+            results.push({ address, ...data });
+          // }
+        // }
       }
+      // console.log("results: " + JSON.stringify(results, null, 2));
       return results;
     },
-    filteredSortedTransfers() {
-      const results = this.filteredTransfers;
-      if (this.settings.sortOption == 'registrantasc') {
-        results.sort((a, b) => {
-          return ('' + a.registrant).localeCompare(b.registrant);
-        });
-      } else if (this.settings.sortOption == 'registrantdsc') {
-        results.sort((a, b) => {
-          return ('' + b.registrant).localeCompare(a.registrant);
-        });
-      }
+    filteredSortedItems() {
+      const results = this.filteredItems;
+      // if (this.settings.sortOption == 'registrantasc') {
+      //   results.sort((a, b) => {
+      //     return ('' + a.registrant).localeCompare(b.registrant);
+      //   });
+      // } else if (this.settings.sortOption == 'registrantdsc') {
+      //   results.sort((a, b) => {
+      //     return ('' + b.registrant).localeCompare(a.registrant);
+      //   });
+      // }
       return results;
     },
-    pagedFilteredSortedTransfers() {
-      logInfo("Addresses", "pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
-      return this.filteredSortedTransfers.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
+    pagedFilteredSortedItems() {
+      logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
   },
   methods: {
+    toggleTokenContractFavourite(item) {
+      // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
+      logInfo("Tokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleTokenContractFavourite', item);
+      // if (item && item.contract) {
+        // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
+        // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+        // localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
+      // }
+    },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
     },
@@ -433,7 +314,7 @@ const Tokens = {
         //   this.$bvModal.show('modal-address');
         // }
         this.$bvModal.show('modal-transfer');
-        this.$refs.transfersTable.clearSelected();
+        this.$refs.tokenContractsTable.clearSelected();
       }
     },
 

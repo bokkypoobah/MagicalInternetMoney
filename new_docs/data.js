@@ -156,6 +156,11 @@ const dataModule = {
       Vue.set(state.addresses[info.account], info.field, info.value);
       logInfo("dataModule", "mutations.setAddressField - accounts[" + info.account + "]." + info.field + " = " + state.addresses[info.account][info.field]);
     },
+    toggleTokenContractFavourite(state, tokenContract) {
+      const chainId = store.getters['connection/chainId'];
+      Vue.set(state.tokenContracts[chainId][tokenContract.address], 'favourite', !state.tokenContracts[chainId][tokenContract.address].favourite);
+      logInfo("dataModule", "mutations.toggleTokenContractFavourite - tokenContract: " + JSON.stringify(state.tokenContracts[chainId][tokenContract.address]));
+    },
 
     addNewAddress(state, newAccount) {
       logInfo("dataModule", "mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
@@ -509,6 +514,11 @@ const dataModule = {
       // logInfo("dataModule", "actions.setAddressField - info: " + JSON.stringify(info));
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
+    },
+    async toggleTokenContractFavourite(context, tokenContract) {
+      // logInfo("dataModule", "actions.toggleAddressField - info: " + JSON.stringify(info));
+      await context.commit('toggleTokenContractFavourite', tokenContract);
+      await context.dispatch('saveData', ['tokenContracts']);
     },
 
     async deleteAddress(context, account) {
