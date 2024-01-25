@@ -472,7 +472,7 @@ const dataModule = {
       if (Object.keys(context.state.transfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'transfers']) {
+        for (let type of ['addresses', 'registry', 'transfers', 'tokenContracts']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -1513,9 +1513,9 @@ const dataModule = {
         done = data.length < DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       rows = 0;
-
-      Vue.set(this, 'tokenContracts', tokenContracts);
-      localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
+      console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
+      context.commit('setState', { name: 'tokenContracts', data: tokenContracts });
+      await context.dispatch('saveData', ['tokenContracts']);
       logInfo("dataModule", "actions.collateTokens END");
     },
 
