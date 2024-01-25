@@ -84,7 +84,7 @@ const NewTransfer = {
       const results = [];
       results.push({ value: null, text: "(Select Stealth Meta-Address from Favourited Addresses)"})
       for (const [address, addressData] of Object.entries(this.addresses)) {
-        if (addressData.favourite) {
+        if (addressData.type == "stealthMetaAddress" && addressData.favourite) {
           results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + ' / ' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
         }
       }

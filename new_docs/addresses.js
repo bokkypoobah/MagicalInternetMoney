@@ -3,156 +3,6 @@ const Addresses = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-        <b-modal ref="modalnewaddress" id="modal-newaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-          <template #modal-title>New Address</template>
-          <b-form-group label="Action: " label-for="addnewaddress-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-select size="sm" id="addnewaddress-type" v-model="newAccount.action" @change="saveSettings" :options="newAccountActions" class="w-50"></b-form-select>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Phrase:" label-for="addnewaddress-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" description="This exact phrase with the linked address is required for the recovery of your stealth keys!" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaddress-phrase" v-model.trim="newAccount.phrase" @change="saveSettings" placeholder="enter phrase" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="" label-for="addnewaddress-generate" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Click Generate and sign the phrase with your web3 attached account" class="mx-0 my-1 p-0">
-            <b-button size="sm" :disabled="!coinbase" id="addnewaddress-generate" @click="generateNewStealthMetaAddress" variant="primary">Generate</b-button>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaddress-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="addNewAddressCoinbaseFeedback == null" :invalid-feedback="addNewAddressCoinbaseFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="coinbase" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addAddress'" label="Address:" label-for="addnewaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.address || addNewAddressAddressFeedback == null" :invalid-feedback="addNewAddressAddressFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaddress-address" v-model.trim="newAccount.address" placeholder="0x1234...6789" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaddress-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.stealthMetaAddress || addNewAddressStealthMetaAddressFeedback == null" :invalid-feedback="addNewAddressStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="addnewaddress-stealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!newAccount.linkedToAddress || addNewAddressLinkedToFeedback == null" :invalid-feedback="addNewAddressLinkedToFeedback" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaddress-linkedtoaddress" v-model.trim="newAccount.linkedToAddress" placeholder="0x1234...6789" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Generated Stealth Meta-Address:" label-for="addnewaddress-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" readonly id="addnewaddress-generatedstealthmetaaddress" v-model.trim="newAccount.stealthMetaAddress" placeholder="Click generate and sign the phrase with your web3 attached wallet" rows="3" max-rows="4" class="w-75"></b-form-textarea>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'generateStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" readonly id="addnewaddress-coinbase" :value="newAccount.linkedToAddress" class="w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="newAccount.action == 'addAddress' || newAccount.action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="addnewaddress-mine" :pressed.sync="newAccount.mine" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="newAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-          </b-form-group>
-          <b-form-group label="Favourite:" label-for="addnewaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="newAccount.favourite" @click="saveSettings" variant="transparent"><b-icon :icon="newAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-          </b-form-group>
-          <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" id="addnewaddress-name" v-model.trim="newAccount.name" @change="saveSettings" placeholder="optional" class="w-50"></b-form-input>
-          </b-form-group>
-          <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
-          </b-form-group>
-        </b-modal>
-
-        <b-modal ref="modaladdress" id="modal-address" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-          <template #modal-title>{{ account.type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
-          <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-100">
-              <b-form-input size="sm" plaintext id="address-address" v-model.trim="account.account" class="px-2"></b-form-input>
-              <b-input-group-append>
-                <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-                </div>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-75">
-              <b-form-input size="sm" type="text" id="address-name" v-model.trim="account.name" @update="setAddressField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
-              <b-input-group-append>
-                <div>
-                  <b-button size="sm" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
-                  <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-                </div>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <!-- <b-form-group label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="address-mine" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="account.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-          </b-form-group> -->
-          <!-- <b-form-group label="Favourite:" label-for="address-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="address-favourite" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-          </b-form-group> -->
-          <b-form-group label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="address-notes" v-model.trim="account.notes" @update="setAddressField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
-          </b-form-group>
-          <b-form-group label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="address-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
-          </b-form-group>
-          <b-form-group label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
-          </b-form-group>
-        </b-modal>
-
-        <b-modal ref="modalstealthmetaccount" id="modal-stealthmetaccount" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-          <template #modal-title>Stealth Meta-Address</template>
-          <b-form-group label="Address:" label-for="stealthmetaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" plaintext id="stealthmetaddress-address" v-model.trim="stealthMetaAccount.account" rows="3" max-rows="4" class="px-2"></b-form-textarea>
-          </b-form-group>
-          <b-form-group label="Name:" label-for="stealthmetaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-75">
-              <b-form-input size="sm" id="stealthmetaddress-name" v-model.trim="stealthMetaAccount.name" @update="setAddressField(stealthMetaAccount.account, 'name', stealthMetaAccount.name)" debounce="600" placeholder="optional" class="w-50"></b-form-input>
-              <b-input-group-append>
-                <div>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.mine" @click="toggleAddressField(stealthMetaAccount.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo['stealthMetaAddress'].name" class="m-0 ml-5 p-0"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo['stealthMetaAddress'].variant"></b-icon></b-button>
-                  <b-button size="sm" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAddressField(stealthMetaAccount.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-                </div>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <!-- <b-form-group label="Mine:" label-for="stealthmetaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaddress-mine" :pressed.sync="stealthMetaAccount.mine" @click="toggleAddressField(stealthMetaAccount.account, 'mine')" variant="transparent"><b-icon :icon="stealthMetaAccount.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="stealthMetaAccount.mine ? 'warning' : 'secondary'"></b-icon></b-button>
-          </b-form-group> -->
-          <!-- <b-form-group label="Favourite:" label-for="stealthmetaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" id="stealthmetaddress-favourite" :pressed.sync="stealthMetaAccount.favourite" @click="toggleAddressField(stealthMetaAccount.account, 'favourite')" variant="transparent"><b-icon :icon="stealthMetaAccount.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-          </b-form-group> -->
-          <b-form-group label="Notes:" label-for="stealthmetaddress-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-textarea size="sm" id="stealthmetaddress-notes" v-model.trim="stealthMetaAccount.notes" @update="setAddressField(stealthMetaAccount.account, 'notes', stealthMetaAccount.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
-          </b-form-group>
-          <b-form-group label="Linked To Address:" label-for="stealthmetaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-100">
-              <b-form-input size="sm" plaintext id="stealthmetaddress-linkedtoaddress" v-model.trim="stealthMetaAccount.linkedToAddress" class="px-2"></b-form-input>
-              <b-input-group-append>
-                <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + stealthMetaAccount.linkedToAddress" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-                </div>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Phrase:" label-for="stealthmetaddress-phrase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaddress-phrase" v-model.trim="stealthMetaAccount.phrase" class="px-2 w-100"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Private Key:" label-for="stealthmetaddress-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-input-group size="sm" class="w-100">
-              <b-form-input :type="stealthMetaAccount.spendingPrivateKey ? 'text' : 'password'" size="sm" plaintext id="stealthmetaddress-spendingprivatekey" :value="stealthMetaAccount.spendingPrivateKey ? stealthMetaAccount.spendingPrivateKey : 'a'.repeat(65) + 'h'" class="px-2"></b-form-input>
-              <b-input-group-append>
-                <b-button v-if="!stealthMetaAccount.spendingPrivateKey" :disabled="stealthMetaAccount.linkedToAddress != coinbase" @click="revealModalAddressSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-                <!-- <b-button v-if="modalAddress.spendingPrivateKey" @click="copyToClipboard(modalAddress.spendingPrivateKey ? modalAddress.spendingPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button> -->
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Private Key:" label-for="stealthmetaddress-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaddress-viewingprivatekey" v-model.trim="stealthMetaAccount.viewingPrivateKey" class="px-2 w-100"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Spending Public Key:" label-for="stealthmetaddress-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaddress-spendingpublickey" v-model.trim="stealthMetaAccount.spendingPublicKey" class="px-2 w-100"></b-form-input>
-          </b-form-group>
-          <b-form-group v-if="stealthMetaAccount.phrase" label="Viewing Public Key:" label-for="stealthmetaddress-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaddress-viewingpublickey" v-model.trim="stealthMetaAccount.viewingPublicKey" class="px-2 w-100"></b-form-input>
-          </b-form-group>
-          <b-form-group label="Source:" label-for="stealthmetaddress-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="stealthmetaddress-source" :value="stealthMetaAccount.source && (stealthMetaAccount.source.substring(0, 1).toUpperCase() + stealthMetaAccount.source.slice(1))" class="px-2 w-25"></b-form-input>
-          </b-form-group>
-          <b-form-group label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAddress(stealthMetaAccount.account, 'modalstealthmetaccount');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
-          </b-form-group>
-        </b-modal>
-
         <!-- :TOOLBAR -->
         <div class="d-flex flex-wrap m-0 p-0">
           <div v-if="false" class="mt-0 pr-1">
@@ -425,53 +275,6 @@ const Addresses = {
         version: 0,
       },
       defaultPhrase: "I want to login into my stealth wallet on Ethereum mainnet.",
-      newAccount: {
-        action: 'addCoinbase',
-        address: null,
-        stealthMetaAddress: null,
-        linkedToAddress: null,
-        phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
-        mine: false,
-        favourite: false,
-        name: null,
-        viewingPrivateKey: null,
-        spendingPublicKey: null,
-        viewingPublicKey: null,
-      },
-
-      account: {
-        account: null,
-        type: null,
-        ensName: null,
-        mine: null,
-        favourite: null,
-        name: null,
-        notes: null,
-        source: null,
-      },
-
-      stealthMetaAccount: {
-          account: null,
-          type: null,
-          linkedToAddress: null,
-          phrase: null,
-          mine: null,
-          favourite: null,
-          name: null,
-          notes: null,
-          spendingPrivateKey: null,
-          viewingPrivateKey: null,
-          spendingPublicKey: null,
-          viewingPublicKey: null,
-          source: null,
-      },
-
-      newAccountActions: [
-        { value: 'addCoinbase', text: 'Add Attached Web3 Address' },
-        { value: 'addAddress', text: 'Add Address' },
-        { value: 'addStealthMetaAddress', text: 'Add Stealth Meta-Address' },
-        { value: 'generateStealthMetaAddress', text: 'Generate Stealth Meta-Address' },
-      ],
       addressTypeInfo: {
         "address": { variant: "warning", name: "My Address" },
         "stealthAddress": { variant: "dark", name: "My Stealth Address" },
@@ -541,116 +344,11 @@ const Addresses = {
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
-    accountsInfo() {
-      return store.getters['data/accountsInfo'];
-    },
-    txs() {
-      return store.getters['data/txs'];
-    },
-    assets() {
-      return store.getters['data/assets'];
-    },
-    ensMap() {
-      return store.getters['data/ensMap'];
-    },
     sync() {
       return store.getters['data/sync'];
     },
     coinbaseIncluded() {
       return this.addresses[this.coinbase] && true || false;
-    },
-
-    addNewAddressCoinbaseFeedback() {
-      if (this.newAccount.action == 'addCoinbase') {
-        if (!this.coinbase) {
-          return "Waiting for your web3 attached account connection";
-        }
-      }
-      return null;
-    },
-
-    addNewAddressAddressFeedback() {
-      if (this.newAccount.action == 'addAddress') {
-        if (!this.newAccount.address) {
-          return "Enter Address";
-        }
-        try {
-          const address = ethers.utils.getAddress(this.newAccount.address);
-        } catch (e) {
-          return "Invalid Address";
-        }
-      }
-      return null;
-    },
-
-    addNewAddressStealthMetaAddressFeedback() {
-      if (this.newAccount.action == 'addStealthMetaAddress') {
-        if (!this.newAccount.stealthMetaAddress) {
-          return "Enter Stealth Meta-Address";
-        }
-        if (!this.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
-          return "Invalid Stealth Meta-Address";
-        }
-      }
-      return null;
-    },
-
-    addNewAddressLinkedToFeedback() {
-      if (this.newAccount.action == 'addStealthMetaAddress') {
-        if (!this.newAccount.linkedToAddress) {
-          return "Enter Linked To Address";
-        }
-        if (!this.newAccount.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-          return "Invalid Linked To Address";
-        }
-      }
-      return null;
-    },
-
-    addNewAddressFeedback() {
-      if (this.newAccount.action == 'addCoinbase') {
-        if (!this.coinbase) {
-          return "Waiting for your web3 attached account connection";
-        }
-        return null;
-      } else if (this.newAccount.action == 'addAddress') {
-        if (!this.newAccount.address) {
-          return "Enter Address";
-        }
-        if (!this.newAccount.address.match(/^0x[0-9a-fA-F]{40}$/)) {
-          return "Invalid Address";
-        }
-        return null;
-      } else if (this.newAccount.action == 'addStealthMetaAddress') {
-        if (!this.newAccount.stealthMetaAddress) {
-          return "Enter Stealth Meta-Address";
-        }
-        if (!this.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
-          return "Invalid Stealth Meta-Address";
-        }
-        if (!this.newAccount.linkedToAddress) {
-          return "Enter Linked To Address";
-        }
-        if (!this.newAccount.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-          return "Invalid Linked To Address";
-        }
-        return null;
-      } else if (this.newAccount.action == 'generateStealthMetaAddress') {
-        if (!this.newAccount.stealthMetaAddress) {
-          return "Enter Stealth Meta-Address";
-        }
-        if (!this.newAccount.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
-          return "Invalid Stealth Meta-Address";
-        }
-        if (!this.newAccount.linkedToAddress) {
-          return "Enter Linked To Address";
-        }
-        if (!this.newAccount.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-          return "Invalid Linked To Address";
-        }
-        return null;
-      }
-      return "Aaargh";
     },
 
     totalAddresses() {
@@ -765,19 +463,6 @@ const Addresses = {
 
     viewModalAddAccount() {
       logInfo("Addresses", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-      // this.newAccount.action = 'addCoinbase';
-      // this.newAccount.address = null;
-      // this.newAccount.stealthMetaAddress = null;
-      // this.newAccount.linkedToAddress = this.coinbase;
-      // this.newAccount.phrase = this.defaultPhrase;
-      // this.newAccount.mine = false;
-      // this.newAccount.favourite = false;
-      // this.newAccount.name = null;
-      // this.newAccount.viewingPrivateKey = null;
-      // this.newAccount.spendingPublicKey = null;
-      // this.newAccount.viewingPublicKey = null;
-      // this.$bvModal.show('modal-newaddress');
-
       store.dispatch('newAddress/newAddress', null);
 
     },
@@ -787,110 +472,12 @@ const Addresses = {
       if (item && item.length > 0) {
         const account = item[0].account;
         if (account.substring(0, 3) == "st:") {
-          // this.stealthMetaAccount.account = item[0].account;
-          // this.stealthMetaAccount.type = item[0].type;
-          // this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
-          // this.stealthMetaAccount.phrase = item[0].phrase;
-          // this.stealthMetaAccount.mine = item[0].mine;
-          // this.stealthMetaAccount.favourite = item[0].favourite;
-          // this.stealthMetaAccount.name = item[0].name;
-          // this.stealthMetaAccount.notes = item[0].notes;
-          // this.stealthMetaAccount.spendingPrivateKey = null;
-          // this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
-          // this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
-          // this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
-          // this.stealthMetaAccount.source = item[0].source;
-          // this.$bvModal.show('modal-stealthmetaccount');
-
           store.dispatch('viewStealthMetaAddress/viewStealthMetaAddress', item[0].account);
-
         } else {
-          // this.account.account = item[0].account;
-          // this.account.type = item[0].type;
-          // this.account.ensName = item[0].ensName;
-          // this.account.mine = item[0].mine;
-          // this.account.favourite = item[0].favourite;
-          // this.account.name = item[0].name;
-          // this.account.notes = item[0].notes;
-          // this.account.source = item[0].source;
-          // this.$bvModal.show('modal-address');
-
           store.dispatch('viewAddress/viewAddress', item[0].account);
-
         }
         this.$refs.accountsTable.clearSelected();
       }
-    },
-
-    async generateNewStealthMetaAddress() {
-      logInfo("Addresses", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-      logInfo("Addresses", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
-      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.newAccount.phrase));
-      logInfo("Addresses", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [phraseInHex, this.coinbase],
-      });
-      const signature1 = signature.slice(2, 66);
-      const signature2 = signature.slice(66, 130);
-      // Hash "v" and "r" values using SHA-256
-      const hashedV = ethers.utils.sha256("0x" + signature1);
-      const hashedR = ethers.utils.sha256("0x" + signature2);
-      const n = ethers.BigNumber.from(SECP256K1_N);
-      // Calculate the private keys by taking the hash values modulo the curve order
-      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
-      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
-      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-      this.newAccount.viewingPrivateKey = keyPair2.privateKey;
-      console.log("viewingPrivateKey: " + keyPair2.privateKey);
-      // Vue.set(this.modalNewStealthMetaAddress, 'viewingPrivateKey', keyPair2.privateKey);
-      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
-      const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-      console.log("stealthMetaAddress: " + stealthMetaAddress);
-      this.newAccount.spendingPublicKey = spendingPublicKey;
-      this.newAccount.viewingPublicKey = viewingPublicKey;
-      this.newAccount.linkedToAddress = this.coinbase;
-      // Vue.set(this.settings.newAccount, 'linkedToAddress', this.coinbase + 'x');
-      this.newAccount.stealthMetaAddress = stealthMetaAddress;
-      // Vue.set(this.modalNewStealthMetaAddress, 'spendingPublicKey', spendingPublicKey);
-      // Vue.set(this.modalNewStealthMetaAddress, 'viewingPublicKey', viewingPublicKey);
-      // Vue.set(this.modalNewStealthMetaAddress, 'stealthMetaAddress', stealthMetaAddress);
-      // Vue.set(this.modalNewStealthMetaAddress, 'linkedTo', { address: this.coinbase });
-      // let status;
-      // if (stealthMetaAddress in this.addresses) {
-      //   status = this.addresses[stealthMetaAddress].mine ? "mine" : "notmine";
-      // } else {
-      //   status = "doesnotexist";
-      // }
-      // Vue.set(this.modalNewStealthMetaAddress, 'status', status);
-      // console.log("this.modalNewStealthMetaAddress: " + JSON.stringify(this.modalNewStealthMetaAddress, null, 2));
-      logInfo("Addresses", "methods.generateNewStealthMetaAddress END: " + JSON.stringify(this.settings.newAccount, null, 2));
-    },
-
-    async revealModalAddressSpendingPrivateKey() {
-      console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.stealthMetaAccount.phrase);
-      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.stealthMetaAccount.phrase));
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [phraseInHex, this.coinbase],
-      });
-      const signature1 = signature.slice(2, 66);
-      const signature2 = signature.slice(66, 130);
-      // Hash "v" and "r" values using SHA-256
-      const hashedV = ethers.utils.sha256("0x" + signature1);
-      const hashedR = ethers.utils.sha256("0x" + signature2);
-      const n = ethers.BigNumber.from(SECP256K1_N);
-      // Calculate the private keys by taking the hash values modulo the curve order
-      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
-      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
-      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-      Vue.set(this.stealthMetaAccount, 'spendingPrivateKey', keyPair1.privateKey);
-      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
-      const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
     },
 
     addNewAddress() {
@@ -925,9 +512,6 @@ const Addresses = {
       this.settings.selectedAccounts = {};
       this.saveSettings();
     },
-    // async toggleAccountInfoField(account, field) {
-    //   store.dispatch('data/toggleAccountInfoField', { account, field });
-    // },
     async toggleAddressField(account, field) {
       logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
       store.dispatch('data/toggleAddressField', { account, field });
@@ -936,9 +520,6 @@ const Addresses = {
       logInfo("Addresses", "methods.setAddressField - account: " + account + ", field: " + field + ", value: " + value);
       store.dispatch('data/setAddressField', { account, field, value });
     },
-    // async setAccountInfoField(account, field, value) {
-    //   store.dispatch('data/setAccountInfoField', { account, field, value });
-    // },
     async deleteAddress(account, modalRef) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
         .then(value => {
@@ -990,24 +571,7 @@ const Addresses = {
       return result == null || result.length == 0 ? null : (length == 0 ? result : result.substring(0, length));
     },
     copyToClipboard(str) {
-      // https://github.com/30-seconds/30-seconds-of-code/blob/master/snippets/copyToClipboard.md
-      const el = document.createElement('textarea');
-      el.value = str;
-      el.setAttribute('readonly', '');
-      el.style.position = 'absolute';
-      el.style.left = '-9999px';
-      document.body.appendChild(el);
-      const selected =
-        document.getSelection().rangeCount > 0
-          ? document.getSelection().getRangeAt(0)
-          : false;
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      if (selected) {
-        document.getSelection().removeAllRanges();
-        document.getSelection().addRange(selected);
-      }
+      navigator.clipboard.writeText(str);
     },
     exportAccounts() {
       console.log("exportAccounts");
