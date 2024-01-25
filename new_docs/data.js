@@ -16,6 +16,10 @@ const Data = {
           <b-col cols="4" class="small">Transfers</b-col>
           <b-col class="small truncate" cols="8">{{ transfers.length }}</b-col>
         </b-row>
+        <b-row>
+          <b-col cols="4" class="small">Token Contracts</b-col>
+          <b-col class="small truncate" cols="8">{{ Object.keys(tokenContracts[chainId] || {}).length }}</b-col>
+        </b-row>
         <!-- <b-row>
           <b-col cols="4" class="small">Assets</b-col>
           <b-col class="small truncate" cols="8">{{ Object.keys(assets).length }}</b-col>
@@ -58,6 +62,9 @@ const Data = {
     },
     transfers() {
       return store.getters['data/transfers'];
+    },
+    tokenContracts() {
+      return store.getters['data/tokenContracts'];
     },
     // mappings() {
     //   return store.getters['data/mappings'];
