@@ -15,13 +15,13 @@ const NewAddress = {
         <b-form-group v-if="action == 'addCoinbase'" label="Attached Web3 Address:" label-for="addnewaddress-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="addnewaddress-coinbase" :value="coinbase" class="px-2 w-75"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="action == 'addAddress'" label="Address:" label-for="addnewaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="action == 'addAddress'" label="Address:" label-for="addnewaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!address || addNewAddressAddressFeedback == null" :invalid-feedback="addNewAddressAddressFeedback" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-address" v-model.trim="address" debounce="600" placeholder="0x1234...6789" class="w-75"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaddress-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="action == 'addStealthMetaAddress'" label="Stealth Meta-Address:" label-for="addnewaddress-stealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!address || addNewAddressStealthMetaAddressFeedback == null" :invalid-feedback="addNewAddressStealthMetaAddressFeedback" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" id="addnewaddress-stealthmetaaddress" v-model.trim="address" debounce="600" placeholder="st:eth:0x1234...6789" rows="3" max-rows="4" class="w-100"></b-form-textarea>
         </b-form-group>
-        <b-form-group v-if="action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="action == 'addStealthMetaAddress'" label="Linked To Address:" label-for="addnewaddress-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!linkedToAddress || addNewAddressLinkedToAddressFeedback == null" :invalid-feedback="addNewAddressLinkedToAddressFeedback" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-linkedtoaddress" v-model.trim="linkedToAddress" debounce="600" placeholder="0x1234...6789" class="w-75"></b-form-input>
         </b-form-group>
         <b-form-group v-if="action == 'generateStealthMetaAddress' && address" label="Generated Stealth Meta-Address:" label-for="addnewaddress-generatedstealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -39,9 +39,9 @@ const NewAddress = {
         <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-name" v-model.trim="name" debounce="600" placeholder="optional" class="w-50"></b-form-input>
         </b-form-group>
-        <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="addNewAddressFeedback" class="mx-0 my-1 p-0">
           <!-- <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button> -->
-          <b-button size="sm" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
+          <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
         </b-form-group>
       </b-modal>
     </div>
@@ -158,6 +158,92 @@ const NewAddress = {
         store.dispatch('newAddress/setShow', show);
       },
     },
+
+    addNewAddressAddressFeedback() {
+      if (this.action == 'addAddress') {
+        if (!this.address) {
+          return "Enter Address";
+        }
+        try {
+          const address = ethers.utils.getAddress(this.address);
+        } catch (e) {
+          return "Invalid Address";
+        }
+      }
+      return null;
+    },
+
+    addNewAddressStealthMetaAddressFeedback() {
+      if (this.action == 'addStealthMetaAddress') {
+        if (!this.address) {
+          return "Enter Stealth Meta-Address";
+        }
+        if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+          return "Invalid Stealth Meta-Address";
+        }
+      }
+      return null;
+    },
+
+    addNewAddressLinkedToAddressFeedback() {
+      if (this.action == 'addStealthMetaAddress') {
+        if (!this.linkedToAddress) {
+          return "Enter Linked To Address";
+        }
+        if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+          return "Invalid Linked To Address";
+        }
+      }
+      return null;
+    },
+
+    addNewAddressFeedback() {
+      if (this.action == 'addCoinbase') {
+        if (!this.coinbase) {
+          return "Waiting for your web3 attached account connection";
+        }
+        return null;
+      } else if (this.action == 'addAddress') {
+        if (!this.address) {
+          return "Enter Address";
+        }
+        if (!this.address.match(/^0x[0-9a-fA-F]{40}$/)) {
+          return "Invalid Address";
+        }
+        return null;
+      } else if (this.action == 'addStealthMetaAddress') {
+        if (!this.address) {
+          return "Enter Stealth Meta-Address";
+        }
+        if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+          return "Invalid Stealth Meta-Address";
+        }
+        if (!this.linkedToAddress) {
+          return "Enter Linked To Address";
+        }
+        if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+          return "Invalid Linked To Address";
+        }
+        return null;
+      } else if (this.action == 'generateStealthMetaAddress') {
+        if (!this.address) {
+          return "Generate Stealth Meta-Address";
+        }
+        if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+          return "Invalid Stealth Meta-Address";
+        }
+        if (!this.linkedToAddress) {
+          return "Enter Linked To Address";
+        }
+        if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+          return "Invalid Linked To Address";
+        }
+        return null;
+      }
+      return "Aaargh";
+    },
+
+
   },
   methods: {
     saveSettings() {
