@@ -161,7 +161,7 @@ const ViewStealthMetaAddress = {
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     async revealModalAddressSpendingPrivateKey() {
-      console.log(moment().format("HH:mm:ss") + " revealModalAddressSpendingPrivateKey - phrase: " + this.phrase);
+      logInfo("ViewStealthMetaAddress", "methods.revealModalAddressSpendingPrivateKey - phrase: " + this.phrase);
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.phrase));
       const signature = await ethereum.request({
         method: 'personal_sign',
