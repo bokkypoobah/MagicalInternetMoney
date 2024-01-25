@@ -105,13 +105,7 @@ const dataModule = {
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
     transfers: {},
-    // mappings: {}, // Various mappings
-    // txs: {}, // account => Txs(timestamp, tx, txReceipt)
-    // txsInfo: {}, // account => Txs Info
-    // blocks: {}, // blockNumber => timestamp and account balances
-    // functionSelectors: {}, // selector => [functions]
-    // eventSelectors: {}, // selector => [events]
-    // assets: {},
+    tokens: {},
     ensMap: {},
     exchangeRates: {},
     sync: {
@@ -136,13 +130,7 @@ const dataModule = {
     addresses: state => state.addresses,
     registry: state => state.registry,
     transfers: state => state.transfers,
-    // mappings: state => state.mappings,
-    // txs: state => state.txs,
-    // txsInfo: state => state.txsInfo,
-    // blocks: state => state.blocks,
-    // functionSelectors: state => state.functionSelectors,
-    // eventSelectors: state => state.eventSelectors,
-    // assets: state => state.assets,
+    tokens: state => state.tokens,
     ensMap: state => state.ensMap,
     exchangeRates: state => state.exchangeRates,
     sync: state => state.sync,
@@ -164,7 +152,6 @@ const dataModule = {
 
     addNewAddress(state, newAccount) {
       logInfo("dataModule", "mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
-
       let address = null;
       let linkedToAddress = null;
       let type = null;
@@ -239,166 +226,166 @@ const dataModule = {
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
-    addAccountEvent(state, info) {
-      const [account, eventRecord] = [info.account, info.eventRecord];
-      const addressData = state.addresses[account];
-      if (!(eventRecord.txHash in addressData.events)) {
-        addressData.events[eventRecord.txHash] = eventRecord.blockNumber;
-      }
-    },
-    addAccountInternalTransactions(state, info) {
-      const [account, results] = [info.account, info.results];
-      const addressData = state.addresses[account];
-      const groupByHashes = {};
-      for (const result of results) {
-        if (!(result.hash in addressData.internalTransactions)) {
-          if (!(result.hash in groupByHashes)) {
-            groupByHashes[result.hash] = [];
-          }
-          groupByHashes[result.hash].push(result);
-        }
-      }
-      for (const [txHash, results] of Object.entries(groupByHashes)) {
-        for (let resultIndex in results) {
-          const result = results[resultIndex];
-          if (!(txHash in addressData.internalTransactions)) {
-            addressData.internalTransactions[txHash] = {};
-          }
-          addressData.internalTransactions[txHash][resultIndex] = { ...result, hash: undefined };
-        }
-      }
-    },
-    addAccountTransactions(state, info) {
-      const [account, results] = [info.account, info.results];
-      const addressData = state.addresses[account];
-      for (const result of results) {
-        if (!(result.hash in addressData.transactions)) {
-          addressData.transactions[result.hash] = result.blockNumber;
-        }
-      }
-    },
-    updateAccountTimestampAndBlock(state, info) {
-      const [account, events] = [info.account, info.events];
-      Vue.set(state.addresses[account], 'updated', {
-        timestamp: info.timestamp,
-        blockNumber: info.blockNumber,
-      });
-    },
-    addAccountToken(state, token) {
-      const contract = ethers.utils.getAddress(token.contract);
-      const contractData = state.addresses[contract];
-      if (!(token.tokenId in contractData.assets)) {
-        Vue.set(state.addresses[contract].assets, token.tokenId, {
-          name: token.name,
-          description: token.description,
-          image: token.image,
-          type: token.kind,
-          isFlagged: token.isFlagged,
-          events: {},
-        });
-      }
-    },
-    updateAccountToken(state, token) {
-      const contract = ethers.utils.getAddress(token.contract);
-      const contractData = state.addresses[contract] || {};
-      if (token.tokenId in contractData.assets) {
-        const newData = {
-          ...state.addresses[contract].assets[token.tokenId],
-          name: token.name,
-          description: token.description,
-          image: token.image,
-          type: token.kind,
-          isFlagged: token.isFlagged,
-        };
-        Vue.set(state.addresses[contract].assets, token.tokenId, newData);
-      }
-    },
-    addAccountERC20Transfers(state, transfer) {
-      const contract = ethers.utils.getAddress(transfer.contract);
-      const contractData = state.addresses[contract];
-      if (!(transfer.txHash in contractData.erc20transfers)) {
-        Vue.set(state.addresses[contract].erc20transfers, transfer.txHash, {});
-      }
-      if (!(transfer.logIndex in state.addresses[contract].erc20transfers[transfer.txHash])) {
-        const tempTransfer = { ...transfer, txHash: undefined, logIndex: undefined };
-        Vue.set(state.addresses[contract].erc20transfers[transfer.txHash], transfer.logIndex, tempTransfer);
-      }
-    },
-    addAccountTokenEvents(state, info) {
-      console.log("addAccountTokenEvents: " + info.txHash + " " + JSON.stringify(info.events, null, 2));
-      for (const [eventIndex, event] of info.events.entries()) {
-        // console.log("  " + eventIndex + " " + event.type + " " + event.contract + " " + event.tokenId + " " + JSON.stringify(event));
-        if (event.type == 'preerc721' || event.type == 'erc721' || event.type == 'erc1155') {
-          const contractData = state.addresses[event.contract] || {};
-          // console.log("contractData: " + JSON.stringify(contractData, null, 2));
-          // console.log("contractData.assets[event.tokenId]: " + JSON.stringify(contractData.assets[event.tokenId], null, 2));
-          if (contractData.assets[event.tokenId]) {
-            if (!(info.txHash in contractData.assets[event.tokenId].events)) {
-              Vue.set(state.addresses[event.contract].assets[event.tokenId].events, info.txHash, {
-                blockNumber: info.blockNumber,
-                transactionIndex: info.transactionIndex,
-                timestamp: info.timestamp,
-                logs: {},
-              });
-            }
-            if (!(event.logIndex in state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs)) {
-              Vue.set(state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs, event.logIndex, {
-                // txHash: info.txHash,
-                action: event.action || undefined,
-                type: event.type || undefined,
-                from: event.from || undefined,
-                to: event.to || undefined,
-                price: event.price || undefined,
-              });
-            }
-            // console.log("contractData.assets[event.tokenId]: " + JSON.stringify(contractData.assets[event.tokenId], null, 2));
-          }
-          // console.log(txHash + " " + eventItem.type + " " + eventItem.contract + " " + (tokenContract ? tokenContract.type : '') + " " + (tokenContract ? tokenContract.name : '') + " " + (eventItem.tokenId ? eventItem.tokenId : '?'));
-        }
-      }
-    },
-    resetTokens(state) {
-      for (const [account, addressData] of Object.entries(state.accounts)) {
-        if (['preerc721', 'erc721', 'erc1155'].includes(addressData.type)) {
-          Vue.set(state.addresses[account], 'assets', {});
-        }
-      }
-    },
-    addBlock(state, info) {
-      const [blockNumber, timestamp, account, asset, balance] = [info.blockNumber, info.timestamp, info.account, info.asset, info.balance];
-      if (!(blockNumber in state.blocks)) {
-        Vue.set(state.blocks, blockNumber, {
-          timestamp,
-          balances: {},
-        });
-      }
-      if (!(account in state.blocks[blockNumber].balances)) {
-        Vue.set(state.blocks[blockNumber].balances, account, {});
-      }
-      if (!(asset in state.blocks[blockNumber].balances[account])) {
-        Vue.set(state.blocks[blockNumber].balances[account], asset, balance);
-      }
-    },
-    addNewFunctionSelectors(state, functionSelectors) {
-      for (const [functionSelector, functionNames] of Object.entries(functionSelectors)) {
-        if (!(functionSelector in state.functionSelectors)) {
-          Vue.set(state.functionSelectors, functionSelector, functionNames.map(e => e.name));
-        }
-      }
-    },
-    addNewEventSelectors(state, eventSelectors) {
-      for (const [eventSelector, eventNames] of Object.entries(eventSelectors)) {
-        if (!(eventSelector in state.eventSelectors)) {
-          Vue.set(state.eventSelectors, eventSelector, eventNames.map(e => e.name));
-        }
-      }
-    },
-    addENSName(state, nameInfo) {
-      Vue.set(state.ensMap, nameInfo.account, nameInfo.name);
-    },
-    addTxs(state, info) {
-      Vue.set(state.txs, info.txHash, info.txInfo);
-    },
+    // addAccountEvent(state, info) {
+    //   const [account, eventRecord] = [info.account, info.eventRecord];
+    //   const addressData = state.addresses[account];
+    //   if (!(eventRecord.txHash in addressData.events)) {
+    //     addressData.events[eventRecord.txHash] = eventRecord.blockNumber;
+    //   }
+    // },
+    // addAccountInternalTransactions(state, info) {
+    //   const [account, results] = [info.account, info.results];
+    //   const addressData = state.addresses[account];
+    //   const groupByHashes = {};
+    //   for (const result of results) {
+    //     if (!(result.hash in addressData.internalTransactions)) {
+    //       if (!(result.hash in groupByHashes)) {
+    //         groupByHashes[result.hash] = [];
+    //       }
+    //       groupByHashes[result.hash].push(result);
+    //     }
+    //   }
+    //   for (const [txHash, results] of Object.entries(groupByHashes)) {
+    //     for (let resultIndex in results) {
+    //       const result = results[resultIndex];
+    //       if (!(txHash in addressData.internalTransactions)) {
+    //         addressData.internalTransactions[txHash] = {};
+    //       }
+    //       addressData.internalTransactions[txHash][resultIndex] = { ...result, hash: undefined };
+    //     }
+    //   }
+    // },
+    // addAccountTransactions(state, info) {
+    //   const [account, results] = [info.account, info.results];
+    //   const addressData = state.addresses[account];
+    //   for (const result of results) {
+    //     if (!(result.hash in addressData.transactions)) {
+    //       addressData.transactions[result.hash] = result.blockNumber;
+    //     }
+    //   }
+    // },
+    // updateAccountTimestampAndBlock(state, info) {
+    //   const [account, events] = [info.account, info.events];
+    //   Vue.set(state.addresses[account], 'updated', {
+    //     timestamp: info.timestamp,
+    //     blockNumber: info.blockNumber,
+    //   });
+    // },
+    // addAccountToken(state, token) {
+    //   const contract = ethers.utils.getAddress(token.contract);
+    //   const contractData = state.addresses[contract];
+    //   if (!(token.tokenId in contractData.assets)) {
+    //     Vue.set(state.addresses[contract].assets, token.tokenId, {
+    //       name: token.name,
+    //       description: token.description,
+    //       image: token.image,
+    //       type: token.kind,
+    //       isFlagged: token.isFlagged,
+    //       events: {},
+    //     });
+    //   }
+    // },
+    // updateAccountToken(state, token) {
+    //   const contract = ethers.utils.getAddress(token.contract);
+    //   const contractData = state.addresses[contract] || {};
+    //   if (token.tokenId in contractData.assets) {
+    //     const newData = {
+    //       ...state.addresses[contract].assets[token.tokenId],
+    //       name: token.name,
+    //       description: token.description,
+    //       image: token.image,
+    //       type: token.kind,
+    //       isFlagged: token.isFlagged,
+    //     };
+    //     Vue.set(state.addresses[contract].assets, token.tokenId, newData);
+    //   }
+    // },
+    // addAccountERC20Transfers(state, transfer) {
+    //   const contract = ethers.utils.getAddress(transfer.contract);
+    //   const contractData = state.addresses[contract];
+    //   if (!(transfer.txHash in contractData.erc20transfers)) {
+    //     Vue.set(state.addresses[contract].erc20transfers, transfer.txHash, {});
+    //   }
+    //   if (!(transfer.logIndex in state.addresses[contract].erc20transfers[transfer.txHash])) {
+    //     const tempTransfer = { ...transfer, txHash: undefined, logIndex: undefined };
+    //     Vue.set(state.addresses[contract].erc20transfers[transfer.txHash], transfer.logIndex, tempTransfer);
+    //   }
+    // },
+    // addAccountTokenEvents(state, info) {
+    //   console.log("addAccountTokenEvents: " + info.txHash + " " + JSON.stringify(info.events, null, 2));
+    //   for (const [eventIndex, event] of info.events.entries()) {
+    //     // console.log("  " + eventIndex + " " + event.type + " " + event.contract + " " + event.tokenId + " " + JSON.stringify(event));
+    //     if (event.type == 'preerc721' || event.type == 'erc721' || event.type == 'erc1155') {
+    //       const contractData = state.addresses[event.contract] || {};
+    //       // console.log("contractData: " + JSON.stringify(contractData, null, 2));
+    //       // console.log("contractData.assets[event.tokenId]: " + JSON.stringify(contractData.assets[event.tokenId], null, 2));
+    //       if (contractData.assets[event.tokenId]) {
+    //         if (!(info.txHash in contractData.assets[event.tokenId].events)) {
+    //           Vue.set(state.addresses[event.contract].assets[event.tokenId].events, info.txHash, {
+    //             blockNumber: info.blockNumber,
+    //             transactionIndex: info.transactionIndex,
+    //             timestamp: info.timestamp,
+    //             logs: {},
+    //           });
+    //         }
+    //         if (!(event.logIndex in state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs)) {
+    //           Vue.set(state.addresses[event.contract].assets[event.tokenId].events[info.txHash].logs, event.logIndex, {
+    //             // txHash: info.txHash,
+    //             action: event.action || undefined,
+    //             type: event.type || undefined,
+    //             from: event.from || undefined,
+    //             to: event.to || undefined,
+    //             price: event.price || undefined,
+    //           });
+    //         }
+    //         // console.log("contractData.assets[event.tokenId]: " + JSON.stringify(contractData.assets[event.tokenId], null, 2));
+    //       }
+    //       // console.log(txHash + " " + eventItem.type + " " + eventItem.contract + " " + (tokenContract ? tokenContract.type : '') + " " + (tokenContract ? tokenContract.name : '') + " " + (eventItem.tokenId ? eventItem.tokenId : '?'));
+    //     }
+    //   }
+    // },
+    // resetTokens(state) {
+    //   for (const [account, addressData] of Object.entries(state.accounts)) {
+    //     if (['preerc721', 'erc721', 'erc1155'].includes(addressData.type)) {
+    //       Vue.set(state.addresses[account], 'assets', {});
+    //     }
+    //   }
+    // },
+    // addBlock(state, info) {
+    //   const [blockNumber, timestamp, account, asset, balance] = [info.blockNumber, info.timestamp, info.account, info.asset, info.balance];
+    //   if (!(blockNumber in state.blocks)) {
+    //     Vue.set(state.blocks, blockNumber, {
+    //       timestamp,
+    //       balances: {},
+    //     });
+    //   }
+    //   if (!(account in state.blocks[blockNumber].balances)) {
+    //     Vue.set(state.blocks[blockNumber].balances, account, {});
+    //   }
+    //   if (!(asset in state.blocks[blockNumber].balances[account])) {
+    //     Vue.set(state.blocks[blockNumber].balances[account], asset, balance);
+    //   }
+    // },
+    // addNewFunctionSelectors(state, functionSelectors) {
+    //   for (const [functionSelector, functionNames] of Object.entries(functionSelectors)) {
+    //     if (!(functionSelector in state.functionSelectors)) {
+    //       Vue.set(state.functionSelectors, functionSelector, functionNames.map(e => e.name));
+    //     }
+    //   }
+    // },
+    // addNewEventSelectors(state, eventSelectors) {
+    //   for (const [eventSelector, eventNames] of Object.entries(eventSelectors)) {
+    //     if (!(eventSelector in state.eventSelectors)) {
+    //       Vue.set(state.eventSelectors, eventSelector, eventNames.map(e => e.name));
+    //     }
+    //   }
+    // },
+    // addENSName(state, nameInfo) {
+    //   Vue.set(state.ensMap, nameInfo.account, nameInfo.name);
+    // },
+    // addTxs(state, info) {
+    //   Vue.set(state.txs, info.txHash, info.txInfo);
+    // },
     // updateTxData(state, info) {
     //   Vue.set(state.txs[info.txHash].dataImported, 'tx', {
     //     hash: info.tx.hash,
