@@ -60,6 +60,7 @@ const store = new Vuex.Store({
     welcome: welcomeModule,
     registry: registryModule,
     transfers: transfersModule,
+    tokens: tokensModule,
     newTransfer: newTransferModule,
     newAddress: newAddressModule,
     viewAddress: viewAddressModule,
