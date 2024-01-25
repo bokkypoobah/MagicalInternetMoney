@@ -29,6 +29,45 @@ const ViewAddress = {
         <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
         </b-form-group>
+        <b-form-group v-if="type == 'stealthAddress'" label="Created Via Stealth Transfers:" label-for="address-stealthtransfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-row class="px-2">
+            <b-col cols="4" class="px-2 mt-1">
+              <font size="-1">When</font>
+            </b-col>
+            <b-col cols="4" class="px-2 mt-1">
+              <font size="-1">From</font>
+            </b-col>
+            <b-col cols="4" class="px-0 mt-1">
+              <font size="-1">Transfers</font>
+            </b-col>
+          </b-row>
+          <b-row v-for="(item, index) of stealthTransfers" v-bind:key="item.txHash" class="px-2">
+            <b-col cols="4" class="px-0 mt-1">
+              <!-- {{ formatTimestamp(item.timestamp) }} -->
+              <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+                {{ formatTimestamp(item.timestamp) }}
+              </b-button>
+            </b-col>
+            <b-col cols="4" class="px-0 mt-1">
+              <b-button v-if="item.tx && item.tx.from" size="sm" :href="'https://sepolia.etherscan.io/address/' + item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+                {{ item.tx.from.substring(0, 10) + '...' + item.tx.from.slice(-8) }}
+              </b-button>
+            </b-col>
+            <b-col cols="4" class="px-0 mt-1">
+              <b-row v-for="(subitem, subindex) of item.transfers" v-bind:key="item.token">
+                <b-col cols="12">
+                  <span v-if="getTokenType(subitem.token) == 'eth'">
+                    <font size="-1">{{ formatETH(subitem.value) + ' ETH'}}</font>
+                  </span>
+                  <span v-else>
+                    <font size="-1">TODO: other tokens</font>
+                  </span>
+                </b-col>
+              </b-row>
+            </b-col>
+          </b-row>
+        </b-form-group>
+
         <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
             <b-form-input size="sm" type="text" id="address-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
@@ -124,6 +163,9 @@ const ViewAddress = {
     source() {
       return store.getters['viewAddress/source'];
     },
+    stealthTransfers() {
+      return store.getters['viewAddress/stealthTransfers'];
+    },
     show: {
       get: function () {
         return store.getters['viewAddress/show'];
@@ -134,6 +176,35 @@ const ViewAddress = {
     },
   },
   methods: {
+    getTokenType(address) {
+      if (address == ADDRESS_ETHEREUMS) {
+        return "eth";
+      } else {
+        // TODO: ERC-20 & ERC-721
+        return address.substring(0, 10) + '...' + address.slice(-8);
+      }
+    },
+    formatETH(e, precision = 0) {
+      try {
+        if (precision == 0) {
+          return e ? ethers.utils.formatEther(e).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
+        } else {
+          return e ? parseFloat(parseFloat(ethers.utils.formatEther(e)).toFixed(precision)) : null;
+        }
+      } catch (err) {
+      }
+      return e.toFixed(precision);
+    },
+    formatTimestamp(ts) {
+      if (ts != null) {
+        // if (this.settings.reportingDateTime == 1) {
+          return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
+        // } else {
+        //   return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+        // }
+      }
+      return null;
+    },
     saveSettings() {
       logInfo("ViewAddress", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
@@ -212,6 +283,7 @@ const viewAddressModule = {
     name: state => state.name,
     notes: state => state.notes,
     source: state => state.source,
+    stealthTransfers: state => state.stealthTransfers,
     show: state => state.show,
   },
   mutations: {
@@ -226,6 +298,18 @@ const viewAddressModule = {
       state.name = data.name;
       state.notes = data.notes;
       state.source = data.source;
+      const stealthTransfers = [];
+      if (data.type == "stealthAddress") {
+        const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
+        for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
+          for (const [logIndex, item] of Object.entries(logIndexes)) {
+            if (item.schemeId == 0 && item.stealthAddress == address) {
+              stealthTransfers.push(item);
+            }
+          }
+        }
+      }
+      Vue.set(state, 'stealthTransfers', stealthTransfers);
       state.show = true;
     },
     setMine(state, mine) {
