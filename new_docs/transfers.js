@@ -82,7 +82,12 @@ const Transfers = {
           <font size="-1">
             <b-row v-for="(item, index) of transfer.item.transfers" v-bind:key="item.token">
               <b-col cols="12" class="text-right px-0 mt-1">
-                {{ item.value + ' ' + item.token }}
+                <span v-if="getTokenType(item.token) == 'eth'">
+                  <font size="-1">{{ formatETH(item.value) }}</font>
+                </span>
+                <span v-else>
+                  xx {{ item.value + ' ' + item.token }}
+                </span>
                 <!-- <span v-if="getTokenType(item.token) == 'eth'">
                   <font size="-1">{{ formatETH(item.value) }}</font>
                 </span>
@@ -221,18 +226,15 @@ const Transfers = {
           <template #cell(tokens)="data">
             <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
               <b-col>
-                <!-- {{ index }}.{{ item }} -->
-                <!-- {{ getTokenType(item.token) }} -->
                 <span v-if="getTokenType(item.token) == 'eth'">
-                  <!-- <font size="-1">{{ formatETH(item.value, 9) + ' ETH'}}</font> -->
-                  <font size="-1">{{ item.value + ' ETH'}}</font>
+                  <font size="-1">{{ formatETH(item.value) + ' ETH'}}</font>
                 </span>
-                <!-- <span v-else-if="getTokenType(item.token) == 'erc20'">
+                <span v-else-if="getTokenType(item.token) == 'erc20'">
                   <font size="-1">
                     {{ formatETH(item.value) }}
                     <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover.bottom="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
                   </font>
-                </span> -->
+                </span>
                 <span v-else>
                   <font size="-1">
                     <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.bottom="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
@@ -351,6 +353,17 @@ const Transfers = {
   methods: {
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
+    },
+    formatETH(e, precision = 0) {
+      try {
+        if (precision == 0) {
+          return e ? ethers.utils.formatEther(e).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
+        } else {
+          return e ? parseFloat(parseFloat(ethers.utils.formatEther(e)).toFixed(precision)) : null;
+        }
+      } catch (err) {
+      }
+      return e.toFixed(precision);
     },
     saveSettings() {
       logInfo("Transfers", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
