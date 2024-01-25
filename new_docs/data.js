@@ -540,13 +540,11 @@ const dataModule = {
       await context.dispatch('saveData', ['accounts']);
     },
     async resetData(context, section) {
-      const CHAIN_ID = 1;
       console.log("data.actions.resetData - section: " + section);
-      // TODO: Handle "report"
       context.commit('setState', { name: section, data: {} });
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-      const status = await db0.cache.where("objectName").equals(CHAIN_ID + '.' + section).delete();
+      const status = await db0.cache.where("objectName").equals(section).delete();
       console.log("status: " + JSON.stringify(status));
       db0.close();
     },
@@ -554,29 +552,6 @@ const dataModule = {
       logInfo("dataModule", "actions.addNewAddress - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
       context.commit('addNewAddress', newAccount);
       await context.dispatch('saveData', ['addresses']);
-      // const accounts = newAccounts == null ? [] : newAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
-      // const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-      // for (let account of accounts) {
-      //   const addressData = await getAccountInfo(account, provider);
-      //   if (addressData.account) {
-      //     context.commit('addNewAddress', addressData);
-      //     const isMyAccount = true; // account == store.getters['connection/coinbase'];
-      //     const accountInfo = {
-      //       account,
-      //       mine: isMyAccount,
-      //       sync: isMyAccount,
-      //       report: isMyAccount,
-      //     };
-      //     context.commit('addNewAddressInfo', accountInfo);
-      //   }
-      //   // const names = await ensReverseRecordsContract.getNames([account]);
-      //   // const name = names.length == 1 ? names[0] : account;
-      //   // if (!(account in context.state.ensMap)) {
-      //   //   context.commit('addENSName', { account, name });
-      //   // }
-      // }
-      // context.dispatch('saveData', ['accountsInfo', 'accounts', 'ensMap']);
     },
     async restoreAccount(context, addressData) {
       logInfo("dataModule", "actions.restoreAccount - addressData: " + JSON.stringify(addressData));
@@ -652,6 +627,9 @@ const dataModule = {
         }
         if (section == "syncTokens" || section == "all") {
           await context.dispatch('syncTokens', parameter);
+        }
+        if (section == "collateTokens" || section == "all") {
+          await context.dispatch('collateTokens', parameter);
         }
 
         // if (section == "syncTransferEvents" || section == "all") {
@@ -1397,6 +1375,16 @@ const dataModule = {
       }
 
       logInfo("dataModule", "actions.syncTokens END");
+    },
+
+    async collateTokens(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      logInfo("dataModule", "actions.collateTokens: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      logInfo("dataModule", "actions.collateTokens END");
     },
 
     // async syncTransferEvents(context, parameter) {
