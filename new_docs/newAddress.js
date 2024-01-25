@@ -141,6 +141,15 @@ const NewAddress = {
         store.dispatch('newAddress/setNotes', notes);
       },
     },
+    viewingPrivateKey() {
+      return store.getters['newAddress/viewingPrivateKey'];
+    },
+    spendingPublicKey() {
+      return store.getters['newAddress/spendingPublicKey'];
+    },
+    viewingPublicKey() {
+      return store.getters['newAddress/viewingPublicKey'];
+    },
     show: {
       get: function () {
         return store.getters['newAddress/show'];
@@ -188,7 +197,20 @@ const NewAddress = {
     },
     async addNewAddress() {
       logInfo("NewAddress", "methods.addNewAddress BEGIN");
-      // store.dispatch('newAddress/addNewAddress', null);
+      store.dispatch('data/addNewAddress', {
+        action: this.action,
+        address: this.address,
+        linkedToAddress: this.linkedToAddress,
+        phrase: this.phrase,
+        mine: this.mine,
+        favourite: this.favourite,
+        name: this.name,
+        notes: this.notes,
+        viewingPrivateKey: this.viewingPrivateKey,
+        spendingPublicKey: this.spendingPublicKey,
+        viewingPublicKey: this.viewingPublicKey,
+        source: this.source,
+      });
       this.$refs['newaddress'].hide();
     },
 

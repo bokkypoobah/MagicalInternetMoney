@@ -164,76 +164,49 @@ const dataModule = {
 
     addNewAddress(state, newAccount) {
       logInfo("dataModule", "mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
-      const address = newAccount.action == "addCoinbase" ? store.getters['connection/coinbase'] : (newAccount.action == "addAddress" ? ethers.utils.getAddress(newAccount.address) : newAccount.stealthMetaAddress);
-      const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
-      const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
-      const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
-      const mine = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? true : newAccount.mine;
-      // const block = store.getters['connection/block'];
-      if (address in state.addresses) {
-        Vue.set(state.addresses[address], 'type', type);
-        if (type == "stealthMetaAddress") {
-          Vue.set(state.addresses[address], 'linkedToAddress', linkedToAddress);
-          Vue.set(state.addresses[address], 'phrase', newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined);
-          Vue.set(state.addresses[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
-          Vue.set(state.addresses[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
-          Vue.set(state.addresses[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
-        }
-        Vue.set(state.addresses[address], 'mine', mine);
-        Vue.set(state.addresses[address], 'favourite', newAccount.favourite);
-        Vue.set(state.addresses[address], 'name', newAccount.name);
-      } else {
-        if (type == "address") {
-          Vue.set(state.addresses, address, {
-            type,
-            source,
-            mine,
-            favourite: newAccount.favourite,
-            name: newAccount.name,
-            notes: null,
-          });
-        } else {
-          Vue.set(state.addresses, address, {
-            type,
-            linkedToAddress,
-            phrase: newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined,
-            viewingPrivateKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined,
-            spendingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined,
-            viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
-            source,
-            mine,
-            favourite: newAccount.favourite,
-            name: newAccount.name,
-            notes: null,
-          });
-        }
-
-        // Vue.set(state.accounts, address, {
-        //   type,
-        //   source,
-        //   mine,
-        //   name,
-      //     type: info.type || null,
-      //     name: info.name || null, // ERC-20, ERC-721 & ERC-1155
-      //     ensName: null,
-      //     symbol: info.symbol || null, // ERC-20, ERC-721 & ERC-1155
-      //     decimals: info.decimals || null, // ERC-20
-      //     slug: info.slug || null, // ERC-721 & ERC-1155
-      //     image: info.image || null, // ?ERC-20, ERC-721 & ERC-1155
-      //     created: {
-      //       timestamp: block && block.timestamp || null,
-      //       blockNumber: block && block.number || null,
-      //     },
-      //     updated: {
-      //       timestamp: null,
-      //       blockNumber: null,
-      //     },
-      //     transactions: {},
-      //     internalTransactions: {},
-      //     events: {},
-      //     assets: {},
-        // });
-      }
+      // const address = newAccount.action == "addCoinbase" ? store.getters['connection/coinbase'] : (newAccount.action == "addAddress" ? ethers.utils.getAddress(newAccount.address) : newAccount.stealthMetaAddress);
+      // const type = (newAccount.action == "addCoinbase" || newAccount.action == "addAddress") ? "address" : "stealthMetaAddress";
+      // const linkedToAddress = (newAccount.action == "addStealthMetaAddress" || newAccount.action == "generateStealthMetaAddress") ? newAccount.linkedToAddress : undefined;
+      // const source = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? "attached" : "manual";
+      // const mine = (newAccount.action == "addCoinbase" || newAccount.action == "generateStealthMetaAddress") ? true : newAccount.mine;
+      // if (address in state.addresses) {
+      //   Vue.set(state.addresses[address], 'type', type);
+      //   if (type == "stealthMetaAddress") {
+      //     Vue.set(state.addresses[address], 'linkedToAddress', linkedToAddress);
+      //     Vue.set(state.addresses[address], 'phrase', newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined);
+      //     Vue.set(state.addresses[address], 'viewingPrivateKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined);
+      //     Vue.set(state.addresses[address], 'spendingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined);
+      //     Vue.set(state.addresses[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
+      //   }
+      //   Vue.set(state.addresses[address], 'mine', mine);
+      //   Vue.set(state.addresses[address], 'favourite', newAccount.favourite);
+      //   Vue.set(state.addresses[address], 'name', newAccount.name);
+      // } else {
+      //   if (type == "address") {
+      //     Vue.set(state.addresses, address, {
+      //       type,
+      //       source,
+      //       mine,
+      //       favourite: newAccount.favourite,
+      //       name: newAccount.name,
+      //       notes: null,
+      //     });
+      //   } else {
+      //     Vue.set(state.addresses, address, {
+      //       type,
+      //       linkedToAddress,
+      //       phrase: newAccount.action == "generateStealthMetaAddress" ? newAccount.phrase : undefined,
+      //       viewingPrivateKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPrivateKey : undefined,
+      //       spendingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined,
+      //       viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
+      //       source,
+      //       mine,
+      //       favourite: newAccount.favourite,
+      //       name: newAccount.name,
+      //       notes: null,
+      //     });
+      //   }
+      // }
       logInfo("dataModule", "mutations.addNewAddress AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
     },
     deleteAddress(state, address) {
