@@ -1,7 +1,7 @@
 const NewAddress = {
   template: `
     <div>
-      <b-modal ref="viewaddress" v-model="show" id="modal-newaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+      <b-modal ref="newaddress" v-model="show" id="modal-newaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>New Address</template>
         <b-form-group label="Action: " label-for="addnewaddress-type" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-select size="sm" id="addnewaddress-type" v-model="action" :options="newAccountActions" class="w-50"></b-form-select>
@@ -188,6 +188,8 @@ const NewAddress = {
     },
     async addNewAddress() {
       logInfo("NewAddress", "methods.addNewAddress BEGIN");
+      // store.dispatch('newAddress/addNewAddress', null);
+      this.$refs['newaddress'].hide();
     },
 
     async deleteAddress(account) {
@@ -355,7 +357,6 @@ const newAddressModule = {
       logInfo("newAddressModule", "actions.setKeys - keys: " + JSON.stringify(keys, null, 2));
       await context.commit('setKeys', keys);
     },
-
     async setMine(context, mine) {
       logInfo("newAddressModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
@@ -372,10 +373,10 @@ const newAddressModule = {
       logInfo("newAddressModule", "actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
-    async setSource(context, source) {
-      logInfo("newAddressModule", "actions.setSource - source: " + source);
-      await context.commit('setSource', source);
-    },
+    // async setSource(context, source) {
+    //   logInfo("newAddressModule", "actions.setSource - source: " + source);
+    //   await context.commit('setSource', source);
+    // },
     async setShow(context, show) {
       await context.commit('setShow', show);
     },
