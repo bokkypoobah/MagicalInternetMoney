@@ -64,13 +64,16 @@ const NewTransfer = {
       <b-modal ref="newtransfer" v-model="show" id="modal-newtransfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>New Stealth Transfer</template>
         <b-form-group label="Attached Web3 Address:" label-for="newtransfer-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" readonly id="newtransfer-coinbase" :value="coinbase" class="w-75"></b-form-input>
+          <b-form-input size="sm" plaintext id="newtransfer-coinbase" :value="coinbase" class="px-2 w-75"></b-form-input>
         </b-form-group>
         <b-form-group v-if="stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
         </b-form-group>
         <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from Favourited Addresses'" class="w-100"></b-form-select>
+          <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select From Your Favourited Stealth Meta-Addresses'" class="w-100"></b-form-select>
+        </b-form-group>
+        <b-form-group v-if="!stealthMetaAddressSpecified" label="" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
         </b-form-group>
         <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!amount || newTransferAmountFeedback == null" :invalid-feedback="newTransferAmountFeedback" class="mx-0 my-1 p-0">
           <b-form-input type="text" size="sm" id="newtransfer-amount" v-model.trim="amount" placeholder="e.g., 0.01 for 0.01 ETH" debounce="600" class="w-50 text-right"></b-form-input>
@@ -203,7 +206,7 @@ const NewTransfer = {
 
     stealthMetaAddressesOptions() {
       const results = [];
-      results.push({ value: null, text: "(Select Stealth Meta-Address from Favourited Addresses)"})
+      results.push({ value: null, text: "(Select From Your Favourited Stealth Meta-Addresses)"})
       for (const [address, addressData] of Object.entries(this.addresses)) {
         if (addressData.type == "stealthMetaAddress" && addressData.favourite) {
           results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + ' / ' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
@@ -228,16 +231,11 @@ const NewTransfer = {
         return "Enter Amount";
       }
       if (this.amount == 0 && this.items.length == 0) {
-        return "Enter non-zero amount";
+        return "Enter Non-Zero Amount";
       }
-      // if (this.action == 'addStealthMetaAddress') {
-      //   if (!this.linkedToAddress) {
-      //     return "Enter Linked To Address";
-      //   }
       if (!this.amount.match(/^\d*\.?\d+$/)) {
         return "Invalid Number";
       }
-      // }
       return null;
     },
 
@@ -246,54 +244,15 @@ const NewTransfer = {
         return "Enter Amount";
       }
       if (this.amount == 0 && this.items.length == 0) {
-        return "Enter non-zero amount";
+        return "Enter Non-Zero Amount";
       }
       if (!this.amount.match(/^\d*\.?\d+$/)) {
         return "Invalid Number";
       }
-      // if (this.action == 'addCoinbase') {
-      //   if (!this.coinbase) {
-      //     return "Waiting for your web3 attached account connection";
-      //   }
-      //   return null;
-      // } else if (this.action == 'addAddress') {
-      //   if (!this.address) {
-      //     return "Enter Address";
-      //   }
-      //   if (!this.address.match(/^0x[0-9a-fA-F]{40}$/)) {
-      //     return "Invalid Address";
-      //   }
-      //   return null;
-      // } else if (this.action == 'addStealthMetaAddress') {
-      //   if (!this.address) {
-      //     return "Enter Stealth Meta-Address";
-      //   }
-      //   if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
-      //     return "Invalid Stealth Meta-Address";
-      //   }
-      //   if (!this.linkedToAddress) {
-      //     return "Enter Linked To Address";
-      //   }
-      //   if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-      //     return "Invalid Linked To Address";
-      //   }
-      //   return null;
-      // } else if (this.action == 'generateStealthMetaAddress') {
-      //   if (!this.address) {
-      //     return "Generate Stealth Meta-Address";
-      //   }
-      //   if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
-      //     return "Invalid Stealth Meta-Address";
-      //   }
-      //   if (!this.linkedToAddress) {
-      //     return "Enter Linked To Address";
-      //   }
-      //   if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
-      //     return "Invalid Linked To Address";
-      //   }
-      //   return null;
-      // }
-      return "Aaargh";
+      if (!this.stealthMetaAddress) {
+        return "Select A Stealth Meta-Address"
+      }
+      return null;
     },
 
 
@@ -583,8 +542,8 @@ const newTransferModule = {
     stealthMetaAddress: null,
     amount: null,
     items: [
-      {"token":"0x8b73448426797099b6b9a96c4343f528bbAfc55e","type":"erc721","symbol":"TESTTOADZ","name":"TestToadz","tokenId":"60"},
-      {"token":"0x5A4Fc44325aa235B81aD60c60444F515fD418436","type":"erc20","symbol":"WEENUS","name":"Weenus 💪","decimals":18,"amount":"20"},
+      // {"token":"0x8b73448426797099b6b9a96c4343f528bbAfc55e","type":"erc721","symbol":"TESTTOADZ","name":"TestToadz","tokenId":"60"},
+      // {"token":"0x5A4Fc44325aa235B81aD60c60444F515fD418436","type":"erc20","symbol":"WEENUS","name":"Weenus 💪","decimals":18,"amount":"20"},
     ],
   },
   getters: {
@@ -600,6 +559,7 @@ const newTransferModule = {
       state.show = true;
       state.stealthMetaAddressSpecified = !!stealthMetaAddress;
       state.stealthMetaAddress = stealthMetaAddress;
+      state.items = [];
     },
     setShow(state, show) {
       state.show = show;
