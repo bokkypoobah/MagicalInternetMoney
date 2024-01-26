@@ -73,7 +73,7 @@ const NewTransfer = {
           <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select From Your Favourited Stealth Meta-Addresses'" class="w-100"></b-form-select>
         </b-form-group>
         <b-form-group v-if="!stealthMetaAddressSpecified" label="" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+          <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" placeholder="Select from above" class="px-2"></b-form-textarea>
         </b-form-group>
         <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!amount || newTransferAmountFeedback == null" :invalid-feedback="newTransferAmountFeedback" class="mx-0 my-1 p-0">
           <b-form-input type="text" size="sm" id="newtransfer-amount" v-model.trim="amount" placeholder="e.g., 0.01 for 0.01 ETH" debounce="600" class="w-50 text-right"></b-form-input>
@@ -368,8 +368,9 @@ const NewTransfer = {
       if (this.modalAddTokensToNewTransfer.type == "erc20") {
         const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
         const contractWithSigner = contract.connect(provider.getSigner());
+        const decimals = await contract.decimals();
         try {
-          const tx = await contractWithSigner.approve(MAGICALINTERNETMONEYADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToNewTransfer.approvedInput, this.modalNewTransfer.decimals));
+          const tx = await contractWithSigner.approve(MAGICALINTERNETMONEYADDRESS_SEPOLIA, ethers.utils.parseUnits(this.modalAddTokensToNewTransfer.approvedInput, decimals));
           console.log("tx: " + JSON.stringify(tx));
         } catch (e) {
           console.log("updateApproval - ERC20.approve(...) error: " + JSON.stringify(e));
@@ -479,14 +480,14 @@ const NewTransfer = {
       const schemeId = 0;
       const value = ethers.utils.parseEther(this.amount);
       const tokenInfos = [];
-      // for (const item of this.modalNewTransfer.items) {
-      //   console.log(JSON.stringify(item));
-      //   if (item.type == "erc20") {
-      //     tokenInfos.push([false, item.token, ethers.utils.parseUnits(item.amount, item.decimals).toString()]);
-      //   } else {
-      //     tokenInfos.push([true, item.token, item.tokenId.toString()]);
-      //   }
-      // }
+      for (const item of this.items) {
+        console.log(JSON.stringify(item));
+        if (item.type == "erc20") {
+          tokenInfos.push([false, item.token, ethers.utils.parseUnits(item.amount, item.decimals).toString()]);
+        } else {
+          tokenInfos.push([true, item.token, item.tokenId.toString()]);
+        }
+      }
       console.log("tokenInfos: " + JSON.stringify(tokenInfos));
       try {
         const tx = await contractWithSigner.transferAndAnnounce(schemeId, result.stealthAddress, result.ephemeralPublicKey, result.viewTag, tokenInfos, { value });
