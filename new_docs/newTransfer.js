@@ -538,7 +538,7 @@ const NewTransfer = {
 const newTransferModule = {
   namespaced: true,
   state: {
-    show: true,
+    show: false,
     stealthMetaAddressSpecified: false,
     stealthMetaAddress: null,
     amount: null,

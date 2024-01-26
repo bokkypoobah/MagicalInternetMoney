@@ -3,7 +3,19 @@ const Tokens = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
+        <!-- :MODALFAUCETS -->
+        <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
+          <template #modal-title>ERC-20 & ERC-721 Faucets</template>
+          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.bottom="'Select faucet'"></b-form-select>
+          <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
+        </b-modal>
+
         <div class="d-flex flex-wrap m-0 p-0">
+          <div class="mt-0 flex-grow-1">
+          </div>
+          <div class="mt-0 pr-1">
+            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.bottom="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+          </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
@@ -161,6 +173,9 @@ const Tokens = {
         item: null,
         stealthPrivateKey: null,
       },
+      modalFaucet: {
+        selectedFaucet: null,
+      },
       sortOptions: [
         // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
         // { value: 'nameregistrantdsc', text: '▼ Name, ▲ Registrant' },
@@ -220,6 +235,22 @@ const Tokens = {
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
+    faucets() {
+      return FAUCETS && FAUCETS[this.chainId];
+    },
+    faucetsOptions() {
+      const results = [];
+      if (FAUCETS && FAUCETS[this.chainId]) {
+        results.push({ value: null, text: '(select a faucet)' });
+        for (const item of FAUCETS[this.chainId]) {
+          results.push({
+            value: item.address,
+            text: item.drip + " x " + (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + (item.type == "erc20" ? " (" + item.decimals + " dp)" : "") + ' @ ' + item.address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + item.address.slice(-this.ADDRESS_SEGMENT_LENGTH),
+          });
+        }
+      }
+      return results;
+    },
 
     totalRows() {
       let result = 0;
@@ -263,6 +294,37 @@ const Tokens = {
 
   },
   methods: {
+    viewFaucets() {
+      console.log(moment().format("HH:mm:ss") + " viewFaucets");
+      this.$bvModal.show('modal-faucets');
+    },
+    async drip() {
+      console.log(moment().format("HH:mm:ss") + " drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const faucetInfo = FAUCETS[this.chainId] && FAUCETS[this.chainId].filter(e => e.address == this.modalFaucet.selectedFaucet)[0] || null;
+      if (faucetInfo) {
+        console.log("faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
+        if (faucetInfo.type == "erc20") {
+          try {
+            const tx = await signer.sendTransaction({ to: faucetInfo.address, value: "0" });
+            console.log("tx: " + JSON.stringify(tx));
+          } catch (e) {
+            console.log("drip ERC-20 - error: " + JSON.stringify(e));
+          }
+        } else {
+          const testToadzContract = new ethers.Contract(faucetInfo.address, TESTTOADZABI, provider);
+          const testToadzContractWithSigner = testToadzContract.connect(provider.getSigner());
+          try {
+            const tx = await testToadzContractWithSigner.mint(3);
+            console.log("tx: " + JSON.stringify(tx));
+          } catch (e) {
+            console.log("drip ERC-721 - error: " + JSON.stringify(e));
+          }
+        }
+      }
+    },
+
     toggleTokenContractFavourite(item) {
       // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
       logInfo("Tokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
