@@ -72,7 +72,7 @@ const NewTransfer = {
         <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.bottom="'Select Stealth Meta-Address from Favourited Addresses'" class="w-100"></b-form-select>
         </b-form-group>
-        <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Amount:" label-for="newtransfer-amount" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!amount || newTransferAmountFeedback == null" :invalid-feedback="newTransferAmountFeedback" class="mx-0 my-1 p-0">
           <b-form-input type="text" size="sm" id="newtransfer-amount" v-model.trim="amount" placeholder="e.g., 0.01 for 0.01 ETH" debounce="600" class="w-50 text-right"></b-form-input>
         </b-form-group>
         <b-form-group label="" label-for="newtransfer-tokens" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -102,8 +102,9 @@ const NewTransfer = {
             </b-col>
           </b-row>
         </b-form-group>
-        <b-form-group label="" label-for="newtransfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" :disabled="!stealthMetaAddress || amount == null" id="newtransfer-transfer" @click="executeNewTransfer()" variant="warning">Transfer</b-button>
+        <b-form-group label="" label-for="newtransfer-transfer" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="newTransferFeedback" class="mx-0 my-1 p-0">
+          <!-- <b-button size="sm" :disabled="!modalNewTransfer.stealthMetaAddress || modalNewTransfer.amount == null || (modalNewTransfer.amount == 0 && modalNewTransfer.items.length == 0)" id="newtransfer-transfer" @click="executeNewTransfer()" variant="warning">Transfer</b-button> -->
+          <b-button size="sm" :disabled="!!newTransferFeedback" id="newtransfer-transfer" @click="executeNewTransfer()" variant="warning">Transfer</b-button>
         </b-form-group>
       </b-modal>
     </div>
@@ -221,6 +222,80 @@ const NewTransfer = {
       }
       return results;
     },
+
+    newTransferAmountFeedback() {
+      if (!this.amount) {
+        return "Enter Amount";
+      }
+      if (this.amount == 0 && this.items.length == 0) {
+        return "Enter non-zero amount";
+      }
+      // if (this.action == 'addStealthMetaAddress') {
+      //   if (!this.linkedToAddress) {
+      //     return "Enter Linked To Address";
+      //   }
+      if (!this.amount.match(/^\d*\.?\d+$/)) {
+        return "Invalid Number";
+      }
+      // }
+      return null;
+    },
+
+    newTransferFeedback() {
+      if (!this.amount) {
+        return "Enter Amount";
+      }
+      if (this.amount == 0 && this.items.length == 0) {
+        return "Enter non-zero amount";
+      }
+      if (!this.amount.match(/^\d*\.?\d+$/)) {
+        return "Invalid Number";
+      }
+      // if (this.action == 'addCoinbase') {
+      //   if (!this.coinbase) {
+      //     return "Waiting for your web3 attached account connection";
+      //   }
+      //   return null;
+      // } else if (this.action == 'addAddress') {
+      //   if (!this.address) {
+      //     return "Enter Address";
+      //   }
+      //   if (!this.address.match(/^0x[0-9a-fA-F]{40}$/)) {
+      //     return "Invalid Address";
+      //   }
+      //   return null;
+      // } else if (this.action == 'addStealthMetaAddress') {
+      //   if (!this.address) {
+      //     return "Enter Stealth Meta-Address";
+      //   }
+      //   if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+      //     return "Invalid Stealth Meta-Address";
+      //   }
+      //   if (!this.linkedToAddress) {
+      //     return "Enter Linked To Address";
+      //   }
+      //   if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+      //     return "Invalid Linked To Address";
+      //   }
+      //   return null;
+      // } else if (this.action == 'generateStealthMetaAddress') {
+      //   if (!this.address) {
+      //     return "Generate Stealth Meta-Address";
+      //   }
+      //   if (!this.address.match(/^st:eth:0x[0-9a-fA-F]{132}$/)) {
+      //     return "Invalid Stealth Meta-Address";
+      //   }
+      //   if (!this.linkedToAddress) {
+      //     return "Enter Linked To Address";
+      //   }
+      //   if (!this.linkedToAddress.match(/^0x[0-9a-fA-F]{40}$/)) {
+      //     return "Invalid Linked To Address";
+      //   }
+      //   return null;
+      // }
+      return "Aaargh";
+    },
+
 
     filteredERC721Tokens() {
       logInfo("NewTransfer", "methods.filteredERC721Tokens BEGIN");
