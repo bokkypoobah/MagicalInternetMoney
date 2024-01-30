@@ -648,6 +648,9 @@ const dataModule = {
         if (section == "collateTokens" || section == "all") {
           await context.dispatch('collateTokens', parameter);
         }
+        if (section == "syncERC721Metadata" || section == "all") {
+          await context.dispatch('syncERC721Metadata', parameter);
+        }
 
         // if (section == "syncTransferEvents" || section == "all") {
         //   await context.dispatch('syncTransferEvents', parameter);
@@ -1535,6 +1538,77 @@ const dataModule = {
       await context.dispatch('saveData', ['tokenContracts']);
       logInfo("dataModule", "actions.collateTokens END");
     },
+
+    async syncERC721Metadata(context, parameter) {
+      const DB_PROCESSING_BATCH_SIZE = 123;
+      logInfo("dataModule", "actions.syncERC721Metadata: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
+
+      for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
+        if (data.type == "erc721") {
+          // console.log(address + " => " + JSON.stringify(data, null, 2));
+          for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            const contract = new ethers.Contract(address, ERC721ABI, provider);
+            const metadata = await contract.tokenURI(tokenId);
+            if (metadata.substring(0, 7) == "ipfs://") {
+              console.log("metadata: " + JSON.stringify(metadata));
+              const ipfsFile = "https://ipfs.io/ipfs/" + metadata.substring(7);
+              console.log("ipfsFile: " + ipfsFile);
+              const ipfsFileContent = await fetch(ipfsFile).then(response => response.json());
+              console.log("ipfsFileContent: " + JSON.stringify(ipfsFileContent, null, 2));
+              const imageFile = ipfsFileContent && ipfsFileContent.image || null;
+              if (imageFile.substring(0, 7) == "ipfs://") {
+                const ipfsImageFile = "https://ipfs.io/ipfs/" + imageFile.substring(7);
+                console.log("ipfsImageFile: " + ipfsImageFile);
+
+
+                const imageUrlToBase64 = async url => {
+                  const response = await fetch(url);
+                  const blob = await response.blob();
+                  return new Promise((onSuccess, onError) => {
+                    try {
+                      const reader = new FileReader() ;
+                      reader.onload = function(){ onSuccess(this.result) } ;
+                      reader.readAsDataURL(blob) ;
+                    } catch(e) {
+                      onError(e);
+                    }
+                  });
+                };
+
+                const base64 = await imageUrlToBase64(ipfsImageFile);
+                console.log("base64: " + JSON.stringify(base64));
+
+                // const ipfsImageFileContentResponse = await fetch(ipfsImageFile);
+                // const ipfsImageFileContent = ipfsImageFileContentResponse.blob();
+                // console.log("ipfsImageFileContent: " + JSON.stringify(ipfsImageFileContent));
+
+                // await fetch(ipfsImageFile)
+                //   .then(response => response.blob())
+                //   .then((blob) => {
+                //     const imageUrl = URL.createObjectURL(blob);
+                //     console.log("imageUrl: " + JSON.stringify(imageUrl));
+                //     // Do something with the image data
+                //   })
+                //   .catch(error => console.error(error));
+
+
+              }
+            }
+            // const registry = context.state.registry;
+            //
+          }
+        }
+      }
+
+      logInfo("dataModule", "actions.syncERC721Metadata END");
+    },
+
 
     // async syncTransferEvents(context, parameter) {
     //   logInfo("dataModule", "actions.syncTransferEvents: " + JSON.stringify(parameter));
