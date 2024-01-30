@@ -617,6 +617,10 @@ const dataModule = {
       // }
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
+      if (!(coinbase in context.state.addresses)) {
+        context.commit('addNewAddress', { action: "addCoinbase" });
+      }
+
       for (const [sectionIndex, section] of info.sections.entries()) {
         logInfo("dataModule", "actions.syncIt: " + sectionIndex + "." + section);
         const parameter = { chainId, coinbase, /*accountsToSync,*/ blockNumber, confirmations, /*confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey,*/ cryptoCompareAPIKey/*, etherscanBatchSize, OVERLAPBLOCKS, processFilters*/ };
@@ -1565,11 +1569,16 @@ const dataModule = {
 
       logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
 
-      //  data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
-      //  data:application/json;base64, 0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
+      // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
+      // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
+      // data:application/json;base64, 0x1C60841b70821dcA733c9B1a26dBe1a33338bD43 GLICPIXXXVER002
+      // IPFS data in another contract 0xC2C747E0F7004F9E8817Db2ca4997657a7746928 Hashmask
+      // No tokenURI                   0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85 ENS
+      // TODO ?                        0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401 ENS Name Wrapper
+      // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721" && address == "0x31385d3520bCED94f77AaE104b406994D8F2168C") {
+        if (data.type == "erc721" && address == "0xbe9371326F91345777b04394448c23E2BFEaa826") {
           console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
