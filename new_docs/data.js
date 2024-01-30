@@ -1542,6 +1542,21 @@ const dataModule = {
     },
 
     async syncERC721Metadata(context, parameter) {
+
+      const imageUrlToBase64 = async url => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((onSuccess, onError) => {
+          try {
+            const reader = new FileReader() ;
+            reader.onload = function(){ onSuccess(this.result) } ;
+            reader.readAsDataURL(blob) ;
+          } catch(e) {
+            onError(e);
+          }
+        });
+      };
+
       const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.syncERC721Metadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
@@ -1550,10 +1565,11 @@ const dataModule = {
 
       logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
 
-      // 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
+      //  data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
+      //  data:application/json;base64, 0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721" && address == "0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c") {
+        if (data.type == "erc721" && address == "0x31385d3520bCED94f77AaE104b406994D8F2168C") {
           console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
@@ -1572,6 +1588,17 @@ const dataModule = {
                 console.log("metadata: " + JSON.stringify(metadata, null, 2));
               }
 
+              if (tokenURIResult.substring(0, 8) == "https://") {
+                const data = await fetch(tokenURIResult).then(response => response.json());
+                console.log("data: " + JSON.stringify(data, null, 2));
+                metadata.name = data.name || undefined;
+                metadata.description = data.description || undefined;
+                metadata.attributes = data.attributes || {};
+                const imageFile = data.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + data.image.substring(7) : data.image;
+                const base64 = await imageUrlToBase64(imageFile);
+                metadata.image = base64 || undefined;
+                console.log("metadata: " + JSON.stringify(metadata, null, 2));
+              }
 
               if (tokenURIResult.substring(0, 7) == "ipfs://") {
                 const ipfsFile = "https://ipfs.io/ipfs/" + tokenURIResult.substring(7);
@@ -1582,19 +1609,6 @@ const dataModule = {
                 if (imageFile.substring(0, 7) == "ipfs://") {
                   const ipfsImageFile = "https://ipfs.io/ipfs/" + imageFile.substring(7);
                   console.log("ipfsImageFile: " + ipfsImageFile);
-                  const imageUrlToBase64 = async url => {
-                    const response = await fetch(url);
-                    const blob = await response.blob();
-                    return new Promise((onSuccess, onError) => {
-                      try {
-                        const reader = new FileReader() ;
-                        reader.onload = function(){ onSuccess(this.result) } ;
-                        reader.readAsDataURL(blob) ;
-                      } catch(e) {
-                        onError(e);
-                      }
-                    });
-                  };
 
                   const base64 = await imageUrlToBase64(ipfsImageFile);
                   console.log("base64: " + JSON.stringify(base64));
