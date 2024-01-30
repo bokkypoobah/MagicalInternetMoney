@@ -1550,17 +1550,31 @@ const dataModule = {
 
       logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
 
+      // 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
+
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721") {
+        if (data.type == "erc721" && address == "0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c") {
           console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const contract = new ethers.Contract(address, ERC721ABI, provider);
+            const metadata = {};
             try {
-              const metadata = await contract.tokenURI(tokenId);
-              console.log("metadata: " + JSON.stringify(metadata));
-              if (metadata.substring(0, 7) == "ipfs://") {
-                const ipfsFile = "https://ipfs.io/ipfs/" + metadata.substring(7);
+              const tokenURIResult = await contract.tokenURI(tokenId);
+              console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
+              if (tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
+                const decodedJSON = atob(tokenURIResult.substring(29));
+                const data = JSON.parse(decodedJSON);
+                metadata.name = data.name || undefined;
+                metadata.description = data.description || undefined;
+                metadata.attributes = data.attributes || {};
+                metadata.image = data.image || undefined;
+                console.log("metadata: " + JSON.stringify(metadata, null, 2));
+              }
+
+
+              if (tokenURIResult.substring(0, 7) == "ipfs://") {
+                const ipfsFile = "https://ipfs.io/ipfs/" + tokenURIResult.substring(7);
                 console.log("ipfsFile: " + ipfsFile);
                 const ipfsFileContent = await fetch(ipfsFile).then(response => response.json());
                 console.log("ipfsFileContent: " + JSON.stringify(ipfsFileContent, null, 2));
