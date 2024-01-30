@@ -648,7 +648,7 @@ const dataModule = {
         if (section == "collateTokens" || section == "all") {
           await context.dispatch('collateTokens', parameter);
         }
-        if (section == "syncERC721Metadata" || section == "all") {
+        if (section == "syncERC721Metadata" || section == "xall") {
           await context.dispatch('syncERC721Metadata', parameter);
         }
 
@@ -1513,6 +1513,7 @@ const dataModule = {
               tokenContracts[item.chainId][item.contract].balances = balances;
               tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
             } else if (item.eventType == "erc721" && item.type == "Transfer") {
+              console.log("item: " + JSON.stringify(item));
               const tokenIds = tokenContracts[item.chainId][item.contract].tokenIds || {};
               if (item.from in selectedAddressesMap) {
                 if (!(item.from in tokenIds)) {
@@ -1520,6 +1521,7 @@ const dataModule = {
                 }
               }
               if (item.to in selectedAddressesMap) {
+                console.log("item in to: " + JSON.stringify(item));
                 if (!(item.to in tokenIds)) {
                   tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber, logIndex: item.logIndex };
                 }
@@ -1550,55 +1552,55 @@ const dataModule = {
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
         if (data.type == "erc721") {
-          // console.log(address + " => " + JSON.stringify(data, null, 2));
+          console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const contract = new ethers.Contract(address, ERC721ABI, provider);
-            const metadata = await contract.tokenURI(tokenId);
-            if (metadata.substring(0, 7) == "ipfs://") {
+            try {
+              const metadata = await contract.tokenURI(tokenId);
               console.log("metadata: " + JSON.stringify(metadata));
-              const ipfsFile = "https://ipfs.io/ipfs/" + metadata.substring(7);
-              console.log("ipfsFile: " + ipfsFile);
-              const ipfsFileContent = await fetch(ipfsFile).then(response => response.json());
-              console.log("ipfsFileContent: " + JSON.stringify(ipfsFileContent, null, 2));
-              const imageFile = ipfsFileContent && ipfsFileContent.image || null;
-              if (imageFile.substring(0, 7) == "ipfs://") {
-                const ipfsImageFile = "https://ipfs.io/ipfs/" + imageFile.substring(7);
-                console.log("ipfsImageFile: " + ipfsImageFile);
+              if (metadata.substring(0, 7) == "ipfs://") {
+                const ipfsFile = "https://ipfs.io/ipfs/" + metadata.substring(7);
+                console.log("ipfsFile: " + ipfsFile);
+                const ipfsFileContent = await fetch(ipfsFile).then(response => response.json());
+                console.log("ipfsFileContent: " + JSON.stringify(ipfsFileContent, null, 2));
+                const imageFile = ipfsFileContent && ipfsFileContent.image || null;
+                if (imageFile.substring(0, 7) == "ipfs://") {
+                  const ipfsImageFile = "https://ipfs.io/ipfs/" + imageFile.substring(7);
+                  console.log("ipfsImageFile: " + ipfsImageFile);
+                  const imageUrlToBase64 = async url => {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    return new Promise((onSuccess, onError) => {
+                      try {
+                        const reader = new FileReader() ;
+                        reader.onload = function(){ onSuccess(this.result) } ;
+                        reader.readAsDataURL(blob) ;
+                      } catch(e) {
+                        onError(e);
+                      }
+                    });
+                  };
 
+                  const base64 = await imageUrlToBase64(ipfsImageFile);
+                  console.log("base64: " + JSON.stringify(base64));
 
-                const imageUrlToBase64 = async url => {
-                  const response = await fetch(url);
-                  const blob = await response.blob();
-                  return new Promise((onSuccess, onError) => {
-                    try {
-                      const reader = new FileReader() ;
-                      reader.onload = function(){ onSuccess(this.result) } ;
-                      reader.readAsDataURL(blob) ;
-                    } catch(e) {
-                      onError(e);
-                    }
-                  });
-                };
+                  // const ipfsImageFileContentResponse = await fetch(ipfsImageFile);
+                  // const ipfsImageFileContent = ipfsImageFileContentResponse.blob();
+                  // console.log("ipfsImageFileContent: " + JSON.stringify(ipfsImageFileContent));
 
-                const base64 = await imageUrlToBase64(ipfsImageFile);
-                console.log("base64: " + JSON.stringify(base64));
-
-                // const ipfsImageFileContentResponse = await fetch(ipfsImageFile);
-                // const ipfsImageFileContent = ipfsImageFileContentResponse.blob();
-                // console.log("ipfsImageFileContent: " + JSON.stringify(ipfsImageFileContent));
-
-                // await fetch(ipfsImageFile)
-                //   .then(response => response.blob())
-                //   .then((blob) => {
-                //     const imageUrl = URL.createObjectURL(blob);
-                //     console.log("imageUrl: " + JSON.stringify(imageUrl));
-                //     // Do something with the image data
-                //   })
-                //   .catch(error => console.error(error));
-
-
+                  // await fetch(ipfsImageFile)
+                  //   .then(response => response.blob())
+                  //   .then((blob) => {
+                  //     const imageUrl = URL.createObjectURL(blob);
+                  //     console.log("imageUrl: " + JSON.stringify(imageUrl));
+                  //     // Do something with the image data
+                  //   })
+                  //   .catch(error => console.error(error));
+                }
               }
+            } catch (e) {
+              console.error(e.message);
             }
             // const registry = context.state.registry;
             //

@@ -22,6 +22,7 @@ const Tokens = {
             <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['all'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
           <div class="mt-0 pr-1">
+            <!-- <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncTokens', 'collateTokens', 'syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button> -->
             <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
@@ -288,7 +289,8 @@ const Tokens = {
       return results;
     },
     pagedFilteredSortedItems() {
-      logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
