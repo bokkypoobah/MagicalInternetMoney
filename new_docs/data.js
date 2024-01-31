@@ -1492,7 +1492,7 @@ const dataModule = {
                 totalSupply: totalSupply && totalSupply.toString() || null,
                 type: item.eventType,
                 firstEventBlockNumber: item.blockNumber,
-                lastEventBlockNumber: null,
+                lastEventBlockNumber: item.blockNumber,
                 events: {},
                 balances: {},
                 tokenIds: {},

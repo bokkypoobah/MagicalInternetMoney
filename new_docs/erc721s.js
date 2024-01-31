@@ -258,25 +258,19 @@ const ERC721s = {
     totalRows() {
       let result = 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-        result++;
+        if (data.type == "erc721") {
+          result++;
+        }
       }
       return result;
     },
     filteredItems() {
       const results = [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-        // console.log(address + " => " + JSON.stringify(data));
-      // for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
-        // for (const [logIndex, item] of Object.entries(logIndexes)) {
-          // console.log(blockNumber + "." + logIndex + " => " + JSON.stringify(item, null, 2));
-          // if (item.schemeId == 0) {
-            if (data.type == "erc721") {              
-              results.push({ address, ...data });
-            }
-          // }
-        // }
+        if (data.type == "erc721") {
+          results.push({ address, ...data });
+        }
       }
-      // console.log("results: " + JSON.stringify(results, null, 2));
       return results;
     },
     filteredSortedItems() {
@@ -293,8 +287,7 @@ const ERC721s = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
-      logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems));
+      logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
