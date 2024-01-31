@@ -11,9 +11,13 @@ const routes = [{
   //   component: Account,
   //   name: 'Account',
   }, {
-    path: '/tokens',
-    component: Tokens,
-    name: 'Tokens',
+    path: '/erc721s',
+    component: ERC721s,
+    name: 'ERC721s',
+  }, {
+    path: '/erc20s',
+    component: ERC20s,
+    name: 'ERC20s',
   }, {
     path: '/transfers',
     component: Transfers,

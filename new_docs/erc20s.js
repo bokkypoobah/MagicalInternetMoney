@@ -1,11 +1,11 @@
-const Tokens = {
+const ERC20s = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
         <!-- :MODALFAUCETS -->
         <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
-          <template #modal-title>ERC-20 & ERC-721 Faucets</template>
+          <template #modal-title>ERC-20 Faucets</template>
           <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.bottom="'Select faucet'"></b-form-select>
           <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
         </b-modal>
@@ -244,10 +244,12 @@ const Tokens = {
       if (FAUCETS && FAUCETS[this.chainId]) {
         results.push({ value: null, text: '(select a faucet)' });
         for (const item of FAUCETS[this.chainId]) {
-          results.push({
-            value: item.address,
-            text: item.drip + " x " + (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + (item.type == "erc20" ? " (" + item.decimals + " dp)" : "") + ' @ ' + item.address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + item.address.slice(-this.ADDRESS_SEGMENT_LENGTH),
-          });
+          if (item.type == "erc20") {
+            results.push({
+              value: item.address,
+              text: item.drip + " x " + (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + (item.type == "erc20" ? " (" + item.decimals + " dp)" : "") + ' @ ' + item.address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + item.address.slice(-this.ADDRESS_SEGMENT_LENGTH),
+            });
+          }
         }
       }
       return results;
@@ -268,7 +270,9 @@ const Tokens = {
         // for (const [logIndex, item] of Object.entries(logIndexes)) {
           // console.log(blockNumber + "." + logIndex + " => " + JSON.stringify(item, null, 2));
           // if (item.schemeId == 0) {
-            results.push({ address, ...data });
+            if (data.type == "erc20") {
+              results.push({ address, ...data });              
+            }
           // }
         // }
       }
@@ -289,8 +293,8 @@ const Tokens = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
-      logInfo("Tokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems));
+      // logInfo("ERC20s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("ERC20s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -329,7 +333,7 @@ const Tokens = {
 
     toggleTokenContractFavourite(item) {
       // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
-      logInfo("Tokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      logInfo("ERC20s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
       // if (item && item.contract) {
         // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
@@ -355,7 +359,7 @@ const Tokens = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("Tokens", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("ERC20s", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     async syncIt(info) {
@@ -389,7 +393,7 @@ const Tokens = {
       return null;
     },
     rowSelected(item) {
-      logInfo("Tokens", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("ERC20s", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         this.transfer.item = item[0];
         this.transfer.stealthPrivateKey = null;
@@ -472,7 +476,7 @@ const Tokens = {
     },
 
     async timeoutCallback() {
-      logDebug("Tokens", "timeoutCallback() count: " + this.count);
+      logDebug("ERC20s", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -484,10 +488,10 @@ const Tokens = {
     },
   },
   beforeDestroy() {
-    logDebug("Tokens", "beforeDestroy()");
+    logDebug("ERC20s", "beforeDestroy()");
   },
   mounted() {
-    logDebug("Tokens", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("ERC20s", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
@@ -497,7 +501,7 @@ const Tokens = {
       }
     }
     this.reschedule = true;
-    logDebug("Tokens", "Calling timeoutCallback()");
+    logDebug("ERC20s", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -505,7 +509,7 @@ const Tokens = {
   },
 };
 
-const tokensModule = {
+const erc20sModule = {
   namespaced: true,
   state: {
     params: null,
@@ -518,16 +522,16 @@ const tokensModule = {
   },
   mutations: {
     deQueue(state) {
-      logDebug("tokensModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
+      logDebug("erc20sModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
       state.executionQueue.shift();
     },
     updateParams(state, params) {
       state.params = params;
-      logDebug("tokensModule", "updateParams('" + params + "')")
+      logDebug("erc20sModule", "updateParams('" + params + "')")
     },
     updateExecuting(state, executing) {
       state.executing = executing;
-      logDebug("tokensModule", "updateExecuting(" + executing + ")")
+      logDebug("erc20sModule", "updateExecuting(" + executing + ")")
     },
   },
   actions: {

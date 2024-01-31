@@ -62,7 +62,8 @@
     <script src="registry.js"></script>
     <script src="newTransfer.js"></script>
     <script src="transfers.js"></script>
-    <script src="tokens.js"></script>
+    <script src="erc20s.js"></script>
+    <script src="erc721s.js"></script>
     <script src="newAddress.js"></script>
     <script src="viewAddress.js"></script>
     <script src="viewStealthMetaAddress.js"></script>
@@ -91,7 +92,8 @@
             <b-navbar-nav class="ml-auto">
               <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover="'Welcome'">Home</b-nav-item>
               <b-nav-item size="sm" to="/addresses" active-class="active" v-b-popover.hover="'View/edit addresses'">Addresses</b-nav-item>
-              <b-nav-item size="sm" to="/tokens" active-class="active" v-b-popover.hover="'ERC-20 and ERC-721 Tokens'">Tokens</b-nav-item>
+              <b-nav-item size="sm" to="/erc20s" active-class="active" v-b-popover.hover="'ERC-20 Fungible Tokens'">Fungible Tokens</b-nav-item>
+              <b-nav-item size="sm" to="/erc721s" active-class="active" v-b-popover.hover="'ERC-721 Non-Fungible Tokens'">Non-Fungible Tokens</b-nav-item>
               <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'Registry of Addresses to Stealth Meta-Addresses'">Registry</b-nav-item>
               <b-nav-item size="sm" to="/transfers" active-class="active" v-b-popover.hover="'Stealth Transfers'">Transfers</b-nav-item>
               <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
