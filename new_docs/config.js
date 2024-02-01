@@ -427,6 +427,26 @@ const configModule = {
       { value: 2500, text: '2.5k' },
       { value: 10000, text: '10k' },
     ],
+    chainInfo: {
+      "1": {
+        name: "Ethereum Mainnet",
+        explorerPrefix: "https://etherscan.io/",
+        explorerAddressPrefix: "https://etherscan.io/address/",
+        explorerTokenPrefix: "https://etherscan.io/token/",
+        explorerTxPrefix: "https://etherscan.io/tx/",
+        explorerBlockPrefix: "https://etherscan.io/block/",
+        nftTokenPrefix: "https://opensea.io/assets/ethereum/",
+      },
+      "11155111": {
+        name: "Sepolia Testnet",
+        explorerPrefix: "https://sepolia.etherscan.io/",
+        explorerAddressPrefix: "https://sepolia.etherscan.io/address/",
+        explorerTokenPrefix: "https://sepolia.etherscan.io/token/",
+        explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
+        explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
+        nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
+      },
+    },
     processPeriods: [
       { value: null, text: '(all)', data: { from: null, to: null } },
       { value: "custom", text: '(custom)', data: { from: null, to: null } },
@@ -455,6 +475,7 @@ const configModule = {
   getters: {
     settings: state => state.settings,
     pageSizes: state => state.pageSizes,
+    chainInfo: state => state.chainInfo,
     processPeriods: state => state.processPeriods,
     periodOptions(state) {
       const results = [];

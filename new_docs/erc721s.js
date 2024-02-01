@@ -69,7 +69,7 @@ const ERC721s = {
           </template>
 
           <template #cell(contract)="data">
-            <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" target="_blank">
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
               <font size="-1">{{ data.item.address.substring(0, 10) + '...' + data.item.address.slice(-8) }}</font>
             </b-link>
           </template>
@@ -98,7 +98,7 @@ const ERC721s = {
             <span v-if="data.item.type == 'erc721'">
               <font size="-1">
                 <span v-for="(tokenData, tokenId) of data.item.tokenIds">
-                  <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + data.item.address + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
+                  <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
                 </span>
               </font>
             </span>
@@ -223,6 +223,9 @@ const ERC721s = {
     },
     pageSizes() {
       return store.getters['config/pageSizes'];
+    },
+    chainInfo() {
+      return store.getters['config/chainInfo'];
     },
     addresses() {
       return store.getters['data/addresses'];
