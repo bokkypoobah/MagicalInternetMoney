@@ -1583,7 +1583,7 @@ const dataModule = {
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const contract = new ethers.Contract(address, ERC721ABI, provider);
-            const metadata = {};
+            const metadata = tokenData.metadata || {};
             try {
               const tokenURIResult = await contract.tokenURI(tokenId);
               console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
