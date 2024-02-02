@@ -1578,7 +1578,7 @@ const dataModule = {
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721" && address == "0x8FA600364B93C53e0c71C7A33d2adE21f4351da3") {
+        if (data.type == "erc721" && ["0x8FA600364B93C53e0c71C7A33d2adE21f4351da3", "0x680384A5F9e64192994E73B9034Da27A5F48e785"].includes(address)) {
           console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
@@ -1618,16 +1618,11 @@ const dataModule = {
                 metadata.name = ipfsFileContent.name || undefined;
                 metadata.description = ipfsFileContent.description || undefined;
                 metadata.attributes = ipfsFileContent.attributes || {};
-
-                const imageFile = ipfsFileContent && ipfsFileContent.image || null;
-                if (imageFile.substring(0, 7) == "ipfs://") {
-                  const ipfsImageFile = "https://ipfs.io/ipfs/" + imageFile.substring(7);
-                  console.log("ipfsImageFile: " + ipfsImageFile);
-                  const base64 = await imageUrlToBase64(ipfsImageFile);
-                  console.log("base64: " + JSON.stringify(base64));
-                  metadata.image = base64 || undefined;
-                  Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
-                }
+                const imageFile = ipfsFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + ipfsFileContent.image.substring(7) : ipfsFileContent.image;
+                const base64 = await imageUrlToBase64(imageFile);
+                console.log("base64: " + JSON.stringify(base64));
+                metadata.image = base64 || undefined;
+                Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
                 console.log("metadata: " + JSON.stringify(metadata, null, 2));
               }
             } catch (e) {
