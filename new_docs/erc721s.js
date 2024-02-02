@@ -36,7 +36,7 @@ const ERC721s = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedItems.length + '/' + totalRows }}</font>
+            <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedItems.length + '/' + totalRows }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -46,7 +46,8 @@ const ERC721s = {
           </div>
         </div>
 
-        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+        <!-- <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1"> -->
+        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -74,25 +75,25 @@ const ERC721s = {
             </b-link>
           </template>
           <template #cell(type)="data">
-            <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
+            <!-- <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font> -->
           </template>
           <template #cell(symbol)="data">
-            <font size="-1">{{ data.item.symbol }}</font>
+            <!-- <font size="-1">{{ data.item.symbol }}</font> -->
           </template>
           <template #cell(name)="data">
-            <font size="-1">{{ data.item.name }}</font>
+            <!-- <font size="-1">{{ data.item.name }}</font> -->
           </template>
           <template #cell(firstEventBlockNumber)="data">
-            <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
+            <!-- <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font> -->
           </template>
           <template #cell(lastEventBlockNumber)="data">
-            <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font>
+            <!-- <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font> -->
           </template>
           <template #cell(decimals)="data">
-            <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font>
+            <!-- <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font> -->
           </template>
           <template #cell(balance)="data">
-            <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
+            <!-- <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
               <b-button size="sm" :href="'https://sepolia.etherscan.io/token/' + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
             </span>
             <span v-if="data.item.type == 'erc721'">
@@ -101,7 +102,7 @@ const ERC721s = {
                   <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
                 </span>
               </font>
-            </span>
+            </span> -->
           </template>
 
           <template #cell(totalSupply)="data">
@@ -262,7 +263,7 @@ const ERC721s = {
       let result = 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
-          result++;
+          result += Object.keys(data.tokenIds).length;
         }
       }
       return result;
@@ -271,7 +272,11 @@ const ERC721s = {
       const results = [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
-          results.push({ address, ...data });
+          for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
+            // console.log(address + " => " + JSON.stringify(data, null, 2));
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            results.push({ address, tokenId, owner: tokenData.owner });
+          }
         }
       }
       return results;
