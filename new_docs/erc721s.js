@@ -93,7 +93,12 @@ const ERC721s = {
 
           <template #cell(info)="data">
             <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + data.item.tokenId" target="_blank">
-              <font size="-1">{{ data.item.name }}</font>
+              <span v-if="data.item.name">
+                <font size="-1">{{ data.item.name }}</font>
+              </span>
+              <span v-else>
+                <font size="-1">{{ '#' + (data.item.tokenId.length > 20 ? (data.item.tokenId.substring(0, 10) + '...' + data.item.tokenId.slice(-8)) : data.item.tokenId) }}</font>
+              </span>
             </b-link>
             <br />
             <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
