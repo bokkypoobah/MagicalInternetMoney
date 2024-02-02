@@ -57,6 +57,7 @@ const ERC721s = {
         name: tokenData.metadata && tokenData.metadata.name || null,
         description: tokenData.metadata && tokenData.metadata.description || null,
         attributes: tokenData.metadata && tokenData.metadata.attributes || [],
+        imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
         image: tokenData.metadata && tokenData.metadata.image || null,
         blockNumber: tokenData.blockNumber,
         logIndex: tokenData.logIndex,
@@ -89,6 +90,25 @@ const ERC721s = {
               <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
             </b-avatar>
           </template>
+
+          <template #cell(info)="data">
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + data.item.tokenId" target="_blank">
+              <font size="-1">{{ data.item.name }}</font>
+            </b-link>
+            <br />
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
+              <font size="-1">{{ data.item.collectionName }}</font>
+            </b-link>
+          </template>
+
+          <template #cell(attributes)="data">
+            <!-- {{ data.item.attributes }} -->
+            <b-row v-for="(attribute, i) in data.item.attributes"  v-bind:key="i" class="m-0 p-0">
+              <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
+              <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ attribute.value }}</font></b></font></b-col>
+            </b-row>
+          </template>
+
 
 
           <template #cell(favourite)="data">
@@ -315,6 +335,7 @@ const ERC721s = {
               name: tokenData.metadata && tokenData.metadata.name || null,
               description: tokenData.metadata && tokenData.metadata.description || null,
               attributes: tokenData.metadata && tokenData.metadata.attributes || null,
+              imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
               image: tokenData.metadata && tokenData.metadata.image || null,
               blockNumber: tokenData.blockNumber,
               logIndex: tokenData.logIndex,
