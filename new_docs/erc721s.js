@@ -283,7 +283,10 @@ const ERC721s = {
               totalSupply: data.totalSupply,
               tokenId,
               owner: tokenData.owner,
-              metadata: tokenData.metadata || {},
+              name: tokenData.metadata && tokenData.metadata.name || null,
+              description: tokenData.metadata && tokenData.metadata.description || null,
+              attributes: tokenData.metadata && tokenData.metadata.attributes || [],
+              image: tokenData.metadata && tokenData.metadata.image || null,
               blockNumber: tokenData.blockNumber,
               logIndex: tokenData.logIndex,
             });

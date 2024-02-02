@@ -1634,6 +1634,8 @@ const dataModule = {
         }
       }
 
+      console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
+      await context.dispatch('saveData', ['tokenContracts']);
       logInfo("dataModule", "actions.syncERC721Metadata END");
     },
 
