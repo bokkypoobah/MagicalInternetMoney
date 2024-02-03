@@ -26,15 +26,10 @@ const ViewToken = {
           </b-input-group>
         </b-form-group>
 
-        <b-form-group v-if="type == 'stealthAddress'" label="Private Key:" label-for="token-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input :type="stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="token-spendingprivatekey" :value="stealthPrivateKey ? stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <b-button v-if="!stealthPrivateKey" :disabled="!linkedTo || linkedTo.address != coinbase" @click="revealSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
-              <b-button v-if="stealthPrivateKey" @click="copyToClipboard(stealthPrivateKey ? stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
-            </b-input-group-append>
-          </b-input-group>
+        <b-form-group label="Collection Name:" label-for="token-collectionname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-collectionname" :value="collectionName" class="px-2 w-100"></b-form-input>
         </b-form-group>
+
         <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="token-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="token-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
@@ -149,6 +144,15 @@ const ViewToken = {
     },
     tokenId() {
       return store.getters['viewToken/tokenId'];
+    },
+    tokenContracts() {
+      return store.getters['data/tokenContracts'];
+    },
+    collectionName() {
+      if (this.address) {
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].name || null;
+      }
+      return null;
     },
     linkedTo() {
       return store.getters['viewToken/linkedTo'];
