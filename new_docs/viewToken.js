@@ -39,11 +39,11 @@ const ViewToken = {
         </b-form-group>
 
         <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <component size="sm" plaintext :is="description && description.length > 30 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
+          <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
         </b-form-group>
 
         <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-avatar v-if="image" button rounded size="15rem" :src="image">
+          <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2">
             <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
           </b-avatar>
         </b-form-group>
