@@ -7,9 +7,10 @@ Vue.use(Vuex);
 Vue.component('connection', Connection);
 Vue.component('coredata', Data);
 Vue.component('new-address', NewAddress);
+Vue.component('new-transfer', NewTransfer);
 Vue.component('view-address', ViewAddress);
 Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
-Vue.component('new-transfer', NewTransfer);
+Vue.component('view-token', ViewToken);
 // Vue.component('flat-pickr', VueFlatpickr);
 
 // hljs.registerLanguage('solidity', window.hljsDefineSolidity);

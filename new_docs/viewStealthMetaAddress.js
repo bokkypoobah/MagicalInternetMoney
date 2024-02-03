@@ -1,7 +1,7 @@
 const ViewStealthMetaAddress = {
   template: `
     <div>
-      <b-modal ref="viewstealthmetaaddress" v-model="show" id="modal-viewstealthmetaaddress" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+      <b-modal ref="viewstealthmetaaddress" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>Stealth Meta-Address</template>
         <b-form-group label="Address:" label-for="stealthmetaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" plaintext id="stealthmetaddress-address" v-model.trim="address" rows="3" max-rows="4" class="px-2"></b-form-textarea>

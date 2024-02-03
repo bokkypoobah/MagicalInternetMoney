@@ -1,7 +1,7 @@
-const ViewAddress = {
+const ViewToken = {
   template: `
     <div>
-      <b-modal ref="viewaddress" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+      <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>{{ type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
         <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -205,7 +205,7 @@ const ViewAddress = {
         return result;
       }
 
-      logInfo("ViewAddress", "methods.revealSpendingPrivateKey BEGIN");
+      logInfo("ViewToken", "methods.revealSpendingPrivateKey BEGIN");
       const stealthTransfer = this.stealthTransfers && this.stealthTransfers.length > 0 && this.stealthTransfers[0] || {};
       const linkedToStealthMetaAddress = this.linkedTo && this.linkedTo.stealthMetaAddress || null;
       const stealthMetaAddressData = linkedToStealthMetaAddress && this.addresses[linkedToStealthMetaAddress] || {};
@@ -263,7 +263,7 @@ const ViewAddress = {
       return null;
     },
     saveSettings() {
-      logInfo("ViewAddress", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("ViewToken", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     setShow(show) {
@@ -274,7 +274,7 @@ const ViewAddress = {
         .then(value => {
           if (value) {
             store.dispatch('data/deleteAddress', account);
-            this.$refs['viewaddress'].hide();
+            this.$refs['viewtoken'].hide();
           }
         })
         .catch(err => {
@@ -282,7 +282,7 @@ const ViewAddress = {
         })
     },
     async timeoutCallback() {
-      logDebug("ViewAddress", "timeoutCallback() count: " + this.count);
+      logDebug("ViewToken", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -294,10 +294,10 @@ const ViewAddress = {
     },
   },
   beforeDestroy() {
-    logDebug("ViewAddress", "beforeDestroy()");
+    logDebug("ViewToken", "beforeDestroy()");
   },
   mounted() {
-    logDebug("ViewAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("ViewToken", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
@@ -307,7 +307,7 @@ const ViewAddress = {
       }
     }
     this.reschedule = true;
-    logDebug("ViewAddress", "Calling timeoutCallback()");
+    logDebug("ViewToken", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -315,7 +315,7 @@ const ViewAddress = {
   },
 };
 
-const viewAddressModule = {
+const viewTokenModule = {
   namespaced: true,
   state: {
     address: null,
@@ -345,7 +345,7 @@ const viewAddressModule = {
   },
   mutations: {
     viewAddress(state, address) {
-      logInfo("viewAddressModule", "mutations.viewAddress - address: " + address);
+      logInfo("viewTokenModule", "mutations.viewAddress - address: " + address);
       const data = store.getters['data/addresses'][address] || {};
       state.address = address;
       state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
@@ -370,19 +370,19 @@ const viewAddressModule = {
       state.show = true;
     },
     setMine(state, mine) {
-      logInfo("viewAddressModule", "mutations.setMine - mine: " + mine);
+      logInfo("viewTokenModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setFavourite(state, favourite) {
-      logInfo("viewAddressModule", "mutations.setFavourite - favourite: " + favourite);
+      logInfo("viewTokenModule", "mutations.setFavourite - favourite: " + favourite);
       state.favourite = favourite;
     },
     setName(state, name) {
-      logInfo("viewAddressModule", "mutations.setName - name: " + name);
+      logInfo("viewTokenModule", "mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      logInfo("viewAddressModule", "mutations.setNotes - notes: " + notes);
+      logInfo("viewTokenModule", "mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setShow(state, show) {
@@ -391,27 +391,27 @@ const viewAddressModule = {
   },
   actions: {
     async viewAddress(context, address) {
-      logInfo("viewAddressModule", "actions.viewAddress - address: " + address);
+      logInfo("viewTokenModule", "actions.viewAddress - address: " + address);
       await context.commit('viewAddress', address);
     },
     async setMine(context, mine) {
-      logInfo("viewAddressModule", "actions.setMine - mine: " + mine);
+      logInfo("viewTokenModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setFavourite(context, favourite) {
-      logInfo("viewAddressModule", "actions.setFavourite - favourite: " + favourite);
+      logInfo("viewTokenModule", "actions.setFavourite - favourite: " + favourite);
       await context.commit('setFavourite', favourite);
     },
     async setName(context, name) {
-      logInfo("viewAddressModule", "actions.setName - name: " + name);
+      logInfo("viewTokenModule", "actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      logInfo("viewAddressModule", "actions.setNotes - notes: " + notes);
+      logInfo("viewTokenModule", "actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setSource(context, source) {
-      logInfo("viewAddressModule", "actions.setSource - source: " + source);
+      logInfo("viewTokenModule", "actions.setSource - source: " + source);
       await context.commit('setSource', source);
     },
     async setShow(context, show) {
