@@ -338,9 +338,9 @@ const ERC721s = {
       const results = [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
-          <!-- console.log(address + " => " + JSON.stringify(data, null, 2)); -->
+          // console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             results.push({
               address,
               favourite: data.favourite,
