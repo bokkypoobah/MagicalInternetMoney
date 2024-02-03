@@ -18,12 +18,21 @@ const ERC721s = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
-          <div class="mt-0 pr-1">
+          <div v-if="sync.section == null" class="mt-0 pr-1">
             <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['all'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
           </div>
-          <div class="mt-0 pr-1">
-            <!-- <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncTokens', 'collateTokens', 'syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button> -->
-            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button>
+          <div v-if="sync.section == null" class="mt-0 pr-1">
+            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['x syncTokens', 'x collateTokens', 'syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button>
+          </div>
+          <div v-if="sync.section != null" class="mt-1" style="width: 200px;">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+              <b-progress-bar :value="sync.completed">
+                {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+              </b-progress-bar>
+            </b-progress>
+          </div>
+          <div class="ml-0 mt-1">
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -276,6 +285,9 @@ const ERC721s = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    sync() {
+      return store.getters['data/sync'];
+    },
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
@@ -326,7 +338,7 @@ const ERC721s = {
       const results = [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
-          console.log(address + " => " + JSON.stringify(data, null, 2));
+          <!-- console.log(address + " => " + JSON.stringify(data, null, 2)); -->
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             results.push({
@@ -364,7 +376,7 @@ const ERC721s = {
       return results;
     },
     pagedFilteredSortedItems() {
-      logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -434,6 +446,9 @@ const ERC721s = {
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
+    },
+    async halt() {
+      store.dispatch('data/setSyncHalt', true);
     },
     newTransfer(stealthMetaAddress = null) {
       store.dispatch('newTransfer/newTransfer', stealthMetaAddress);

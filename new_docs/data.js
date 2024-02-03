@@ -1569,6 +1569,23 @@ const dataModule = {
 
       logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
 
+      let total = 0;
+      let completed = 0;
+      for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
+        if (data.type == "erc721") {
+          for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
+            const metadata = tokenData.metadata || null;
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata));
+            if (!metadata || !metadata.name) {
+              completed++;
+            }
+            total++;
+          }
+        }
+      }
+      console.log("total: " + total);
+      context.commit('setSyncSection', { section: 'ERC-721 Metadata', total });
+
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
       // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
       // data:application/json;base64, 0x1C60841b70821dcA733c9B1a26dBe1a33338bD43 GLICPIXXXVER002
@@ -1578,68 +1595,63 @@ const dataModule = {
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721" && ["0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85", "x 0x8FA600364B93C53e0c71C7A33d2adE21f4351da3", "x 0x680384A5F9e64192994E73B9034Da27A5F48e785", "x 0x8b73448426797099b6b9a96c4343f528bbAfc55e"].includes(address)) {
-          console.log(address + " => " + JSON.stringify(data, null, 2));
+        if (data.type == "erc721" && !context.state.sync.halt /*&& ["0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85", "x 0x8FA600364B93C53e0c71C7A33d2adE21f4351da3", "x 0x680384A5F9e64192994E73B9034Da27A5F48e785", "x 0x8b73448426797099b6b9a96c4343f528bbAfc55e"].includes(address)*/) {
+          // console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
-            const contract = new ethers.Contract(address, ERC721ABI, provider);
-            const metadata = tokenData.metadata || {};
-            try {
-              let tokenURIResult;
-              if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
-                tokenURIResult = "https://metadata.ens.domains/mainnet/" + address + "/" + tokenId;
-              } else {
-                tokenURIResult = await contract.tokenURI(tokenId);
-              }
-              console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
-              if (tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
-                const decodedJSON = atob(tokenURIResult.substring(29));
-                const data = JSON.parse(decodedJSON);
-                metadata.name = data.name || undefined;
-                metadata.description = data.description || undefined;
-                metadata.attributes = data.attributes || {};
-                metadata.imageSource = "(onchain)";
-                metadata.image = data.image || undefined;
-                console.log("metadata: " + JSON.stringify(metadata, null, 2));
-              }
-
-              // if (tokenURIResult.substring(0, 8) == "https://") {
-              //   const data = await fetch(tokenURIResult).then(response => response.json());
-              //   console.log("data: " + JSON.stringify(data, null, 2));
-              //   metadata.name = data.name || undefined;
-              //   metadata.description = data.description || undefined;
-              //   metadata.attributes = data.attributes || {};
-              //   const imageFile = data.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + data.image.substring(7) : data.image;
-              //   const base64 = await imageUrlToBase64(imageFile);
-              //   metadata.image = base64 || undefined;
-              //   console.log("metadata: " + JSON.stringify(metadata, null, 2));
-              // }
-
-              if (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://") {
-                const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
-                console.log("metadataFile: " + metadataFile);
-                try {
-                  const metadataFileContent = await fetch(metadataFile).then(response => response.json());
-                  console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
-                  metadata.name = metadataFileContent.name || undefined;
-                  metadata.description = metadataFileContent.description || undefined;
-                  metadata.attributes = metadataFileContent.attributes || {};
-                  metadata.imageSource = metadataFileContent.image;
-                  const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
-                  const base64 = await imageUrlToBase64(imageFile);
-                  console.log("base64: " + JSON.stringify(base64));
-                  metadata.image = base64 || undefined;
-                  Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
-                  console.log("metadata: " + JSON.stringify(metadata, null, 2));
-                } catch (e1) {
-                  console.error(e1.message);
+            if ((!tokenData.metadata || !tokenData.metadata.name) && !context.state.sync.halt) {
+              console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+              const contract = new ethers.Contract(address, ERC721ABI, provider);
+              const metadata = tokenData.metadata || {};
+              try {
+                let tokenURIResult;
+                if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
+                  tokenURIResult = "https://metadata.ens.domains/mainnet/" + address + "/" + tokenId;
+                } else {
+                  tokenURIResult = await contract.tokenURI(tokenId);
                 }
+                console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
+                if (tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
+                  const decodedJSON = atob(tokenURIResult.substring(29));
+                  const data = JSON.parse(decodedJSON);
+                  metadata.name = data.name || undefined;
+                  metadata.description = data.description || undefined;
+                  metadata.attributes = data.attributes || {};
+                  metadata.imageSource = "(onchain)";
+                  metadata.image = data.image || undefined;
+                  console.log("metadata: " + JSON.stringify(metadata, null, 2));
+                }
+                if (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://") {
+                  const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
+                  console.log("metadataFile: " + metadataFile);
+                  try {
+                    const metadataFileContent = await fetch(metadataFile).then(response => response.json());
+                    console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
+                    // metadataFileContent: {
+                    //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
+                    // }
+                    metadata.name = metadataFileContent.name || undefined;
+                    metadata.description = metadataFileContent.description || undefined;
+                    metadata.attributes = metadataFileContent.attributes || {};
+                    metadata.imageSource = metadataFileContent.image;
+                    const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
+                    const base64 = await imageUrlToBase64(imageFile);
+                    console.log("base64: " + JSON.stringify(base64));
+                    metadata.image = base64 || undefined;
+                    Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
+                    console.log("metadata: " + JSON.stringify(metadata, null, 2));
+                  } catch (e1) {
+                    console.error(e1.message);
+                  }
+                }
+              } catch (e) {
+                console.error(e.message);
               }
-            } catch (e) {
-              console.error(e.message);
+              completed++;
+              if (completed % 10 == 0) {
+                await context.dispatch('saveData', ['tokenContracts']);
+              }
+              context.commit('setSyncCompleted', completed);
             }
-            // const registry = context.state.registry;
-            //
           }
         }
       }
