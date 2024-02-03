@@ -1576,7 +1576,7 @@ const dataModule = {
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             const metadata = tokenData.metadata || null;
             console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata));
-            if (!metadata || !metadata.name) {
+            if (metadata && metadata.name) {
               completed++;
             }
             total++;
