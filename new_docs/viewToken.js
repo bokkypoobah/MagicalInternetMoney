@@ -2,29 +2,42 @@ const ViewToken = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>{{ type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
-        <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <template #modal-title>ERC-721 Token</template>
+
+        <b-form-group label="Address:" label-for="token-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="address-address" v-model.trim="address" class="px-2"></b-form-input>
+            <b-form-input size="sm" plaintext id="token-address" v-model.trim="address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].explorerTokenPrefix + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Private Key:" label-for="address-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
+
+        <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
-            <b-form-input :type="stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="address-spendingprivatekey" :value="stealthPrivateKey ? stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
+            <b-form-textarea size="sm" plaintext id="token-tokenid" v-model.trim="tokenId" rows="2" max-rows="3" class="px-2"></b-form-textarea>
+            <b-input-group-append>
+              <div>
+                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + address + '/' + tokenId" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+
+        <b-form-group v-if="type == 'stealthAddress'" label="Private Key:" label-for="token-spendingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Sign message to reveal the private key" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input :type="stealthPrivateKey ? 'text' : 'password'" size="sm" plaintext id="token-spendingprivatekey" :value="stealthPrivateKey ? stealthPrivateKey : 'A'.repeat(66)" class="px-2"></b-form-input>
             <b-input-group-append>
               <b-button v-if="!stealthPrivateKey" :disabled="!linkedTo || linkedTo.address != coinbase" @click="revealSpendingPrivateKey();" variant="link" class="m-0 ml-2 p-0"><b-icon-eye shift-v="+1" font-scale="1.1"></b-icon-eye></b-button>
               <b-button v-if="stealthPrivateKey" @click="copyToClipboard(stealthPrivateKey ? stealthPrivateKey : '*'.repeat(66));" variant="link" class="m-0 ml-2 p-0"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="address-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="token-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="address-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
+            <b-form-input size="sm" plaintext id="token-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
                 <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
@@ -32,13 +45,13 @@ const ViewToken = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Via Stealth Meta-Address:" label-for="address-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" plaintext id="address-linkedtostealthmetaaddress" v-model.trim="linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+        <b-form-group v-if="type == 'stealthAddress'" label="Via Stealth Meta-Address:" label-for="token-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" plaintext id="token-linkedtostealthmetaaddress" v-model.trim="linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
         </b-form-group>
-        <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
+        <b-form-group v-if="false" label="ENS Name:" label-for="token-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Created Via Stealth Transfers:" label-for="address-stealthtransfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'stealthAddress'" label="Created Via Stealth Transfers:" label-for="token-stealthtransfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="px-2">
             <b-col cols="4" class="px-2 mt-1">
               <font size="-1">When</font>
@@ -77,9 +90,9 @@ const ViewToken = {
           </b-row>
         </b-form-group>
 
-        <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
-            <b-form-input size="sm" type="text" id="address-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
+            <b-form-input size="sm" type="text" id="token-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
             <b-input-group-append>
               <div>
                 <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="addressTypeInfo[type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[type || 'address'].variant"></b-icon></b-button>
@@ -88,13 +101,13 @@ const ViewToken = {
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
-        <b-form-group label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" id="address-notes" v-model.trim="notes" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
+        <b-form-group label="Notes:" label-for="token-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-textarea size="sm" id="token-notes" v-model.trim="notes" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
         </b-form-group>
-        <b-form-group label="Source:" label-for="address-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="address-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
+        <b-form-group label="Source:" label-for="token-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="address" label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="address" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
       </b-modal>
@@ -125,66 +138,72 @@ const ViewToken = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    chainInfo() {
+      return store.getters['config/chainInfo'];
+    },
     addresses() {
       return store.getters['data/addresses'];
     },
     address() {
-      return store.getters['viewAddress/address'];
+      return store.getters['viewToken/address'];
+    },
+    tokenId() {
+      return store.getters['viewToken/tokenId'];
     },
     linkedTo() {
-      return store.getters['viewAddress/linkedTo'];
+      return store.getters['viewToken/linkedTo'];
     },
     type() {
-      return store.getters['viewAddress/type'];
+      return store.getters['viewToken/type'];
     },
     mine: {
       get: function () {
-        return store.getters['viewAddress/mine'];
+        return store.getters['viewToken/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'mine', value: mine });
-        store.dispatch('viewAddress/setMine', mine);
+        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'mine', value: mine });
+        store.dispatch('viewToken/setMine', mine);
       },
     },
     favourite: {
       get: function () {
-        return store.getters['viewAddress/favourite'];
+        return store.getters['viewToken/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewAddress/setFavourite', favourite);
+        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'favourite', value: favourite });
+        store.dispatch('viewToken/setFavourite', favourite);
       },
     },
     name: {
       get: function () {
-        return store.getters['viewAddress/name'];
+        return store.getters['viewToken/name'];
       },
       set: function (name) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'name', value: name });
-        store.dispatch('viewAddress/setName', name);
+        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'name', value: name });
+        store.dispatch('viewToken/setName', name);
       },
     },
     notes: {
       get: function () {
-        return store.getters['viewAddress/notes'];
+        return store.getters['viewToken/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'notes', value: notes });
-        store.dispatch('viewAddress/setNotes', notes);
+        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'notes', value: notes });
+        store.dispatch('viewToken/setNotes', notes);
       },
     },
     source() {
-      return store.getters['viewAddress/source'];
+      return store.getters['viewToken/source'];
     },
     stealthTransfers() {
-      return store.getters['viewAddress/stealthTransfers'];
+      return store.getters['viewToken/stealthTransfers'];
     },
     show: {
       get: function () {
-        return store.getters['viewAddress/show'];
+        return store.getters['viewToken/show'];
       },
       set: function (show) {
-        store.dispatch('viewAddress/setShow', show);
+        store.dispatch('viewToken/setShow', show);
       },
     },
   },
@@ -267,7 +286,7 @@ const ViewToken = {
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     setShow(show) {
-      store.dispatch('viewAddress/setShow', show);
+      store.dispatch('viewToken/setShow', show);
     },
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
@@ -319,6 +338,8 @@ const viewTokenModule = {
   namespaced: true,
   state: {
     address: null,
+    tokenId: null,
+
     linkedTo: {
       address: null,
       stealthMetaAddress: null,
@@ -333,6 +354,8 @@ const viewTokenModule = {
   },
   getters: {
     address: state => state.address,
+    tokenId: state => state.tokenId,
+
     linkedTo: state => state.linkedTo,
     type: state => state.type,
     mine: state => state.mine,
@@ -344,29 +367,31 @@ const viewTokenModule = {
     show: state => state.show,
   },
   mutations: {
-    viewAddress(state, address) {
-      logInfo("viewTokenModule", "mutations.viewAddress - address: " + address);
-      const data = store.getters['data/addresses'][address] || {};
-      state.address = address;
-      state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
-      state.type = data.type;
-      state.mine = data.mine;
-      state.favourite = data.favourite;
-      state.name = data.name;
-      state.notes = data.notes;
-      state.source = data.source;
-      const stealthTransfers = [];
-      if (data.type == "stealthAddress") {
-        const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
-        for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
-          for (const [logIndex, item] of Object.entries(logIndexes)) {
-            if (item.schemeId == 0 && item.stealthAddress == address) {
-              stealthTransfers.push(item);
-            }
-          }
-        }
-      }
-      Vue.set(state, 'stealthTransfers', stealthTransfers);
+    viewToken(state, info) {
+      logInfo("viewTokenModule", "mutations.viewToken - info: " + JSON.stringify(info));
+
+      // const data = store.getters['data/addresses'][address] || {};
+      state.address = info.address;
+      state.tokenId = info.tokenId;
+      // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
+      // state.type = data.type;
+      // state.mine = data.mine;
+      // state.favourite = data.favourite;
+      // state.name = data.name;
+      // state.notes = data.notes;
+      // state.source = data.source;
+      // const stealthTransfers = [];
+      // if (data.type == "stealthAddress") {
+      //   const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
+      //   for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
+      //     for (const [logIndex, item] of Object.entries(logIndexes)) {
+      //       if (item.schemeId == 0 && item.stealthAddress == address) {
+      //         stealthTransfers.push(item);
+      //       }
+      //     }
+      //   }
+      // }
+      // Vue.set(state, 'stealthTransfers', stealthTransfers);
       state.show = true;
     },
     setMine(state, mine) {
@@ -390,9 +415,9 @@ const viewTokenModule = {
     },
   },
   actions: {
-    async viewAddress(context, address) {
-      logInfo("viewTokenModule", "actions.viewAddress - address: " + address);
-      await context.commit('viewAddress', address);
+    async viewToken(context, info) {
+      logInfo("viewTokenModule", "actions.viewToken - info: " + JSON.stringify(info));
+      await context.commit('viewToken', info);
     },
     async setMine(context, mine) {
       logInfo("viewTokenModule", "actions.setMine - mine: " + mine);

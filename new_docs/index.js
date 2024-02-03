@@ -67,6 +67,7 @@ const store = new Vuex.Store({
     newAddress: newAddressModule,
     viewAddress: viewAddressModule,
     viewStealthMetaAddress: viewStealthMetaAddressModule,
+    viewToken: viewTokenModule,
     config: configModule,
     // mappings: mappingsModule,
     data: dataModule,
