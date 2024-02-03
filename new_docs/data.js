@@ -1595,7 +1595,7 @@ const dataModule = {
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
 
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721" && !context.state.sync.halt /*&& ["0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85", "x 0x8FA600364B93C53e0c71C7A33d2adE21f4351da3", "x 0x680384A5F9e64192994E73B9034Da27A5F48e785", "x 0x8b73448426797099b6b9a96c4343f528bbAfc55e"].includes(address)*/) {
+        if (data.type == "erc721" && !context.state.sync.halt /*&& ["0x8FA600364B93C53e0c71C7A33d2adE21f4351da3"].includes(address)*/) {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             if ((!tokenData.metadata || !tokenData.metadata.name) && !context.state.sync.halt) {
