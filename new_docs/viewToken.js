@@ -26,83 +26,36 @@ const ViewToken = {
           </b-input-group>
         </b-form-group>
 
+        <b-form-group label="Collection Symbol:" label-for="token-collectionsymbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-collectionsymbol" :value="collectionSymbol" class="px-2 w-100"></b-form-input>
+        </b-form-group>
+
         <b-form-group label="Collection Name:" label-for="token-collectionname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-collectionname" :value="collectionName" class="px-2 w-100"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="type == 'stealthAddress'" label="Linked To Address:" label-for="token-linkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="token-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
+        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Via Stealth Meta-Address:" label-for="token-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" plaintext id="token-linkedtostealthmetaaddress" v-model.trim="linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
+
+        <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <component size="sm" plaintext :is="description && description.length > 30 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
         </b-form-group>
-        <b-form-group v-if="false" label="ENS Name:" label-for="token-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
+
+        <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-avatar v-if="image" button rounded size="15rem" :src="image">
+            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+          </b-avatar>
         </b-form-group>
-        <b-form-group v-if="type == 'stealthAddress'" label="Created Via Stealth Transfers:" label-for="token-stealthtransfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-row class="px-2">
-            <b-col cols="4" class="px-2 mt-1">
-              <font size="-1">When</font>
-            </b-col>
-            <b-col cols="4" class="px-2 mt-1">
-              <font size="-1">From</font>
-            </b-col>
-            <b-col cols="4" class="px-0 mt-1">
-              <font size="-1">Transfers</font>
-            </b-col>
-          </b-row>
-          <b-row v-for="(item, index) of stealthTransfers" v-bind:key="item.txHash" class="px-2">
-            <b-col cols="4" class="px-0 mt-1">
-              <!-- {{ formatTimestamp(item.timestamp) }} -->
-              <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
-                {{ formatTimestamp(item.timestamp) }}
-              </b-button>
-            </b-col>
-            <b-col cols="4" class="px-0 mt-1">
-              <b-button v-if="item.tx && item.tx.from" size="sm" :href="'https://sepolia.etherscan.io/address/' + item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
-                {{ item.tx.from.substring(0, 10) + '...' + item.tx.from.slice(-8) }}
-              </b-button>
-            </b-col>
-            <b-col cols="4" class="px-0 mt-1">
-              <b-row v-for="(subitem, subindex) of item.transfers" v-bind:key="item.token">
-                <b-col cols="12">
-                  <span v-if="getTokenType(subitem.token) == 'eth'">
-                    <font size="-1">{{ formatETH(subitem.value) + ' ETH'}}</font>
-                  </span>
-                  <span v-else>
-                    <font size="-1">TODO: other tokens</font>
-                  </span>
-                </b-col>
-              </b-row>
-            </b-col>
+        <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">
+            <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
+            <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value / 1000) : attribute.value }}</font></b></b-col>
           </b-row>
         </b-form-group>
 
-        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-75">
-            <b-form-input size="sm" type="text" id="token-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="addressTypeInfo[type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[type || 'address'].variant"></b-icon></b-button>
-                <b-button size="sm" :pressed.sync="favourite" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
-        <b-form-group label="Notes:" label-for="token-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" id="token-notes" v-model.trim="notes" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
-        </b-form-group>
-        <b-form-group label="Source:" label-for="token-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
-        </b-form-group>
-        <b-form-group v-if="address" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+
+        <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
       </b-modal>
@@ -148,12 +101,48 @@ const ViewToken = {
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
+    collectionSymbol() {
+      if (this.address) {
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].symbol || null;
+      }
+      return null;
+    },
     collectionName() {
       if (this.address) {
         return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].name || null;
       }
       return null;
     },
+    name() {
+      if (this.address) {
+        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.name || null;
+      }
+      return null;
+    },
+    description() {
+      if (this.address) {
+        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.description || null;
+      }
+      return null;
+    },
+    image() {
+      if (this.address) {
+        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.image || null;
+      }
+      return null;
+    },
+
+    attributes() {
+      if (this.address) {
+        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
+        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.attributes || null;
+      }
+      return null;
+    },
+
     linkedTo() {
       return store.getters['viewToken/linkedTo'];
     },
@@ -176,15 +165,6 @@ const ViewToken = {
       set: function (favourite) {
         store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'favourite', value: favourite });
         store.dispatch('viewToken/setFavourite', favourite);
-      },
-    },
-    name: {
-      get: function () {
-        return store.getters['viewToken/name'];
-      },
-      set: function (name) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'name', value: name });
-        store.dispatch('viewToken/setName', name);
       },
     },
     notes: {
