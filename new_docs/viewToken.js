@@ -54,6 +54,9 @@ const ViewToken = {
           </b-row>
         </b-form-group>
 
+        <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
+        </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
@@ -272,6 +275,48 @@ const ViewToken = {
     setShow(show) {
       store.dispatch('viewToken/setShow', show);
     },
+
+    async refreshTokenMetadata() {
+
+      const imageUrlToBase64 = async url => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((onSuccess, onError) => {
+          try {
+            const reader = new FileReader() ;
+            reader.onload = function(){ onSuccess(this.result) } ;
+            reader.readAsDataURL(blob) ;
+          } catch(e) {
+            onError(e);
+          }
+        });
+      };
+
+      logInfo("ViewToken", "refreshTokenMetadata()");
+
+      const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.address + "%3A" + this.tokenId + "&includeAttributes=true";
+      console.log("url: " + url);
+      const data = await fetch(url).then(response => response.json());
+      // console.log("data: " + JSON.stringify(data, null, 2));
+      if (data.tokens.length > 0) {
+        const tokenData = data.tokens[0].token;
+        // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
+        const base64 = await imageUrlToBase64(tokenData.image);
+        const metadata = {
+          chainId: tokenData.chainId,
+          address: tokenData.contract,
+          tokenId: tokenData.tokenId,
+          name: tokenData.name,
+          description: tokenData.description,
+          attributes: tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value })),
+          imageSource: tokenData.image,
+          image: base64,
+        };
+        console.log("metadata: " + JSON.stringify(metadata, null, 2));
+
+      }
+    },
+
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
         .then(value => {

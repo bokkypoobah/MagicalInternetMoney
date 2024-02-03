@@ -1547,20 +1547,6 @@ const dataModule = {
 
     async syncERC721Metadata(context, parameter) {
 
-      const imageUrlToBase64 = async url => {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        return new Promise((onSuccess, onError) => {
-          try {
-            const reader = new FileReader() ;
-            reader.onload = function(){ onSuccess(this.result) } ;
-            reader.readAsDataURL(blob) ;
-          } catch(e) {
-            onError(e);
-          }
-        });
-      };
-
       const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.syncERC721Metadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
