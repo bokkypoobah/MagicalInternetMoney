@@ -43,9 +43,18 @@ const ViewToken = {
         </b-form-group>
 
         <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2">
+          <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
             <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-          </b-avatar>
+          <!-- </b-avatar> -->
+
+          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2">
+            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+          </b-img>
+
+
+          <!-- <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
+          </b-img> -->
+
         </b-form-group>
         <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">

@@ -95,9 +95,11 @@ const ERC721s = {
           </b-avatar> -->
 
           <template #cell(image)="data">
-            <b-avatar v-if="data.item.image" button rounded size="7rem" :src="data.item.image">
+            <!-- <b-avatar v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image"> -->
               <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-            </b-avatar>
+            <!-- </b-avatar> -->
+            <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
+            </b-img>
           </template>
 
           <template #cell(info)="data">
@@ -253,8 +255,8 @@ const ERC721s = {
       // ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
