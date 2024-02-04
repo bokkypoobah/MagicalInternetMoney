@@ -1620,6 +1620,7 @@ const dataModule = {
                   metadata.attributes = data.attributes || {};
                   metadata.imageSource = "(onchain)";
                   metadata.image = data.image || undefined;
+                  Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
                   console.log("metadata: " + JSON.stringify(metadata, null, 2));
                 }
                 if (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://") {
@@ -1633,13 +1634,15 @@ const dataModule = {
                     // }
                     metadata.name = metadataFileContent.name || undefined;
                     metadata.description = metadataFileContent.description || undefined;
-                    metadata.attributes = metadataFileContent.attributes || {};
+                    metadata.attributes = metadataFileContent.attributes || [];
+                    metadata.attributes.sort((a, b) => {
+                      return ('' + a.trait_type).localeCompare(b.trait_type);
+                    });
                     metadata.imageSource = metadataFileContent.image;
                     const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
                     const base64 = await imageUrlToBase64(imageFile);
-                    console.log("base64: " + JSON.stringify(base64));
                     metadata.image = base64 || undefined;
-                    Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
+                    // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
                     console.log("metadata: " + JSON.stringify(metadata, null, 2));
                   } catch (e1) {
                     console.error(e1.message);

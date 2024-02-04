@@ -50,7 +50,7 @@ const ViewToken = {
         <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">
             <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
-            <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? (attribute.value > 1000000000000n ? formatTimestamp(attribute.value / 1000) : formatTimestamp(attribute.value)) : attribute.value }}</font></b></b-col>
+            <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
           </b-row>
         </b-form-group>
 
@@ -260,6 +260,9 @@ const ViewToken = {
     },
     formatTimestamp(ts) {
       if (ts != null) {
+        if (ts > 1000000000000n) {
+          ts = ts / 1000;
+        }
         // if (this.settings.reportingDateTime == 1) {
           return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
         // } else {
@@ -279,7 +282,7 @@ const ViewToken = {
     async refreshTokenMetadata() {
 
       const imageUrlToBase64 = async url => {
-        const response = await fetch(url);
+        const response = await fetch(url /*, { mode: 'cors' }*/);
         const blob = await response.blob();
         return new Promise((onSuccess, onError) => {
           try {
@@ -302,13 +305,17 @@ const ViewToken = {
         const tokenData = data.tokens[0].token;
         // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
         const base64 = await imageUrlToBase64(tokenData.image);
+        const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
+        attributes.sort((a, b) => {
+          return ('' + a.trait_type).localeCompare(b.trait_type);
+        });
         const metadata = {
           chainId: tokenData.chainId,
           address: ethers.utils.getAddress(tokenData.contract),
           tokenId: tokenData.tokenId,
           name: tokenData.name,
           description: tokenData.description,
-          attributes: tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value })),
+          attributes,
           imageSource: tokenData.image,
           image: base64,
         };
