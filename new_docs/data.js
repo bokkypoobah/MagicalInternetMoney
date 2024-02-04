@@ -238,6 +238,17 @@ const dataModule = {
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
+    setTokenMetadata(state, info) {
+      logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
+      Vue.set(state.tokenContracts[info.chainId][info.address].tokenIds[info.tokenId], 'metadata', {
+        name: info.name,
+        description: info.description,
+        attributes: info.attributes,
+        imageSource: info.imageSource,
+        image: info.image,
+      });
+    },
+
     // addAccountEvent(state, info) {
     //   const [account, eventRecord] = [info.account, info.eventRecord];
     //   const addressData = state.addresses[account];
@@ -518,6 +529,11 @@ const dataModule = {
     async toggleTokenContractFavourite(context, tokenContract) {
       // logInfo("dataModule", "actions.toggleAddressField - info: " + JSON.stringify(info));
       await context.commit('toggleTokenContractFavourite', tokenContract);
+      await context.dispatch('saveData', ['tokenContracts']);
+    },
+    async setTokenMetadata(context, info) {
+      logInfo("dataModule", "actions.addNewAddress - info: " + JSON.stringify(info, null, 2));
+      context.commit('setTokenMetadata', info);
       await context.dispatch('saveData', ['tokenContracts']);
     },
 

@@ -304,7 +304,7 @@ const ViewToken = {
         const base64 = await imageUrlToBase64(tokenData.image);
         const metadata = {
           chainId: tokenData.chainId,
-          address: tokenData.contract,
+          address: ethers.utils.getAddress(tokenData.contract),
           tokenId: tokenData.tokenId,
           name: tokenData.name,
           description: tokenData.description,
@@ -313,7 +313,7 @@ const ViewToken = {
           image: base64,
         };
         console.log("metadata: " + JSON.stringify(metadata, null, 2));
-
+        store.dispatch('data/setTokenMetadata', metadata);
       }
     },
 
