@@ -47,7 +47,7 @@ const ViewToken = {
             <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
           <!-- </b-avatar> -->
 
-          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2">
+          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 300px;">
             <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
           </b-img>
 
