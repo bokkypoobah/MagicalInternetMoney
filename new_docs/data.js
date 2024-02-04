@@ -1642,7 +1642,7 @@ const dataModule = {
                     const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
                     const base64 = await imageUrlToBase64(imageFile);
                     metadata.image = base64 || undefined;
-                    // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
+                    Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
                     console.log("metadata: " + JSON.stringify(metadata, null, 2));
                   } catch (e1) {
                     console.error(e1.message);
