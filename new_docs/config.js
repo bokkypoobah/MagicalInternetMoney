@@ -175,9 +175,6 @@ const Config = {
     coinbase() {
       return store.getters['connection/coinbase'];
     },
-    network() {
-      return store.getters['connection/network'];
-    },
     settings() {
       return store.getters['config/settings'];
     },

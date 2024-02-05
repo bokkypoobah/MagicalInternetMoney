@@ -97,9 +97,6 @@ const Registry = {
     coinbase() {
       return store.getters['connection/coinbase'];
     },
-    network() {
-      return store.getters['connection/network'];
-    },
     chainId() {
       return store.getters['connection/chainId'];
     },

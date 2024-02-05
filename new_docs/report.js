@@ -954,9 +954,6 @@ const Report = {
     coinbase() {
       return store.getters['connection/coinbase'];
     },
-    network() {
-      return store.getters['connection/network'];
-    },
     block() {
       return store.getters['connection/block'];
     },

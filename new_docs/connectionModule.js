@@ -1,146 +1,3 @@
-// ----------------------------------------------------------------------------
-// Network           Network Id   Chain Id
-// Mainnet                    1          1
-// Ropsten                    3          3
-// Rinkeby                    4          4
-// Kovan                     42         42
-// Görli                      5          5
-// Truffle Develop Network 4447
-// Ganache Blockchain      5777
-// Testnet   | Explorers                     | Testnet ETH Faucets
-// :-------- |:----------------------------- |:-------------------------
-// Ropsten   | https://ropsten.etherscan.io/ | https://faucet.metamask.io/<br />https://twitter.com/BokkyPooBah/status/1099498823699714048
-// Kovan     | https://kovan.etherscan.io/   | https://faucet.kovan.network/<br />https://github.com/kovan-testnet/faucet<br />https://faucet.kovan.radarrelay.com/
-// Rinkeby   | https://rinkeby.etherscan.io/ | https://faucet.metamask.io/<br />https://faucet.rinkeby.io/
-// Görli     | https://goerli.etherscan.io/  | https://faucet.goerli.mudit.blog/<br />https://goerli-faucet.slock.it/<br />https://bridge.goerli.com/
-// ----------------------------------------------------------------------------
-var networks = {
-  "-1" : {
-    "id": "-1",
-    "name": "Network Unknown",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "",
-    "opensea": "(none)",
-    "faucets": {}
-  },
-  "1" : {
-    "id": "1",
-    "name": "Ethereum Mainnet",
-    "nixAddress": "0xFF0000ffe3475C081E541a1baAbc5DB7eA6e0353",
-    "nixHelperAddress": "0x76f910c835b5a06CD465657f1a71153e2B6B2C0B",
-    "wethAddress": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    "royaltyEngineAddress": "0x0385603ab55642cb4Dd5De3aE9e306809991804f",
-    "erc721HelperAddress": "0x0eE1d7943890D8335110B879C25271e864Ee7CA8",
-    "explorer": "https://etherscan.io/",
-    "opensea": "https://opensea.io/",
-    "faucets": {}
-  },
-  "2" : {
-    "id": "2",
-    "name": "Morden Testnet (deprecated)",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "https://morden.etherscan.io/",
-    "opensea": "(none)",
-    "faucets": {}
-  },
-  "3" : {
-    "id": "3",
-    "name": "Ropsten Testnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "https://ropsten.etherscan.io/",
-    "opensea": "(none)",
-    "faucets": { "faucet.metamask.io": "https://faucet.metamask.io/" }
-  },
-  "4" : {
-    "id": "4",
-    "name": "Rinkeby Testnet",
-    "nixAddress": "0xFF0000ffe3475C081E541a1baAbc5DB7eA6e0353",
-    "nixHelperAddress": "0x76f910c835b5a06CD465657f1a71153e2B6B2C0B",
-    "wethAddress": "0xD0000DE5A8A759EAD912F89d2E6f1ae59063a61A",
-    "royaltyEngineAddress": "0x8d17687ea9a6bb6efA24ec11DcFab01661b2ddcd",
-    "erc721HelperAddress": "0x1CB0bA2E867549Aa7485a91dD90C454C2121b975",
-    "explorer": "https://rinkeby.etherscan.io/",
-    "opensea": "https://testnets.opensea.io/",
-    "faucets": { "faucet.metamask.io": "https://faucet.metamask.io/", "faucet.rinkeby.io": "https://faucet.rinkeby.io/" }
-  },
-  "42" : {
-    "id": "42",
-    "name": "Kovan Testnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "https://kovan.etherscan.io/",
-    "opensea": "(none)",
-    "faucets": { "faucet.kovan.network": "https://faucet.kovan.network/", "github.com/kovan-testnet": "https://github.com/kovan-testnet/faucet" }
-  },
-  "5" : {
-    "id": "5",
-    "name": "Görli Testnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "https://goerli.etherscan.io/",
-    "opensea": "(none)",
-    "faucets": { "faucet.goerli.mudit.blog": "https://faucet.goerli.mudit.blog/", "goerli-faucet.slock.it": "https://goerli-faucet.slock.it/" }
-  },
-  "1337" : {
-    "id": "1337",
-    "name": "Geth Devnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "(none)",
-    "opensea": "(none)",
-    "faucets": {}
-  },
-  "4447" : {
-    "id": "4447",
-    "name": "Truffle Devnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "(none)",
-    "opensea": "(none)",
-    "faucets": {}
-  },
-  "5777" : {
-    "id": "5777",
-    "name": "Ganache Devnet",
-    "nixAddress": null,
-    "nixHelperAddress": null,
-    "wethAddress": null,
-    "royaltyEngineAddress": null,
-    "erc721HelperAddress": null,
-    "explorer": "(none)",
-    "opensea": "(none)",
-    "faucets": {}
-  },
-};
-
-function getNetworkDetails(network) {
-  return networks[network] || networks[-1];
-}
-
 function getTimeDiff(ts) {
   if (ts > 0) {
     var secs = parseInt(new Date() / 1000 - ts);
@@ -195,55 +52,27 @@ const Connection = {
           Please use the <b-link href="https://metamask.io" target="_blank">MetaMask</b-link> addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser to view this page
         </b-card-text>
       </b-card>
-      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ network.name }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
+      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ chainId }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
       <b-collapse id="connection" visible class="mt-2">
         <b-card no-body class="border-0" v-if="connected">
-          <b-row>
+          <!-- <b-row>
             <b-col cols="4" class="small">Block</b-col>
             <b-col class="small truncate" cols="8" >
               <b-link :href="network.explorer + 'block/' + blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
             </b-col>
-          </b-row>
-          <b-row>
+          </b-row> -->
+          <!-- <b-row>
             <b-col cols="4" class="small">Coinbase</b-col>
             <b-col class="small truncate" cols="8">
               <b-link :href="network.explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 20) + '...') }}</b-link><span class="float-right"><b-link v-b-popover.hover="'View on OpenSea.io'" :href="network.opensea + 'accounts/'+ coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span>
             </b-col>
-          </b-row>
-          <b-row>
+          </b-row> -->
+          <!-- <b-row>
             <b-col cols="4" class="small">ETH Balance</b-col>
             <b-col class="small truncate" cols="8">
               <b-link :href="network.explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ formatETH(balance) }}</b-link>
             </b-col>
-          </b-row>
-          <!--
-          <b-row>
-            <b-col cols="4" class="small">WETH Balance</b-col>
-            <b-col class="small truncate" cols="8">
-              <b-link :href="network.explorer + 'token/' + network.wethAddress + '?=' + coinbase" class="card-link" target="_blank">{{ formatETH(wethBalance) }}</b-link>
-            </b-col>
-          </b-row>
-          -->
-          <b-row>
-            <b-col cols="4" class="small">WETH</b-col>
-            <b-col class="small truncate" cols="8">
-              <b-link :href="network.explorer + 'token/' + network.wethAddress" class="card-link" target="_blank">{{ network.wethAddress == null ? '' : (network.wethAddress.substring(0, 20) + '...') }}</b-link>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="4" class="small">ERC721 Helper</b-col>
-            <b-col class="small truncate" cols="8">
-              <b-link :href="network.explorer + 'address/' + network.erc721HelperAddress + '#code'" class="card-link" target="_blank">{{ network.erc721HelperAddress == null ? '' : (network.erc721HelperAddress.substring(0, 20) + '...') }}</b-link>
-            </b-col>
-          </b-row>
-          <b-row v-show="Object.keys(faucets).length">
-            <b-col cols="4" class="small">Faucet(s)</b-col>
-            <b-col class="small truncate" cols="8">
-              <span v-for="(url, name) in faucets">
-                <b-link :href="url" class="card-link" target="_blank">{{ name }}</b-link><br />
-              </span>
-            </b-col>
-          </b-row>
+          </b-row> -->
           <b-row v-show="Object.keys(txs).length">
             <b-col cols="4" class="small">
               Transactions
@@ -296,15 +125,6 @@ const Connection = {
     chainId() {
       return store.getters['connection/chainId'];
     },
-    network() {
-      return store.getters['connection/network'];
-    },
-    explorer() {
-      return store.getters['connection/explorer'];
-    },
-    faucets() {
-      return store.getters['connection/faucets'] || [];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
@@ -316,15 +136,6 @@ const Connection = {
     },
     balanceString() {
       return store.getters['connection/balance'] == null ? "" : new BigNumber(store.getters['connection/balance']).shift(-18).toString();
-    },
-    weth() {
-      return store.getters['connection/weth'];
-    },
-    wethBalance() {
-      return store.getters['connection/weth'] ? store.getters['connection/weth'].balance : null;
-    },
-    wethAllowanceToNix() {
-      return store.getters['connection/weth'] ? store.getters['connection/weth'].allowanceToNix : null;
     },
     block() {
       return store.getters['connection/block'];
@@ -416,7 +227,7 @@ const Connection = {
           try {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const network = await provider.getNetwork();
-            console.log("this.chainId: " + this.chainId + ", network.chainId: " + network.chainId);
+            // console.log("this.chainId: " + this.chainId + ", network.chainId: " + network.chainId);
             if (this.chainId != network.chainId) {
               store.dispatch('connection/setChainId', network.chainId);
             }
@@ -518,27 +329,9 @@ const connectionModule = {
     connected: false,
     connectionError: null,
     chainId: null,
-    network: {
-      chainId: null,
-      updated: true,
-      name: null,
-      nixAddress: null,
-      nixHelperAddress: null,
-      wethAddress: null,
-      royaltyEngineAddress: null,
-      erc721HelperAddress: null,
-      explorer: "https://etherscan.io/",
-      opensea: null,
-      faucets: {},
-    },
     coinbase: null,
     coinbaseUpdated: false,
     balance: null,
-    weth: {
-      balance: null,
-      allowanceToNix: null,
-      updatedAccounts: [],
-    },
     block: null,
     blockUpdated: false,
     txs: {},
@@ -549,14 +342,10 @@ const connectionModule = {
     connected: state => state.connected,
     connectionError: state => state.connectionError,
     connection: state => state.connection,
-    network: state => state.network,
-    // chainId: state => state.network && state.network.chainId || null,
     chainId: state => state.chainId,
     coinbase: state => state.coinbase,
     coinbaseUpdated: state => state.coinbaseUpdated,
     balance: state => state.balance,
-
-    weth: state => state.weth,
 
     block: state => state.block,
     blockUpdated: state => state.blockUpdated,
@@ -580,38 +369,6 @@ const connectionModule = {
       logInfo("connectionModule", "mutations.setChainId(" + chainId + ")");
       state.chainId = chainId;
     },
-    setNetwork(state, network) {
-      // logInfo("connectionModule", "mutations.setNetwork() - network.chainId: " + network.chainId);
-      if (state.network.chainId != network.chainId) {
-        state.network.chainId = network.chainId;
-        var networkDetails = getNetworkDetails(network.chainId);
-        state.network.name = networkDetails.name;
-        // state.network.nixAddress = networkDetails.nixAddress;
-        // state.network.nixHelperAddress = networkDetails.nixHelperAddress;
-        state.network.wethAddress = networkDetails.wethAddress;
-        // state.network.royaltyEngineAddress = networkDetails.royaltyEngineAddress;
-        state.network.erc721HelperAddress = networkDetails.erc721HelperAddress;
-        state.network.explorer = networkDetails.explorer;
-        state.network.opensea = networkDetails.opensea;
-        state.network.faucets = networkDetails.faucets;
-        state.network.updated = true;
-        logDebug("connectionModule", "state.network: " + JSON.stringify(state.network));
-      } else {
-        if (state.network.updated) {
-          state.network.updated = false;
-        }
-      }
-
-      // network: {
-      //   chainId: null,
-      //   updated: true,
-      //   name: null,
-      //   explorer: "https://etherscan.io/",
-      //   opensea: null,
-      //   faucets: null,
-      // },
-
-    },
     setCoinbase(state, coinbase) {
       logDebug("connectionModule", "mutations.setCoinbase(" + coinbase + ")");
       if (coinbase != state.coinbase) {
@@ -626,10 +383,6 @@ const connectionModule = {
     },
     setBalance(state, b) {
       state.balance = b;
-    },
-    setWeth(state, weth) {
-      // logInfo("connectionModule", "mutations.setWeth(): " + JSON.stringify(weth));
-      state.weth = weth;
     },
     setBlock(state, block) {
       logDebug("connectionModule", "mutations.setBlock()");
@@ -681,17 +434,11 @@ const connectionModule = {
     setChainId(context, chainId) {
       context.commit('setChainId', chainId);
     },
-    setNetwork(context, n) {
-      context.commit('setNetwork', n);
-    },
     setCoinbase(context, cb) {
       context.commit('setCoinbase', cb);
     },
     setBalance(context, b) {
       context.commit('setBalance', b);
-    },
-    setWeth(context, weth ) {
-      context.commit('setWeth', weth);
     },
     setBlock(context, block) {
       logDebug("connectionModule", "actions.setBlock()");
