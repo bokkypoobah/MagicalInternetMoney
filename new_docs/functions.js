@@ -374,3 +374,42 @@ const imageUrlToBase64 = async url => {
     }
   });
 };
+
+function getTimeDiff(ts) {
+  if (ts > 0) {
+    var secs = parseInt(new Date() / 1000 - ts);
+    var mins = parseInt(secs / 60);
+    secs = secs % 60;
+    var hours = parseInt(mins / 60);
+    mins = mins % 60;
+    var days = parseInt(hours / 24);
+    hours = hours % 24;
+    var s = "";
+    if (days > 0) {
+      s += days + "d ";
+    }
+    if (hours > 0) {
+      s += hours + "h ";
+    }
+    if (mins > 0) {
+      s += mins + "m ";
+    }
+    if (secs > 0) {
+      s += secs + "s";
+    }
+    return "-" + s;
+  } else {
+    return "";
+  }
+}
+
+const promisify = (inner) =>
+  new Promise((resolve, reject) =>
+    inner((err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(res);
+      }
+    })
+  );
