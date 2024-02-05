@@ -1440,6 +1440,7 @@ const dataModule = {
               }
               completed++;
               if (completed % 10 == 0) {
+                context.commit('forceRefresh');
                 await context.dispatch('saveData', ['tokenContracts']);
               }
               context.commit('setSyncCompleted', completed);
