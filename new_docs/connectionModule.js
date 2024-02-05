@@ -383,6 +383,7 @@ const Connection = {
             logInfo("Connection", "execWeb3() handleChainChanged: " + JSON.stringify(_chainId));
             // alert('Ethereum chain has changed - reloading this page.')
             // window.location.reload();
+            store.dispatch('connection/setChainId', parseInt(_chainId));
           }
           window.ethereum.on('chainChanged', handleChainChanged);
 
@@ -509,6 +510,7 @@ const connectionModule = {
     powerOn: false,
     connected: false,
     connectionError: null,
+    chainId: null,
     network: {
       chainId: null,
       updated: true,
@@ -541,7 +543,8 @@ const connectionModule = {
     connectionError: state => state.connectionError,
     connection: state => state.connection,
     network: state => state.network,
-    chainId: state => state.network && state.network.chainId || null,
+    // chainId: state => state.network && state.network.chainId || null,
+    chainId: state => state.chainId,
     coinbase: state => state.coinbase,
     coinbaseUpdated: state => state.coinbaseUpdated,
     balance: state => state.balance,
@@ -565,6 +568,10 @@ const connectionModule = {
     setConnectionError(state, error) {
       logDebug("connectionModule", "mutations.setConnectionError(" + error + ")");
       state.connectionError = error;
+    },
+    setChainId(state, chainId) {
+      logInfo("connectionModule", "mutations.setChainId(" + chainId + ")");
+      state.chainId = chainId;
     },
     setNetwork(state, network) {
       // logInfo("connectionModule", "mutations.setNetwork() - network.chainId: " + network.chainId);
@@ -663,6 +670,9 @@ const connectionModule = {
     setConnectionError(context, error) {
       logDebug("connectionModule", "actions.setConnectionError(" + error + ")");
       context.commit('setConnectionError', error);
+    },
+    setChainId(context, chainId) {
+      context.commit('setChainId', chainId);
     },
     setNetwork(context, n) {
       context.commit('setNetwork', n);
