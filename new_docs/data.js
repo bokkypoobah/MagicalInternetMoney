@@ -468,6 +468,9 @@ const dataModule = {
       if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('identifyMyStealthTransfers', parameter);
       }
+      if (options.stealthTransfers && !options.devThing) {
+        await context.dispatch('collateTransfers', parameter);
+      }
 
       if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('syncRegistrations', parameter);

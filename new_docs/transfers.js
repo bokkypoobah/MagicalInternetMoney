@@ -179,7 +179,7 @@ const Transfers = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalRegistryEntries }}</font>
+            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalTransfers }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -317,8 +317,8 @@ const Transfers = {
       return store.getters['data/transfers'];
     },
 
-    totalRegistryEntries() {
-      let result = 0;
+    totalTransfers() {
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
           result++;
@@ -327,10 +327,9 @@ const Transfers = {
       return result;
     },
     filteredTransfers() {
-      const results = [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
-          // console.log(blockNumber + "." + logIndex + " => " + JSON.stringify(item, null, 2));
           if (item.schemeId == 0) {
             results.push(item);
           }
