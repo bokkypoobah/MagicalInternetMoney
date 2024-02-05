@@ -8,6 +8,7 @@ Vue.component('connection', Connection);
 Vue.component('coredata', Data);
 Vue.component('new-address', NewAddress);
 Vue.component('new-transfer', NewTransfer);
+Vue.component('sync-options', SyncOptions);
 Vue.component('view-address', ViewAddress);
 Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
 Vue.component('view-token', ViewToken);
@@ -65,6 +66,7 @@ const store = new Vuex.Store({
     erc721s: erc721sModule,
     newTransfer: newTransferModule,
     newAddress: newAddressModule,
+    syncOptions: syncOptionsModule,
     viewAddress: viewAddressModule,
     viewStealthMetaAddress: viewStealthMetaAddressModule,
     viewToken: viewTokenModule,
