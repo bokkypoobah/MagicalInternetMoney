@@ -293,6 +293,9 @@ const Connection = {
     connectionError() {
       return store.getters['connection/connectionError'];
     },
+    chainId() {
+      return store.getters['connection/chainId'];
+    },
     network() {
       return store.getters['connection/network'];
     },
@@ -413,7 +416,11 @@ const Connection = {
           try {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const network = await provider.getNetwork();
-            store.dispatch('connection/setNetwork', network);
+            console.log("this.chainId: " + this.chainId + ", network.chainId: " + network.chainId);
+            if (this.chainId != network.chainId) {
+              store.dispatch('connection/setChainId', network.chainId);
+            }
+            // store.dispatch('connection/setNetwork', network);
             // logInfo("Connection", "execWeb3() network: " + JSON.stringify(this.network));
             const block = await provider.getBlock();
             store.dispatch('connection/setBlock', block);
