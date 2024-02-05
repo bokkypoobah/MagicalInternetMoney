@@ -18,12 +18,18 @@ const ERC20s = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
-          <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['all'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+          <div v-if="sync.section == null" class="mt-0 pr-1">
+            <b-button size="sm" :disabled="!coinbase" @click="viewSyncOptions" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
-          <div class="mt-0 pr-1">
-            <!-- <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncTokens', 'collateTokens', 'syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button> -->
-            <b-button size="sm" :disabled="!coinbase" @click="syncIt({ sections: ['syncERC721Metadata'], parameters: [] })" variant="link" v-b-popover.hover.top="'Dev button'"><b-icon-cloud-download shift-v="+1" font-scale="1.2" variant="info"></b-icon-cloud-download></b-button>
+          <div v-if="sync.section != null" class="mt-1" style="width: 200px;">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+              <b-progress-bar :value="sync.completed">
+                {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
+              </b-progress-bar>
+            </b-progress>
+          </div>
+          <div class="ml-0 mt-1">
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -218,6 +224,9 @@ const ERC20s = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    sync() {
+      return store.getters['data/sync'];
+    },
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
@@ -352,8 +361,11 @@ const ERC20s = {
       logInfo("ERC20s", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
-    async syncIt(info) {
-      store.dispatch('data/syncIt', info);
+    async viewSyncOptions(blah) {
+      store.dispatch('syncOptions/viewSyncOptions', blah);
+    },
+    async halt() {
+      store.dispatch('data/setSyncHalt', true);
     },
     newTransfer(stealthMetaAddress = null) {
       store.dispatch('newTransfer/newTransfer', stealthMetaAddress);

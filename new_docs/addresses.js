@@ -125,19 +125,10 @@ const Addresses = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['all'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
+            <b-button size="sm" :disabled="!coinbase" @click="viewSyncOptions" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
-          <div v-if="false && sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['syncBuildTokens', 'syncBuildTokenEvents'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'DEV BUTTON 1'"><b-icon-lightning shift-v="+1" font-scale="1.2"></b-icon-lightning></b-button>
-          </div>
-          <div v-if="false && sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="block == null" @click="syncIt({ sections: ['syncBlocksAndBalances'], parameters: Object.keys(settings.selectedAccounts) })" variant="link" v-b-popover.hover.top="'DEV BUTTON 2'"><b-icon-lightning shift-v="+1" font-scale="1.2"></b-icon-lightning></b-button>
-          </div>
-          <div v-if="false && sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" @click="exportAccounts" variant="link" v-b-popover.hover.top="'Export accounts'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
-          </div>
-          <div v-if="false" class="mt-1" style="width: 200px;">
-            <b-progress v-if="false && sync.section != null" height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+          <div v-if="sync.section != null" class="mt-1" style="width: 200px;">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
@@ -147,6 +138,9 @@ const Addresses = {
             <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
+          </div>
+          <div v-if="false && sync.section == null" class="mt-0 pr-1">
+            <b-button size="sm" @click="exportAccounts" variant="link" v-b-popover.hover.top="'Export accounts'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
           </div>
           <div class="mt-0 pr-1">
             <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -529,11 +523,8 @@ const Addresses = {
           // An error occurred
         })
     },
-    async syncIt(info) {
-      store.dispatch('data/syncIt', info);
-    },
-    async syncItNew(info) {
-      store.dispatch('data/syncItNew', info);
+    async viewSyncOptions(blah) {
+      store.dispatch('syncOptions/viewSyncOptions', blah);
     },
     async halt() {
       store.dispatch('data/setSyncHalt', true);

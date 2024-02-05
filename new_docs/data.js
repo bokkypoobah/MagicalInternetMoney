@@ -635,36 +635,39 @@ const dataModule = {
       }
 
       const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, options };
-      if (options.stealthTransfers) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('syncAnnouncements', parameter);
       }
-      if (options.stealthTransfers) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('syncAnnouncementsData', parameter);
       }
-      if (options.stealthTransfers) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('identifyMyStealthTransfers', parameter);
       }
 
-      if (options.stealthMetaAddressRegistry) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('syncRegistrations', parameter);
       }
-      if (options.stealthMetaAddressRegistry) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('syncRegistrationsData', parameter);
       }
-      if (options.stealthMetaAddressRegistry) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('collateRegistrations', parameter);
       }
 
-      if (options.tokens) {
+      if (options.tokens && !options.devThing) {
         await context.dispatch('syncTokens', parameter);
       }
-      if (options.tokens) {
+      if (options.tokens && !options.devThing) {
         await context.dispatch('collateTokens', parameter);
       }
-      if (options.erc721Metadata) {
+      if (options.erc721Metadata && !options.devThing) {
         await context.dispatch('syncERC721Metadata', parameter);
       }
 
+      if (options.devThing) {
+        console.log("Dev Thing");
+      }
 
       /*
       for (const [sectionIndex, section] of info.sections.entries()) {
