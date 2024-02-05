@@ -112,6 +112,7 @@ const dataModule = {
     tokenContracts: {},
     ensMap: {},
     exchangeRates: {},
+    forceRefresh: 0,
     sync: {
       section: null,
       total: null,
@@ -137,6 +138,7 @@ const dataModule = {
     tokenContracts: state => state.tokenContracts,
     ensMap: state => state.ensMap,
     exchangeRates: state => state.exchangeRates,
+    forceRefresh: state => state.forceRefresh,
     sync: state => state.sync,
     db: state => state.db,
   },
@@ -253,6 +255,10 @@ const dataModule = {
       //   console.log(date + "\t" + exchangeRates[date]);
       // }
       Vue.set(state, 'exchangeRates', exchangeRates);
+    },
+    forceRefresh(state) {
+      Vue.set(state, 'forceRefresh', parseInt(state.forceRefresh) + 1);
+      console.log("forceRefresh: " + state.forceRefresh);
     },
     saveTxTags(state, info) {
       if (!(info.txHash in state.txsInfo)) {
@@ -490,6 +496,7 @@ const dataModule = {
       context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
       context.commit('setSyncSection', { section: null, total: null });
       context.commit('setSyncHalt', false);
+      context.commit('forceRefresh');
     },
     async syncAnnouncements(context, parameter) {
       logInfo("dataModule", "actions.syncAnnouncements BEGIN: " + JSON.stringify(parameter));

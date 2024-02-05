@@ -322,7 +322,7 @@ const ERC721s = {
     },
 
     totalRows() {
-      let result = 0;
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
           result += Object.keys(data.tokenIds).length;
@@ -331,7 +331,7 @@ const ERC721s = {
       return result;
     },
     filteredItems() {
-      const results = [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
           // console.log(address + " => " + JSON.stringify(data, null, 2));

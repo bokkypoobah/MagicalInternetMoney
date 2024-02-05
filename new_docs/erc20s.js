@@ -262,7 +262,7 @@ const ERC20s = {
     },
 
     totalRows() {
-      let result = 0;
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc20") {
           result++;
@@ -271,7 +271,7 @@ const ERC20s = {
       return result;
     },
     filteredItems() {
-      const results = [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc20") {
           results.push({ address, ...data });

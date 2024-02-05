@@ -118,10 +118,10 @@ const Registry = {
     },
 
     totalRegistryEntries() {
-      return Object.keys(this.registry[this.chainId] || {}).length;
+      return Object.keys(this.registry[this.chainId] || {}).length + ((store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0);
     },
     filteredRegistryEntries() {
-      const results = [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [registrant, stealthMetaAddress] of Object.entries(this.registry[this.chainId] || {})) {
         results.push({ registrant, stealthMetaAddress });
       }

@@ -346,7 +346,7 @@ const Addresses = {
       return Object.keys(this.addresses).length;
     },
     filteredAddresses() {
-      const results = [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
       for (const [account, accountData] of Object.entries(this.addresses)) {
         const accountName = accountData.name || null;
