@@ -607,8 +607,8 @@ const dataModule = {
         await context.commit('setState', { name: 'txs', data: info.txs });
       }
     },
-    async syncIt(context, info) {
-      logInfo("dataModule", "actions.syncIt - sections: " + JSON.stringify(info.sections) + ", parameters: " + JSON.stringify(info.parameters).substring(0, 1000));
+    async syncIt(context, options) {
+      logInfo("dataModule", "actions.syncIt - options: " + JSON.stringify(options, null, 2));
       // const db = new Dexie(context.state.db.name);
       // db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -637,9 +637,42 @@ const dataModule = {
         context.commit('addNewAddress', { action: "addCoinbase" });
       }
 
+      const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, options };
+      if (options.stealthTransfers) {
+        await context.dispatch('syncAnnouncements', parameter);
+      }
+      if (options.stealthTransfers) {
+        await context.dispatch('syncAnnouncementsData', parameter);
+      }
+      if (options.stealthTransfers) {
+        await context.dispatch('identifyMyStealthTransfers', parameter);
+      }
+
+      if (options.stealthMetaAddressRegistry) {
+        await context.dispatch('syncRegistrations', parameter);
+      }
+      if (options.stealthMetaAddressRegistry) {
+        await context.dispatch('syncRegistrationsData', parameter);
+      }
+      if (options.stealthMetaAddressRegistry) {
+        await context.dispatch('collateRegistrations', parameter);
+      }
+
+      if (options.tokens) {
+        await context.dispatch('syncTokens', parameter);
+      }
+      if (options.tokens) {
+        await context.dispatch('collateTokens', parameter);
+      }
+      if (options.erc721Metadata) {
+        await context.dispatch('syncERC721Metadata', parameter);
+      }
+
+
+      /*
       for (const [sectionIndex, section] of info.sections.entries()) {
         logInfo("dataModule", "actions.syncIt: " + sectionIndex + "." + section);
-        const parameter = { chainId, coinbase, /*accountsToSync,*/ blockNumber, confirmations, /*confirmedBlockNumber, confirmedTimestamp, etherscanAPIKey,*/ cryptoCompareAPIKey/*, etherscanBatchSize, OVERLAPBLOCKS, processFilters*/ };
+        const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey };
 
         if (section == "syncAnnouncements" || section == "all") {
           await context.dispatch('syncAnnouncements', parameter);
@@ -671,38 +704,6 @@ const dataModule = {
         if (section == "syncERC721Metadata" || section == "xall") {
           await context.dispatch('syncERC721Metadata', parameter);
         }
-
-        // if (section == "syncTransferEvents" || section == "all") {
-        //   await context.dispatch('syncTransferEvents', parameter);
-        // }
-        // if (section == "syncImportInternalTransactions" || section == "all") {
-        //   await context.dispatch('syncImportInternalTransactions', parameter);
-        // }
-        // if (section == "syncImportTransactions" || section == "all") {
-        //   await context.dispatch('syncImportTransactions', parameter);
-        // }
-        // if (section == "syncBlocksAndBalances" || section == "all") {
-        //   await context.dispatch('syncBlocksAndBalances', parameter);
-        // }
-        // if (section == "syncTransactions" || section == "all") {
-        //   await context.dispatch('syncTransactions', parameter);
-        // }
-        // if (section == "syncFunctionSelectors" || section == "all") {
-        //   await context.dispatch('syncFunctionSelectors', parameter);
-        // }
-        // if (section == "syncEventSelectors" || section == "all") {
-        //   await context.dispatch('syncEventSelectors', parameter);
-        // }
-        // if (section == "syncBuildTokenContractsAndAccounts" || section == "all") {
-        //   await context.dispatch('syncBuildTokenContractsAndAccounts', parameter);
-        // }
-        // if (section == "syncBuildTokens" || section == "all") {
-        //   await context.dispatch('syncBuildTokens', parameter);
-        // }
-        // if (section == "syncBuildTokenEvents" || section == "all") {
-        //   await context.dispatch('syncBuildTokenEvents', parameter);
-        // }
-
         // if (section == "syncImportExchangeRates" || section == "all") {
         //   await context.dispatch('syncImportExchangeRates', parameter);
         // }
@@ -710,6 +711,7 @@ const dataModule = {
         //   await context.dispatch('syncRefreshENS', parameter);
         // }
       }
+      */
       context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
       context.commit('setSyncSection', { section: null, total: null });
       context.commit('setSyncHalt', false);

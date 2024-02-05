@@ -9,23 +9,12 @@ const SyncOptions = {
         <b-form-checkbox size="sm" switch :disabled="chainId != 1 && chainId != 11155111" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Tokens and ERC-721 Non-Fungible Tokens'" class="ml-2 mt-1">Fungible and Non-Fungible Tokens</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="chainId != 1 && chainId != 11155111" v-model="settings.erc721Metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Non-Fungible Token Metadata</b-form-checkbox>
 
-        <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names on Mainnet</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names on Mainnet</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
 
-
-        <b-form-checkbox size="sm" switch v-model="settings.incrementalSync" @input="saveSettings" v-b-popover.hover="'Incremental Sync or Full Sync'" class="ml-2 mt-1">Incremental Sync</b-form-checkbox>
+        <b-form-checkbox size="sm" switch v-model="settings.incrementalSync" @input="saveSettings" v-b-popover.hover="'Incremental sync or resync all events'" class="ml-2 mt-1">Incremental Sync</b-form-checkbox>
         <b-form-checkbox size="sm" switch v-model="settings.devThing" @input="saveSettings" v-b-popover.hover="'Do Some Dev Thing'" class="ml-2 mt-1">Dev Thing</b-form-checkbox>
-
-        <!--
-        <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.transfers" @input="saveSettings" class="ml-2 mt-1">Stealth Address transfer announcements</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.directory" @input="saveSettings" class="ml-2 mt-1">Stealth Address Registry registrations</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.tokens" @input="saveSettings" class="ml-2 mt-1">ERC-20 & ERC-721 transfers for my address set</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="chainId != 11155111 || !settings.sync.tokens" v-model="settings.sync.rescanTokens" @input="saveSettings" class="ml-2 mt-1">Full ERC-20 & ERC-721 rescan, after my address set changes</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.sync.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names in Mainnet</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.sync.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances for my addresses</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="chainId != 11155111" v-model="settings.sync.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange rates</b-form-checkbox>
-        -->
 
         <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" id="sync-go" @click="syncNow()" variant="primary">Do It!</b-button>
@@ -76,15 +65,22 @@ const SyncOptions = {
       logInfo("SyncOptions", "methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.syncOptionsSettings = JSON.stringify(this.settings);
     },
-    setShow(show) {
-      store.dispatch('newTransfer/setShow', show);
-    },
+    // setShow(show) {
+    //   store.dispatch('newTransfer/setShow', show);
+    // },
     syncNow() {
-      store.dispatch('data/syncIt', { sections: ['all'], parameters: [] });
-    },
-
-    async syncIt(info) {
-      store.dispatch('data/syncIt', info);
+      store.dispatch('data/syncIt', {
+        stealthTransfers: this.settings.stealthTransfers,
+        stealthMetaAddressRegistry: this.settings.stealthMetaAddressRegistry,
+        tokens: this.settings.tokens,
+        erc721Metadata: this.settings.erc721Metadata,
+        ens: this.settings.ens,
+        balances: this.settings.balances,
+        exchangeRates: this.settings.exchangeRates,
+        incrementalSync: this.settings.incrementalSync,
+        devThing: this.settings.devThing,
+      });
+      store.dispatch('syncOptions/setShow', false);
     },
   },
   mounted() {
