@@ -42,7 +42,7 @@ const ERC20s = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedItems.length + '/' + totalRows }}</font>
+            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedItems.length + '/' + totalERC20Contracts }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -261,7 +261,7 @@ const ERC20s = {
       return results;
     },
 
-    totalRows() {
+    totalERC20Contracts() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc20") {

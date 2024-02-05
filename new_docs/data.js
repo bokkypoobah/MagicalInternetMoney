@@ -5,28 +5,28 @@ const Data = {
     <b-collapse id="data-module" visible class="my-2">
       <b-card no-body class="border-0">
         <b-row>
-          <b-col cols="4" class="small">Addresses</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(addresses).length }}</b-col>
+          <b-col cols="5" class="small text-right">Addresses:</b-col>
+          <b-col class="small truncate" cols="7">{{ Object.keys(addresses).length }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="4" class="small">Registry</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(registry[chainId] || {}).length }}</b-col>
+          <b-col cols="5" class="small text-right">ERC-20 Contracts:</b-col>
+          <b-col class="small truncate" cols="7">{{ totalERC20Contracts }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="4" class="small">Transfers</b-col>
-          <b-col class="small truncate" cols="8">{{ transfers.length }}</b-col>
+          <b-col cols="5" class="small text-right">ERC-721 Tokens:</b-col>
+          <b-col class="small truncate" cols="7">{{ totalERC721Tokens }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="4" class="small">Token Contracts</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(tokenContracts[chainId] || {}).length }}</b-col>
+          <b-col cols="5" class="small text-right">Registry:</b-col>
+          <b-col class="small truncate" cols="7">{{ Object.keys(registry[chainId] || {}).length }}</b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="5" class="small text-right">Stealth Transfers:</b-col>
+          <b-col class="small truncate" cols="7">{{ totalTransfers }}</b-col>
         </b-row>
         <!-- <b-row>
-          <b-col cols="4" class="small">Assets</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(assets).length }}</b-col>
-        </b-row> -->
-        <!-- <b-row>
-          <b-col cols="4" class="small">ENS Map</b-col>
-          <b-col class="small truncate" cols="8">{{ Object.keys(ensMap).length }}</b-col>
+          <b-col cols="5" class="small">ENS Map</b-col>
+          <b-col class="small truncate" cols="7">{{ Object.keys(ensMap).length }}</b-col>
         </b-row> -->
       </b-card>
     </b-collapse>
@@ -62,6 +62,33 @@ const Data = {
     },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
+    },
+    totalTransfers() {
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
+      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+        for (const [logIndex, item] of Object.entries(logIndexes)) {
+          result++;
+        }
+      }
+      return result;
+    },
+    totalERC20Contracts() {
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
+      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+        if (data.type == "erc20") {
+          result++;
+        }
+      }
+      return result;
+    },
+    totalERC721Tokens() {
+      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
+      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+        if (data.type == "erc721") {
+          result += Object.keys(data.tokenIds).length;
+        }
+      }
+      return result;
     },
     // mappings() {
     //   return store.getters['data/mappings'];

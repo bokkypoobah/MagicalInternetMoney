@@ -13,15 +13,16 @@ const Connection = {
       <b-collapse id="connection" visible class="mt-2">
         <b-card no-body class="border-0" v-if="connected">
           <b-row>
-            <b-col cols="4" class="small">Block</b-col>
-            <b-col class="small truncate" cols="8" >
+            <b-col cols="5" class="small text-right">Block:</b-col>
+            <b-col class="small truncate" cols="7" >
               <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerBlockPrefix + blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
             </b-col>
           </b-row>
           <b-row>
-            <b-col cols="4" class="small">Attached Address</b-col>
-            <b-col class="small truncate" cols="8">
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link><span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span>
+            <b-col cols="5" class="small text-right">Coinbase:</b-col>
+            <b-col class="small truncate" cols="7">
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
+              <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
             </b-col>
           </b-row>
           <!-- <b-row>

@@ -42,7 +42,7 @@ const ERC721s = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedItems.length + '/' + totalRows }}</font>
+            <font size="-2" v-b-popover.hover.top="'# tokens'">{{ filteredSortedItems.length + '/' + totalERC721Tokens }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -321,7 +321,7 @@ const ERC721s = {
       return results;
     },
 
-    totalRows() {
+    totalERC721Tokens() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
