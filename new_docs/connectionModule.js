@@ -9,25 +9,25 @@ const Connection = {
           Please use the <b-link href="https://metamask.io" target="_blank">MetaMask</b-link> addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser to view this page
         </b-card-text>
       </b-card>
-      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ chainId }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
+      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ chainInfo[chainId] && chainInfo[chainId].name || ("Chain Id: " + chainId) }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
       <b-collapse id="connection" visible class="mt-2">
         <b-card no-body class="border-0" v-if="connected">
-          <!-- <b-row>
+          <b-row>
             <b-col cols="4" class="small">Block</b-col>
             <b-col class="small truncate" cols="8" >
-              <b-link :href="network.explorer + 'block/' + blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerBlockPrefix + blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
             </b-col>
-          </b-row> -->
-          <!-- <b-row>
-            <b-col cols="4" class="small">Coinbase</b-col>
+          </b-row>
+          <b-row>
+            <b-col cols="4" class="small">Attached Address</b-col>
             <b-col class="small truncate" cols="8">
-              <b-link :href="network.explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 20) + '...') }}</b-link><span class="float-right"><b-link v-b-popover.hover="'View on OpenSea.io'" :href="network.opensea + 'accounts/'+ coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span>
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link><span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span>
             </b-col>
-          </b-row> -->
+          </b-row>
           <!-- <b-row>
             <b-col cols="4" class="small">ETH Balance</b-col>
             <b-col class="small truncate" cols="8">
-              <b-link :href="network.explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ formatETH(balance) }}</b-link>
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ formatETH(balance) }}</b-link>
             </b-col>
           </b-row> -->
           <b-row v-show="Object.keys(txs).length">
@@ -81,6 +81,9 @@ const Connection = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    chainInfo() {
+      return store.getters['config/chainInfo'];
     },
     coinbase() {
       return store.getters['connection/coinbase'];
@@ -150,11 +153,15 @@ const Connection = {
         }
         if (this.connected && !this.listenersInstalled) {
           logInfo("Connection", "execWeb3() Installing listeners");
-          function handleChainChanged(_chainId) {
+          async function handleChainChanged(_chainId) {
             logInfo("Connection", "execWeb3() handleChainChanged: " + JSON.stringify(_chainId));
             // alert('Ethereum chain has changed - reloading this page.')
             // window.location.reload();
             store.dispatch('connection/setChainId', parseInt(_chainId));
+            // const signer = provider.getSigner();
+            // const coinbase = await signer.getAddress();
+            // const balance = await provider.getBalance(coinbase);
+            // store.dispatch('connection/setBalance', balance);
           }
           window.ethereum.on('chainChanged', handleChainChanged);
 
@@ -164,6 +171,8 @@ const Connection = {
             const signer = provider.getSigner();
             const coinbase = await signer.getAddress();
             store.dispatch('connection/setCoinbase', coinbase);
+            const balance = await provider.getBalance(coinbase);
+            store.dispatch('connection/setBalance', balance);
             t.refreshNow = true;
           }
           window.ethereum.on('accountsChanged', handleAccountsChanged);

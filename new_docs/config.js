@@ -433,6 +433,7 @@ const configModule = {
         explorerTxPrefix: "https://etherscan.io/tx/",
         explorerBlockPrefix: "https://etherscan.io/block/",
         nftTokenPrefix: "https://opensea.io/assets/ethereum/",
+        nftAccountPrefix: "https://opensea.io/",
       },
       "11155111": {
         name: "Sepolia Testnet",
@@ -442,6 +443,7 @@ const configModule = {
         explorerTxPrefix: "https://sepolia.etherscan.io/tx/",
         explorerBlockPrefix: "https://sepolia.etherscan.io/block/",
         nftTokenPrefix: "https://testnets.opensea.io/assets/sepolia/",
+        nftAccountPrefix: "https://testnets.opensea.io/",
       },
     },
     processPeriods: [
