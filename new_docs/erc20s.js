@@ -58,7 +58,9 @@ const ERC20s = {
               </b-dropdown-item>
             </b-dropdown>
           </div>
-
+          <div class="mt-0 pr-1">
+            <b-button size="sm" :pressed.sync="settings.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.95" variant="danger"></b-icon></b-button>
+          </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
@@ -221,6 +223,7 @@ const ERC20s = {
       settings: {
         filter: null,
         junkFilter: null,
+        favouritesOnly: false,
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
@@ -326,9 +329,18 @@ const ERC20s = {
       }
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc20") {
-          // console.log(address + " => " + JSON.stringify(data, null, 2));
           let include = true;
-          if (regex) {
+          if (this.settings.junkFilter) {
+            if (this.settings.junkFilter == 'junk' && !data.junk) {
+              include = false;
+            } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
+              include = false;
+            }
+          }
+          if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
+            include = false;
+          }
+          if (include && regex) {
             if (!(regex.test(data.symbol) || regex.test(data.name) || regex.test(address))) {
               include = false;
             }
