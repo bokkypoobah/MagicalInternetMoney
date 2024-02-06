@@ -19,7 +19,7 @@ const Connection = {
             </b-col>
           </b-row>
           <b-row>
-            <b-col cols="5" class="small text-right">Coinbase:</b-col>
+            <b-col cols="5" v-b-popover.hover="'Your Web3 attached account'" class="small text-right">Coinbase:</b-col>
             <b-col class="small truncate" cols="7">
               <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
               <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
