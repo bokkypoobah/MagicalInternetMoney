@@ -101,23 +101,6 @@ const ERC721s = {
           </div>
         </div>
 
-<!--
-        address,
-        favourite: data.favourite,
-        collectionSymbol: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS" : data.symbol,
-        collectionName: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service" : data.name,
-        totalSupply: data.totalSupply,
-        tokenId,
-        owner: tokenData.owner,
-        name: tokenData.metadata && tokenData.metadata.name || null,
-        description: tokenData.metadata && tokenData.metadata.description || null,
-        attributes: tokenData.metadata && tokenData.metadata.attributes || [],
-        imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
-        image: tokenData.metadata && tokenData.metadata.image || null,
-        blockNumber: tokenData.blockNumber,
-        logIndex: tokenData.logIndex,
- -->
-
         <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
@@ -158,9 +141,12 @@ const ERC721s = {
               </span>
             </b-link>
             <br />
+
             <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
               <font size="-1">{{ data.item.collectionName }}</font>
             </b-link>
+            <b-button size="sm" @click="toggleTokenContractJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
           <template #cell(attributes)="data">
@@ -390,6 +376,7 @@ const ERC721s = {
             // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             results.push({
               address,
+              junk: data.junk,
               favourite: data.favourite,
               collectionSymbol: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS" : data.symbol,
               collectionName: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service" : data.name,
@@ -460,15 +447,13 @@ const ERC721s = {
       }
     },
 
+    toggleTokenContractJunk(item) {
+      logInfo("ERC721s", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleTokenContractJunk', item);
+    },
     toggleTokenContractFavourite(item) {
-      // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
       logInfo("ERC721s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
-      // if (item && item.contract) {
-        // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
-        // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-        // localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
-      // }
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);

@@ -388,7 +388,7 @@ const dataModule = {
       await context.dispatch('saveData', ['tokenContracts']);
     },
     async toggleTokenContractJunk(context, tokenContract) {
-      // logInfo("dataModule", "actions.toggleTokenContractJunk - info: " + JSON.stringify(info));
+      logInfo("dataModule", "actions.toggleTokenContractJunk - tokenContract: " + JSON.stringify(tokenContract));
       await context.commit('toggleTokenContractJunk', tokenContract);
       await context.dispatch('saveData', ['tokenContracts']);
     },
@@ -896,6 +896,7 @@ const dataModule = {
                   },
                   source: "announcer",
                   mine: true,
+                  junk: false,
                   favourite: false,
                   name: null,
                   notes: null,

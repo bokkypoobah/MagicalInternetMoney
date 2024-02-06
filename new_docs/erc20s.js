@@ -402,25 +402,13 @@ const ERC20s = {
       }
     },
 
-    toggleTokenContractFavourite(item) {
-      // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
-      logInfo("ERC20s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleTokenContractFavourite', item);
-      // if (item && item.contract) {
-        // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
-        // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-        // localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
-      // }
-    },
     toggleTokenContractJunk(item) {
-      // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
       logInfo("ERC20s", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractJunk', item);
-      // if (item && item.contract) {
-        // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
-        // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
-        // localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
-      // }
+    },
+    toggleTokenContractFavourite(item) {
+      logInfo("ERC20s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleTokenContractFavourite', item);
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
