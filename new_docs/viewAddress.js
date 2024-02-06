@@ -298,17 +298,17 @@ const ViewAddress = {
   },
   mounted() {
     logDebug("ViewAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
-    store.dispatch('data/restoreState');
+    // store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
-        this.settings.currentPage = 1;
+        // this.settings.currentPage = 1;
       }
     }
-    this.reschedule = true;
-    logDebug("ViewAddress", "Calling timeoutCallback()");
-    this.timeoutCallback();
+    // this.reschedule = true;
+    // logDebug("ViewAddress", "Calling timeoutCallback()");
+    // this.timeoutCallback();
   },
   destroyed() {
     this.reschedule = false;
