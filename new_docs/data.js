@@ -133,6 +133,7 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
+    DB_PROCESSING_BATCH_SIZE: 12,
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
     transfers: {},
@@ -742,7 +743,6 @@ const dataModule = {
     },
 
     async syncAnnouncementsData(context, parameter) {
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.syncAnnouncementsData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -750,10 +750,10 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       const total = rows;
       logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
@@ -762,7 +762,7 @@ const dataModule = {
       // this.sync.section = 'Announcements Tx Data';
       rows = 0;
       do {
-        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
@@ -804,7 +804,7 @@ const dataModule = {
         }
         rows = parseInt(rows) + data.length;
         // this.sync.completed = rows;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
       logInfo("dataModule", "actions.syncAnnouncementsData END");
@@ -825,7 +825,6 @@ const dataModule = {
         return result;
       }
 
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.identifyMyStealthTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -845,7 +844,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
@@ -904,7 +903,7 @@ const dataModule = {
           });
         }
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       // rows = 0;
       // localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
@@ -916,7 +915,6 @@ const dataModule = {
     },
 
     async collateTransfers(context, parameter) {
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.collateTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -931,7 +929,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId && item.schemeId == 0) {
@@ -951,7 +949,7 @@ const dataModule = {
           }
         }
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       //   done = true;
       } while (!done);
       console.log("transfers AFTER: " + JSON.stringify(transfers, null, 2));
@@ -963,7 +961,6 @@ const dataModule = {
     },
 
     async syncRegistrationsData(context, parameter) {
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.syncRegistrationsData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -971,10 +968,10 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
         // done = true;
       } while (!done);
       const total = rows;
@@ -984,7 +981,7 @@ const dataModule = {
       // this.sync.section = 'Registrations Tx Data';
       rows = 0;
       do {
-        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
@@ -1027,13 +1024,12 @@ const dataModule = {
         }
         rows = parseInt(rows) + data.length;
         // this.sync.completed = rows;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       logInfo("dataModule", "actions.syncRegistrationsData END");
     },
 
     async collateRegistrations(context, parameter) {
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.collateRegistrations: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -1047,7 +1043,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.registrations.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId && item.schemeId == 0) {
@@ -1057,7 +1053,7 @@ const dataModule = {
           }
         }
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
         // done = true;
       } while (!done);
       // console.log("registry AFTER: " + JSON.stringify(registry, null, 2));
@@ -1232,7 +1228,6 @@ const dataModule = {
     },
 
     async collateTokens(context, parameter) {
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.collateTokens: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
@@ -1267,7 +1262,7 @@ const dataModule = {
       let done = false;
       const newTokenContractsMap = {};
       do {
-        let data = await db.tokenEvents.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.tokenEvents.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId) {
@@ -1277,7 +1272,7 @@ const dataModule = {
           }
         }
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       // this.sync.completed = 0;
       const total = Object.keys(newTokenContractsMap).length;
@@ -1286,7 +1281,7 @@ const dataModule = {
       rows = 0;
       done = false;
       do {
-        let data = await db.tokenEvents.offset(rows).limit(DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.tokenEvents.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId) {
@@ -1366,7 +1361,7 @@ const dataModule = {
           }
         }
         rows = parseInt(rows) + data.length;
-        done = data.length < DB_PROCESSING_BATCH_SIZE;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       rows = 0;
       console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
@@ -1377,7 +1372,6 @@ const dataModule = {
 
     async syncERC721Metadata(context, parameter) {
 
-      const DB_PROCESSING_BATCH_SIZE = 123;
       logInfo("dataModule", "actions.syncERC721Metadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
