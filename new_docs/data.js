@@ -240,6 +240,7 @@ const dataModule = {
             type,
             source,
             mine,
+            junk: false,
             favourite: newAccount.favourite,
             name: newAccount.name,
             notes: null,
@@ -254,6 +255,7 @@ const dataModule = {
             viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
             source,
             mine,
+            junk: false,
             favourite: newAccount.favourite,
             name: newAccount.name,
             notes: null,
@@ -1310,6 +1312,7 @@ const dataModule = {
               } catch (e) {
               }
               tokenContracts[item.chainId][item.contract] = {
+                junk: false,
                 favourite: false,
                 symbol: item.contract == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS": (symbol && symbol.trim() || null),
                 name: item.contract == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service": (name && name.trim() || null),
