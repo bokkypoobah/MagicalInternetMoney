@@ -486,7 +486,7 @@ const dataModule = {
         context.commit('addNewAddress', { action: "addCoinbase" });
       }
 
-      const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, options };
+      const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, ...options };
       if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('syncAnnouncements', parameter);
       }
