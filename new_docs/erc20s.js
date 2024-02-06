@@ -11,6 +11,54 @@ const ERC20s = {
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
+          <div class="mt-0 pr-1" style="width: 200px;">
+            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
+          </div>
+
+          <div class="mt-0 pr-1">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover="'Junk filter'">
+              <template #button-content>
+                <span v-if="settings.junkFilter == 'excludejunk'">
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                    <b-icon stacked icon="slash-circle" variant="danger"></b-icon>
+                  </b-iconstack>
+                </span>
+                <span v-else-if="settings.junkFilter == null">
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="circle-fill" variant="warning"></b-icon>
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+                <span v-else>
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+              </template>
+              <b-dropdown-item href="#" @click="settings.junkFilter = 'excludejunk'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  <b-icon stacked icon="slash-circle" variant="danger"></b-icon>
+                </b-iconstack>
+                Exclude Junk
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.junkFilter = null; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="circle-fill" variant="warning"></b-icon>
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                </b-iconstack>
+                Include Junk
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.junkFilter = 'junk'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                </b-iconstack>
+                Junk
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
+
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
@@ -71,7 +119,8 @@ const ERC20s = {
           </template>
 
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+            <b-button size="sm" @click="toggleTokenContractJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
           <template #cell(contract)="data">
@@ -171,6 +220,7 @@ const ERC20s = {
       reschedule: true,
       settings: {
         filter: null,
+        junkFilter: null,
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
@@ -189,18 +239,11 @@ const ERC20s = {
         { value: 'registrantasc', text: '▲ Registrant' },
         { value: 'registrantdsc', text: '▼ Registrant' },
       ],
-      // fields: [
-      //   { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-      //   { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-      //   { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      //   { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      //   { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      // ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 3%;', tdClass: 'text-truncate' },
-        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'firstEventBlockNumber', label: 'First Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -272,9 +315,27 @@ const ERC20s = {
     },
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
+      let regex = null;
+      if (this.settings.filter != null && this.settings.filter.length > 0) {
+        try {
+          regex = new RegExp(this.settings.filter, 'i');
+        } catch (e) {
+          console.log("filteredItems - regex error: " + e.message);
+          regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+        }
+      }
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc20") {
-          results.push({ address, ...data });
+          // console.log(address + " => " + JSON.stringify(data, null, 2));
+          let include = true;
+          if (regex) {
+            if (!(regex.test(data.symbol) || regex.test(data.name) || regex.test(address))) {
+              include = false;
+            }
+          }
+          if (include) {
+            results.push({ address, ...data });
+          }
         }
       }
       return results;
@@ -334,6 +395,16 @@ const ERC20s = {
       // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
       logInfo("ERC20s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
+      // if (item && item.contract) {
+        // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
+        // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
+        // localStorage.magicalInternetMoneyTokenContracts = JSON.stringify(this.tokenContracts);
+      // }
+    },
+    toggleTokenContractJunk(item) {
+      // logInfo("Addresses", "methods.toggleAddressField - account: " + account + ", field: " + field);
+      logInfo("ERC20s", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleTokenContractJunk', item);
       // if (item && item.contract) {
         // Vue.set(this.tokenContracts[this.chainId][item.contract], 'favourite', !this.tokenContracts[this.chainId][item.contract].favourite);
         // Vue.set(this, 'forceRefresh', parseInt(this.forceRefresh) + 1);
