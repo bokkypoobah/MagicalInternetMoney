@@ -61,8 +61,6 @@ const ViewStealthMetaAddress = {
   `,
   data: function () {
     return {
-      count: 0,
-      reschedule: true,
       addressTypeInfo: {
         "address": { variant: "warning", name: "My Address" },
         "stealthAddress": { variant: "dark", name: "My Stealth Address" },
@@ -196,37 +194,18 @@ const ViewStealthMetaAddress = {
           // An error occurred
         })
     },
-    async timeoutCallback() {
-      logDebug("ViewStealthMetaAddress", "timeoutCallback() count: " + this.count);
-
-      this.count++;
-      var t = this;
-      if (this.reschedule) {
-        setTimeout(function() {
-          t.timeoutCallback();
-        }, 15000);
-      }
-    },
   },
   beforeDestroy() {
     logDebug("ViewStealthMetaAddress", "beforeDestroy()");
   },
   mounted() {
     logDebug("ViewStealthMetaAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
-    // store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
-        // this.settings.currentPage = 1;
       }
     }
-    // this.reschedule = true;
-    // logDebug("ViewStealthMetaAddress", "Calling timeoutCallback()");
-    // this.timeoutCallback();
-  },
-  destroyed() {
-    this.reschedule = false;
   },
 };
 

@@ -75,8 +75,6 @@ const ViewToken = {
   `,
   data: function () {
     return {
-      count: 0,
-      reschedule: true,
       stealthPrivateKey: null,
       addressTypeInfo: {
         "address": { variant: "warning", name: "My Address" },
@@ -345,37 +343,18 @@ const ViewToken = {
           // An error occurred
         })
     },
-    async timeoutCallback() {
-      logDebug("ViewToken", "timeoutCallback() count: " + this.count);
-
-      this.count++;
-      var t = this;
-      if (this.reschedule) {
-        setTimeout(function() {
-          t.timeoutCallback();
-        }, 15000);
-      }
-    },
   },
   beforeDestroy() {
     logDebug("ViewToken", "beforeDestroy()");
   },
   mounted() {
     logDebug("ViewToken", "mounted() $route: " + JSON.stringify(this.$route.params));
-    // store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
-        // this.settings.currentPage = 1;
       }
     }
-    // this.reschedule = true;
-    // logDebug("ViewToken", "Calling timeoutCallback()");
-    // this.timeoutCallback();
-  },
-  destroyed() {
-    this.reschedule = false;
   },
 };
 

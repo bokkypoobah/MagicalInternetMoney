@@ -48,8 +48,6 @@ const NewAddress = {
   `,
   data: function () {
     return {
-      count: 0,
-      reschedule: true,
       addressTypeInfo: {
         "address": { variant: "warning", name: "My Address" },
         "stealthAddress": { variant: "dark", name: "My Stealth Address" },
@@ -312,37 +310,18 @@ const NewAddress = {
           // An error occurred
         })
     },
-    async timeoutCallback() {
-      logDebug("NewAddress", "timeoutCallback() count: " + this.count);
-
-      this.count++;
-      var t = this;
-      if (this.reschedule) {
-        setTimeout(function() {
-          t.timeoutCallback();
-        }, 15000);
-      }
-    },
   },
   beforeDestroy() {
     logDebug("NewAddress", "beforeDestroy()");
   },
   mounted() {
     logDebug("NewAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
-    // store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
-        // this.settings.currentPage = 1;
       }
     }
-    // this.reschedule = true;
-    // logDebug("NewAddress", "Calling timeoutCallback()");
-    // this.timeoutCallback();
-  },
-  destroyed() {
-    this.reschedule = false;
   },
 };
 
@@ -351,7 +330,6 @@ const newAddressModule = {
   state: {
     action: 'addCoinbase',
     address: null,
-    // stealthMetaAddress: null,
     linkedToAddress: null,
     phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
     mine: null,
@@ -367,7 +345,6 @@ const newAddressModule = {
   getters: {
     action: state => state.action,
     address: state => state.address,
-    // stealthMetaAddress: state => state.stealthMetaAddress,
     linkedToAddress: state => state.linkedToAddress,
     phrase: state => state.phrase,
     mine: state => state.mine,
@@ -385,7 +362,6 @@ const newAddressModule = {
       logInfo("newAddressModule", "mutations.newAddress - blah: " + blah);
       state.action = 'addCoinbase';
       state.address = null;
-      // state.stealthMetaAddress = null;
       state.linkedToAddress = null;
       state.phrase = "I want to login into my stealth wallet on Ethereum mainnet.";
       state.mine = false;
@@ -481,10 +457,6 @@ const newAddressModule = {
       logInfo("newAddressModule", "actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
-    // async setSource(context, source) {
-    //   logInfo("newAddressModule", "actions.setSource - source: " + source);
-    //   await context.commit('setSource', source);
-    // },
     async setShow(context, show) {
       await context.commit('setShow', show);
     },
