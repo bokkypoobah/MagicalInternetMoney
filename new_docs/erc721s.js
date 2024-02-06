@@ -369,28 +369,48 @@ const ERC721s = {
     },
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
+      let regex = null;
+      if (this.settings.filter != null && this.settings.filter.length > 0) {
+        try {
+          regex = new RegExp(this.settings.filter, 'i');
+        } catch (e) {
+          console.log("filteredItems - regex error: " + e.message);
+          regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+        }
+      }
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.type == "erc721") {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
+          const collectionName = data.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
-            results.push({
-              address,
-              junk: data.junk,
-              favourite: data.favourite,
-              collectionSymbol: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS" : data.symbol,
-              collectionName: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service" : data.name,
-              totalSupply: data.totalSupply,
-              tokenId,
-              owner: tokenData.owner,
-              name: tokenData.metadata && tokenData.metadata.name || null,
-              description: tokenData.metadata && tokenData.metadata.description || null,
-              attributes: tokenData.metadata && tokenData.metadata.attributes || null,
-              imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
-              image: tokenData.metadata && tokenData.metadata.image || null,
-              blockNumber: tokenData.blockNumber,
-              logIndex: tokenData.logIndex,
-            });
+            let include = true;
+            if (include && regex) {
+              const name = tokenData.metadata && tokenData.metadata.name || null;
+              const description = tokenData.metadata && tokenData.metadata.description || null;
+              if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
+                include = false;
+              }
+            }
+            if (include) {
+              results.push({
+                address,
+                junk: data.junk,
+                favourite: data.favourite,
+                collectionSymbol: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS" : data.symbol,
+                collectionName: address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service" : data.name,
+                totalSupply: data.totalSupply,
+                tokenId,
+                owner: tokenData.owner,
+                name: tokenData.metadata && tokenData.metadata.name || null,
+                description: tokenData.metadata && tokenData.metadata.description || null,
+                attributes: tokenData.metadata && tokenData.metadata.attributes || null,
+                imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
+                image: tokenData.metadata && tokenData.metadata.image || null,
+                blockNumber: tokenData.blockNumber,
+                logIndex: tokenData.logIndex,
+              });
+            }
           }
         }
       }
