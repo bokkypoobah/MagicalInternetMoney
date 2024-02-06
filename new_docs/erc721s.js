@@ -11,6 +11,55 @@ const ERC721s = {
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
+          <div class="mt-0 pr-1" style="width: 200px;">
+            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
+          </div>
+          <div class="mt-0 pr-1">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover="'Junk filter'">
+              <template #button-content>
+                <span v-if="settings.junkFilter == 'excludejunk'">
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                    <b-icon stacked icon="slash-circle" variant="danger"></b-icon>
+                  </b-iconstack>
+                </span>
+                <span v-else-if="settings.junkFilter == null">
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="circle-fill" variant="warning"></b-icon>
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+                <span v-else>
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+              </template>
+              <b-dropdown-item href="#" @click="settings.junkFilter = 'excludejunk'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                  <b-icon stacked icon="slash-circle" variant="danger"></b-icon>
+                </b-iconstack>
+                Exclude Junk
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.junkFilter = null; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="circle-fill" variant="warning"></b-icon>
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                </b-iconstack>
+                Include Junk
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.junkFilter = 'junk'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="trash" variant="info" scale="0.75"></b-icon>
+                </b-iconstack>
+                Junk
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
+          <div class="mt-0 pr-1">
+            <b-button size="sm" :pressed.sync="settings.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.bottom="'Show favourited only'"><b-icon :icon="settings.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.95" variant="danger"></b-icon></b-button>
+          </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
@@ -225,6 +274,8 @@ const ERC721s = {
       reschedule: true,
       settings: {
         filter: null,
+        junkFilter: null,
+        favouritesOnly: false,
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
@@ -437,8 +488,8 @@ const ERC721s = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("ERC721s", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.transfersSettings = JSON.stringify(this.settings);
+      logInfo("ERC721s", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.erc721sSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions(blah) {
       store.dispatch('syncOptions/viewSyncOptions', blah);
@@ -547,8 +598,8 @@ const ERC721s = {
   mounted() {
     logDebug("ERC721s", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('transfersSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.transfersSettings);
+    if ('erc721sSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.erc721sSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
