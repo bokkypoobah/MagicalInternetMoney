@@ -213,7 +213,7 @@ const NewTransfer = {
       results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
       for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
         if (data.favourite) {
-          console.log(address + " => " + JSON.stringify(data));
+          // console.log(address + " => " + JSON.stringify(data));
           results.push({ value: address, text: (data.type == "erc20" ? "ERC-20 " : "ERC-721 ") + data.symbol + ' ' + data.name + ' @ ' + address.substring(0, 10) })
         }
       }

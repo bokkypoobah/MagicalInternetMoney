@@ -385,6 +385,16 @@ const ERC721s = {
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             let include = true;
+            if (this.settings.junkFilter) {
+              if (this.settings.junkFilter == 'junk' && !data.junk) {
+                include = false;
+              } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
+                include = false;
+              }
+            }
+            if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
+              include = false;
+            }
             if (include && regex) {
               const name = tokenData.metadata && tokenData.metadata.name || null;
               const description = tokenData.metadata && tokenData.metadata.description || null;
