@@ -136,8 +136,9 @@ const dataModule = {
     DB_PROCESSING_BATCH_SIZE: 12,
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
-    transfers: {},
-    tokenContracts: {},
+    transfers: {}, // ChainId, blockNumber, logIndex => data
+    tokenContracts: {}, // ChainId, tokenContractAddress, tokenId => data
+    tokenMetadata: {}, // ChainId, tokenContractAddress, tokenId => metadata
     ensMap: {},
     exchangeRates: {},
     forceRefresh: 0,
@@ -164,6 +165,7 @@ const dataModule = {
     registry: state => state.registry,
     transfers: state => state.transfers,
     tokenContracts: state => state.tokenContracts,
+    tokenMetadata: state => state.tokenMetadata,
     ensMap: state => state.ensMap,
     exchangeRates: state => state.exchangeRates,
     forceRefresh: state => state.forceRefresh,
@@ -274,13 +276,21 @@ const dataModule = {
     },
     setTokenMetadata(state, info) {
       logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
-      Vue.set(state.tokenContracts[info.chainId][info.address].tokenIds[info.tokenId], 'metadata', {
-        name: info.name,
-        description: info.description,
-        attributes: info.attributes,
-        imageSource: info.imageSource,
-        image: info.image,
-      });
+      if (!(info.chainId in state.tokenMetadata)) {
+        Vue.set(state.tokenMetadata, info.chainId, {});
+      }
+      if (!(info.address in state.tokenMetadata[info.chainId])) {
+        Vue.set(state.tokenMetadata[info.chainId], info.address, {});
+      }
+      if (!(info.tokenId in state.tokenMetadata[info.chainId][info.address])) {
+        Vue.set(state.tokenMetadata[info.chainId][info.address], info.tokenId, {
+          name: info.name,
+          description: info.description,
+          attributes: info.attributes,
+          imageSource: info.imageSource,
+          image: info.image,
+        });
+      }
     },
 
     setExchangeRates(state, exchangeRates) {
@@ -351,7 +361,7 @@ const dataModule = {
       if (Object.keys(context.state.transfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'transfers', 'tokenContracts']) {
+        for (let type of ['addresses', 'registry', 'transfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -361,6 +371,7 @@ const dataModule = {
       }
     },
     async saveData(context, types) {
+      logInfo("dataModule", "actions.saveData - types: " + JSON.stringify(types));
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       for (let type of types) {
@@ -476,13 +487,7 @@ const dataModule = {
       const block = await provider.getBlock();
       const confirmations = store.getters['config/settings'].confirmations && parseInt(store.getters['config/settings'].confirmations) || 10;
       const blockNumber = block && block.number || null;
-      // const confirmedBlockNumber = block && block.number && (block.number - confirmations) || null;
-      // const confirmedBlock = await provider.getBlock(confirmedBlockNumber);
-      // const confirmedTimestamp = confirmedBlock && confirmedBlock.timestamp || null;
-      // const etherscanAPIKey = store.getters['config/settings'].etherscanAPIKey && store.getters['config/settings'].etherscanAPIKey.length > 0 && store.getters['config/settings'].etherscanAPIKey || "YourApiKeyToken";
       const cryptoCompareAPIKey = store.getters['config/settings'].cryptoCompareAPIKey && store.getters['config/settings'].cryptoCompareAPIKey.length > 0 && store.getters['config/settings'].cryptoCompareAPIKey || null;
-      // const etherscanBatchSize = store.getters['config/settings'].etherscanBatchSize && parseInt(store.getters['config/settings'].etherscanBatchSize) || 5_000_000;
-      // const OVERLAPBLOCKS = 10000;
       const processFilters = store.getters['config/processFilters'];
 
       const accountsToSync = [];
@@ -1398,8 +1403,11 @@ const dataModule = {
       for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
         if (data.type == "erc721") {
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            const metadata = tokenData.metadata || null;
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata));
+            const metadata = context.state.tokenMetadata[parameter.chainId] &&
+              context.state.tokenMetadata[parameter.chainId][address] &&
+              context.state.tokenMetadata[parameter.chainId][address][tokenId] ||
+              {};
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata && metadata.name || null));
             if (metadata && metadata.name) {
               completed++;
             }
@@ -1422,10 +1430,22 @@ const dataModule = {
         if (data.type == "erc721" && !context.state.sync.halt /*&& ["0x8FA600364B93C53e0c71C7A33d2adE21f4351da3"].includes(address)*/) {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            if ((!tokenData.metadata || !tokenData.metadata.name) && !context.state.sync.halt) {
+
+            let metadata = context.state.tokenMetadata[parameter.chainId] &&
+              context.state.tokenMetadata[parameter.chainId][address] &&
+              context.state.tokenMetadata[parameter.chainId][address][tokenId] ||
+              null;
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata && metadata.name || null));
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata, null, 2));
+
+            if (!metadata && !context.state.sync.halt) {
               console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
               const contract = new ethers.Contract(address, ERC721ABI, provider);
-              const metadata = tokenData.metadata || {};
+              metadata = {
+                chainId: parameter.chainId,
+                address,
+                tokenId,
+              };
               try {
                 let tokenURIResult;
                 if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
@@ -1442,8 +1462,10 @@ const dataModule = {
                   metadata.attributes = data.attributes || {};
                   metadata.imageSource = "(onchain)";
                   metadata.image = data.image || undefined;
-                  Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
-                  console.log("metadata: " + JSON.stringify(metadata, null, 2));
+                  // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
+                  // console.log("metadata: " + JSON.stringify(metadata, null, 2));
+
+                  context.commit('setTokenMetadata', metadata);
                 }
                 if (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://") {
                   const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
@@ -1464,8 +1486,9 @@ const dataModule = {
                     const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
                     const base64 = await imageUrlToBase64(imageFile);
                     metadata.image = base64 || undefined;
-                    Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
-                    console.log("metadata: " + JSON.stringify(metadata, null, 2));
+                    // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
+                    // console.log("metadata: " + JSON.stringify(metadata, null, 2));
+                    context.commit('setTokenMetadata', metadata);
                   } catch (e1) {
                     console.error(e1.message);
                   }
@@ -1476,7 +1499,7 @@ const dataModule = {
               completed++;
               if (completed % 10 == 0) {
                 context.commit('forceRefresh');
-                await context.dispatch('saveData', ['tokenContracts']);
+                await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
               }
               context.commit('setSyncCompleted', completed);
             }
@@ -1485,7 +1508,7 @@ const dataModule = {
       }
 
       console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
-      await context.dispatch('saveData', ['tokenContracts']);
+      await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
       logInfo("dataModule", "actions.syncERC721Metadata END");
     },
 

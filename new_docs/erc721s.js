@@ -339,6 +339,9 @@ const ERC721s = {
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
+    tokenMetadata() {
+      return store.getters['data/tokenMetadata'];
+    },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
     },
@@ -384,6 +387,12 @@ const ERC721s = {
           const collectionName = data.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+
+            const metadata = this.tokenMetadata[this.chainId] &&
+              this.tokenMetadata[this.chainId][address] &&
+              this.tokenMetadata[this.chainId][address][tokenId] ||
+              {};
+
             let include = true;
             if (this.settings.junkFilter) {
               if (this.settings.junkFilter == 'junk' && !data.junk) {
@@ -396,8 +405,8 @@ const ERC721s = {
               include = false;
             }
             if (include && regex) {
-              const name = tokenData.metadata && tokenData.metadata.name || null;
-              const description = tokenData.metadata && tokenData.metadata.description || null;
+              const name = metadata.name || null;
+              const description = metadata.description || null;
               if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
                 include = false;
               }
@@ -412,11 +421,11 @@ const ERC721s = {
                 totalSupply: data.totalSupply,
                 tokenId,
                 owner: tokenData.owner,
-                name: tokenData.metadata && tokenData.metadata.name || null,
-                description: tokenData.metadata && tokenData.metadata.description || null,
-                attributes: tokenData.metadata && tokenData.metadata.attributes || null,
-                imageSource: tokenData.metadata && tokenData.metadata.imageSource || null,
-                image: tokenData.metadata && tokenData.metadata.image || null,
+                name: metadata.name || null,
+                description: metadata.description || null,
+                attributes: metadata.attributes || null,
+                imageSource: metadata.imageSource || null,
+                image: metadata.image || null,
                 blockNumber: tokenData.blockNumber,
                 logIndex: tokenData.logIndex,
               });
