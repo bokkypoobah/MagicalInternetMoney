@@ -42,9 +42,6 @@ const Data = {
     powerOn() {
       return store.getters['connection/powerOn'];
     },
-    explorer () {
-      return store.getters['connection/explorer'];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
@@ -1507,7 +1504,7 @@ const dataModule = {
         }
       }
 
-      console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
+      // console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
       await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
       logInfo("dataModule", "actions.syncERC721Metadata END");
     },

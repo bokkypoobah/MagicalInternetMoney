@@ -87,9 +87,6 @@ const ViewToken = {
     powerOn() {
       return store.getters['connection/powerOn'];
     },
-    explorer () {
-      return store.getters['connection/explorer'];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
