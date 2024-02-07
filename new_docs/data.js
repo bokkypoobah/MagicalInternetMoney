@@ -5,28 +5,28 @@ const Data = {
     <b-collapse id="data-module" visible class="my-2">
       <b-card no-body class="border-0">
         <b-row>
-          <b-col cols="5" class="small text-right">Addresses:</b-col>
-          <b-col class="small truncate" cols="7">{{ Object.keys(addresses).length }}</b-col>
+          <b-col cols="5" class="small px-1 text-right">Addresses:</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ Object.keys(addresses).length }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="5" class="small text-right">ERC-20 Contracts:</b-col>
-          <b-col class="small truncate" cols="7">{{ totalERC20Contracts }}</b-col>
+          <b-col cols="5" class="small px-1 text-right">ERC-20 Contracts:</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ totalERC20Contracts }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="5" class="small text-right">ERC-721 Tokens:</b-col>
-          <b-col class="small truncate" cols="7">{{ totalERC721Tokens }}</b-col>
+          <b-col cols="5" class="small px-1 text-right">ERC-721 Tokens:</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ totalERC721Tokens }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="5" class="small text-right">Registry:</b-col>
-          <b-col class="small truncate" cols="7">{{ Object.keys(registry[chainId] || {}).length }}</b-col>
+          <b-col cols="5" class="small px-1 text-right">Registry:</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ Object.keys(registry[chainId] || {}).length }}</b-col>
         </b-row>
         <b-row>
-          <b-col cols="5" class="small text-right">Stealth Transfers:</b-col>
-          <b-col class="small truncate" cols="7">{{ totalTransfers }}</b-col>
+          <b-col cols="5" class="small px-1 text-right">Stealth Transfers:</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ totalTransfers }}</b-col>
         </b-row>
         <!-- <b-row>
-          <b-col cols="5" class="small">ENS Map</b-col>
-          <b-col class="small truncate" cols="7">{{ Object.keys(ensMap).length }}</b-col>
+          <b-col cols="5" class="small px-1">ENS Map</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ Object.keys(ensMap).length }}</b-col>
         </b-row> -->
       </b-card>
     </b-collapse>
