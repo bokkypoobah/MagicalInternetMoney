@@ -1473,6 +1473,55 @@ const dataModule = {
                     // metadataFileContent: {
                     //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
                     // }
+                    if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
+                      if (metadataFileContent && metadataFileContent.message) {
+                        console.log("EXPIRED: " + metadataFileContent.message);
+                      }
+
+                      // metadataFileContent: {
+                      //   "is_normalized": true,
+                      //   "name": "mrfahrenheit.eth",
+                      //   "description": "mrfahrenheit.eth, an ENS name.",
+                      //   "attributes": [
+                      //     {
+                      //       "trait_type": "Created Date",
+                      //       "display_type": "date",
+                      //       "value": 1606865196000
+                      //     },
+                      //     {
+                      //       "trait_type": "Length",
+                      //       "display_type": "number",
+                      //       "value": 12
+                      //     },
+                      //     {
+                      //       "trait_type": "Segment Length",
+                      //       "display_type": "number",
+                      //       "value": 12
+                      //     },
+                      //     {
+                      //       "trait_type": "Character Set",
+                      //       "display_type": "string",
+                      //       "value": "letter"
+                      //     },
+                      //     {
+                      //       "trait_type": "Registration Date",
+                      //       "display_type": "date",
+                      //       "value": 1648611636000
+                      //     },
+                      //     {
+                      //       "trait_type": "Expiration Date",
+                      //       "display_type": "date",
+                      //       "value": 3226459236000
+                      //     }
+                      //   ],
+                      //   "url": "https://app.ens.domains/name/mrfahrenheit.eth",
+                      //   "last_request_date": 1707286194502,
+                      //   "version": 0,
+                      //   "background_image": "https://metadata.ens.domains/mainnet/avatar/mrfahrenheit.eth",
+                      //   "image": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image",
+                      //   "image_url": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image"
+                      // }
+                    }
                     metadata.name = metadataFileContent.name || undefined;
                     metadata.description = metadataFileContent.description || undefined;
                     metadata.attributes = metadataFileContent.attributes || [];
@@ -1495,7 +1544,7 @@ const dataModule = {
               }
               completed++;
               if (completed % 10 == 0) {
-                context.commit('forceRefresh');
+                // context.commit('forceRefresh');
                 await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
               }
               context.commit('setSyncCompleted', completed);
