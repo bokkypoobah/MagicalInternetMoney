@@ -1474,12 +1474,19 @@ const dataModule = {
                     // metadataFileContent: {
                     //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
                     // }
+                    let expiredName = null;
                     let expiry = null;
+                    let expired = false;
                     if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
                       if (metadataFileContent && metadataFileContent.message) {
                         console.log("EXPIRED: " + metadataFileContent.message);
-                        const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
-                        expiry = moment.utc(dateString).unix();
+                        // const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
+                        // expiry = moment.utc(dateString).unix();
+                        let inputString;
+                        [inputString, expiredName, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
+                        expiry = moment.utc(expiryString).unix();
+                        console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
+                        expired = true;
                       } else { // if (metadataFileContent && metadataFileContent.attributes) {
                         // console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
                         const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
@@ -1532,17 +1539,21 @@ const dataModule = {
                       //   "image_url": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image"
                       // }
                     }
-                    metadata.name = metadataFileContent.name || undefined;
-                    metadata.description = metadataFileContent.description || undefined;
+                    metadata.name = expired ? expiredName : (metadataFileContent.name || undefined);
+                    metadata.description = expired ? ("Expired " + expiredName) : (metadataFileContent.description || undefined);
                     metadata.expiry = expiry;
-                    metadata.attributes = metadataFileContent.attributes || [];
+                    metadata.attributes = expired ? [] : (metadataFileContent.attributes || []);
                     metadata.attributes.sort((a, b) => {
                       return ('' + a.trait_type).localeCompare(b.trait_type);
                     });
-                    metadata.imageSource = metadataFileContent.image;
-                    const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
-                    const base64 = await imageUrlToBase64(imageFile);
-                    metadata.image = base64 || undefined;
+                    metadata.imageSource = expired ? null : metadataFileContent.image;
+                    if (!expired) {
+                      const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
+                      const base64 = await imageUrlToBase64(imageFile);
+                      metadata.image = base64 || undefined;
+                    } else {
+                      metadata.image = null;
+                    }
                     // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
                     // console.log("metadata: " + JSON.stringify(metadata, null, 2));
                     context.commit('setTokenMetadata', metadata);
