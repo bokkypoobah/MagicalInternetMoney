@@ -450,32 +450,32 @@ const dataModule = {
       console.log("status: " + JSON.stringify(status));
       db0.close();
     },
-    async addNewAddress(context, newAccount) {
-      logInfo("dataModule", "actions.addNewAddress - newAccount: " + JSON.stringify(newAccount, null, 2) + ")");
-      context.commit('addNewAddress', newAccount);
+    async addNewAddress(context, newAddress) {
+      logInfo("dataModule", "actions.addNewAddress - newAddress: " + JSON.stringify(newAddress, null, 2) + ")");
+      context.commit('addNewAddress', newAddress);
       await context.dispatch('saveData', ['addresses']);
     },
-    async restoreAccount(context, addressData) {
-      logInfo("dataModule", "actions.restoreAccount - addressData: " + JSON.stringify(addressData));
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-      const accountInfo = await getAccountInfo(addressData.account, provider)
-      if (accountInfo.account) {
-        context.commit('addNewAddress', accountInfo);
-        context.commit('addNewAccountInfo', addressData);
-      }
-      const names = await ensReverseRecordsContract.getNames([addressData.account]);
-      const name = names.length == 1 ? names[0] : addressData.account;
-      if (!(addressData.account in context.state.ensMap)) {
-        context.commit('addENSName', { account: addressData.account, name });
-      }
-    },
-    async restoreIntermediateData(context, info) {
-      if (info.blocks && info.txs) {
-        await context.commit('setState', { name: 'blocks', data: info.blocks });
-        await context.commit('setState', { name: 'txs', data: info.txs });
-      }
-    },
+    // async restoreAccount(context, addressData) {
+    //   logInfo("dataModule", "actions.restoreAccount - addressData: " + JSON.stringify(addressData));
+    //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+    //   const accountInfo = await getAccountInfo(addressData.account, provider)
+    //   if (accountInfo.account) {
+    //     context.commit('addNewAddress', accountInfo);
+    //     context.commit('addNewAccountInfo', addressData);
+    //   }
+    //   const names = await ensReverseRecordsContract.getNames([addressData.account]);
+    //   const name = names.length == 1 ? names[0] : addressData.account;
+    //   if (!(addressData.account in context.state.ensMap)) {
+    //     context.commit('addENSName', { account: addressData.account, name });
+    //   }
+    // },
+    // async restoreIntermediateData(context, info) {
+    //   if (info.blocks && info.txs) {
+    //     await context.commit('setState', { name: 'blocks', data: info.blocks });
+    //     await context.commit('setState', { name: 'txs', data: info.txs });
+    //   }
+    // },
     async syncIt(context, options) {
       logInfo("dataModule", "actions.syncIt - options: " + JSON.stringify(options, null, 2));
       // const db = new Dexie(context.state.db.name);
