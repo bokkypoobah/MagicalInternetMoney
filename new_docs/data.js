@@ -1328,8 +1328,8 @@ const dataModule = {
               tokenContracts[item.chainId][item.contract] = {
                 junk: false,
                 favourite: false,
-                symbol: item.contract == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "ENS": (symbol && symbol.trim() || null),
-                name: item.contract == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85" ? "Ethereum Name Service": (name && name.trim() || null),
+                symbol: item.contract == ENS_ERC721_ADDRESS ? "ENS": (symbol && symbol.trim() || null),
+                name: item.contract == ENS_ERC721_ADDRESS ? "Ethereum Name Service": (name && name.trim() || null),
                 decimals: parseInt(decimals || 0),
                 totalSupply: totalSupply && totalSupply.toString() || null,
                 type: item.eventType,
@@ -1446,7 +1446,7 @@ const dataModule = {
               };
               try {
                 let tokenURIResult;
-                if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
+                if (address == ENS_ERC721_ADDRESS) {
                   tokenURIResult = "https://metadata.ens.domains/mainnet/" + address + "/" + tokenId;
                 } else {
                   tokenURIResult = await contract.tokenURI(tokenId);
@@ -1477,7 +1477,7 @@ const dataModule = {
                     let expiredName = null;
                     let expiry = null;
                     let expired = false;
-                    if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
+                    if (address == ENS_ERC721_ADDRESS) {
                       if (metadataFileContent && metadataFileContent.message) {
                         console.log("EXPIRED: " + metadataFileContent.message);
                         // const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
