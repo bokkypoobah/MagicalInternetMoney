@@ -149,6 +149,10 @@ const ERC721s = {
             <b-button size="sm" :disabled="data.item.junk" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
+          <template #cell(expiry)="data">
+            {{ formatTimestamp(data.item.expiry) }}
+          </template>
+
           <template #cell(attributes)="data">
             <!-- {{ data.item.attributes }} -->
             <b-row v-for="(attribute, i) in data.item.attributes"  v-bind:key="i" class="m-0 p-0">
@@ -290,8 +294,9 @@ const ERC721s = {
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 45%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -420,6 +425,7 @@ const ERC721s = {
                 owner: tokenData.owner,
                 name: metadata.name || null,
                 description: metadata.description || null,
+                expiry: metadata.expiry || undefined,
                 attributes: metadata.attributes || null,
                 imageSource: metadata.imageSource || null,
                 image: metadata.image || null,
