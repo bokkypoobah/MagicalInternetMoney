@@ -283,6 +283,7 @@ const dataModule = {
         Vue.set(state.tokenMetadata[info.chainId][info.address], info.tokenId, {
           name: info.name,
           description: info.description,
+          expiry: info.expiry || undefined,
           attributes: info.attributes,
           imageSource: info.imageSource,
           image: info.image,
@@ -1473,10 +1474,19 @@ const dataModule = {
                     // metadataFileContent: {
                     //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
                     // }
+                    let expiry = null;
                     if (address == "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85") {
                       if (metadataFileContent && metadataFileContent.message) {
                         console.log("EXPIRED: " + metadataFileContent.message);
+                        const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
+                        expiry = moment.utc(dateString).unix();
+                      } else { // if (metadataFileContent && metadataFileContent.attributes) {
+                        // console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
+                        const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
+                        console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
+                        expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
                       }
+                      console.log("  expiry: " + expiry + " " + moment.utc(expiry * 1000).toString());
 
                       // metadataFileContent: {
                       //   "is_normalized": true,
@@ -1524,6 +1534,7 @@ const dataModule = {
                     }
                     metadata.name = metadataFileContent.name || undefined;
                     metadata.description = metadataFileContent.description || undefined;
+                    metadata.expiry = expiry;
                     metadata.attributes = metadataFileContent.attributes || [];
                     metadata.attributes.sort((a, b) => {
                       return ('' + a.trait_type).localeCompare(b.trait_type);
