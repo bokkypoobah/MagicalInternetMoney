@@ -108,6 +108,9 @@ const ViewToken = {
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
+    tokenMetadata() {
+      return store.getters['data/tokenMetadata'];
+    },
     collectionSymbol() {
       if (this.address) {
         return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].symbol || null;
@@ -120,34 +123,20 @@ const ViewToken = {
       }
       return null;
     },
+    metadata() {
+      return this.address && this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][this.address] && this.tokenMetadata[this.chainId][this.address][this.tokenId] || {};
+    },
     name() {
-      if (this.address) {
-        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.name || null;
-      }
-      return null;
+      return this.metadata && this.metadata.name || null;
     },
     description() {
-      if (this.address) {
-        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.description || null;
-      }
-      return null;
+      return this.metadata && this.metadata.description || null;
     },
     image() {
-      if (this.address) {
-        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.image || null;
-      }
-      return null;
+      return this.metadata && this.metadata.image || null;
     },
-
     attributes() {
-      if (this.address) {
-        // console.log("this.tokenContracts[this.chainId][this.address]: " + JSON.stringify(this.tokenContracts[this.chainId][this.address], null, 2));
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId] && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata && this.tokenContracts[this.chainId][this.address].tokenIds[this.tokenId].metadata.attributes || null;
-      }
-      return null;
+      return this.metadata && this.metadata.attributes || [];
     },
 
     linkedTo() {
