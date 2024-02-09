@@ -301,7 +301,7 @@ const dataModule = {
     },
     forceRefresh(state) {
       Vue.set(state, 'forceRefresh', parseInt(state.forceRefresh) + 1);
-      console.log("forceRefresh: " + state.forceRefresh);
+      logInfo("dataModule", "mutations.forceRefresh: " + state.forceRefresh);
     },
     saveTxTags(state, info) {
       if (!(info.txHash in state.txsInfo)) {
@@ -343,12 +343,12 @@ const dataModule = {
       }
     },
     setSyncSection(state, info) {
-      console.log("setSyncSection: " + JSON.stringify(info));
+      logInfo("dataModule", "mutations.setSyncSection info: " + JSON.stringify(info));
       state.sync.section = info.section;
       state.sync.total = info.total;
     },
     setSyncCompleted(state, completed) {
-      console.log("setSyncCompleted: " + JSON.stringify(completed));
+      logInfo("dataModule", "mutations.setSyncCompleted completed: " + completed);
       state.sync.completed = completed;
     },
     setSyncHalt(state, halt) {
@@ -614,9 +614,9 @@ const dataModule = {
         }
         // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
-          await db.announcements.bulkPut(records).then (function() {
-          }).catch(function(error) {
-            console.log("syncAnnouncements.bulkPut error: " + error);
+          await db.announcements.bulkAdd(records).then (function() {
+          }).catch(Dexie.BulkError, function(e) {
+            console.log("syncAnnouncements.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
@@ -675,32 +675,36 @@ const dataModule = {
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      let rows = 0;
+      let total = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-        rows = parseInt(rows) + data.length;
+        total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      const total = rows;
       logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
       context.commit('setSyncSection', { section: 'Stealth Address Announcement Data', total });
       // this.sync.completed = 0;
       // this.sync.total = rows;
       // this.sync.section = 'Announcements Tx Data';
-      rows = 0;
+      let rows = 0;
       do {
         let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
           // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
+          console.log("DEBUG 1 - item.timestamp: " + item.timestamp + ", item.chainId: " + item.chainId);
           if (item.timestamp == null && item.chainId == parameter.chainId) {
+            console.log("DEBUG 2");
             const block = await provider.getBlock(item.blockNumber);
             item.timestamp = block.timestamp;
+            console.log("DEBUG 3");
             const tx = await provider.getTransaction(item.txHash);
+            console.log("DEBUG 4");
             const txReceipt = await provider.getTransactionReceipt(item.txHash);
+            console.log("DEBUG 5");
             item.tx = {
               type: tx.type,
               blockHash: tx.blockHash,
@@ -725,15 +729,17 @@ const dataModule = {
             records.push(item);
             rows++;
             context.commit('setSyncCompleted', rows);
-
           }
+          console.log("DEBUG 6");
         }
+        console.log("DEBUG 7");
         if (records.length > 0) {
           await db.announcements.bulkPut(records).then (function() {
           }).catch(function(error) {
             console.log("syncAnnouncementsData.bulkPut error: " + error);
           });
         }
+        console.log("DEBUG 8");
         // rows = parseInt(rows) + data.length;
         // context.commit('setSyncCompleted', rows);
         // this.sync.completed = rows;
