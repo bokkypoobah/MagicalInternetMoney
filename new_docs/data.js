@@ -343,10 +343,12 @@ const dataModule = {
       }
     },
     setSyncSection(state, info) {
+      console.log("setSyncSection: " + JSON.stringify(info));
       state.sync.section = info.section;
       state.sync.total = info.total;
     },
     setSyncCompleted(state, completed) {
+      console.log("setSyncCompleted: " + JSON.stringify(completed));
       state.sync.completed = completed;
     },
     setSyncHalt(state, halt) {
@@ -544,6 +546,7 @@ const dataModule = {
       context.commit('setSyncHalt', false);
       context.commit('forceRefresh');
     },
+
     async syncAnnouncements(context, parameter) {
       logInfo("dataModule", "actions.syncAnnouncements BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
@@ -557,6 +560,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
         total = parseInt(total) + logs.length;
+        context.commit('setSyncCompleted', total);
 
         logInfo("dataModule", "actions.syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
@@ -638,6 +642,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncAnnouncements BEGIN");
+      context.commit('setSyncSection', { section: 'Stealth Address Announcements', total: 0 });
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'Stealth Address Announcements';
@@ -658,103 +663,11 @@ const dataModule = {
         const deleteCall = await db.announcements.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
         // console.log("latest: " + JSON.stringify(latest, null, 2));
-        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         // const startBlock = 0;
         await getLogs(startBlock, parameter.blockNumber, selectedContracts, selectedCallers, processLogs);
       // }
       logInfo("dataModule", "actions.syncAnnouncements END");
-    },
-
-    async syncRegistrations(context, parameter) {
-      logInfo("dataModule", "actions.syncRegistrations BEGIN: " + JSON.stringify(parameter));
-      const db = new Dexie(context.state.db.name);
-      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-      // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
-      // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-      // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
-      // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-      // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
-      const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
-      let total = 0;
-      let t = this;
-      async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
-        total = parseInt(total) + logs.length;
-        logInfo("dataModule", "actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
-        const records = [];
-        for (const log of logs) {
-          if (!log.removed) {
-            const logData = erc5564RegistryContract.interface.parseLog(log);
-            const contract = log.address;
-            // if (selectedContracts.includes(contract)) {
-              records.push( {
-                chainId: parameter.chainId,
-                blockNumber: parseInt(log.blockNumber),
-                logIndex: parseInt(log.logIndex),
-                txIndex: parseInt(log.transactionIndex),
-                txHash: log.transactionHash,
-                contract,
-                name: logData.name,
-                registrant: ethers.utils.getAddress(logData.args[0]),
-                schemeId: parseInt(logData.args[1]),
-                stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                mine: false,
-                confirmations: parameter.blockNumber - log.blockNumber,
-                timestamp: null,
-                tx: null,
-              });
-            // }
-          }
-        }
-        if (records.length) {
-          await db.registrations.bulkPut(records).then (function() {
-          }).catch(function(error) {
-            console.log("syncRegistrations.bulkPut error: " + error);
-          });
-        }
-      }
-      async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
-        logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
-        try {
-          const filter = {
-            address: null,
-            fromBlock,
-            toBlock,
-            topics: [
-              '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
-              null,
-              null
-            ]
-          };
-          const eventLogs = await provider.getLogs(filter);
-          await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
-        } catch (e) {
-          const mid = parseInt((fromBlock + toBlock) / 2);
-          await getLogs(fromBlock, mid, selectedContracts, processLogs);
-          await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
-        }
-      }
-      logInfo("dataModule", "actions.syncRegistrations BEGIN");
-      // this.sync.completed = 0;
-      // this.sync.total = 0;
-      // this.sync.section = 'Stealth Address Registry';
-      const selectedContracts = [];
-      // for (const [chainId, chainData] of Object.entries(this.contracts)) {
-      //   for (const [contract, contractData] of Object.entries(chainData)) {
-      //     if (contractData.type == "registry" && contractData.read) {
-      //       selectedContracts.push(contract);
-      //     }
-      //   }
-      // }
-      // if (selectedContracts.length > 0) {
-        const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
-        const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        // const startBlock = 0;
-        await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
-      // }
-      logInfo("dataModule", "actions.syncRegistrations END");
     },
 
     async syncAnnouncementsData(context, parameter) {
@@ -772,6 +685,7 @@ const dataModule = {
       } while (!done);
       const total = rows;
       logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
+      context.commit('setSyncSection', { section: 'Stealth Address Announcement Data', total });
       // this.sync.completed = 0;
       // this.sync.total = rows;
       // this.sync.section = 'Announcements Tx Data';
@@ -809,6 +723,9 @@ const dataModule = {
               type: txReceipt.type,
             };
             records.push(item);
+            rows++;
+            context.commit('setSyncCompleted', rows);
+
           }
         }
         if (records.length > 0) {
@@ -817,7 +734,8 @@ const dataModule = {
             console.log("syncAnnouncementsData.bulkPut error: " + error);
           });
         }
-        rows = parseInt(rows) + data.length;
+        // rows = parseInt(rows) + data.length;
+        // context.commit('setSyncCompleted', rows);
         // this.sync.completed = rows;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
@@ -854,13 +772,13 @@ const dataModule = {
           checkAddresses.push({ address, ...addressData });
         }
       }
-      console.log(moment().format("HH:mm:ss") + " processData - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
+      console.log(moment().format("HH:mm:ss") + " actions.identifyMyStealthTransfers - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
       let rows = 0;
       let done = false;
       do {
         let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " processData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(moment().format("HH:mm:ss") + " actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
           const sender = item.tx && item.tx.from || null;
@@ -974,6 +892,98 @@ const dataModule = {
       // console.log("context.state.transfers: " + JSON.stringify(context.state.transfers, null, 2));
       await context.dispatch('saveData', ['transfers']);
       logInfo("dataModule", "actions.collateTransfers END");
+    },
+
+    async syncRegistrations(context, parameter) {
+      logInfo("dataModule", "actions.syncRegistrations BEGIN: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+      // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
+      // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+      // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
+      // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+      // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
+      const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+      let total = 0;
+      let t = this;
+      async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
+        total = parseInt(total) + logs.length;
+        logInfo("dataModule", "actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        const records = [];
+        for (const log of logs) {
+          if (!log.removed) {
+            const logData = erc5564RegistryContract.interface.parseLog(log);
+            const contract = log.address;
+            // if (selectedContracts.includes(contract)) {
+              records.push( {
+                chainId: parameter.chainId,
+                blockNumber: parseInt(log.blockNumber),
+                logIndex: parseInt(log.logIndex),
+                txIndex: parseInt(log.transactionIndex),
+                txHash: log.transactionHash,
+                contract,
+                name: logData.name,
+                registrant: ethers.utils.getAddress(logData.args[0]),
+                schemeId: parseInt(logData.args[1]),
+                stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                mine: false,
+                confirmations: parameter.blockNumber - log.blockNumber,
+                timestamp: null,
+                tx: null,
+              });
+            // }
+          }
+        }
+        if (records.length) {
+          await db.registrations.bulkPut(records).then (function() {
+          }).catch(function(error) {
+            console.log("syncRegistrations.bulkPut error: " + error);
+          });
+        }
+      }
+      async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
+        logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
+        try {
+          const filter = {
+            address: null,
+            fromBlock,
+            toBlock,
+            topics: [
+              '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
+              null,
+              null
+            ]
+          };
+          const eventLogs = await provider.getLogs(filter);
+          await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
+        } catch (e) {
+          const mid = parseInt((fromBlock + toBlock) / 2);
+          await getLogs(fromBlock, mid, selectedContracts, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
+        }
+      }
+      logInfo("dataModule", "actions.syncRegistrations BEGIN");
+      // this.sync.completed = 0;
+      // this.sync.total = 0;
+      // this.sync.section = 'Stealth Address Registry';
+      const selectedContracts = [];
+      // for (const [chainId, chainData] of Object.entries(this.contracts)) {
+      //   for (const [contract, contractData] of Object.entries(chainData)) {
+      //     if (contractData.type == "registry" && contractData.read) {
+      //       selectedContracts.push(contract);
+      //     }
+      //   }
+      // }
+      // if (selectedContracts.length > 0) {
+        const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
+        const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
+        // const startBlock = 0;
+        await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
+      // }
+      logInfo("dataModule", "actions.syncRegistrations END");
     },
 
     async syncRegistrationsData(context, parameter) {
