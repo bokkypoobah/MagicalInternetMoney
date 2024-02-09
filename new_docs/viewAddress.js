@@ -249,11 +249,14 @@ const ViewAddress = {
     },
     formatTimestamp(ts) {
       if (ts != null) {
-        // if (this.settings.reportingDateTime == 1) {
+        if (ts > 1000000000000n) {
+          ts = ts / 1000;
+        }
+        if (store.getters['config/settings'].reportingDateTime) {
           return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
-        // } else {
-        //   return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
-        // }
+        } else {
+          return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+        }
       }
       return null;
     },
