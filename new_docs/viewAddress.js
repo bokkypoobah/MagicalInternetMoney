@@ -52,7 +52,6 @@ const ViewAddress = {
           </b-row>
           <b-row v-for="(item, index) of stealthTransfers" v-bind:key="item.txHash" class="px-2">
             <b-col cols="4" class="px-0 mt-1">
-              <!-- {{ formatTimestamp(item.timestamp) }} -->
               <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
                 {{ formatTimestamp(item.timestamp) }}
               </b-button>
