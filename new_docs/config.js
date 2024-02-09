@@ -5,7 +5,7 @@ const Config = {
         <b-card no-body no-header bg-variant="light" class="m-1 p-1 w-75">
           <b-card-body class="m-1 p-1">
             <b-form-group label-cols-lg="2" label="Date & Time" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Used in https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000'" class="mx-0 my-1 p-0">
+              <b-form-group label="Local or UTC Time:" label-for="reporting-datetime" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-form-select size="sm" id="reporting-datetime" :value="settings.reportingDateTime" @change="setReportingDateTime($event)" :options="reportingDateTimeOptions" class="w-25"></b-form-select>
               </b-form-group>
             </b-form-group>
