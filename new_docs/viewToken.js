@@ -302,18 +302,27 @@ const ViewToken = {
         attributes.sort((a, b) => {
           return ('' + a.trait_type).localeCompare(b.trait_type);
         });
+        const address = ethers.utils.getAddress(tokenData.contract);
+        let expiry = undefined;
+        if (address == ENS_ERC721_ADDRESS) {
+          const expiryRecord = attributes.filter(e => e.trait_type == "Expiration Date");
+          console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
+          expiry = expiryRecord.length == 1 && expiryRecord[0].value || null;
+        }
         const metadata = {
           chainId: tokenData.chainId,
-          address: ethers.utils.getAddress(tokenData.contract),
+          address,
           tokenId: tokenData.tokenId,
           name: tokenData.name,
           description: tokenData.description,
+          expiry,
           attributes,
           imageSource: tokenData.image,
           image: base64,
         };
         console.log("metadata: " + JSON.stringify(metadata, null, 2));
         store.dispatch('data/setTokenMetadata', metadata);
+        store.dispatch('data/saveData', ['tokenMetadata']);
       }
     },
 
