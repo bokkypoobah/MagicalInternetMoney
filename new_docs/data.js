@@ -614,7 +614,8 @@ const dataModule = {
         }
         // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
-          await db.announcements.bulkAdd(records).then (function() {
+          await db.announcements.bulkAdd(records).then (function(lastKey) {
+            console.log("syncAnnouncements.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
             console.log("syncAnnouncements.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
