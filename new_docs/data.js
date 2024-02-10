@@ -480,7 +480,7 @@ const dataModule = {
     //   }
     // },
     async syncIt(context, options) {
-      logInfo("dataModule", "actions.syncIt - options: " + JSON.stringify(options, null, 2));
+      logInfo("dataModule", "actions.syncIt - options: " + JSON.stringify(options));
       // const db = new Dexie(context.state.db.name);
       // db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -537,9 +537,9 @@ const dataModule = {
         await context.dispatch('syncERC721Metadata', parameter);
       }
 
-      if (options.devThing) {
-        console.log("Dev Thing");
-      }
+      // if (options.devThing) {
+      //   console.log("Dev Thing");
+      // }
 
       context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
       context.commit('setSyncSection', { section: null, total: null });
@@ -561,7 +561,6 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-
         logInfo("dataModule", "actions.syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
@@ -644,9 +643,6 @@ const dataModule = {
       }
       logInfo("dataModule", "actions.syncAnnouncements BEGIN");
       context.commit('setSyncSection', { section: 'Stealth Address Announcements', total: 0 });
-      // this.sync.completed = 0;
-      // this.sync.total = 0;
-      // this.sync.section = 'Stealth Address Announcements';
       const selectedContracts = [];
       const selectedCallers = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
@@ -663,9 +659,7 @@ const dataModule = {
       // if (selectedContracts.length > 0) {
         const deleteCall = await db.announcements.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        // console.log("latest: " + JSON.stringify(latest, null, 2));
         const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
-        // const startBlock = 0;
         await getLogs(startBlock, parameter.blockNumber, selectedContracts, selectedCallers, processLogs);
       // }
       logInfo("dataModule", "actions.syncAnnouncements END");
@@ -679,33 +673,24 @@ const dataModule = {
       let total = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
       context.commit('setSyncSection', { section: 'Stealth Address Announcement Data', total });
-      // this.sync.completed = 0;
-      // this.sync.total = rows;
-      // this.sync.section = 'Announcements Tx Data';
       let rows = 0;
       do {
-        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
-          // console.log(moment().format("HH:mm:ss") + " syncAnnouncementsData: " + JSON.stringify(item));
-          console.log("DEBUG 1 - item.timestamp: " + item.timestamp + ", item.chainId: " + item.chainId);
           if (item.timestamp == null && item.chainId == parameter.chainId) {
-            console.log("DEBUG 2");
             const block = await provider.getBlock(item.blockNumber);
             item.timestamp = block.timestamp;
-            console.log("DEBUG 3");
             const tx = await provider.getTransaction(item.txHash);
-            console.log("DEBUG 4");
             const txReceipt = await provider.getTransactionReceipt(item.txHash);
-            console.log("DEBUG 5");
             item.tx = {
               type: tx.type,
               blockHash: tx.blockHash,
@@ -731,19 +716,15 @@ const dataModule = {
             rows++;
             context.commit('setSyncCompleted', rows);
           }
-          console.log("DEBUG 6");
         }
-        console.log("DEBUG 7");
         if (records.length > 0) {
           await db.announcements.bulkPut(records).then (function() {
           }).catch(function(error) {
             console.log("syncAnnouncementsData.bulkPut error: " + error);
           });
         }
-        console.log("DEBUG 8");
-        // rows = parseInt(rows) + data.length;
-        // context.commit('setSyncCompleted', rows);
-        // this.sync.completed = rows;
+        rows = parseInt(rows) + data.length;
+        context.commit('setSyncCompleted', rows);
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
@@ -779,13 +760,13 @@ const dataModule = {
           checkAddresses.push({ address, ...addressData });
         }
       }
-      console.log(moment().format("HH:mm:ss") + " actions.identifyMyStealthTransfers - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
+      logInfo("dataModule", "actions.identifyMyStealthTransfers - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
       let rows = 0;
       let done = false;
       do {
         let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
           const sender = item.tx && item.tx.from || null;
@@ -798,7 +779,6 @@ const dataModule = {
           // const stealthAddressData = this.addresses[stealthAddress];
           const ephemeralPublicKey = item.ephemeralPublicKey;
           for (const account of checkAddresses) {
-            console.log("Checking account: " + JSON.stringify(account));
             const viewingPrivateKey = account.viewingPrivateKey;
             const viewingPublicKey = account.viewingPublicKey;
             const spendingPublicKey = account.spendingPublicKey;
@@ -846,8 +826,6 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      // rows = 0;
-      // localStorage.magicalInternetMoneyAddresses = JSON.stringify(this.addresses);
       logInfo("dataModule", "actions.identifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
       context.commit('setState', { name: 'addresses', data: addresses });
       await context.dispatch('saveData', ['addresses']);
@@ -917,6 +895,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
         total = parseInt(total) + logs.length;
+        context.commit('setSyncCompleted', total);
         logInfo("dataModule", "actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
@@ -944,9 +923,10 @@ const dataModule = {
           }
         }
         if (records.length) {
-          await db.registrations.bulkPut(records).then (function() {
-          }).catch(function(error) {
-            console.log("syncRegistrations.bulkPut error: " + error);
+          await db.registrations.bulkAdd(records).then (function(lastKey) {
+            console.log("syncRegistrations.bulkAdd lastKey: " + JSON.stringify(lastKey));
+          }).catch(Dexie.BulkError, function(e) {
+            console.log("syncRegistrations.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
@@ -972,9 +952,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
-      // this.sync.completed = 0;
-      // this.sync.total = 0;
-      // this.sync.section = 'Stealth Address Registry';
+      context.commit('setSyncSection', { section: 'Stealth Address Registry', total: 0 });
       const selectedContracts = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
       //   for (const [contract, contractData] of Object.entries(chainData)) {
@@ -986,8 +964,7 @@ const dataModule = {
       // if (selectedContracts.length > 0) {
         const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        // const startBlock = 0;
+        const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
       // }
       logInfo("dataModule", "actions.syncRegistrations END");
@@ -998,23 +975,20 @@ const dataModule = {
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      let rows = 0;
+      let total = 0;
       let done = false;
       do {
-        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-        rows = parseInt(rows) + data.length;
+        total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
         // done = true;
       } while (!done);
-      const total = rows;
       logInfo("dataModule", "actions.syncRegistrationsData - total: " + total);
-      // this.sync.completed = 0;
-      // this.sync.total = rows;
-      // this.sync.section = 'Registrations Tx Data';
-      rows = 0;
+      context.commit('setSyncSection', { section: 'Stealth Address Registry Data', total });
+      let rows = 0;
       do {
-        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
@@ -1056,7 +1030,7 @@ const dataModule = {
           });
         }
         rows = parseInt(rows) + data.length;
-        // this.sync.completed = rows;
+        context.commit('setSyncCompleted', rows);
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       logInfo("dataModule", "actions.syncRegistrationsData END");
