@@ -765,7 +765,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
@@ -848,7 +848,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.announcements.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId && item.schemeId == 0) {
@@ -863,18 +863,13 @@ const dataModule = {
             if (!(item.logIndex in transfers[parameter.chainId][item.blockNumber])) {
               transfers[parameter.chainId][item.blockNumber][item.logIndex] = item;
             }
-
-
           }
         }
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
-      //   done = true;
       } while (!done);
       console.log("transfers AFTER: " + JSON.stringify(transfers, null, 2));
       context.commit('setState', { name: 'transfers', data: transfers });
-
-      // console.log("context.state.transfers: " + JSON.stringify(context.state.transfers, null, 2));
       await context.dispatch('saveData', ['transfers']);
       logInfo("dataModule", "actions.collateTransfers END");
     },
@@ -1050,7 +1045,7 @@ const dataModule = {
       let rows = 0;
       let done = false;
       do {
-        let data = await db.registrations.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId && item.schemeId == 0) {
