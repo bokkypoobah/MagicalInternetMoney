@@ -1203,7 +1203,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncTokens BEGIN");
-      context.commit('setSyncSection', { section: 'ERC-20 & ERC-721 Tokens', total: null });
+      context.commit('setSyncSection', { section: 'Token Events', total: null });
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'ERC-20 & ERC-721 Tokens';
@@ -1277,8 +1277,10 @@ const dataModule = {
       // this.sync.completed = 0;
       const total = Object.keys(newTokenContractsMap).length;
       console.log("total: " + total);
+      context.commit('setSyncSection', { section: 'Token Contracts', total });
       // this.sync.section = 'Token Contracts';
       rows = 0;
+      let completed = 0;
       done = false;
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
@@ -1323,7 +1325,7 @@ const dataModule = {
                 balances: {},
                 tokenIds: {},
               };
-              // this.sync.completed++;
+              context.commit('setSyncCompleted', ++completed);
             }
             const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
             if (item.eventType == "erc20" && item.type == "Transfer") {
@@ -1398,7 +1400,7 @@ const dataModule = {
         }
       }
       console.log("total: " + total);
-      context.commit('setSyncSection', { section: 'ERC-721 Metadata', total });
+      context.commit('setSyncSection', { section: 'ERC-721 Token Metadata', total });
 
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
       // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
