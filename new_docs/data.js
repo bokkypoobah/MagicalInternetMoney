@@ -642,7 +642,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncAnnouncements BEGIN");
-      context.commit('setSyncSection', { section: 'Stealth Address Announcements', total: 0 });
+      context.commit('setSyncSection', { section: 'Stealth Address Announcements', total: null });
       const selectedContracts = [];
       const selectedCallers = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
@@ -947,7 +947,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
-      context.commit('setSyncSection', { section: 'Stealth Address Registry', total: 0 });
+      context.commit('setSyncSection', { section: 'Stealth Address Registry', total: null });
       const selectedContracts = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
       //   for (const [contract, contractData] of Object.entries(chainData)) {
@@ -1091,6 +1091,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
+        context.commit('setSyncCompleted', total);
         logInfo("dataModule", "actions.syncTokens.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
@@ -1168,9 +1169,10 @@ const dataModule = {
           }
         }
         if (records.length) {
-          await db.tokenEvents.bulkPut(records).then (function() {
-          }).catch(function(error) {
-            console.log("syncTokens.bulkPut error: " + error);
+          await db.tokenEvents.bulkAdd(records).then (function(lastKey) {
+            console.log("syncTokens.bulkAdd lastKey: " + JSON.stringify(lastKey));
+          }).catch(Dexie.BulkError, function(e) {
+            console.log("syncTokens.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
@@ -1201,10 +1203,11 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncTokens BEGIN");
-
+      context.commit('setSyncSection', { section: 'ERC-20 & ERC-721 Tokens', total: null });
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'ERC-20 & ERC-721 Tokens';
+      // TODO
       const selectedAddresses = ['0x000000000000000000000000' + parameter.coinbase.substring(2, 42).toLowerCase()];
       // console.log(selectedAddresses);
       // const selectedAddresses = [];
@@ -1216,16 +1219,11 @@ const dataModule = {
       if (selectedAddresses.length > 0) {
         const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        // TODO Dev const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        const startBlock = latest ? parseInt(latest.blockNumber) + 1: 0;
-        // TODO Need to rescan when address set changed
-        // const startBlock = 0;
-        // const startBlock = this.settings.sync.rescanTokens ? 0 : (latest ? parseInt(latest.blockNumber) + 1: 0);
+        const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         for (let section = 0; section < 2; section++) {
           await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
         }
       }
-
       logInfo("dataModule", "actions.syncTokens END");
     },
 
@@ -1264,7 +1262,7 @@ const dataModule = {
       let done = false;
       const newTokenContractsMap = {};
       do {
-        let data = await db.tokenEvents.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId) {
@@ -1283,7 +1281,7 @@ const dataModule = {
       rows = 0;
       done = false;
       do {
-        let data = await db.tokenEvents.offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.chainId == parameter.chainId) {
