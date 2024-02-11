@@ -263,8 +263,8 @@ const StealthTransfers = {
       settings: {
         filter: null,
         currentPage: 1,
-        pageSize: 10,
-        sortOption: 'registrantasc',
+        pageSize: 50,
+        sortOption: 'txorderdsc',
         version: 0,
       },
       transfer: {
@@ -272,18 +272,16 @@ const StealthTransfers = {
         stealthPrivateKey: null,
       },
       sortOptions: [
-        // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
-        // { value: 'nameregistrantdsc', text: '▼ Name, ▲ Registrant' },
-        { value: 'registrantasc', text: '▲ Registrant' },
-        { value: 'registrantdsc', text: '▼ Registrant' },
+        { value: 'txorderasc', text: '▲ TxOrder' },
+        { value: 'txorderdsc', text: '▼ TxOrder' },
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
         { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        <!-- { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
-        <!-- { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' }, -->
+        // { key: 'linkedToAddress', label: 'Linked To Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        // { key: 'viaStealthMetaAddress', label: 'Via Stealth Meta-Address', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
       ],
     }
@@ -336,13 +334,21 @@ const StealthTransfers = {
     },
     filteredSortedTransfers() {
       const results = this.filteredTransfers;
-      if (this.settings.sortOption == 'registrantasc') {
+      if (this.settings.sortOption == 'txorderasc') {
         results.sort((a, b) => {
-          return ('' + a.registrant).localeCompare(b.registrant);
+          if (a.blockNumber == b.blockNumber) {
+            return a.logIndex - b.logIndex;
+          } else {
+            return a.blockNumber - b.blockNumber;
+          }
         });
-      } else if (this.settings.sortOption == 'registrantdsc') {
+      } else if (this.settings.sortOption == 'txorderdsc') {
         results.sort((a, b) => {
-          return ('' + b.registrant).localeCompare(a.registrant);
+          if (a.blockNumber == b.blockNumber) {
+            return b.logIndex - a.logIndex;
+          } else {
+            return b.blockNumber - a.blockNumber;
+          }
         });
       }
       return results;
@@ -369,8 +375,8 @@ const StealthTransfers = {
       return e.toFixed(precision);
     },
     saveSettings() {
-      logInfo("StealthTransfers", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.transfersSettings = JSON.stringify(this.settings);
+      logInfo("StealthTransfers", "methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.stealthTransfersSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions(blah) {
       store.dispatch('syncOptions/viewSyncOptions', blah);
@@ -481,8 +487,8 @@ const StealthTransfers = {
   mounted() {
     logDebug("StealthTransfers", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('transfersSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.transfersSettings);
+    if ('stealthTransfersSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.stealthTransfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
