@@ -556,10 +556,10 @@ const dataModule = {
 
       const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, ...options };
       if (options.stealthTransfers && !options.devThing) {
-        await context.dispatch('syncAnnouncements', parameter);
+        await context.dispatch('syncStealthTransfers', parameter);
       }
       if (options.stealthTransfers && !options.devThing) {
-        await context.dispatch('syncAnnouncementsData', parameter);
+        await context.dispatch('syncStealthTransfersData', parameter);
       }
       if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('identifyMyStealthTransfers', parameter);
@@ -598,8 +598,8 @@ const dataModule = {
       context.commit('forceRefresh');
     },
 
-    async syncAnnouncements(context, parameter) {
-      logInfo("dataModule", "actions.syncAnnouncements BEGIN: " + JSON.stringify(parameter));
+    async syncStealthTransfers(context, parameter) {
+      logInfo("dataModule", "actions.syncStealthTransfers BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -612,7 +612,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        logInfo("dataModule", "actions.syncAnnouncements.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        logInfo("dataModule", "actions.syncStealthTransfers.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -665,14 +665,14 @@ const dataModule = {
         // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
           await db.announcements.bulkAdd(records).then (function(lastKey) {
-            console.log("syncAnnouncements.bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log("syncStealthTransfers.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            console.log("syncAnnouncements.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+            console.log("syncStealthTransfers.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
       async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-        logInfo("dataModule", "actions.syncAnnouncements.getLogs: " + fromBlock + " - " + toBlock);
+        logInfo("dataModule", "actions.syncStealthTransfers.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
             address: null,
@@ -692,7 +692,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
         }
       }
-      logInfo("dataModule", "actions.syncAnnouncements BEGIN");
+      logInfo("dataModule", "actions.syncStealthTransfers BEGIN");
       context.commit('setSyncSection', { section: 'Stealth Transfers', total: null });
       const selectedContracts = [];
       const selectedCallers = [];
@@ -713,11 +713,11 @@ const dataModule = {
         const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         await getLogs(startBlock, parameter.blockNumber, selectedContracts, selectedCallers, processLogs);
       // }
-      logInfo("dataModule", "actions.syncAnnouncements END");
+      logInfo("dataModule", "actions.syncStealthTransfers END");
     },
 
-    async syncAnnouncementsData(context, parameter) {
-      logInfo("dataModule", "actions.syncAnnouncementsData: " + JSON.stringify(parameter));
+    async syncStealthTransfersData(context, parameter) {
+      logInfo("dataModule", "actions.syncStealthTransfersData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -725,16 +725,16 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
+      logInfo("dataModule", "actions.syncStealthTransfersData - total: " + total);
       context.commit('setSyncSection', { section: 'Stealth Transfer Data', total });
       let rows = 0;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.syncAnnouncementsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
           if (item.timestamp == null) {
@@ -771,13 +771,13 @@ const dataModule = {
         if (records.length > 0) {
           await db.announcements.bulkPut(records).then (function() {
           }).catch(function(error) {
-            console.log("syncAnnouncementsData.bulkPut error: " + error);
+            console.log("syncStealthTransfersData.bulkPut error: " + error);
           });
         }
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
-      logInfo("dataModule", "actions.syncAnnouncementsData END");
+      logInfo("dataModule", "actions.syncStealthTransfersData END");
     },
 
     async identifyMyStealthTransfers(context, parameter) {
