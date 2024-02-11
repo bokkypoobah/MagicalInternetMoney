@@ -764,9 +764,9 @@ const dataModule = {
               type: txReceipt.type,
             };
             records.push(item);
-            rows++;
-            context.commit('setSyncCompleted', rows);
           }
+          rows++;
+          context.commit('setSyncCompleted', rows);
         }
         if (records.length > 0) {
           await db.announcements.bulkPut(records).then (function() {
@@ -774,8 +774,6 @@ const dataModule = {
             console.log("syncAnnouncementsData.bulkPut error: " + error);
           });
         }
-        rows = parseInt(rows) + data.length;
-        context.commit('setSyncCompleted', rows);
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
