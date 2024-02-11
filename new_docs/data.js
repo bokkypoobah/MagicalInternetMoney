@@ -693,7 +693,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncAnnouncements BEGIN");
-      context.commit('setSyncSection', { section: 'Stealth Address Announcements', total: null });
+      context.commit('setSyncSection', { section: 'Stealth Transfers', total: null });
       const selectedContracts = [];
       const selectedCallers = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
@@ -730,7 +730,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       logInfo("dataModule", "actions.syncAnnouncementsData - total: " + total);
-      context.commit('setSyncSection', { section: 'Stealth Address Announcement Data', total });
+      context.commit('setSyncSection', { section: 'Stealth Transfer Data', total });
       let rows = 0;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
@@ -982,7 +982,7 @@ const dataModule = {
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
-      context.commit('setSyncSection', { section: 'Stealth Address Registry', total: null });
+      context.commit('setSyncSection', { section: 'Stealth Meta-Address Registry', total: null });
       const selectedContracts = [];
       // for (const [chainId, chainData] of Object.entries(this.contracts)) {
       //   for (const [contract, contractData] of Object.entries(chainData)) {
@@ -1015,7 +1015,7 @@ const dataModule = {
         // done = true;
       } while (!done);
       logInfo("dataModule", "actions.syncRegistrationsData - total: " + total);
-      context.commit('setSyncSection', { section: 'Stealth Address Registry Data', total });
+      context.commit('setSyncSection', { section: 'Stealth Meta-Address Registry Data', total });
       let rows = 0;
       do {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
