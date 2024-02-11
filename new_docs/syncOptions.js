@@ -62,12 +62,9 @@ const SyncOptions = {
   },
   methods: {
     saveSettings() {
-      logInfo("SyncOptions", "methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
+      // logInfo("SyncOptions", "methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.syncOptionsSettings = JSON.stringify(this.settings);
     },
-    // setShow(show) {
-    //   store.dispatch('newTransfer/setShow', show);
-    // },
     syncNow() {
       store.dispatch('data/syncIt', {
         stealthTransfers: this.settings.stealthTransfers,
