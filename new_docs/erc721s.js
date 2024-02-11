@@ -335,9 +335,6 @@ const ERC721s = {
     registry() {
       return store.getters['data/registry'];
     },
-    transfers() {
-      return store.getters['data/transfers'];
-    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },

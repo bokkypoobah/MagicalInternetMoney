@@ -61,7 +61,7 @@ const store = new Vuex.Store({
     connection: connectionModule,
     welcome: welcomeModule,
     registry: registryModule,
-    transfers: transfersModule,
+    stealthTransfers: stealthTransfersModule,
     erc20s: erc20sModule,
     erc721s: erc721sModule,
     newTransfer: newTransferModule,

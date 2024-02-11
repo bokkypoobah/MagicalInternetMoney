@@ -19,9 +19,9 @@ const routes = [{
     component: ERC20s,
     name: 'ERC20s',
   }, {
-    path: '/transfers',
-    component: Transfers,
-    name: 'Transfers',
+    path: '/stealthtransfers',
+    component: StealthTransfers,
+    name: 'StealthTransfers',
   }, {
     path: '/registry',
     component: Registry,

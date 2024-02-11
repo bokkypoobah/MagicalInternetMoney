@@ -1,4 +1,4 @@
-const Transfers = {
+const StealthTransfers = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
@@ -310,13 +310,13 @@ const Transfers = {
     registry() {
       return store.getters['data/registry'];
     },
-    transfers() {
+    stealthTransfers() {
       return store.getters['data/stealthTransfers'];
     },
 
     totalTransfers() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+      for (const [blockNumber, logIndexes] of Object.entries(this.stealthTransfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
           result++;
         }
@@ -325,7 +325,7 @@ const Transfers = {
     },
     filteredTransfers() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
-      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+      for (const [blockNumber, logIndexes] of Object.entries(this.stealthTransfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
           if (item.schemeId == 0) {
             results.push(item);
@@ -369,7 +369,7 @@ const Transfers = {
       return e.toFixed(precision);
     },
     saveSettings() {
-      logInfo("Transfers", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("StealthTransfers", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions(blah) {
@@ -409,38 +409,10 @@ const Transfers = {
       return null;
     },
     rowSelected(item) {
-      logInfo("Transfers", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("StealthTransfers", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         this.transfer.item = item[0];
         this.transfer.stealthPrivateKey = null;
-
-        // const account = item[0].account;
-        // if (account.substring(0, 3) == "st:") {
-        //   this.stealthMetaAccount.account = item[0].account;
-        //   this.stealthMetaAccount.type = item[0].type;
-        //   this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
-        //   this.stealthMetaAccount.phrase = item[0].phrase;
-        //   this.stealthMetaAccount.mine = item[0].mine;
-        //   this.stealthMetaAccount.favourite = item[0].favourite;
-        //   this.stealthMetaAccount.name = item[0].name;
-        //   this.stealthMetaAccount.notes = item[0].notes;
-        //   this.stealthMetaAccount.spendingPrivateKey = null;
-        //   this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
-        //   this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
-        //   this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
-        //   this.stealthMetaAccount.source = item[0].source;
-        //   this.$bvModal.show('modal-stealthmetaccount');
-        // } else {
-        //   this.account.account = item[0].account;
-        //   this.account.type = item[0].type;
-        //   this.account.ensName = item[0].ensName;
-        //   this.account.mine = item[0].mine;
-        //   this.account.favourite = item[0].favourite;
-        //   this.account.name = item[0].name;
-        //   this.account.notes = item[0].notes;
-        //   this.account.source = item[0].source;
-        //   this.$bvModal.show('modal-address');
-        // }
         this.$bvModal.show('modal-transfer');
         this.$refs.transfersTable.clearSelected();
       }
@@ -492,7 +464,7 @@ const Transfers = {
     },
 
     async timeoutCallback() {
-      logDebug("Transfers", "timeoutCallback() count: " + this.count);
+      logDebug("StealthTransfers", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -504,10 +476,10 @@ const Transfers = {
     },
   },
   beforeDestroy() {
-    logDebug("Transfers", "beforeDestroy()");
+    logDebug("StealthTransfers", "beforeDestroy()");
   },
   mounted() {
-    logDebug("Transfers", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("StealthTransfers", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
@@ -517,7 +489,7 @@ const Transfers = {
       }
     }
     this.reschedule = true;
-    logDebug("Transfers", "Calling timeoutCallback()");
+    logDebug("StealthTransfers", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -525,7 +497,7 @@ const Transfers = {
   },
 };
 
-const transfersModule = {
+const stealthTransfersModule = {
   namespaced: true,
   state: {
     params: null,
@@ -538,16 +510,16 @@ const transfersModule = {
   },
   mutations: {
     deQueue(state) {
-      logDebug("transfersModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
+      logDebug("stealthTransfersModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
       state.executionQueue.shift();
     },
     updateParams(state, params) {
       state.params = params;
-      logDebug("transfersModule", "updateParams('" + params + "')")
+      logDebug("stealthTransfersModule", "updateParams('" + params + "')")
     },
     updateExecuting(state, executing) {
       state.executing = executing;
-      logDebug("transfersModule", "updateExecuting(" + executing + ")")
+      logDebug("stealthTransfersModule", "updateExecuting(" + executing + ")")
     },
   },
   actions: {

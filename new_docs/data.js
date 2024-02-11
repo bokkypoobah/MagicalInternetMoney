@@ -22,7 +22,7 @@ const Data = {
         </b-row>
         <b-row>
           <b-col cols="5" class="small px-1 text-right">Stealth Transfers:</b-col>
-          <b-col class="small px-1 truncate" cols="7">{{ totalTransfers }}</b-col>
+          <b-col class="small px-1 truncate" cols="7">{{ totalStealthTransfers }}</b-col>
         </b-row>
         <!-- <b-row>
           <b-col cols="5" class="small px-1">ENS Map</b-col>
@@ -54,15 +54,15 @@ const Data = {
     registry() {
       return store.getters['data/registry'];
     },
-    transfers() {
-      return store.getters['data/transfers'];
+    stealthTransfers() {
+      return store.getters['data/stealthTransfers'];
     },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
-    totalTransfers() {
+    totalStealthTransfers() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [blockNumber, logIndexes] of Object.entries(this.transfers[this.chainId] || {})) {
+      for (const [blockNumber, logIndexes] of Object.entries(this.stealthTransfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
           result++;
         }
@@ -133,7 +133,6 @@ const dataModule = {
     DB_PROCESSING_BATCH_SIZE: 12,
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
-    transfers: {}, // TODO: Delete ChainId, blockNumber, logIndex => data
     stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
     tokenContracts: {}, // ChainId, tokenContractAddress, tokenId => data
     tokenMetadata: {}, // ChainId, tokenContractAddress, tokenId => metadata
@@ -161,7 +160,6 @@ const dataModule = {
   getters: {
     addresses: state => state.addresses,
     registry: state => state.registry,
-    transfers: state => state.transfers, // TODO: Delete
     stealthTransfers: state => state.stealthTransfers,
     tokenContracts: state => state.tokenContracts,
     tokenMetadata: state => state.tokenMetadata,
@@ -410,7 +408,7 @@ const dataModule = {
   actions: {
     async restoreState(context) {
       logInfo("dataModule", "actions.restoreState");
-      if (Object.keys(context.state.transfers).length == 0) {
+      if (Object.keys(context.state.stealthTransfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
         for (let type of ['addresses', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
@@ -567,7 +565,7 @@ const dataModule = {
         await context.dispatch('identifyMyStealthTransfers', parameter);
       }
       if (options.stealthTransfers && !options.devThing) {
-        await context.dispatch('collateTransfers', parameter);
+        await context.dispatch('collateStealthTransfers', parameter);
       }
 
       if (options.stealthMetaAddressRegistry && !options.devThing) {
@@ -888,23 +886,17 @@ const dataModule = {
       logInfo("dataModule", "actions.identifyMyStealthTransfers END");
     },
 
-    async collateTransfers(context, parameter) {
-      logInfo("dataModule", "actions.collateTransfers: " + JSON.stringify(parameter));
+    async collateStealthTransfers(context, parameter) {
+      logInfo("dataModule", "actions.collateStealthTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      // const transfers = {}; // context.state.transfers;
-      // console.log("parameter.chainId: " + parameter.chainId);
-      // if (!(parameter.chainId in transfers)) {
-      //   transfers[parameter.chainId] = {};
-      // }
-      // console.log("transfers BEFORE: " + JSON.stringify(transfers, null, 2));
       let rows = 0;
       let done = false;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.collateTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.collateStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.schemeId == 0) {
             context.commit('addStealthTransfer', item);
@@ -914,7 +906,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       await context.dispatch('saveData', ['stealthTransfers']);
-      logInfo("dataModule", "actions.collateTransfers END");
+      logInfo("dataModule", "actions.collateStealthTransfers END");
     },
 
     async syncRegistrations(context, parameter) {
