@@ -89,20 +89,11 @@ const Config = {
               </b-form-group>
             </b-form-group>
             <b-form-group label-cols-lg="2" label="Reset Data" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
-              <b-form-group v-if="false" label="Tokens:" label-for="reset-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset tokens for regeneration. DEV function'" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="reset-tokens" @click="resetTokens()" variant="primary">Reset</b-button>
-              </b-form-group>
-              <b-form-group v-if="false" label="Temporary Data:" label-for="reset-localstorage" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage'" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="reset-localstorage" @click="reset(['localStorage'])" variant="primary">Reset</b-button>
-              </b-form-group>
-              <b-form-group v-if="false" label="Intermediate Data:" label-for="reset-intermediate" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage, plus assets, transactions and ENS names stored in your browser IndexedDB'" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="reset-intermediate" @click="reset(['localStorage', 'txs', 'assets', 'ensMap'])" variant="primary">Reset</b-button>
-              </b-form-group>
-              <b-form-group label="All Data:" label-for="reset-unlock" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Type 'gm' three times above, no spaces, to unlock the button below" class="mx-0 my-1 p-0">
+              <b-form-group label="Reset All Data:" label-for="reset-unlock" label-size="sm" label-cols-sm="2" label-align-sm="right" description="Type 'gm' three times above, no spaces, to unlock the button below" class="mx-0 my-1 p-0">
                 <b-form-input type="text" size="sm" id="reset-unlock" v-model.trim="unlock" placeholder="gm" class="w-25"></b-form-input>
               </b-form-group>
               <b-form-group label="" label-for="reset-all" label-size="sm" label-cols-sm="2" label-align-sm="right" :description="'Reset view preferences stored in your browser LocalStorage, plus accounts, assets, transactions and ENS names stored in your browser IndexedDB'" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="unlock != 'gmgmgm'" id="reset-all" @click="reset(['localStorage', 'accounts', 'accountsInfo', 'txs', 'txsInfo', 'blocks', 'functionSelectors', 'eventSelectors', 'assets', 'ensMap', 'exchangeRates', 'report'])" variant="warning">Reset</b-button>
+                <b-button size="sm" :disabled="unlock != 'gmgmgm'" id="reset-all" @click="reset()" variant="warning">Reset</b-button>
               </b-form-group>
             </b-form-group>
           </b-card-body>
@@ -334,19 +325,12 @@ const Config = {
     async resetTokens() {
       await store.dispatch('data/resetTokens');
     },
-    reset(sections) {
-      console.log("reset() - sections: " + JSON.stringify(sections));
-      for (let section of sections) {
-        if (section == 'localStorage') {
-          console.log("- deleting localStorage");
-          for (let key of ['coinbase', 'accountsSettings', 'transactionsSettings', 'configSettings']) {
-            delete localStorage[key];
-          }
-        } else {
-          console.log("- data/resetData: " + section);
-          store.dispatch('data/resetData', section);
-        }
+    reset() {
+      logInfo("Config", "method.reset");
+      for (let key of ['addressesSettings', 'configSettings', 'erc20sSettings', 'erc721sSettings', 'powerOn', 'syncOptionsSettings']) {
+        delete localStorage[key];
       }
+      store.dispatch('data/resetData');
       alert('Click OK. This page will be reloaded in 5 seconds.')
       setTimeout(function() {
         window.location.reload();

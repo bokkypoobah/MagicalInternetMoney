@@ -444,14 +444,15 @@ const dataModule = {
       await context.commit('resetTokens');
       await context.dispatch('saveData', ['accounts']);
     },
-    async resetData(context, section) {
-      console.log("data.actions.resetData - section: " + section);
-      context.commit('setState', { name: section, data: {} });
-      const db0 = new Dexie(context.state.db.name);
-      db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-      const status = await db0.cache.where("objectName").equals(section).delete();
-      console.log("status: " + JSON.stringify(status));
-      db0.close();
+    async resetData(context) {
+      logInfo("dataModule", "actions.resetData");
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      await db.announcements.clear();
+      await db.cache.clear();
+      await db.registrations.clear();
+      await db.tokenEvents.clear();
+      db.close();
     },
     async addNewAddress(context, newAddress) {
       logInfo("dataModule", "actions.addNewAddress - newAddress: " + JSON.stringify(newAddress, null, 2) + ")");
