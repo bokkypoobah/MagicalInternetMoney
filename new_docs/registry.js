@@ -81,10 +81,10 @@ const Registry = {
         version: 0,
       },
       sortOptions: [
-        // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
-        // { value: 'nameregistrantdsc', text: '▼ Name, ▲ Registrant' },
         { value: 'registrantasc', text: '▲ Registrant' },
         { value: 'registrantdsc', text: '▼ Registrant' },
+        { value: 'stealthmetaaddressasc', text: '▲ Stealth Meta-Address' },
+        { value: 'stealthmetaaddressdsc', text: '▼ Stealth Meta-Address' },
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -133,6 +133,14 @@ const Registry = {
       } else if (this.settings.sortOption == 'registrantdsc') {
         results.sort((a, b) => {
           return ('' + b.registrant).localeCompare(a.registrant);
+        });
+      } else if (this.settings.sortOption == 'stealthmetaaddressasc') {
+        results.sort((a, b) => {
+          return ('' + a.stealthMetaAddress).localeCompare(b.stealthMetaAddress);
+        });
+      } else if (this.settings.sortOption == 'stealthmetaaddressdsc') {
+        results.sort((a, b) => {
+          return ('' + b.stealthMetaAddress).localeCompare(a.stealthMetaAddress);
         });
       }
       return results;
