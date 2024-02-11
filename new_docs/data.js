@@ -133,7 +133,8 @@ const dataModule = {
     DB_PROCESSING_BATCH_SIZE: 12,
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
-    transfers: {}, // ChainId, blockNumber, logIndex => data
+    transfers: {}, // TODO: Delete ChainId, blockNumber, logIndex => data
+    stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
     tokenContracts: {}, // ChainId, tokenContractAddress, tokenId => data
     tokenMetadata: {}, // ChainId, tokenContractAddress, tokenId => metadata
     ensMap: {},
@@ -160,7 +161,8 @@ const dataModule = {
   getters: {
     addresses: state => state.addresses,
     registry: state => state.registry,
-    transfers: state => state.transfers,
+    transfers: state => state.transfers, // TODO: Delete
+    stealthTransfers: state => state.stealthTransfers,
     tokenContracts: state => state.tokenContracts,
     tokenMetadata: state => state.tokenMetadata,
     ensMap: state => state.ensMap,
@@ -309,6 +311,37 @@ const dataModule = {
         });
       }
     },
+    addStealthTransfer(state, info) {
+      logInfo("dataModule", "mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
+      // Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
+      // Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
+      // Vue.set(state.addresses[info.stealthAddress], 'mine', info.mine);
+
+      if (!(info.chainId in state.stealthTransfers)) {
+        Vue.set(state.stealthTransfers, info.chainId, {});
+      }
+      if (!(info.blockNumber in state.stealthTransfers[info.chainId])) {
+        Vue.set(state.stealthTransfers[info.chainId], info.blockNumber, {});
+      }
+      if (!(info.logIndex in state.stealthTransfers[info.chainId][info.blockNumber])) {
+        Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, info);
+        // Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, {
+        //   chainId: undefined,
+        //   blockNumber: undefined,
+        //   logIndex: undefined,
+        //   ...info,
+        //   // name: info.name,
+        //   // description: info.description,
+        //   // expiry: info.expiry || undefined,
+        //   // attributes: info.attributes,
+        //   // imageSource: info.imageSource,
+        //   // image: info.image,
+        // });
+      }
+
+
+      logInfo("dataModule", "mutations.addStealthTransfer AFTER: " + JSON.stringify(state.stealthTransfers[info.chainId], null, 2));
+    },
 
     setExchangeRates(state, exchangeRates) {
       // const dates = Object.keys(exchangeRates);
@@ -380,7 +413,7 @@ const dataModule = {
       if (Object.keys(context.state.transfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'transfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -861,12 +894,12 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      const transfers = {}; // context.state.transfers;
-      console.log("parameter.chainId: " + parameter.chainId);
-      if (!(parameter.chainId in transfers)) {
-        transfers[parameter.chainId] = {};
-      }
-      console.log("transfers BEFORE: " + JSON.stringify(transfers, null, 2));
+      // const transfers = {}; // context.state.transfers;
+      // console.log("parameter.chainId: " + parameter.chainId);
+      // if (!(parameter.chainId in transfers)) {
+      //   transfers[parameter.chainId] = {};
+      // }
+      // console.log("transfers BEFORE: " + JSON.stringify(transfers, null, 2));
       let rows = 0;
       let done = false;
       do {
@@ -874,25 +907,13 @@ const dataModule = {
         logInfo("dataModule", "actions.collateTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.schemeId == 0) {
-      //       // logInfo("dataModule", "actions.collateTransfers - processing: " + JSON.stringify(item, null, 2));
-      //       const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
-      //       registry[parameter.chainId][item.registrant] = stealthMetaAddress;
-            // transfers[parameter.chainId].push(item);
-
-            if (!(item.blockNumber in transfers[parameter.chainId])) {
-              transfers[parameter.chainId][item.blockNumber] = {};
-            }
-            if (!(item.logIndex in transfers[parameter.chainId][item.blockNumber])) {
-              transfers[parameter.chainId][item.blockNumber][item.logIndex] = item;
-            }
+            context.commit('addStealthTransfer', item);
           }
         }
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log("transfers AFTER: " + JSON.stringify(transfers, null, 2));
-      context.commit('setState', { name: 'transfers', data: transfers });
-      await context.dispatch('saveData', ['transfers']);
+      await context.dispatch('saveData', ['stealthTransfers']);
       logInfo("dataModule", "actions.collateTransfers END");
     },
 

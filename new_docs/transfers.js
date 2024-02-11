@@ -311,7 +311,7 @@ const Transfers = {
       return store.getters['data/registry'];
     },
     transfers() {
-      return store.getters['data/transfers'];
+      return store.getters['data/stealthTransfers'];
     },
 
     totalTransfers() {
