@@ -322,9 +322,6 @@ const Config = {
         }, 5000);
       }
     },
-    async resetTokens() {
-      await store.dispatch('data/resetTokens');
-    },
     reset() {
       logInfo("Config", "method.reset");
       for (let key of ['addressesSettings', 'configSettings', 'erc20sSettings', 'erc721sSettings', 'powerOn', 'syncOptionsSettings']) {
