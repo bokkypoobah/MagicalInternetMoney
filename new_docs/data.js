@@ -268,6 +268,25 @@ const dataModule = {
       }
       logInfo("dataModule", "mutations.addNewAddress AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
     },
+    addNewStealthAddress(state, info) {
+      logInfo("dataModule", "mutations.addNewStealthAddress: " + JSON.stringify(info, null, 2));
+      Vue.set(state.addresses, info.stealthAddress, {
+        type: info.type,
+        linkedTo: info.linkedTo,
+        source: info.source,
+        mine: info.mine,
+        junk: info.junk,
+        favourite: info.favourite,
+        name: info.name,
+        notes: info.notes,
+      });
+    },
+    updateToStealthAddress(state, info) {
+      logInfo("dataModule", "mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
+      Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
+      Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
+      Vue.set(state.addresses[info.stealthAddress], 'mine', info.mine);
+    },
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
@@ -789,15 +808,19 @@ const dataModule = {
               item.iReceived = true;
               if (stealthAddress in addresses) {
                 if (addresses[stealthAddress].type != "stealthAddress") {
-                  addresses[stealthAddress].type = "stealthAddress";
-                  addresses[stealthAddress].linkedTo = {
-                    stealthMetaAddress: account.address,
-                    address: account.linkedToAddress,
-                  };
-                  addresses[stealthAddress].mine = true;
+                  context.commit('updateToStealthAddress', {
+                    stealthAddress,
+                    type: "stealthAddress",
+                    linkedTo: {
+                      stealthMetaAddress: account.address,
+                      address: account.linkedToAddress,
+                    },
+                    mine: true,
+                  });
                 }
               } else {
-                addresses[stealthAddress] = {
+                context.commit('addNewStealthAddress', {
+                  stealthAddress,
                   type: "stealthAddress",
                   linkedTo: {
                     stealthMetaAddress: account.address,
@@ -809,10 +832,8 @@ const dataModule = {
                   favourite: false,
                   name: null,
                   notes: null,
-                };
+                });
               }
-              // Vue.set(this.addresses[stealthAddress], 'linkedTo', { stealthMetaAddress: address.address, address: address.linkedTo.address });
-              // Vue.set(this.addresses[stealthAddress], 'mine', true);
               break;
             }
           }
