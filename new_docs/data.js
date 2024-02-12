@@ -130,7 +130,7 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    DB_PROCESSING_BATCH_SIZE: 12,
+    DB_PROCESSING_BATCH_SIZE: 123,
     addresses: {}, // Address => Info
     registry: {}, // Address => StealthMetaAddress
     stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
@@ -282,7 +282,7 @@ const dataModule = {
       });
     },
     updateToStealthAddress(state, info) {
-      logInfo("dataModule", "mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
+      // logInfo("dataModule", "mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
       Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
       Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
       Vue.set(state.addresses[info.stealthAddress], 'mine', info.mine);
@@ -291,7 +291,7 @@ const dataModule = {
       Vue.delete(state.addresses, address);
     },
     setTokenMetadata(state, info) {
-      logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
+      // logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokenMetadata)) {
         Vue.set(state.tokenMetadata, info.chainId, {});
       }
@@ -310,11 +310,7 @@ const dataModule = {
       }
     },
     addStealthTransfer(state, info) {
-      logInfo("dataModule", "mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
-      // Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
-      // Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
-      // Vue.set(state.addresses[info.stealthAddress], 'mine', info.mine);
-
+      // logInfo("dataModule", "mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.stealthTransfers)) {
         Vue.set(state.stealthTransfers, info.chainId, {});
       }
@@ -323,22 +319,7 @@ const dataModule = {
       }
       if (!(info.logIndex in state.stealthTransfers[info.chainId][info.blockNumber])) {
         Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, info);
-        // Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, {
-        //   chainId: undefined,
-        //   blockNumber: undefined,
-        //   logIndex: undefined,
-        //   ...info,
-        //   // name: info.name,
-        //   // description: info.description,
-        //   // expiry: info.expiry || undefined,
-        //   // attributes: info.attributes,
-        //   // imageSource: info.imageSource,
-        //   // image: info.image,
-        // });
       }
-
-
-      logInfo("dataModule", "mutations.addStealthTransfer AFTER: " + JSON.stringify(state.stealthTransfers[info.chainId], null, 2));
     },
 
     setExchangeRates(state, exchangeRates) {
@@ -1051,7 +1032,7 @@ const dataModule = {
           }
         }
         if (records.length > 0) {
-          console.log("records: " + JSON.stringify(records, null, 2));
+          // console.log("records: " + JSON.stringify(records, null, 2));
           await db.registrations.bulkPut(records).then (function() {
           }).catch(function(error) {
             console.log("syncRegistrationsData.bulkPut error: " + error);
@@ -1275,21 +1256,21 @@ const dataModule = {
           selectedAddressesMap[address] = true;
         }
       }
-      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
 
       const tokenContracts = context.state.tokenContracts;
       // const tokenContracts = {};
       if (!(parameter.chainId in tokenContracts)) {
         tokenContracts[parameter.chainId] = {};
       }
-      console.log("tokenContracts: " + JSON.stringify(tokenContracts));
+      // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
 
       // TODO: Incremental Sync. Resetting balance in the meantime
       for (const [contract, contractData] of Object.entries(tokenContracts[parameter.chainId])) {
         tokenContracts[parameter.chainId][contract].balances = {};
         tokenContracts[parameter.chainId][contract].tokenIds = {};
       }
-      console.log("tokenContracts: " + JSON.stringify(tokenContracts));
+      // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
 
       let rows = 0;
       let done = false;
@@ -1306,7 +1287,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       const total = Object.keys(newTokenContractsMap).length;
-      console.log("total: " + total);
+      // console.log("total: " + total);
       context.commit('setSyncSection', { section: 'Token Contracts', total });
       rows = 0;
       let completed = 0;
@@ -1373,7 +1354,7 @@ const dataModule = {
             tokenContracts[item.chainId][item.contract].balances = balances;
             tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
           } else if (item.eventType == "erc721" && item.type == "Transfer") {
-            console.log("item: " + JSON.stringify(item));
+            // console.log("item: " + JSON.stringify(item));
             const tokenIds = tokenContracts[item.chainId][item.contract].tokenIds || {};
             if (item.from in selectedAddressesMap) {
               if (!(item.from in tokenIds)) {
@@ -1381,7 +1362,7 @@ const dataModule = {
               }
             }
             if (item.to in selectedAddressesMap) {
-              console.log("item in to: " + JSON.stringify(item));
+              // console.log("item in to: " + JSON.stringify(item));
               if (!(item.to in tokenIds)) {
                 tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber, logIndex: item.logIndex };
               }
@@ -1394,7 +1375,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       rows = 0;
-      console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
+      // console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
       context.commit('setState', { name: 'tokenContracts', data: tokenContracts });
       await context.dispatch('saveData', ['tokenContracts']);
       logInfo("dataModule", "actions.collateTokens END");
@@ -1426,7 +1407,7 @@ const dataModule = {
           }
         }
       }
-      console.log("total: " + total);
+      // console.log("total: " + total);
       context.commit('setSyncSection', { section: 'ERC-721 Token Metadata', total });
 
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
@@ -1446,11 +1427,11 @@ const dataModule = {
               context.state.tokenMetadata[parameter.chainId][address] &&
               context.state.tokenMetadata[parameter.chainId][address][tokenId] ||
               null;
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata && metadata.name || null));
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata && metadata.name || null));
             // console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata, null, 2));
 
             if (!metadata && !context.state.sync.halt) {
-              console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+              // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
               const contract = new ethers.Contract(address, ERC721ABI, provider);
               metadata = {
                 chainId: parameter.chainId,
@@ -1464,7 +1445,7 @@ const dataModule = {
                 } else {
                   tokenURIResult = await contract.tokenURI(tokenId);
                 }
-                console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
+                // console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
                 if (tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
                   const decodedJSON = atob(tokenURIResult.substring(29));
                   const data = JSON.parse(decodedJSON);
@@ -1480,10 +1461,10 @@ const dataModule = {
                 }
                 if (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://") {
                   const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
-                  console.log("metadataFile: " + metadataFile);
+                  // console.log("metadataFile: " + metadataFile);
                   try {
                     const metadataFileContent = await fetch(metadataFile).then(response => response.json());
-                    console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
+                    // console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
                     // metadataFileContent: {
                     //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
                     // }
@@ -1492,21 +1473,21 @@ const dataModule = {
                     let expired = false;
                     if (address == ENS_ERC721_ADDRESS) {
                       if (metadataFileContent && metadataFileContent.message) {
-                        console.log("EXPIRED: " + metadataFileContent.message);
+                        // console.log("EXPIRED: " + metadataFileContent.message);
                         // const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
                         // expiry = moment.utc(dateString).unix();
                         let inputString;
                         [inputString, expiredName, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
                         expiry = moment.utc(expiryString).unix();
-                        console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
+                        // console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
                         expired = true;
                       } else { // if (metadataFileContent && metadataFileContent.attributes) {
                         // console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
                         const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
-                        console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
+                        // console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
                         expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
                       }
-                      console.log("  expiry: " + expiry + " " + moment.utc(expiry * 1000).toString());
+                      // console.log("  expiry: " + expiry + " " + moment.utc(expiry * 1000).toString());
 
                       // metadataFileContent: {
                       //   "is_normalized": true,

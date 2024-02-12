@@ -335,7 +335,7 @@ const viewAddressModule = {
       state.source = data.source;
       const stealthTransfers = [];
       if (data.type == "stealthAddress") {
-        const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
+        const transfers = store.getters['data/stealthTransfers'][store.getters['connection/chainId']] || {};
         for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
           for (const [logIndex, item] of Object.entries(logIndexes)) {
             if (item.schemeId == 0 && item.stealthAddress == address) {
