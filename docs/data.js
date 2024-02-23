@@ -134,7 +134,8 @@ const dataModule = {
     addresses: {}, // Address => Info
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
-    tokens: {}, // chainId -> contract -> tokenId => { chainId, contract, tokenId, name, description, image, kind, isFlagged, isSpam, isNsfw, metadataDisabled, rarity, rarityRank, attributes
+    tokens: {}, // chainId -> contract -> tokenId => owner or balances
+    metadata: {}, // chainId -> contract [-> tokenId] => metadata
     timestamps: {}, // chainId -> blockNumber => timestamp
     txs: {}, // txHash => tx & txReceipt
 
@@ -173,6 +174,7 @@ const dataModule = {
 
     collection: state => state.collection,
     tokens: state => state.tokens,
+    metadata: state => state.metadata,
     timestamps: state => state.timestamps,
     txs: state => state.txs,
 
@@ -437,7 +439,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'timestamps', 'txs', 'metadata', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -616,9 +618,9 @@ const dataModule = {
       if (options.tokens || options.devThing) {
         await context.dispatch('collateTokens', parameter);
       }
-      // if (options.metadata && !options.devThing) {
-      //   await context.dispatch('syncMetadata', parameter);
-      // }
+      if (options.metadata && !options.devThing) {
+        await context.dispatch('syncTokenMetadata', parameter);
+      }
 
       // if (options.devThing) {
       //   console.log("Dev Thing");
@@ -1675,34 +1677,63 @@ const dataModule = {
       logInfo("dataModule", "actions.collateTokens END");
     },
 
-    async syncMetadata(context, parameter) {
+    async syncTokenMetadata(context, parameter) {
 
-      logInfo("dataModule", "actions.syncMetadata: " + JSON.stringify(parameter));
+      logInfo("dataModule", "actions.syncTokenMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      logInfo("dataModule", "actions.syncMetadata BEGIN");
+      logInfo("dataModule", "actions.syncTokenMetadata BEGIN");
 
-      let total = 0;
-      let completed = 0;
-      for (const [address, data] of Object.entries(context.state.tokenContracts[parameter.chainId] || {})) {
-        if (data.type == "erc721") {
-          for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            const metadata = context.state.tokenMetadata[parameter.chainId] &&
-              context.state.tokenMetadata[parameter.chainId][address] &&
-              context.state.tokenMetadata[parameter.chainId][address][tokenId] ||
-              {};
-            // console.log(address + "/" + tokenId + " => " + JSON.stringify(metadata && metadata.name || null));
-            if (metadata && metadata.name) {
-              completed++;
+      const contractsToProcess = [];
+      const tokensToProcess = [];
+      for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
+        // console.log(contract + " => " + JSON.stringify(contractData));
+        if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract]) {
+          contractsToProcess.push(contract);
+        }
+        if (contractData.type == "erc721") {
+          for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
+            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
+            if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract] || !context.state.metadata[parameter.chainId][contract][tokenId]) {
+              tokensToProcess.push({ contract, tokenId });
             }
-            total++;
           }
         }
+        // TODO: ERC-1155
       }
-      // console.log("total: " + total);
-      context.commit('setSyncSection', { section: 'ERC-721 Token Metadata', total });
+
+      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
+      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess));
+
+      context.commit('setSyncSection', { section: 'Token Contract Metadata', total: contractsToProcess.length });
+      let completed = 0;
+      for (const contract of contractsToProcess) {
+        console.log("Processing: " + contract);
+        context.commit('setSyncCompleted', completed);
+
+        // TODO
+
+        completed++;
+      }
+
+      completed = 0;
+      context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
+      context.commit('setSyncCompleted', 0);
+      for (const token of tokensToProcess) {
+        console.log("Processing: " + JSON.stringify(token));
+        context.commit('setSyncCompleted', completed);
+
+        // TODO
+
+        completed++;
+      }
+
+      bailout;
+
+      let total = 0;
+      completed = 0;
 
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
       // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
@@ -1865,7 +1896,7 @@ const dataModule = {
 
       // console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
       await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
-      logInfo("dataModule", "actions.syncMetadata END");
+      logInfo("dataModule", "actions.syncTokenMetadata END");
     },
 
     async syncImportExchangeRates(context, parameter) {
