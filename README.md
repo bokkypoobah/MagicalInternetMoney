@@ -2,22 +2,46 @@
 
 Status: **Work In Progress**
 
-Magical Internet Money is a dapp to help manage your crypto assets.
+Magical Internet Money is here to help manage your crypto assets.
 
-Features:
+##### Features
+
 * Handling multiple addresses
-* Handling EVM chain crypto assets, with no additional backend servers:
+* Handling EVM chain crypto assets:
+  * ETH
   * ERC-20 Fungible Tokens
   * ERC-721 Non-Fungible Tokens
   * ERC-1155 Non-Fungible Tokens
   * ERC-721 and ERC-1155 ENS Names
-  * Stealth Transfers (Sepolia Testnet) - [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538)
-* Data is stored in your local browser storage
-* The source code can be downloaded to your local computer and run using e.g. [anywhere](https://www.npmjs.com/package/anywhere) in the `./docs` folder
+  * Stealth Transfers of ETH, ERC-20 and ERC-721 tokens
+* All data is stored in your local browser storage
+* Execute simply from GitHub Pages
+* No additional backend servers required, as on-chain data is used, supplemented with public data sources
+* Source code can be downloaded and run using e.g. [anywhere](https://www.npmjs.com/package/anywhere) in the `./docs` folder
 
-Test it at [https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/) in your web3 browser.
+##### Requirements
+* Web3 browser, connected to Ethereum Mainnet or the Sepolia Testnet currently
 
-Note: This project is currently heavily under development. Please clear out your browser's LocalStorage and IndexedDB for this dapp if it is not operating as expected, as this could be due to a change in the configuration data.
+##### URL
+[https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/)
+
+##### Notes
+This project is currently heavily under development. Clear your browser's LocalStorage and IndexedDB if this dapp is not operating as expected as the configuration data may have a new format.
+
+##### References
+
+* [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564)
+* [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538)
+* https://github.com/nerolation/stealth-wallet
+  * https://stealth-wallet.xyz/
+  * https://nerolation.github.io/stealth-utils/ from https://github.com/nerolation/stealth-utils
+  * [StealthTransactionHelper on Sepolia](https://sepolia.etherscan.io/address/0x054Aa0E0b4C92142a583fDfa9369FF3558F8dea4#code)
+* https://github.com/kassandraoftroy/erc5564-contracts
+* [An incomplete guide to stealth addresses](https://vitalik.eth.limo/general/2024/01/20/stealth.html)
+* [ERC-5564 Stealth Addresses](https://ethereum-magicians.org/t/erc-5564-stealth-addresses/10614)
+* [EIP-5564: Improving Privacy on Ethereum through Stealth Address Wallets](https://medium.com/@toni_w/eip-5564-improving-privacy-on-ethereum-through-stealth-address-wallets-fdf3250e81a1)
+* [Ethereum stealth addresses (ERC-5564) library](https://github.com/jsign/zig-stealth-addresses)
+* https://github.com/paulmillr/noble-curves
 
 <br />
 
@@ -143,25 +167,6 @@ Click on the [>] button to send ETH/ERC-20/ERC-721 tokens to that Stealth Meta-A
 <kbd><img src="images/SampleScreen_StealthTransfer_PrivateKeyEnteredInWeb3Wallet_20240115.png" /></kbd>
 
 
-
-<br />
-
----
-
-## References
-
-* [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564)
-* [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538)
-* https://github.com/nerolation/stealth-wallet
-  * https://stealth-wallet.xyz/
-  * https://nerolation.github.io/stealth-utils/ from https://github.com/nerolation/stealth-utils
-  * [StealthTransactionHelper on Sepolia](https://sepolia.etherscan.io/address/0x054Aa0E0b4C92142a583fDfa9369FF3558F8dea4#code)
-* https://github.com/kassandraoftroy/erc5564-contracts
-* [An incomplete guide to stealth addresses](https://vitalik.eth.limo/general/2024/01/20/stealth.html)
-* [ERC-5564 Stealth Addresses](https://ethereum-magicians.org/t/erc-5564-stealth-addresses/10614)
-* [EIP-5564: Improving Privacy on Ethereum through Stealth Address Wallets](https://medium.com/@toni_w/eip-5564-improving-privacy-on-ethereum-through-stealth-address-wallets-fdf3250e81a1)
-* [Ethereum stealth addresses (ERC-5564) library](https://github.com/jsign/zig-stealth-addresses)
-* https://github.com/paulmillr/noble-curves
 
 <br />
 
