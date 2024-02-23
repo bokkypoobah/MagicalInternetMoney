@@ -125,7 +125,7 @@ const ERC20s = {
           </template>
 
           <template #cell(contract)="data">
-            <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.address + '#code'" target="_blank">
+            <b-link :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
               <font size="-1">{{ data.item.address.substring(0, 10) + '...' + data.item.address.slice(-8) }}</font>
             </b-link>
           </template>
@@ -149,7 +149,7 @@ const ERC20s = {
           </template>
           <template #cell(balance)="data">
             <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-              <b-button size="sm" :href="'https://sepolia.etherscan.io/token/' + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
+              <b-button size="sm" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
             </span>
             <span v-if="data.item.type == 'erc721'">
               <font size="-1">
@@ -265,6 +265,9 @@ const ERC20s = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    chainInfo() {
+      return store.getters['config/chainInfo'];
     },
     sync() {
       return store.getters['data/sync'];
