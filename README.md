@@ -6,27 +6,31 @@ Magical Internet Money is here to help manage your crypto assets.
 
 ##### Features
 
-* Handling multiple addresses
-* Handling EVM chain crypto assets:
+* Multiple addresses
+* EVM chain crypto assets:
   * ETH
   * ERC-20 Fungible Tokens
-  * ERC-721 Non-Fungible Tokens
-  * ERC-1155 Non-Fungible Tokens
-  * ERC-721 and ERC-1155 ENS Names
+  * ERC-721 and ERC-1155 Non-Fungible Tokens
+  * ENS Names (ERC-721 and ERC-1155)
   * Stealth Transfers of ETH, ERC-20 and ERC-721 tokens
 * All data is stored in your local browser storage
 * Execute simply from GitHub Pages
-* No additional backend servers required, as on-chain data is used, supplemented with public data sources
+* No additional backend servers required
+* On-chain data is used where possible, supplemented with public data sources
 * Source code can be downloaded and run using e.g. [anywhere](https://www.npmjs.com/package/anywhere) in the `./docs` folder
+
 
 ##### Requirements
 * Web3 browser, connected to Ethereum Mainnet or the Sepolia Testnet currently
 
+
 ##### URL
 [https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/)
 
+
 ##### Notes
 This project is currently heavily under development. Clear your browser's LocalStorage and IndexedDB if this dapp is not operating as expected as the configuration data may have a new format.
+
 
 ##### References
 
