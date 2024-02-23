@@ -197,7 +197,6 @@ const dataModule = {
       const chainId = store.getters['connection/chainId'];
       // TODO: Incremental Syncing tokens to state.tokens
       Vue.set(state.tokens, chainId, tokens);
-      // console.log("state.tokens: " + JSON.stringify(state.tokens, null, 2));
     },
     toggleAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
@@ -441,7 +440,7 @@ const dataModule = {
         for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
-            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
