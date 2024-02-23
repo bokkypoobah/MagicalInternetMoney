@@ -372,8 +372,8 @@ const newAddressModule = {
     show: state => state.show,
   },
   mutations: {
-    newAddress(state, blah) {
-      logInfo("newAddressModule", "mutations.newAddress - blah: " + blah);
+    newAddress(state) {
+      logInfo("newAddressModule", "mutations.newAddress");
       state.action = 'addCoinbase';
       state.address = null;
       state.linkedToAddress = null;
@@ -436,9 +436,9 @@ const newAddressModule = {
     },
   },
   actions: {
-    async newAddress(context, blah) {
-      logInfo("newAddressModule", "actions.newAddress - blah: " + blah);
-      await context.commit('newAddress', blah);
+    async newAddress(context) {
+      logInfo("newAddressModule", "actions.newAddress");
+      await context.commit('newAddress');
     },
     async setAction(context, action) {
       logInfo("newAddressModule", "actions.setAction - action: " + action);

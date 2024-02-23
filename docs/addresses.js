@@ -461,8 +461,7 @@ const Addresses = {
 
     viewModalAddAccount() {
       logInfo("Addresses", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
-      store.dispatch('newAddress/newAddress', null);
-
+      store.dispatch('newAddress/newAddress');
     },
 
     rowSelected(item) {
