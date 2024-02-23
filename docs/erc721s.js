@@ -338,6 +338,9 @@ const ERC721s = {
     tokens() {
       return store.getters['data/tokens'];
     },
+    metadata() {
+      return store.getters['data/metadata'];
+    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
@@ -384,53 +387,58 @@ const ERC721s = {
         }
       }
       for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
+        const tokenMetadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] || {};
+        console.log(address + " => " + JSON.stringify(tokenMetadata, null, 2));
+        // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
         if (data.type == "erc721") {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
-          const collectionName = data.name;
+          const collectionName = tokenMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
 
-            const metadata = this.tokenMetadata[this.chainId] &&
-              this.tokenMetadata[this.chainId][address] &&
-              this.tokenMetadata[this.chainId][address][tokenId] ||
-              {};
+            // const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] && this.metadata[this.chainId][address][tokenId] || {};
+            // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
+            // const metadata = this.tokenMetadata[this.chainId] &&
+            //   this.tokenMetadata[this.chainId][address] &&
+            //   this.tokenMetadata[this.chainId][address][tokenId] ||
+            //   {};
 
             let include = true;
-            if (this.settings.junkFilter) {
-              if (this.settings.junkFilter == 'junk' && !data.junk) {
-                include = false;
-              } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
-                include = false;
-              }
-            }
-            if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
-              include = false;
-            }
-            if (include && regex) {
-              const name = metadata.name || null;
-              const description = metadata.description || null;
-              if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
-                include = false;
-              }
-            }
+            // if (this.settings.junkFilter) {
+            //   if (this.settings.junkFilter == 'junk' && !data.junk) {
+            //     include = false;
+            //   } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
+            //     include = false;
+            //   }
+            // }
+            // if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
+            //   include = false;
+            // }
+            // if (include && regex) {
+            //   const name = metadata.name || null;
+            //   const description = metadata.description || null;
+            //   if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
+            //     include = false;
+            //   }
+            // }
             if (include) {
               results.push({
                 address,
                 junk: data.junk,
                 favourite: data.favourite,
-                collectionSymbol: address == ENS_ERC721_ADDRESS ? "ENS" : data.symbol,
-                collectionName: address == ENS_ERC721_ADDRESS ? "Ethereum Name Service" : data.name,
+                collectionSymbol: tokenMetadata.symbol,
+                collectionName: tokenMetadata.name,
                 totalSupply: data.totalSupply,
                 tokenId,
                 owner: tokenData.owner,
-                name: metadata.name || null,
-                description: metadata.description || null,
-                expiry: metadata.expiry || undefined,
-                attributes: metadata.attributes || null,
-                imageSource: metadata.imageSource || null,
-                image: metadata.image || null,
-                blockNumber: tokenData.blockNumber,
-                logIndex: tokenData.logIndex,
+                // name: metadata.name || null,
+                // description: metadata.description || null,
+                // expiry: metadata.expiry || undefined,
+                // attributes: metadata.attributes || null,
+                // imageSource: metadata.imageSource || null,
+                // image: metadata.image || null,
+                // blockNumber: tokenData.blockNumber,
+                // logIndex: tokenData.logIndex,
               });
             }
           }
