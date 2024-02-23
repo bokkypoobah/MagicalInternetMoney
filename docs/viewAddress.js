@@ -76,19 +76,29 @@ const ViewAddress = {
           </b-row>
         </b-form-group>
 
+        <b-form-group label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-mine" :pressed.sync="mine" variant="transparent"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="mine ? 'warning' : 'secondary'"></b-icon></b-button>
+        </b-form-group>
+
+        <b-form-group label="Favourite:" label-for="address-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-favourite" :pressed.sync="favourite" variant="transparent"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+        </b-form-group>
+
         <b-form-group label="Check:" label-for="address-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-checkbox-group size="sm" id="address-check" v-model="check" :options="checkOptions"></b-form-checkbox-group>
+          <b-form-checkbox-group size="sm" id="address-check" v-model="check" :options="checkOptions" class="ml-2"></b-form-checkbox-group>
         </b-form-group>
 
         <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
             <b-form-input size="sm" type="text" id="address-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
+            <!--
             <b-input-group-append>
               <div>
                 <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="addressTypeInfo[type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[type || 'address'].variant"></b-icon></b-button>
                 <b-button size="sm" :pressed.sync="favourite" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
               </div>
             </b-input-group-append>
+            -->
           </b-input-group>
         </b-form-group>
         <b-form-group label="Notes:" label-for="address-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">

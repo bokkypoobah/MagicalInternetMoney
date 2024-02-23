@@ -37,7 +37,7 @@ const NewAddress = {
           <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="favourite" variant="transparent"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
         </b-form-group>
         <b-form-group label="Check:" label-for="addnewaddress-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-checkbox-group size="sm" id="addnewaddress-check" v-model="check" :options="checkOptions"></b-form-checkbox-group>
+          <b-form-checkbox-group size="sm" id="addnewaddress-check" v-model="check" :options="checkOptions" class="ml-2"></b-form-checkbox-group>
         </b-form-group>
         <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-name" v-model.trim="name" debounce="600" placeholder="optional" class="w-50"></b-form-input>
