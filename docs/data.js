@@ -1327,12 +1327,12 @@ const dataModule = {
       // console.log(selectedAddresses);
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        console.log(address + " => " + JSON.stringify(addressData));
+        // console.log(address + " => " + JSON.stringify(addressData));
         if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
-      console.log(selectedAddresses);
+      console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
       if (selectedAddresses.length > 0) {
         const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
@@ -1458,93 +1458,55 @@ const dataModule = {
       logInfo("dataModule", "actions.collateTokens BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.mine) {
+        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
           selectedAddressesMap[address] = true;
         }
       }
-      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
 
-      const tokenContracts = context.state.tokenContracts;
-      // const tokenContracts = {};
-      if (!(parameter.chainId in tokenContracts)) {
-        tokenContracts[parameter.chainId] = {};
-      }
-      // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
-
-      // TODO: Incremental Sync. Resetting balance in the meantime
-      for (const [contract, contractData] of Object.entries(tokenContracts[parameter.chainId])) {
-        tokenContracts[parameter.chainId][contract].balances = {};
-        tokenContracts[parameter.chainId][contract].tokenIds = {};
-      }
-      // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
+      //
+      // const tokenContracts = context.state.tokenContracts;
+      // // const tokenContracts = {};
+      // if (!(parameter.chainId in tokenContracts)) {
+      //   tokenContracts[parameter.chainId] = {};
+      // }
+      // // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
+      //
+      // // TODO: Incremental Sync. Resetting balance in the meantime
+      // for (const [contract, contractData] of Object.entries(tokenContracts[parameter.chainId])) {
+      //   tokenContracts[parameter.chainId][contract].balances = {};
+      //   tokenContracts[parameter.chainId][contract].tokenIds = {};
+      // }
+      // // console.log("tokenContracts: " + JSON.stringify(tokenContracts));
 
       let rows = 0;
       let done = false;
-      const newTokenContractsMap = {};
+      const tokens = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (!(item.contract in tokenContracts[item.chainId]) && !(item.contract in newTokenContractsMap)) {
-            newTokenContractsMap[item.contract] = true;
-          }
-        }
-        rows = parseInt(rows) + data.length;
-        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
-      } while (!done);
-      const total = Object.keys(newTokenContractsMap).length;
-      // console.log("total: " + total);
-      context.commit('setSyncSection', { section: 'Token Contracts', total });
-      rows = 0;
-      let completed = 0;
-      done = false;
-      do {
-        let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
-        for (const item of data) {
-          if (!(item.contract in tokenContracts[parameter.chainId])) {
-            const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
-            let symbol = null;
-            let name = null;
-            let decimals = null;
-            let totalSupply = null;
-            try {
-              symbol = await contract.symbol();
-            } catch (e) {
-            }
-            try {
-              name = await contract.name();
-            } catch (e) {
-            }
+          // console.log("item: " + JSON.stringify(item));
+          if (!(item.contract in tokens)) {
             if (item.eventType == "erc20") {
-              try {
-                decimals = await contract.decimals();
-              } catch (e) {
-              }
+              tokens[item.contract] = {
+                type: item.eventType,
+                balances: {},
+              };
+            } else {
+              tokens[item.contract] = {
+                type: item.eventType,
+                tokenIds: {},
+              };
             }
-            try {
-              totalSupply = await contract.totalSupply();
-            } catch (e) {
-            }
-            tokenContracts[item.chainId][item.contract] = {
-              junk: false,
-              favourite: false,
-              symbol: item.contract == ENS_ERC721_ADDRESS ? "ENS": (symbol && symbol.trim() || null),
-              name: item.contract == ENS_ERC721_ADDRESS ? "Ethereum Name Service": (name && name.trim() || null),
-              decimals: parseInt(decimals || 0),
-              totalSupply: totalSupply && totalSupply.toString() || null,
-              type: item.eventType,
-              firstEventBlockNumber: item.blockNumber,
-              lastEventBlockNumber: item.blockNumber,
-              events: {},
-              balances: {},
-              tokenIds: {},
-            };
-            context.commit('setSyncCompleted', ++completed);
           }
-          const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
+          // if (!(item.contract in tokenContracts[item.chainId]) && !(item.contract in newTokenContractsMap)) {
+          //   newTokenContractsMap[item.contract] = true;
+          // }
+
           if (item.eventType == "erc20" && item.type == "Transfer") {
-            const balances = tokenContracts[item.chainId][item.contract].balances || 0;
+            // console.log("erc20: " + JSON.stringify(item));
+            const balances = tokens[item.contract].balances || {};
             if (item.from in selectedAddressesMap) {
               if (!(item.from in balances)) {
                 balances[item.from] = "0";
@@ -1557,33 +1519,135 @@ const dataModule = {
               }
               balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
             }
-            tokenContracts[item.chainId][item.contract].balances = balances;
-            tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
-          } else if (item.eventType == "erc721" && item.type == "Transfer") {
-            // console.log("item: " + JSON.stringify(item));
-            const tokenIds = tokenContracts[item.chainId][item.contract].tokenIds || {};
-            if (item.from in selectedAddressesMap) {
-              if (!(item.from in tokenIds)) {
-                delete tokenIds[item.tokenId];
+            tokens[item.contract].balances = balances;
+          // TODO: Handle ERC-1155 Value
+          } else if ((item.eventType == "erc721" && item.type == "Transfer") || (item.eventType == "erc1155" && item.type == "TransferSingle")) {
+            if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
+              tokens[item.contract].tokenIds[item.tokenId] = item.to;
+            }
+
+            // if (item.from in selectedAddressesMap) {
+            //   if (!(item.from in tokens[item.contract].tokenIds)) {
+            //     // delete tokens[item.contract].tokenIds[item.tokenId];
+            //     tokens[item.contract].tokenIds[item.tokenId] = item.to;
+            //   }
+            // }
+            // if (item.to in selectedAddressesMap) {
+            //   // console.log("item in to: " + JSON.stringify(item));
+            //   if (!(item.to in tokens[item.contract].tokenIds)) {
+            //     tokens[item.contract].tokenIds[item.tokenId] = item.to;
+            //   }
+            // }
+          } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
+            for (let tokenId of item.tokenIds) {
+              if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
+                tokens[item.contract].tokenIds[tokenId] = item.to;
               }
             }
-            if (item.to in selectedAddressesMap) {
-              // console.log("item in to: " + JSON.stringify(item));
-              if (!(item.to in tokenIds)) {
-                tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber, logIndex: item.logIndex };
-              }
-            }
-            tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
-            tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
+
           }
         }
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      rows = 0;
-      // console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
-      context.commit('setState', { name: 'tokenContracts', data: tokenContracts });
-      await context.dispatch('saveData', ['tokenContracts']);
+
+      console.log("tokens: " + JSON.stringify(tokens, null, 2));
+      context.commit('setState', { name: 'tokens', data: tokens });
+      await context.dispatch('saveData', ['tokens']);
+
+      // const total = Object.keys(newTokenContractsMap).length;
+      //
+      // // console.log("total: " + total);
+      // context.commit('setSyncSection', { section: 'Token Contracts', total });
+      // rows = 0;
+      // let completed = 0;
+      // done = false;
+      // do {
+      //   let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+      //   logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+      //   for (const item of data) {
+      //     if (!(item.contract in tokenContracts[parameter.chainId])) {
+      //       const contract = new ethers.Contract(item.contract, ERC20ABI, provider);
+      //       let symbol = null;
+      //       let name = null;
+      //       let decimals = null;
+      //       let totalSupply = null;
+      //       try {
+      //         symbol = await contract.symbol();
+      //       } catch (e) {
+      //       }
+      //       try {
+      //         name = await contract.name();
+      //       } catch (e) {
+      //       }
+      //       if (item.eventType == "erc20") {
+      //         try {
+      //           decimals = await contract.decimals();
+      //         } catch (e) {
+      //         }
+      //       }
+      //       try {
+      //         totalSupply = await contract.totalSupply();
+      //       } catch (e) {
+      //       }
+      //       tokenContracts[item.chainId][item.contract] = {
+      //         junk: false,
+      //         favourite: false,
+      //         symbol: item.contract == ENS_ERC721_ADDRESS ? "ENS": (symbol && symbol.trim() || null),
+      //         name: item.contract == ENS_ERC721_ADDRESS ? "Ethereum Name Service": (name && name.trim() || null),
+      //         decimals: parseInt(decimals || 0),
+      //         totalSupply: totalSupply && totalSupply.toString() || null,
+      //         type: item.eventType,
+      //         firstEventBlockNumber: item.blockNumber,
+      //         lastEventBlockNumber: item.blockNumber,
+      //         events: {},
+      //         balances: {},
+      //         tokenIds: {},
+      //       };
+      //       context.commit('setSyncCompleted', ++completed);
+      //     }
+      //     const lastEventBlockNumber = tokenContracts[item.chainId][item.contract].lastEventBlockNumber || 0;
+      //     if (item.eventType == "erc20" && item.type == "Transfer") {
+      //       const balances = tokenContracts[item.chainId][item.contract].balances || 0;
+      //       if (item.from in selectedAddressesMap) {
+      //         if (!(item.from in balances)) {
+      //           balances[item.from] = "0";
+      //         }
+      //         balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
+      //       }
+      //       if (item.to in selectedAddressesMap) {
+      //         if (!(item.to in balances)) {
+      //           balances[item.to] = "0";
+      //         }
+      //         balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
+      //       }
+      //       tokenContracts[item.chainId][item.contract].balances = balances;
+      //       tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
+      //     } else if (item.eventType == "erc721" && item.type == "Transfer") {
+      //       // console.log("item: " + JSON.stringify(item));
+      //       const tokenIds = tokenContracts[item.chainId][item.contract].tokenIds || {};
+      //       if (item.from in selectedAddressesMap) {
+      //         if (!(item.from in tokenIds)) {
+      //           delete tokenIds[item.tokenId];
+      //         }
+      //       }
+      //       if (item.to in selectedAddressesMap) {
+      //         // console.log("item in to: " + JSON.stringify(item));
+      //         if (!(item.to in tokenIds)) {
+      //           tokenIds[item.tokenId] = { owner: item.to, blockNumber: item.blockNumber, logIndex: item.logIndex };
+      //         }
+      //       }
+      //       tokenContracts[item.chainId][item.contract].tokenIds = tokenIds;
+      //       tokenContracts[item.chainId][item.contract].lastEventBlockNumber = item.blockNumber;
+      //     }
+      //   }
+      //   rows = parseInt(rows) + data.length;
+      //   done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
+      // } while (!done);
+      // rows = 0;
+      // // console.log("tokenContracts: " + JSON.stringify(tokenContracts, null, 2));
+      // context.commit('setState', { name: 'tokenContracts', data: tokenContracts });
+      // await context.dispatch('saveData', ['tokenContracts']);
       logInfo("dataModule", "actions.collateTokens END");
     },
 
