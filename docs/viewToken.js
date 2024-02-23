@@ -150,7 +150,7 @@ const ViewToken = {
         return store.getters['viewToken/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'mine', value: mine });
+        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'mine', value: mine });
         store.dispatch('viewToken/setMine', mine);
       },
     },
@@ -159,7 +159,7 @@ const ViewToken = {
         return store.getters['viewToken/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'favourite', value: favourite });
+        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'favourite', value: favourite });
         store.dispatch('viewToken/setFavourite', favourite);
       },
     },
@@ -168,7 +168,7 @@ const ViewToken = {
         return store.getters['viewToken/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewToken/address'], field: 'notes', value: notes });
+        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'notes', value: notes });
         store.dispatch('viewToken/setNotes', notes);
       },
     },

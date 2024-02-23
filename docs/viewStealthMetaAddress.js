@@ -95,7 +95,7 @@ const ViewStealthMetaAddress = {
         return store.getters['viewStealthMetaAddress/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewStealthMetaAddress/address'], field: 'mine', value: mine });
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'mine', value: mine });
         store.dispatch('viewStealthMetaAddress/setMine', mine);
       },
     },
@@ -104,7 +104,7 @@ const ViewStealthMetaAddress = {
         return store.getters['viewStealthMetaAddress/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewStealthMetaAddress/address'], field: 'favourite', value: favourite });
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'favourite', value: favourite });
         store.dispatch('viewStealthMetaAddress/setFavourite', favourite);
       },
     },
@@ -113,7 +113,7 @@ const ViewStealthMetaAddress = {
         return store.getters['viewStealthMetaAddress/name'];
       },
       set: function (name) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewStealthMetaAddress/address'], field: 'name', value: name });
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'name', value: name });
         store.dispatch('viewStealthMetaAddress/setName', name);
       },
     },
@@ -122,7 +122,7 @@ const ViewStealthMetaAddress = {
         return store.getters['viewStealthMetaAddress/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewStealthMetaAddress/address'], field: 'notes', value: notes });
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'notes', value: notes });
         store.dispatch('viewStealthMetaAddress/setNotes', notes);
       },
     },

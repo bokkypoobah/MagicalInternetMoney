@@ -76,6 +76,10 @@ const ViewAddress = {
           </b-row>
         </b-form-group>
 
+        <b-form-group label="Check:" label-for="address-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-checkbox-group size="sm" id="address-check" v-model="check" :options="checkOptions"></b-form-checkbox-group>
+        </b-form-group>
+
         <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
             <b-form-input size="sm" type="text" id="address-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
@@ -119,6 +123,9 @@ const ViewAddress = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    checkOptions() {
+      return store.getters['data/checkOptions'];
+    },
     addresses() {
       return store.getters['data/addresses'];
     },
@@ -136,7 +143,7 @@ const ViewAddress = {
         return store.getters['viewAddress/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'mine', value: mine });
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'mine', value: mine });
         store.dispatch('viewAddress/setMine', mine);
       },
     },
@@ -145,8 +152,17 @@ const ViewAddress = {
         return store.getters['viewAddress/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'favourite', value: favourite });
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'favourite', value: favourite });
         store.dispatch('viewAddress/setFavourite', favourite);
+      },
+    },
+    check: {
+      get: function () {
+        return store.getters['viewAddress/check'];
+      },
+      set: function (check) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'check', value: check });
+        store.dispatch('viewAddress/setCheck', check);
       },
     },
     name: {
@@ -154,7 +170,7 @@ const ViewAddress = {
         return store.getters['viewAddress/name'];
       },
       set: function (name) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'name', value: name });
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'name', value: name });
         store.dispatch('viewAddress/setName', name);
       },
     },
@@ -163,7 +179,7 @@ const ViewAddress = {
         return store.getters['viewAddress/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { account: store.getters['viewAddress/address'], field: 'notes', value: notes });
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'notes', value: notes });
         store.dispatch('viewAddress/setNotes', notes);
       },
     },
@@ -315,6 +331,7 @@ const viewAddressModule = {
     type: state => state.type,
     mine: state => state.mine,
     favourite: state => state.favourite,
+    check: state => state.check,
     name: state => state.name,
     notes: state => state.notes,
     source: state => state.source,
@@ -330,6 +347,7 @@ const viewAddressModule = {
       state.type = data.type;
       state.mine = data.mine;
       state.favourite = data.favourite;
+      state.check = data.check;
       state.name = data.name;
       state.notes = data.notes;
       state.source = data.source;
@@ -355,6 +373,10 @@ const viewAddressModule = {
       logInfo("viewAddressModule", "mutations.setFavourite - favourite: " + favourite);
       state.favourite = favourite;
     },
+    setCheck(state, check) {
+      logInfo("viewAddressModule", "mutations.setCheck - check: " + check);
+      state.check = check;
+    },
     setName(state, name) {
       logInfo("viewAddressModule", "mutations.setName - name: " + name);
       state.name = name;
@@ -379,6 +401,10 @@ const viewAddressModule = {
     async setFavourite(context, favourite) {
       logInfo("viewAddressModule", "actions.setFavourite - favourite: " + favourite);
       await context.commit('setFavourite', favourite);
+    },
+    async setCheck(context, check) {
+      logInfo("viewAddressModule", "actions.setCheck - check: " + check);
+      await context.commit('setCheck', check);
     },
     async setName(context, name) {
       logInfo("viewAddressModule", "actions.setName - name: " + name);

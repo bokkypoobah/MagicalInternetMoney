@@ -82,7 +82,7 @@ const NewAddress = {
         return store.getters['newAddress/action'];
       },
       set: function (action) {
-        // store.dispatch('data/setAddressField', { account: store.getters['newAddress/address'], field: 'action', value: action });
+        // store.dispatch('data/setAddressField', { address: store.getters['newAddress/address'], field: 'action', value: action });
         store.dispatch('newAddress/setAction', action);
       },
     },
