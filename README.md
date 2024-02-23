@@ -1,5 +1,30 @@
 # Magical Internet Money
 
+Status: **Work In Progress**
+
+Magical Internet Money is a dapp to help manage your crypto assets.
+
+Features:
+* Handling multiple addresses
+* Handling EVM chain crypto assets, with no additional backend servers:
+  * ERC-20 Fungible Tokens
+  * ERC-721 Non-Fungible Tokens
+  * ERC-1155 Non-Fungible Tokens
+  * ERC-721 and ERC-1155 ENS Names
+  * Stealth Transfers (Sepolia Testnet) - [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538)
+* Data is stored in your local browser storage
+* The source code can be downloaded to your local computer and run using e.g. [anywhere](https://www.npmjs.com/package/anywhere) in the `./docs` folder
+
+Test it at [https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/) in your web3 browser.
+
+Note: This project is currently heavily under development. Please clear out your browser's LocalStorage and IndexedDB for this dapp if it is not operating as expected, as this could be due to a change in the configuration data.
+
+<br />
+
+---
+
+## Old Stuff
+
 An implementation of [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564) and [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538) (using `address` instead of `bytes`).
 
 Test it at [https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/) (WIP) connected to the Ethereum Sepolia testnet.
