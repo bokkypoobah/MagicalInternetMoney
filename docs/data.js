@@ -1686,49 +1686,94 @@ const dataModule = {
 
       logInfo("dataModule", "actions.syncTokenMetadata BEGIN");
 
-      const contractsToProcess = [];
-      const tokensToProcess = [];
+      const contractsToProcess = {};
+      const tokensToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
         // console.log(contract + " => " + JSON.stringify(contractData));
         if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract]) {
-          contractsToProcess.push(contract);
+          // contractsToProcess.push(contract);
+          contractsToProcess[contract] = contractData;
         }
         if (contractData.type == "erc721") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
             // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
             if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract] || !context.state.metadata[parameter.chainId][contract][tokenId]) {
-              tokensToProcess.push({ contract, tokenId });
+              if (!(contract in tokensToProcess)) {
+                tokensToProcess[contract] = {};
+              }
+              tokensToProcess[contract][tokenId] = tokenData;
             }
           }
         }
         // TODO: ERC-1155
       }
 
-      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
-      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess));
+      // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
+      // console.log("tokensToProcess: " + JSON.stringify(tokensToProcess));
+
+
+      // for (const [key, value] of Object.entries(tokensToProcess)) {
+      //   console.log(JSON.stringify(key) + " => " + JSON.stringify(value));
+      // }
 
       context.commit('setSyncSection', { section: 'Token Contract Metadata', total: contractsToProcess.length });
       let completed = 0;
-      for (const contract of contractsToProcess) {
-        console.log("Processing: " + contract);
+      for (const [contract, contractData] of Object.entries(contractsToProcess)) {
+        console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
         context.commit('setSyncCompleted', completed);
-
-        // TODO
+        const interface = new ethers.Contract(contract, ERC20ABI, provider);
+        let symbol = null;
+        let name = null;
+        let decimals = null;
+        let totalSupply = null;
+        try {
+          symbol = await interface.symbol();
+        } catch (e) {
+        }
+        try {
+          name = await interface.name();
+        } catch (e) {
+        }
+        if (contractData.type == "erc20") {
+            try {
+              decimals = await interface.decimals();
+            } catch (e) {
+            }
+        }
+        try {
+          totalSupply = await interface.totalSupply();
+        } catch (e) {
+        }
+        console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        //       tokenContracts[item.chainId][item.contract] = {
+        //         junk: false,
+        //         favourite: false,
+        //         symbol: item.contract == ENS_ERC721_ADDRESS ? "ENS": (symbol && symbol.trim() || null),
+        //         name: item.contract == ENS_ERC721_ADDRESS ? "Ethereum Name Service": (name && name.trim() || null),
+        //         decimals: parseInt(decimals || 0),
+        //         totalSupply: totalSupply && totalSupply.toString() || null,
+        //         type: item.eventType,
+        //         firstEventBlockNumber: item.blockNumber,
+        //         lastEventBlockNumber: item.blockNumber,
+        //         events: {},
+        //         balances: {},
+        //         tokenIds: {},
+        //       };
+        //       context.commit('setSyncCompleted', ++completed);
+        //     }
 
         completed++;
       }
 
-      completed = 0;
-      context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
-      context.commit('setSyncCompleted', 0);
-      for (const token of tokensToProcess) {
-        console.log("Processing: " + JSON.stringify(token));
-        context.commit('setSyncCompleted', completed);
-
-        // TODO
-
-        completed++;
-      }
+      // completed = 0;
+      // context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
+      // context.commit('setSyncCompleted', 0);
+      // for (const token of tokensToProcess) {
+      //   console.log("Processing: " + JSON.stringify(token));
+      //   context.commit('setSyncCompleted', completed);
+      //   // TODO
+      //   completed++;
+      // }
 
       bailout;
 
