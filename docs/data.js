@@ -607,9 +607,9 @@ const dataModule = {
       if (options.txData && !options.devThing) {
         await context.dispatch('syncTokenEventTxData', parameter);
       }
-      // if ((options.erc20 || options.erc721) && !options.devThing) {
-      //   await context.dispatch('collateTokens', parameter);
-      // }
+      if (options.tokens || options.devThing) {
+        await context.dispatch('collateTokens', parameter);
+      }
       // if (options.metadata && !options.devThing) {
       //   await context.dispatch('syncMetadata', parameter);
       // }
