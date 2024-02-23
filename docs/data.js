@@ -192,6 +192,13 @@ const dataModule = {
       // logInfo("dataModule", "mutations.setState - info: " + JSON.stringify(info, null, 2));
       Vue.set(state, info.name, info.data);
     },
+    updateTokens(state, tokens) {
+      // logInfo("dataModule", "mutations.updateTokens - tokens: " + JSON.stringify(tokens, null, 2));
+      const chainId = store.getters['connection/chainId'];
+      // TODO: Incremental Syncing tokens to state.tokens
+      Vue.set(state.tokens, chainId, tokens);
+      // console.log("state.tokens: " + JSON.stringify(state.tokens, null, 2));
+    },
     toggleAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
       logInfo("dataModule", "mutations.toggleAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
@@ -1553,8 +1560,8 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
-      console.log("tokens: " + JSON.stringify(tokens, null, 2));
-      context.commit('setState', { name: 'tokens', data: tokens });
+      // console.log("tokens: " + JSON.stringify(tokens, null, 2));
+      context.commit('updateTokens', tokens);
       await context.dispatch('saveData', ['tokens']);
 
       //
