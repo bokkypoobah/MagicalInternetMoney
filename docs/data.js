@@ -164,10 +164,8 @@ const dataModule = {
       updated: null,
     },
     checkOptions: [
-      { value: 'eth', text: 'ETH' },
-      { value: 'erc20', text: 'ERC-20' },
-      { value: 'erc721', text: 'ERC-721' },
-      { value: 'erc1155', text: 'ERC-1155' },
+      { value: 'ethers', text: 'Ethers' },
+      { value: 'tokens', text: 'ERC-20, ERC-721 and ERC-1155 Tokens' },
     ],
   },
   getters: {
@@ -344,6 +342,15 @@ const dataModule = {
         Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, info);
       }
     },
+    addTimestamp(state, info) {
+      logInfo("dataModule", "mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
+      if (!(info.chainId in state.timestamps)) {
+        Vue.set(state.timestamps, info.chainId, {});
+      }
+      if (!(info.blockNumber in state.timestamps[info.chainId])) {
+        Vue.set(state.timestamps[info.chainId], info.blockNumber, info.timestamp);
+      }
+    },
 
     setExchangeRates(state, exchangeRates) {
       // const dates = Object.keys(exchangeRates);
@@ -415,7 +422,7 @@ const dataModule = {
       if (Object.keys(context.state.stealthTransfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'timestamps', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -560,7 +567,7 @@ const dataModule = {
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
       if (!(coinbase in context.state.addresses) && Object.keys(context.state.addresses).length == 0) {
-        context.commit('addNewAddress', { action: "addCoinbase" });
+        context.commit('addNewAddress', { action: "addCoinbase", check: ["ethers", "tokens"] });
       }
 
       const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, ...options };
@@ -587,8 +594,11 @@ const dataModule = {
         await context.dispatch('collateRegistrations', parameter);
       }
 
-      if ((options.erc20 || options.erc721 || options.erc1155) && !options.devThing) {
-        await context.dispatch('syncERC20AndERC721Tokens', parameter);
+      if (options.tokens && !options.devThing) {
+        await context.dispatch('syncTokenEvents', parameter);
+      }
+      if (options.timestamps && !options.devThing) {
+        await context.dispatch('syncTokenEventTimestamps', parameter);
       }
       // if ((options.erc20 || options.erc721) && !options.devThing) {
       //   await context.dispatch('collateTokens', parameter);
@@ -1108,8 +1118,8 @@ const dataModule = {
       logInfo("dataModule", "actions.collateRegistrations END");
     },
 
-    async syncERC20AndERC721Tokens(context, parameter) {
-      logInfo("dataModule", "actions.syncERC20AndERC721Tokens: " + JSON.stringify(parameter));
+    async syncTokenEvents(context, parameter) {
+      logInfo("dataModule", "actions.syncTokenEvents: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1146,7 +1156,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        logInfo("dataModule", "actions.syncERC20AndERC721Tokens.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
+        logInfo("dataModule", "actions.syncTokenEvents.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1220,10 +1230,11 @@ const dataModule = {
               console.log("NOT HANDLED: " + JSON.stringify(log));
             }
             // TODO: Testing if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
-            if (eventRecord &&
-                ((parameter.erc20 && eventRecord.eventType == "erc20") ||
-                 (parameter.erc721 && eventRecord.eventType == "erc721") ||
-                 (parameter.erc1155 && eventRecord.eventType == "erc1155"))) {
+            // if (eventRecord &&
+            //     ((parameter.erc20 && eventRecord.eventType == "erc20") ||
+            //      (parameter.erc721 && eventRecord.eventType == "erc721") ||
+            //      (parameter.erc1155 && eventRecord.eventType == "erc1155"))) {
+            if (eventRecord) {
               records.push( {
                 chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
@@ -1239,14 +1250,14 @@ const dataModule = {
         }
         if (records.length) {
           await db.tokenEvents.bulkAdd(records).then (function(lastKey) {
-            console.log("syncERC20AndERC721Tokens.bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log("syncTokenEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            console.log("syncERC20AndERC721Tokens.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+            console.log("syncTokenEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
       async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
-        logInfo("dataModule", "actions.syncERC20AndERC721Tokens.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
+        logInfo("dataModule", "actions.syncTokenEvents.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
         try {
           let topics = null;
           if (section == 0) {
@@ -1299,7 +1310,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
         }
       }
-      logInfo("dataModule", "actions.syncERC20AndERC721Tokens BEGIN");
+      logInfo("dataModule", "actions.syncTokenEvents BEGIN");
       context.commit('setSyncSection', { section: 'Token Events', total: null });
       // this.sync.completed = 0;
       // this.sync.total = 0;
@@ -1310,30 +1321,63 @@ const dataModule = {
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         console.log(address + " => " + JSON.stringify(addressData));
-        if (address.substring(0, 2) == "0x" /*&& addressData.mine*/) {
+        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
+      console.log(selectedAddresses);
       if (selectedAddresses.length > 0) {
-        // TODO: eventType+confirmations
         const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
         // const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         const startBlock = 0;
-
-        if (parameter.erc20 || parameter.erc721) {
-          for (let section = 0; section < 2; section++) {
-            await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
-          }
+        for (let section = 0; section < 4; section++) {
+          await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
         }
-        if (parameter.erc1155) {
-          for (let section = 2; section < 4; section++) {
-            await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
-          }
-        }
-
       }
-      logInfo("dataModule", "actions.syncERC20AndERC721Tokens END");
+      logInfo("dataModule", "actions.syncTokenEvents END");
+    },
+
+    async syncTokenEventTimestamps(context, parameter) {
+      logInfo("dataModule", "actions.syncTokenEventTimestamps: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      let rows = 0;
+      let done = false;
+      const existingTimestamps = context.state.timestamps[parameter.chainId] || {};
+      const newBlocks = {};
+      do {
+        let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        logInfo("dataModule", "actions.syncTokenEventTimestamps - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        for (const item of data) {
+          if (!(item.blockNumber in existingTimestamps) && !(item.blockNumber in newBlocks)) {
+            newBlocks[item.blockNumber] = true;
+          }
+        }
+        rows += data.length;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
+      const total = Object.keys(newBlocks).length;
+      logInfo("dataModule", "actions.syncTokenEventTimestamps - total: " + total);
+      context.commit('setSyncSection', { section: 'Token Event Timestamps', total });
+      let completed = 0;
+      for (let blockNumber of Object.keys(newBlocks)) {
+        const block = await provider.getBlock(parseInt(blockNumber));
+        context.commit('addTimestamp', {
+          chainId: parameter.chainId,
+          blockNumber,
+          timestamp: block.timestamp,
+        });
+        completed++;
+        context.commit('setSyncCompleted', completed);
+        if (context.state.sync.halt) {
+          break;
+        }
+      }
+      // console.log("context.state.timestamps: " + JSON.stringify(context.state.timestamps, null, 2));
+      await context.dispatch('saveData', ['timestamps']);
+      logInfo("dataModule", "actions.syncENSEventTimestamps END");
     },
 
     async collateTokens(context, parameter) {

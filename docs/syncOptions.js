@@ -6,16 +6,16 @@ const SyncOptions = {
 
         <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthTransfers" @input="saveSettings" v-b-popover.hover="'ERC-5564: Stealth Addresses announcements'" class="ml-2 mt-1">Stealth Transfers</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthMetaAddressRegistry" @input="saveSettings" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry entries'" class="ml-2 mt-1">Stealth Meta-Address Registry</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.eth" @input="saveSettings" v-b-popover.hover="'Ether Balances'" class="ml-2 mt-1">TODO: Ethers</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.erc20" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Tokens'" class="ml-2 mt-1">ERC-20 Fungible Tokens</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.erc721" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Tokens'" class="ml-2 mt-1">ERC-721 Non-Fungible Tokens</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.erc1155" @input="saveSettings" v-b-popover.hover="'ERC-1155 Non-Fungible Tokens'" class="ml-2 mt-1">ERC-1155 Non-Fungible Tokens</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Non-Fungible Token Metadata</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.eth" @input="saveSettings" v-b-popover.hover="'Ether Balances'" class="ml-2 mt-1">TODO: Ether Balances</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20, ERC-721 and ERC-1155 Tokens'" class="ml-2 mt-1">Tokens</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Token Metadata</b-form-checkbox>
 
-        <b-form-checkbox size="sm" switch :disabled="true || chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">TODO: Mainnet ENS Names</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="true || chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">TODO: Mainnet ENS Names</b-form-checkbox>
+        <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
 
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.incrementalSync" @input="saveSettings" v-b-popover.hover="'Incremental sync or resync all events'" class="ml-2 mt-1">Incremental Sync</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.timestamps" @input="saveSettings" v-b-popover.hover="'Timestamps'" class="ml-2 mt-1">Timestamps</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.txData" @input="saveSettings" v-b-popover.hover="'Transaction Data'" class="ml-2 mt-1">Transaction Data</b-form-checkbox>
+        <!-- <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.incrementalSync" @input="saveSettings" v-b-popover.hover="'Incremental sync or resync all events'" class="ml-2 mt-1">Incremental Sync</b-form-checkbox> -->
         <b-form-checkbox size="sm" switch v-model="settings.devThing" @input="saveSettings" v-b-popover.hover="'Do Some Dev Thing'" class="ml-2 mt-1">Dev Thing</b-form-checkbox>
 
         <b-form-group label="" label-for="sync-go" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -29,14 +29,14 @@ const SyncOptions = {
       settings: {
         stealthTransfers: true,
         stealthMetaAddressRegistry: true,
-        eth: true,
-        erc20: true,
-        erc721: true,
-        erc1155: true,
+        ethers: true,
+        tokens: true,
         metadata: true,
         ens: true,
         exchangeRates: true,
-        incrementalSync: true,
+        // incrementalSync: true,
+        timestamps: true,
+        txData: true,
         devThing: false,
         version: 0,
       },
@@ -73,14 +73,14 @@ const SyncOptions = {
       store.dispatch('data/syncIt', {
         stealthTransfers: this.settings.stealthTransfers,
         stealthMetaAddressRegistry: this.settings.stealthMetaAddressRegistry,
-        eth: this.settings.eth,
-        erc20: this.settings.erc20,
-        erc721: this.settings.erc721,
-        erc1155: this.settings.erc1155,
+        ethers: this.settings.ethers,
+        tokens: this.settings.tokens,
         metadata: this.settings.metadata,
         ens: this.settings.ens,
         exchangeRates: this.settings.exchangeRates,
-        incrementalSync: this.settings.incrementalSync,
+        // incrementalSync: this.settings.incrementalSync,
+        timestamps: this.settings.timestamps,
+        txData: this.settings.txData,
         devThing: this.settings.devThing,
       });
       store.dispatch('syncOptions/setShow', false);
