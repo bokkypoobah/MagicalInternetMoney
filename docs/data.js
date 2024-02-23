@@ -146,7 +146,7 @@ const dataModule = {
       halt: false,
     },
     db: {
-      name: "magicalinternetmoneydata081b",
+      name: "magicalinternetmoneydata080a",
       version: 1,
       schemaDefinition: {
         announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations,stealthAddress',
