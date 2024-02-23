@@ -319,6 +319,29 @@ const dataModule = {
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
+    addTokenContractMetadata(state, info) {
+      logInfo("dataModule", "mutations.addTokenContractMetadata info: " + JSON.stringify(info, null, 2));
+      if (!(info.chainId in state.metadata)) {
+        Vue.set(state.metadata, info.chainId, {});
+      }
+      if (!(info.contract in state.metadata[info.chainId])) {
+        Vue.set(state.metadata[info.chainId], info.contract, {
+          type: info.type,
+          symbol: info.symbol,
+          name: info.name,
+          decimals: info.decimals,
+          totalSupply: info.totalSupply,
+        });
+      }
+
+      // contract,
+      // symbol,
+      // name,
+      // decimals: decimals && parseInt(decimals) || null,
+      // totalSupply: totalSupply && totalSupply.toString() || null,
+      // ...contractData,
+
+    },
     setTokenMetadata(state, info) {
       // logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokenMetadata)) {
@@ -1726,13 +1749,21 @@ const dataModule = {
         let name = null;
         let decimals = null;
         let totalSupply = null;
-        try {
-          symbol = await interface.symbol();
-        } catch (e) {
-        }
-        try {
-          name = await interface.name();
-        } catch (e) {
+        if (contract == ENS_ERC721_ADDRESS) {
+          symbol = "ENS";
+          name = "Ethereum Name Service";
+        } else if (contract == ENS_ERC1155_ADDRESS) {
+          symbol = "ENSW";
+          name = "Ethereum Name Service Name Wrapper";
+        } else {
+          try {
+            symbol = await interface.symbol();
+          } catch (e) {
+          }
+          try {
+            name = await interface.name();
+          } catch (e) {
+          }
         }
         if (contractData.type == "erc20") {
             try {
@@ -1744,26 +1775,24 @@ const dataModule = {
           totalSupply = await interface.totalSupply();
         } catch (e) {
         }
-        console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
-        //       tokenContracts[item.chainId][item.contract] = {
-        //         junk: false,
-        //         favourite: false,
-        //         symbol: item.contract == ENS_ERC721_ADDRESS ? "ENS": (symbol && symbol.trim() || null),
-        //         name: item.contract == ENS_ERC721_ADDRESS ? "Ethereum Name Service": (name && name.trim() || null),
-        //         decimals: parseInt(decimals || 0),
-        //         totalSupply: totalSupply && totalSupply.toString() || null,
-        //         type: item.eventType,
-        //         firstEventBlockNumber: item.blockNumber,
-        //         lastEventBlockNumber: item.blockNumber,
-        //         events: {},
-        //         balances: {},
-        //         tokenIds: {},
-        //       };
-        //       context.commit('setSyncCompleted', ++completed);
-        //     }
-
+        // console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        context.commit('addTokenContractMetadata', {
+          chainId: parameter.chainId,
+          contract,
+          symbol,
+          name,
+          decimals: decimals && parseInt(decimals) || null,
+          totalSupply: totalSupply && totalSupply.toString() || null,
+          ...contractData,
+        });
         completed++;
+        if (context.state.sync.halt) {
+          break;
+        }
       }
+
+      console.log("context.state.metadata: " + JSON.stringify(context.state.metadata, null, 2));
+      await context.dispatch('saveData', ['metadata']);
 
       // completed = 0;
       // context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
@@ -1775,7 +1804,7 @@ const dataModule = {
       //   completed++;
       // }
 
-      bailout;
+      return;
 
       let total = 0;
       completed = 0;

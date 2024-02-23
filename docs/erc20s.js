@@ -284,6 +284,9 @@ const ERC20s = {
     tokens() {
       return store.getters['data/tokens'];
     },
+    metadata() {
+      return store.getters['data/metadata'];
+    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
@@ -327,6 +330,7 @@ const ERC20s = {
         }
       }
       for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
+        const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] || {};
         if (data.type == "erc20") {
           let include = true;
           if (this.settings.junkFilter) {
@@ -345,7 +349,7 @@ const ERC20s = {
             }
           }
           if (include) {
-            results.push({ address, ...data });
+            results.push({ address, ...data, ...metadata });
           }
         }
       }
