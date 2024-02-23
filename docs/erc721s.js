@@ -388,13 +388,13 @@ const ERC721s = {
       }
       for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         const tokenMetadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] || {};
-        console.log(address + " => " + JSON.stringify(tokenMetadata, null, 2));
+        // console.log(address + " => " + JSON.stringify(tokenMetadata, null, 2));
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
         if (data.type == "erc721") {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
           const collectionName = tokenMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
 
             // const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] && this.metadata[this.chainId][address][tokenId] || {};
             // console.log("  metadata: " + JSON.stringify(metadata, null, 2));

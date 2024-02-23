@@ -125,8 +125,8 @@ const ERC20s = {
           </template>
 
           <template #cell(contract)="data">
-            <b-link :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
-              <font size="-1">{{ data.item.address.substring(0, 10) + '...' + data.item.address.slice(-8) }}</font>
+            <b-link :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
+              <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
           </template>
           <template #cell(type)="data">
@@ -138,56 +138,16 @@ const ERC20s = {
           <template #cell(name)="data">
             <font size="-1">{{ data.item.name }}</font>
           </template>
-          <template #cell(firstEventBlockNumber)="data">
-            <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font>
-          </template>
-          <template #cell(lastEventBlockNumber)="data">
-            <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font>
-          </template>
           <template #cell(decimals)="data">
             <font size="-1">{{ data.item.decimals }}</font>
           </template>
           <template #cell(balance)="data">
             <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-              <b-button size="sm" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
-            </span>
-            <span v-if="data.item.type == 'erc721'">
-              <font size="-1">
-                <span v-for="(tokenData, tokenId) of data.item.tokenIds">
-                  <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + data.item.address + '/' + tokenId" variant="link" v-b-popover.hover.bottom="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
-                </span>
-              </font>
+              <b-button size="sm" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
             </span>
           </template>
-
           <template #cell(totalSupply)="data">
             <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
-          </template>
-
-
-          <template #cell(timestamp)="data">
-            <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-              <span v-if="data.item.timestamp">
-                {{ formatTimestamp(data.item.timestamp) }}
-              </span>
-              <span v-else>
-                {{ '#' + commify0(data.item.blockNumber) }}
-              </span>
-            </b-link>
-          </template>
-          <template #cell(sender)="data">
-            <div v-if="data.item.tx && data.item.tx.from">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.tx.from" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                {{ data.item.tx.from }}
-              </b-link>
-            </div>
-          </template>
-          <template #cell(receiver)="data">
-            <div v-if="data.item.stealthAddress">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.stealthAddress" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                {{ data.item.stealthAddress }}
-              </b-link>
-            </div>
           </template>
           <template #cell(tokens)="data">
             <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
@@ -329,27 +289,27 @@ const ERC20s = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
-        const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] || {};
-        if (data.type == "erc20") {
+      for (const [contract, contractData] of Object.entries(this.tokens[this.chainId] || {})) {
+        const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] || {};
+        if (contractData.type == "erc20") {
           let include = true;
-          if (this.settings.junkFilter) {
-            if (this.settings.junkFilter == 'junk' && !data.junk) {
-              include = false;
-            } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
-              include = false;
-            }
-          }
-          if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
-            include = false;
-          }
-          if (include && regex) {
-            if (!(regex.test(data.symbol) || regex.test(data.name) || regex.test(address))) {
-              include = false;
-            }
-          }
+          // if (this.settings.junkFilter) {
+          //   if (this.settings.junkFilter == 'junk' && !contractData.junk) {
+          //     include = false;
+          //   } else if (this.settings.junkFilter == 'excludejunk' && contractData.junk) {
+          //     include = false;
+          //   }
+          // }
+          // if (include && this.settings.favouritesOnly && (!contractData.favourite || contractData.junk)) {
+          //   include = false;
+          // }
+          // if (include && regex) {
+          //   if (!(regex.test(contractData.symbol) || regex.test(contractData.name) || regex.test(contract))) {
+          //     include = false;
+          //   }
+          // }
           if (include) {
-            results.push({ address, ...data, ...metadata });
+            results.push({ contract, ...contractData, ...metadata });
           }
         }
       }

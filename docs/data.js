@@ -1732,13 +1732,6 @@ const dataModule = {
       }
 
       // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
-      // console.log("tokensToProcess: " + JSON.stringify(tokensToProcess));
-
-
-      // for (const [key, value] of Object.entries(tokensToProcess)) {
-      //   console.log(JSON.stringify(key) + " => " + JSON.stringify(value));
-      // }
-
       context.commit('setSyncSection', { section: 'Token Contract Metadata', total: contractsToProcess.length });
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
@@ -1794,9 +1787,33 @@ const dataModule = {
       console.log("context.state.metadata: " + JSON.stringify(context.state.metadata, null, 2));
       await context.dispatch('saveData', ['metadata']);
 
-      // completed = 0;
-      // context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
-      // context.commit('setSyncCompleted', 0);
+      completed = 0;
+      context.commit('setSyncSection', { section: 'Token Metadata', total: tokensToProcess.length });
+      context.commit('setSyncCompleted', 0);
+
+      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+
+      for (const [contract, contractData] of Object.entries(tokensToProcess)) {
+        // console.log(contract + " => " + JSON.stringify(contractData));
+        for (const [tokenId, tokenData] of Object.entries(contractData)) {
+          console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
+        }
+      }
+
+
+
+      // for (const [key, value] of Object.entries(tokensToProcess)) {
+      //   console.log(JSON.stringify(key) + " => " + JSON.stringify(value));
+      //   console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
+      //   context.commit('setSyncCompleted', completed);
+      //   const interface = new ethers.Contract(contract, ERC20ABI, provider);
+      //
+      //   completed++;
+      //   if (context.state.sync.halt) {
+      //     break;
+      //   }
+      // }
+
       // for (const token of tokensToProcess) {
       //   console.log("Processing: " + JSON.stringify(token));
       //   context.commit('setSyncCompleted', completed);
