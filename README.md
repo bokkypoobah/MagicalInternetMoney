@@ -8,8 +8,7 @@ Magical Internet Money is here to help manage your crypto assets.
 
 * Multiple addresses
 * EVM chain crypto assets:
-  * ETH
-  * ERC-20 Fungible Tokens
+  * ETH and ERC-20 Fungible Tokens
   * ERC-721 and ERC-1155 Non-Fungible Tokens
   * ENS Names (ERC-721 and ERC-1155)
   * Stealth Transfers of ETH, ERC-20 and ERC-721 tokens (testing on Sepolia Testnet)

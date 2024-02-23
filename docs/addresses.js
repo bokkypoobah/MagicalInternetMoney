@@ -248,6 +248,9 @@ const Addresses = {
               {{ data.item.notes || '&nbsp;' }}
             </font>
           </template>
+          <template #cell(check)="data">
+            <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font>
+          </template>
         </b-table>
       </b-card>
     </div>
@@ -311,8 +314,9 @@ const Addresses = {
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'icons', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 40%;', tdClass: 'text-truncate' },
-        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-truncate' },
+        { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 35%;', tdClass: 'text-truncate' },
+        { key: 'check', label: 'Check', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
       ],
     }
   },
@@ -337,6 +341,9 @@ const Addresses = {
     },
     coinbaseIncluded() {
       return this.addresses[this.coinbase] && true || false;
+    },
+    checkOptions() {
+      return store.getters['data/checkOptions'];
     },
 
     totalAddresses() {

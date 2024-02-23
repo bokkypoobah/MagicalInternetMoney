@@ -156,6 +156,12 @@ const dataModule = {
       },
       updated: null,
     },
+    checkOptions: [
+      { value: 'eth', text: 'ETH' },
+      { value: 'erc20', text: 'ERC-20' },
+      { value: 'erc721', text: 'ERC-721' },
+      { value: 'erc1155', text: 'ERC-1155' },
+    ],
   },
   getters: {
     addresses: state => state.addresses,
@@ -168,6 +174,7 @@ const dataModule = {
     forceRefresh: state => state.forceRefresh,
     sync: state => state.sync,
     db: state => state.db,
+    checkOptions: state => state.checkOptions,
   },
   mutations: {
     setState(state, info) {
@@ -237,6 +244,7 @@ const dataModule = {
         }
         Vue.set(state.addresses[address], 'mine', mine);
         Vue.set(state.addresses[address], 'favourite', newAccount.favourite);
+        Vue.set(state.addresses[address], 'check', newAccount.check);
         Vue.set(state.addresses[address], 'name', newAccount.name);
       } else {
         if (type == "address") {
@@ -246,6 +254,7 @@ const dataModule = {
             mine,
             junk: false,
             favourite: newAccount.favourite,
+            check: newAccount.check,
             name: newAccount.name,
             notes: null,
           });
@@ -261,6 +270,7 @@ const dataModule = {
             mine,
             junk: false,
             favourite: newAccount.favourite,
+            check: newAccount.check,
             name: newAccount.name,
             notes: null,
           });

@@ -36,6 +36,9 @@ const NewAddress = {
         <b-form-group label="Favourite:" label-for="addnewaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="favourite" variant="transparent"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
         </b-form-group>
+        <b-form-group label="Check:" label-for="addnewaddress-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-checkbox-group size="sm" id="addnewaddress-check" v-model="check" :options="checkOptions"></b-form-checkbox-group>
+        </b-form-group>
         <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-name" v-model.trim="name" debounce="600" placeholder="optional" class="w-50"></b-form-input>
         </b-form-group>
@@ -70,6 +73,9 @@ const NewAddress = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    checkOptions() {
+      return store.getters['data/checkOptions'];
     },
     action: {
       get: function () {
@@ -118,6 +124,14 @@ const NewAddress = {
       },
       set: function (favourite) {
         store.dispatch('newAddress/setFavourite', favourite);
+      },
+    },
+    check: {
+      get: function () {
+        return store.getters['newAddress/check'];
+      },
+      set: function (check) {
+        store.dispatch('newAddress/setCheck', check);
       },
     },
     name: {
@@ -285,6 +299,7 @@ const NewAddress = {
         phrase: this.phrase,
         mine: this.mine,
         favourite: this.favourite,
+        check: this.check,
         name: this.name,
         notes: this.notes,
         viewingPrivateKey: this.viewingPrivateKey,
@@ -331,6 +346,7 @@ const newAddressModule = {
     phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
     mine: null,
     favourite: null,
+    check: [],
     name: null,
     notes: null,
     viewingPrivateKey: null,
@@ -346,6 +362,7 @@ const newAddressModule = {
     phrase: state => state.phrase,
     mine: state => state.mine,
     favourite: state => state.favourite,
+    check: state => state.check,
     name: state => state.name,
     notes: state => state.notes,
     viewingPrivateKey: state => state.viewingPrivateKey,
@@ -363,6 +380,7 @@ const newAddressModule = {
       state.phrase = "I want to login into my stealth wallet on Ethereum mainnet.";
       state.mine = false;
       state.favourite = false;
+      state.check = [];
       state.name = null;
       state.notes = null;
       state.source = null;
@@ -400,6 +418,10 @@ const newAddressModule = {
     setFavourite(state, favourite) {
       logInfo("newAddressModule", "mutations.setFavourite - favourite: " + favourite);
       state.favourite = favourite;
+    },
+    setCheck(state, check) {
+      logInfo("newAddressModule", "mutations.setCheck - check: " + JSON.stringify(check));
+      state.check = check;
     },
     setName(state, name) {
       logInfo("newAddressModule", "mutations.setName - name: " + name);
@@ -445,6 +467,10 @@ const newAddressModule = {
     async setFavourite(context, favourite) {
       logInfo("newAddressModule", "actions.setFavourite - favourite: " + favourite);
       await context.commit('setFavourite', favourite);
+    },
+    async setCheck(context, check) {
+      logInfo("newAddressModule", "actions.setCheck - check: " + JSON.stringify(check));
+      await context.commit('setCheck', check);
     },
     async setName(context, name) {
       logInfo("newAddressModule", "actions.setName - name: " + name);
