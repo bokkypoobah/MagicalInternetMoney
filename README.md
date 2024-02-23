@@ -4,7 +4,7 @@ Status: **Work In Progress**
 
 Magical Internet Money is here to help manage your crypto assets.
 
-##### Features
+#### Features
 
 * Multiple addresses
 * EVM chain crypto assets:
@@ -20,19 +20,19 @@ Magical Internet Money is here to help manage your crypto assets.
 * Source code can be downloaded and run using e.g. [anywhere](https://www.npmjs.com/package/anywhere) in the `./docs` folder
 
 
-##### Requirements
+#### Requirements
 * Web3 browser, connected to Ethereum Mainnet or the Sepolia Testnet currently
 
 
-##### URL
+#### URL
 [https://bokkypoobah.github.io/MagicalInternetMoney/](https://bokkypoobah.github.io/MagicalInternetMoney/)
 
 
-##### Notes
+#### Notes
 This project is currently heavily under development. Clear your browser's LocalStorage and IndexedDB if this dapp is not operating as expected as the configuration data may have a new format.
 
 
-##### References
+#### References
 
 * [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564)
 * [ERC-6538: Stealth Meta-Address Registry](https://eips.ethereum.org/EIPS/eip-6538)
