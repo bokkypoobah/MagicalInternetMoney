@@ -6,8 +6,10 @@ const SyncOptions = {
 
         <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthTransfers" @input="saveSettings" v-b-popover.hover="'ERC-5564: Stealth Addresses announcements'" class="ml-2 mt-1">Stealth Transfers</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthMetaAddressRegistry" @input="saveSettings" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry entries'" class="ml-2 mt-1">Stealth Meta-Address Registry</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Tokens and ERC-721 Non-Fungible Tokens'" class="ml-2 mt-1">Fungible and Non-Fungible Tokens</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.erc721Metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Non-Fungible Token Metadata</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.erc20" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Tokens'" class="ml-2 mt-1">ERC-20 Fungible Tokens</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.erc721" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Tokens'" class="ml-2 mt-1">ERC-721 Non-Fungible Tokens</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.erc1155" @input="saveSettings" v-b-popover.hover="'ERC-1155 Non-Fungible Tokens'" class="ml-2 mt-1">ERC-1155 Non-Fungible Tokens</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Non-Fungible Token Metadata</b-form-checkbox>
 
         <b-form-checkbox v-if="false" size="sm" switch :disabled="chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">Sync ENS names on Mainnet</b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.balances" @input="saveSettings" class="ml-2 mt-1">TODO: Balances</b-form-checkbox>
@@ -27,8 +29,10 @@ const SyncOptions = {
       settings: {
         stealthTransfers: true,
         stealthMetaAddressRegistry: true,
-        tokens: true,
-        erc721Metadata: true,
+        erc20: true,
+        erc721: true,
+        erc1155: true,
+        metadata: true,
         ens: true,
         balances: true,
         exchangeRates: true,
@@ -69,8 +73,10 @@ const SyncOptions = {
       store.dispatch('data/syncIt', {
         stealthTransfers: this.settings.stealthTransfers,
         stealthMetaAddressRegistry: this.settings.stealthMetaAddressRegistry,
-        tokens: this.settings.tokens,
-        erc721Metadata: this.settings.erc721Metadata,
+        erc20: this.settings.erc20,
+        erc721: this.settings.erc721,
+        erc1155: this.settings.erc1155,
+        metadata: this.settings.metadata,
         ens: this.settings.ens,
         balances: this.settings.balances,
         exchangeRates: this.settings.exchangeRates,
