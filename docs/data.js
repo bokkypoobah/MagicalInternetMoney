@@ -434,7 +434,7 @@ const dataModule = {
   actions: {
     async restoreState(context) {
       logInfo("dataModule", "actions.restoreState");
-      if (Object.keys(context.state.stealthTransfers).length == 0) {
+      if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
         for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {

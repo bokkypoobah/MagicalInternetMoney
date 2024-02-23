@@ -335,6 +335,9 @@ const ERC721s = {
     registry() {
       return store.getters['data/registry'];
     },
+    tokens() {
+      return store.getters['data/tokens'];
+    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
@@ -362,7 +365,7 @@ const ERC721s = {
 
     totalERC721Tokens() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         if (data.type == "erc721") {
           result += Object.keys(data.tokenIds).length;
         }
@@ -380,7 +383,7 @@ const ERC721s = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         if (data.type == "erc721") {
           // console.log(address + " => " + JSON.stringify(data, null, 2));
           const collectionName = data.name;

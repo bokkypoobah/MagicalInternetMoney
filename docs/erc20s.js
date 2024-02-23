@@ -278,6 +278,9 @@ const ERC20s = {
     registry() {
       return store.getters['data/registry'];
     },
+    tokens() {
+      return store.getters['data/tokens'];
+    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
     },
@@ -302,7 +305,7 @@ const ERC20s = {
 
     totalERC20Contracts() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         if (data.type == "erc20") {
           result++;
         }
@@ -320,7 +323,7 @@ const ERC20s = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         if (data.type == "erc20") {
           let include = true;
           if (this.settings.junkFilter) {
