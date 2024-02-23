@@ -431,10 +431,10 @@ const dataModule = {
       if (Object.keys(context.state.stealthTransfers).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
-            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
