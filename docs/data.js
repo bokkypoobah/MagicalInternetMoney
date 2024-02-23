@@ -182,12 +182,12 @@ const dataModule = {
       Vue.set(state, info.name, info.data);
     },
     toggleAddressField(state, info) {
-      Vue.set(state.addresses[info.account], info.field, !state.addresses[info.account][info.field]);
-      logInfo("dataModule", "mutations.toggleAddressField - accounts[" + info.account + "]." + info.field + " = " + state.addresses[info.account][info.field]);
+      Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
+      logInfo("dataModule", "mutations.toggleAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
     setAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, info.value);
-      logInfo("dataModule", "mutations.setAddressField - accounts[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
+      logInfo("dataModule", "mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
     toggleTokenContractFavourite(state, tokenContract) {
       const chainId = store.getters['connection/chainId'];

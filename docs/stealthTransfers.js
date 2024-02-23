@@ -125,23 +125,6 @@ const StealthTransfers = {
         <!-- <b-form-group v-if="false" label="ENS Name:" label-for="transfer-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="transfer-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
         </b-form-group> -->
-        <!-- <b-form-group label="Name:" label-for="transfer-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-75">
-            <b-form-input size="sm" type="text" id="transfer-name" v-model.trim="account.name" @update="setAddressField(account.account, 'name', account.name)" debounce="600" placeholder="optional"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button size="sm" :pressed.sync="account.mine" @click="toggleAddressField(account.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[account.type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="account.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[account.type || 'address'].variant"></b-icon></b-button>
-                <b-button size="sm" :pressed.sync="account.favourite" @click="toggleAddressField(account.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="account.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group> -->
-        <!-- <b-form-group label="Notes:" label-for="transfer-notes" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-textarea size="sm" id="transfer-notes" v-model.trim="account.notes" @update="setAddressField(account.account, 'notes', account.notes)" debounce="600" placeholder="..." class="w-100"></b-form-textarea>
-        </b-form-group> -->
-        <!-- <b-form-group label="Source:" label-for="transfer-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="transfer-source" :value="account.source && (account.source.substring(0, 1).toUpperCase() + account.source.slice(1))" class="px-2 w-25"></b-form-input>
-        </b-form-group> -->
         <!-- <b-form-group label="" label-for="transfer-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group> -->
