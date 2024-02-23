@@ -132,6 +132,12 @@ const dataModule = {
   state: {
     DB_PROCESSING_BATCH_SIZE: 123,
     addresses: {}, // Address => Info
+
+    collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
+    tokens: {}, // chainId -> contract -> tokenId => { chainId, contract, tokenId, name, description, image, kind, isFlagged, isSpam, isNsfw, metadataDisabled, rarity, rarityRank, attributes
+    timestamps: {}, // chainId -> blockNumber => timestamp
+    txs: {}, // txHash => tx & txReceipt
+
     registry: {}, // Address => StealthMetaAddress
     stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
     tokenContracts: {}, // ChainId, tokenContractAddress, tokenId => data
@@ -152,6 +158,7 @@ const dataModule = {
         announcements: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations,stealthAddress',
         registrations: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
         tokenEvents: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,confirmations',
+        // tokenEvents: '[chainId+blockNumber+logIndex],[blockNumber+contract],contract,[eventType+confirmations]',
         cache: '&objectName',
       },
       updated: null,
@@ -165,6 +172,12 @@ const dataModule = {
   },
   getters: {
     addresses: state => state.addresses,
+
+    collection: state => state.collection,
+    tokens: state => state.tokens,
+    timestamps: state => state.timestamps,
+    txs: state => state.txs,
+
     registry: state => state.registry,
     stealthTransfers: state => state.stealthTransfers,
     tokenContracts: state => state.tokenContracts,
@@ -551,38 +564,38 @@ const dataModule = {
       }
 
       const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, ...options };
-      if (options.stealthTransfers && !options.devThing) {
+      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
         await context.dispatch('syncStealthTransfers', parameter);
       }
-      if (options.stealthTransfers && !options.devThing) {
+      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
         await context.dispatch('syncStealthTransfersData', parameter);
       }
-      if (options.stealthTransfers && !options.devThing) {
+      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
         await context.dispatch('identifyMyStealthTransfers', parameter);
       }
-      if (options.stealthTransfers && !options.devThing) {
+      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
         await context.dispatch('collateStealthTransfers', parameter);
       }
 
-      if (options.stealthMetaAddressRegistry && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
         await context.dispatch('syncRegistrations', parameter);
       }
-      if (options.stealthMetaAddressRegistry && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
         await context.dispatch('syncRegistrationsData', parameter);
       }
-      if (options.stealthMetaAddressRegistry && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
         await context.dispatch('collateRegistrations', parameter);
       }
 
-      if (options.tokens && !options.devThing) {
-        await context.dispatch('syncTokens', parameter);
+      if ((options.erc20 || options.erc721 || options.erc1155) && !options.devThing) {
+        await context.dispatch('syncERC20AndERC721Tokens', parameter);
       }
-      if (options.tokens && !options.devThing) {
-        await context.dispatch('collateTokens', parameter);
-      }
-      if (options.erc721Metadata && !options.devThing) {
-        await context.dispatch('syncERC721Metadata', parameter);
-      }
+      // if ((options.erc20 || options.erc721) && !options.devThing) {
+      //   await context.dispatch('collateTokens', parameter);
+      // }
+      // if (options.metadata && !options.devThing) {
+      //   await context.dispatch('syncMetadata', parameter);
+      // }
 
       // if (options.devThing) {
       //   console.log("Dev Thing");
@@ -1095,15 +1108,27 @@ const dataModule = {
       logInfo("dataModule", "actions.collateRegistrations END");
     },
 
-    async syncTokens(context, parameter) {
-      logInfo("dataModule", "actions.syncTokens: " + JSON.stringify(parameter));
+    async syncERC20AndERC721Tokens(context, parameter) {
+      logInfo("dataModule", "actions.syncERC20AndERC721Tokens: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const erc1155Interface = new ethers.utils.Interface(ERC1155ABI);
 
       // ERC-20 & ERC-721 Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
       // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', accountAs32Bytes, null ],
       // [ '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', null, accountAs32Bytes ],
+
+      // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
+      // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
+      // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
+
+      // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+      // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, accountAs32Bytes, null ],
+      // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, null, accountAs32Bytes ],
+
+      // ENS:ETH Registrar Controller NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
+      // [ '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', [tokenIds] ],
 
       // WETH Deposit (index_topic_1 address dst, uint256 wad)
       // 0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c
@@ -1121,7 +1146,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        logInfo("dataModule", "actions.syncTokens.processLogs: " + fromBlock + " - " + toBlock + " " + section + " " + logs.length + " " + total);
+        logInfo("dataModule", "actions.syncERC20AndERC721Tokens.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1179,11 +1204,26 @@ const dataModule = {
               const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
               approved = ethers.BigNumber.from(log.data).toString();
               eventRecord = { type: "ApprovalForAll", owner, operator, approved, eventType: "erc721" };
+            } else if (log.topics[0] == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62") {
+              // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
+              const logData = erc1155Interface.parseLog(log);
+              const [operator, from, to, id, value] = logData.args;
+              tokenId = ethers.BigNumber.from(id).toString();
+              eventRecord = { type: "TransferSingle", operator, from, to, tokenId, value: value.toString(), eventType: "erc1155" };
+            } else if (log.topics[0] == "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb") {
+              // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+              const logData = erc1155Interface.parseLog(log);
+              const [operator, from, to, ids, values] = logData.args;
+              const tokenIds = ids.map(e => ethers.BigNumber.from(e).toString());
+              eventRecord = { type: "TransferBatch", operator, from, to, tokenIds, values: values.map(e => e.toString()), eventType: "erc1155" };
             } else {
               console.log("NOT HANDLED: " + JSON.stringify(log));
             }
             // TODO: Testing if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
-            if (eventRecord) {
+            if (eventRecord &&
+                ((parameter.erc20 && eventRecord.eventType == "erc20") ||
+                 (parameter.erc721 && eventRecord.eventType == "erc721") ||
+                 (parameter.erc1155 && eventRecord.eventType == "erc1155"))) {
               records.push( {
                 chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
@@ -1199,14 +1239,14 @@ const dataModule = {
         }
         if (records.length) {
           await db.tokenEvents.bulkAdd(records).then (function(lastKey) {
-            console.log("syncTokens.bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log("syncERC20AndERC721Tokens.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            console.log("syncTokens.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+            console.log("syncERC20AndERC721Tokens.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
       async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
-        logInfo("dataModule", "actions.syncTokens.getLogs: " + fromBlock + " - " + toBlock + " " + section);
+        logInfo("dataModule", "actions.syncERC20AndERC721Tokens.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
         try {
           let topics = null;
           if (section == 0) {
@@ -1220,40 +1260,67 @@ const dataModule = {
               selectedAddresses,
               null
             ];
+            const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+            await processLogs(fromBlock, toBlock, section, logs);
           } else if (section == 1) {
             topics = [ ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'], null, selectedAddresses ];
+            const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+            await processLogs(fromBlock, toBlock, section, logs);
+          } else if (section == 2) {
+            topics = [ [
+              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
+            ], null, selectedAddresses ];
+            logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+            await processLogs(fromBlock, toBlock, section, logs);
+          } else if (section == 3) {
+            topics = [ [
+              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
+            ], null, null, selectedAddresses ];
+            logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+            await processLogs(fromBlock, toBlock, section, logs);
           }
-          const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
-          await processLogs(fromBlock, toBlock, section, logs);
         } catch (e) {
           const mid = parseInt((fromBlock + toBlock) / 2);
           await getLogs(fromBlock, mid, section, selectedAddresses, processLogs);
           await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
         }
       }
-      logInfo("dataModule", "actions.syncTokens BEGIN");
+      logInfo("dataModule", "actions.syncERC20AndERC721Tokens BEGIN");
       context.commit('setSyncSection', { section: 'Token Events', total: null });
       // this.sync.completed = 0;
       // this.sync.total = 0;
       // this.sync.section = 'ERC-20 & ERC-721 Tokens';
       // TODO
-      const selectedAddresses = ['0x000000000000000000000000' + parameter.coinbase.substring(2, 42).toLowerCase()];
+      // const selectedAddresses = ['0x000000000000000000000000' + parameter.coinbase.substring(2, 42).toLowerCase()];
       // console.log(selectedAddresses);
-      // const selectedAddresses = [];
-      // for (const [address, addressData] of Object.entries(this.addresses)) {
-      //   if (address.substring(0, 2) == "0x" && addressData.mine) {
-      //     selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
-      //   }
-      // }
-      if (selectedAddresses.length > 0) {
-        const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
-        const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
-        for (let section = 0; section < 2; section++) {
-          await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
+      const selectedAddresses = [];
+      for (const [address, addressData] of Object.entries(context.state.addresses)) {
+        if (address.substring(0, 2) == "0x" /*&& addressData.mine*/) {
+          selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
-      logInfo("dataModule", "actions.syncTokens END");
+      if (selectedAddresses.length > 0) {
+        // TODO: eventType+confirmations
+        const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
+        const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+        // const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
+        const startBlock = 0;
+
+        if (parameter.erc20 || parameter.erc721) {
+          for (let section = 0; section < 2; section++) {
+            await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
+          }
+        }
+        if (parameter.erc1155) {
+          for (let section = 2; section < 4; section++) {
+            await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
+          }
+        }
+
+      }
+      logInfo("dataModule", "actions.syncERC20AndERC721Tokens END");
     },
 
     async collateTokens(context, parameter) {
@@ -1396,14 +1463,14 @@ const dataModule = {
       logInfo("dataModule", "actions.collateTokens END");
     },
 
-    async syncERC721Metadata(context, parameter) {
+    async syncMetadata(context, parameter) {
 
-      logInfo("dataModule", "actions.syncERC721Metadata: " + JSON.stringify(parameter));
+      logInfo("dataModule", "actions.syncMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      logInfo("dataModule", "actions.syncERC721Metadata BEGIN");
+      logInfo("dataModule", "actions.syncMetadata BEGIN");
 
       let total = 0;
       let completed = 0;
@@ -1586,7 +1653,7 @@ const dataModule = {
 
       // console.log("tokenContracts[chainId]: " + JSON.stringify(context.state.tokenContracts[parameter.chainId], null, 2));
       await context.dispatch('saveData', ['tokenContracts', 'tokenMetadata']);
-      logInfo("dataModule", "actions.syncERC721Metadata END");
+      logInfo("dataModule", "actions.syncMetadata END");
     },
 
     async syncImportExchangeRates(context, parameter) {
