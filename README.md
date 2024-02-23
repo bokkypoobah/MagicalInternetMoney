@@ -12,7 +12,7 @@ Magical Internet Money is here to help manage your crypto assets.
   * ERC-20 Fungible Tokens
   * ERC-721 and ERC-1155 Non-Fungible Tokens
   * ENS Names (ERC-721 and ERC-1155)
-  * Stealth Transfers of ETH, ERC-20 and ERC-721 tokens
+  * Stealth Transfers of ETH, ERC-20 and ERC-721 tokens (testing on Sepolia Testnet)
 * All data is stored in your local browser storage
 * Execute simply from GitHub Pages
 * No additional backend servers required
