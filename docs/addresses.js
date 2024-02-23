@@ -530,8 +530,8 @@ const Addresses = {
           // An error occurred
         })
     },
-    async viewSyncOptions(blah) {
-      store.dispatch('syncOptions/viewSyncOptions', blah);
+    async viewSyncOptions() {
+      store.dispatch('syncOptions/viewSyncOptions');
     },
     async halt() {
       store.dispatch('data/setSyncHalt', true);

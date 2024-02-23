@@ -1263,21 +1263,33 @@ const dataModule = {
             const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
             await processLogs(fromBlock, toBlock, section, logs);
           } else if (section == 1) {
-            topics = [ ['0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'], null, selectedAddresses ];
+            topics = [[
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+              ],
+              null,
+              selectedAddresses
+            ];
             const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
             await processLogs(fromBlock, toBlock, section, logs);
           } else if (section == 2) {
-            topics = [ [
-              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
-              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
-            ], null, selectedAddresses ];
+            topics = [[
+                '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+                '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
+              ],
+              null,
+              selectedAddresses
+            ];
             logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
             await processLogs(fromBlock, toBlock, section, logs);
           } else if (section == 3) {
             topics = [ [
-              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
-              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
-            ], null, null, selectedAddresses ];
+                '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+                '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb',
+              ],
+              null,
+              null,
+              selectedAddresses
+            ];
             logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
             await processLogs(fromBlock, toBlock, section, logs);
           }
@@ -1297,6 +1309,7 @@ const dataModule = {
       // console.log(selectedAddresses);
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
+        console.log(address + " => " + JSON.stringify(addressData));
         if (address.substring(0, 2) == "0x" /*&& addressData.mine*/) {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }

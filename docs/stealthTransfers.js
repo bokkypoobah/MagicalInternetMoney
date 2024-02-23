@@ -361,8 +361,8 @@ const StealthTransfers = {
       logInfo("StealthTransfers", "methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.stealthTransfersSettings = JSON.stringify(this.settings);
     },
-    async viewSyncOptions(blah) {
-      store.dispatch('syncOptions/viewSyncOptions', blah);
+    async viewSyncOptions() {
+      store.dispatch('syncOptions/viewSyncOptions');
     },
     async halt() {
       store.dispatch('data/setSyncHalt', true);

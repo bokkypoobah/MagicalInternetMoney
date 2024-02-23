@@ -106,8 +106,8 @@ const syncOptionsModule = {
     show: state => state.show,
   },
   mutations: {
-    viewSyncOptions(state, blah) {
-      logInfo("syncOptionsModule", "mutations.viewSyncOptions - blah: " + blah);
+    viewSyncOptions(state) {
+      logInfo("syncOptionsModule", "mutations.viewSyncOptions");
       state.show = true;
     },
     setShow(state, show) {
@@ -116,8 +116,8 @@ const syncOptionsModule = {
   },
   actions: {
     async viewSyncOptions(context, blah) {
-      logInfo("syncOptionsModule", "actions.viewSyncOptions - blah: " + blah);
-      await context.commit('viewSyncOptions', blah);
+      logInfo("syncOptionsModule", "actions.viewSyncOptions");
+      await context.commit('viewSyncOptions');
     },
     async setShow(context, show) {
       await context.commit('setShow', show);

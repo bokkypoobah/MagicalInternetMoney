@@ -425,8 +425,8 @@ const ERC20s = {
       logInfo("ERC20s", "methods.saveSettings - erc20sSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.erc20sSettings = JSON.stringify(this.settings);
     },
-    async viewSyncOptions(blah) {
-      store.dispatch('syncOptions/viewSyncOptions', blah);
+    async viewSyncOptions() {
+      store.dispatch('syncOptions/viewSyncOptions');
     },
     async halt() {
       store.dispatch('data/setSyncHalt', true);
