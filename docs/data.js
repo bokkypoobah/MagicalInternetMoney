@@ -546,7 +546,7 @@ const dataModule = {
       // }
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
-      if (!(coinbase in context.state.addresses)) {
+      if (!(coinbase in context.state.addresses) && Object.keys(context.state.addresses).length == 0) {
         context.commit('addNewAddress', { action: "addCoinbase" });
       }
 
