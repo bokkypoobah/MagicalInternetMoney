@@ -249,10 +249,8 @@ const Addresses = {
             </font>
           </template>
           <template #cell(check)="data">
-
-              <!-- @update="setAddressField(account.account, 'notes', account.notes)"  -->
-            <b-form-checkbox-group size="sm" v-model="data.item.check" @change="setAddressField(data.item.account, 'check', data.item.check)" :options="checkOptions" class="ml-2"></b-form-checkbox-group>
-            <!-- <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font> -->
+            <!-- <b-form-checkbox-group disabled size="sm" v-model="data.item.check" @change="setAddressField(data.item.account, 'check', $event)" :options="checkOptions" class="ml-2"></b-form-checkbox-group> -->
+            <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font>
           </template>
         </b-table>
       </b-card>

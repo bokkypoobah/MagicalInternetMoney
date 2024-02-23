@@ -470,11 +470,6 @@ const dataModule = {
       await context.dispatch('saveData', ['tokenContracts']);
     },
 
-    async setAddressCheck(context, info) {
-      await context.commit('setAddressCheck', info);
-      await context.dispatch('saveData', ['addresses']);
-    },
-
     async deleteAddress(context, account) {
       await context.commit('deleteAddress', account);
       await context.dispatch('saveData', ['addresses']);
