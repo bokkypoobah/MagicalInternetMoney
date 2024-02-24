@@ -365,25 +365,6 @@ const dataModule = {
         }
       }
     },
-    setTokenMetadata(state, info) {
-      // logInfo("dataModule", "mutations.setTokenMetadata info: " + JSON.stringify(info, null, 2));
-      if (!(info.chainId in state.tokenMetadata)) {
-        Vue.set(state.tokenMetadata, info.chainId, {});
-      }
-      if (!(info.address in state.tokenMetadata[info.chainId])) {
-        Vue.set(state.tokenMetadata[info.chainId], info.address, {});
-      }
-      if (!(info.tokenId in state.tokenMetadata[info.chainId][info.address])) {
-        Vue.set(state.tokenMetadata[info.chainId][info.address], info.tokenId, {
-          name: info.name,
-          description: info.description,
-          expiry: info.expiry || undefined,
-          attributes: info.attributes,
-          imageSource: info.imageSource,
-          image: info.image,
-        });
-      }
-    },
     addStealthTransfer(state, info) {
       // logInfo("dataModule", "mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.stealthTransfers)) {
@@ -527,10 +508,10 @@ const dataModule = {
       await context.commit('toggleTokenContractJunk', tokenContract);
       await context.dispatch('saveData', ['tokenContracts']);
     },
-    async setTokenMetadata(context, info) {
-      logInfo("dataModule", "actions.addNewAddress - info: " + JSON.stringify(info, null, 2));
-      context.commit('setTokenMetadata', info);
-      await context.dispatch('saveData', ['tokenContracts']);
+    async addTokenMetadata(context, info) {
+      logInfo("dataModule", "actions.addTokenMetadata - info: " + JSON.stringify(info, null, 2));
+      context.commit('addTokenMetadata', info);
+      await context.dispatch('saveData', ['tokenMetadata']);
     },
 
     async deleteAddress(context, account) {

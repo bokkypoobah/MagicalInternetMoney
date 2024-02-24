@@ -4,12 +4,12 @@ const ViewToken = {
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>ERC-721 Token</template>
 
-        <b-form-group label="Address:" label-for="token-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="token-address" v-model.trim="address" class="px-2"></b-form-input>
+            <b-form-input size="sm" plaintext id="token-contract" v-model.trim="contract" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].explorerTokenPrefix + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].explorerTokenPrefix + contract" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -20,7 +20,7 @@ const ViewToken = {
             <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
             <b-input-group-append>
               <div>
-                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + address + '/' + tokenId" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + contract + '/' + tokenId" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -68,7 +68,7 @@ const ViewToken = {
         </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
       </b-modal>
     </div>
@@ -99,32 +99,32 @@ const ViewToken = {
     addresses() {
       return store.getters['data/addresses'];
     },
-    address() {
-      return store.getters['viewToken/address'];
+    contract() {
+      return store.getters['viewToken/contract'];
     },
     tokenId() {
       return store.getters['viewToken/tokenId'];
     },
+    tokens() {
+      return store.getters['data/tokens'];
+    },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
+    },
+    contractMetadata() {
+      return store.getters['data/contractMetadata'];
     },
     tokenMetadata() {
       return store.getters['data/tokenMetadata'];
     },
     collectionSymbol() {
-      if (this.address) {
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].symbol || null;
-      }
-      return null;
+      return this.contract && this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][this.contract] && this.contractMetadata[this.chainId][this.contract].symbol || null;
     },
     collectionName() {
-      if (this.address) {
-        return this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.address] && this.tokenContracts[this.chainId][this.address].name || null;
-      }
-      return null;
+      return this.contract && this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][this.contract] && this.contractMetadata[this.chainId][this.contract].name || null;
     },
     metadata() {
-      return this.address && this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][this.address] && this.tokenMetadata[this.chainId][this.address][this.tokenId] || {};
+      return this.contract && this.tokenId && this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][this.contract] && this.tokenMetadata[this.chainId][this.contract][this.tokenId] || {};
     },
     name() {
       return this.metadata && this.metadata.name || null;
@@ -290,7 +290,7 @@ const ViewToken = {
 
       logInfo("ViewToken", "refreshTokenMetadata()");
 
-      const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.address + "%3A" + this.tokenId + "&includeAttributes=true";
+      const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
       console.log("url: " + url);
       const data = await fetch(url).then(response => response.json());
       // console.log("data: " + JSON.stringify(data, null, 2));
@@ -311,17 +311,17 @@ const ViewToken = {
         }
         const metadata = {
           chainId: tokenData.chainId,
-          address,
+          contract: this.contract,
           tokenId: tokenData.tokenId,
+          expiry,
           name: tokenData.name,
           description: tokenData.description,
-          expiry,
+          image: tokenData.image,
           attributes,
-          imageSource: tokenData.image,
-          image: base64,
+          // image: base64,
         };
         console.log("metadata: " + JSON.stringify(metadata, null, 2));
-        store.dispatch('data/setTokenMetadata', metadata);
+        store.dispatch('data/addTokenMetadata', metadata);
         store.dispatch('data/saveData', ['tokenMetadata']);
       }
     },
@@ -356,7 +356,7 @@ const ViewToken = {
 const viewTokenModule = {
   namespaced: true,
   state: {
-    address: null,
+    contract: null,
     tokenId: null,
 
     linkedTo: {
@@ -372,7 +372,7 @@ const viewTokenModule = {
     show: false,
   },
   getters: {
-    address: state => state.address,
+    contract: state => state.contract,
     tokenId: state => state.tokenId,
 
     linkedTo: state => state.linkedTo,
@@ -390,7 +390,7 @@ const viewTokenModule = {
       logInfo("viewTokenModule", "mutations.viewToken - info: " + JSON.stringify(info));
 
       // const data = store.getters['data/addresses'][address] || {};
-      state.address = info.address;
+      state.contract = info.contract;
       state.tokenId = info.tokenId;
       // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
       // state.type = data.type;

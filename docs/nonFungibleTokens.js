@@ -562,7 +562,7 @@ const NonFungibleTokens = {
     rowSelected(item) {
       logInfo("NonFungibleTokens", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
-        store.dispatch('viewToken/viewToken', { address: item[0].address, tokenId: item[0].tokenId });
+        store.dispatch('viewToken/viewToken', { contract: item[0].contract, tokenId: item[0].tokenId });
         this.$refs.tokenContractsTable.clearSelected();
       }
     },
