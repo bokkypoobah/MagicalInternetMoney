@@ -1808,7 +1808,7 @@ const dataModule = {
       // No tokenURI                   0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85 ENS
       // TODO ?                        0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401 ENS Name Wrapper
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
-      // console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
 
       for (const [contract, contractData] of Object.entries(tokensToProcess)) {
         // console.log(contract + " => " + JSON.stringify(contractData));
@@ -1821,11 +1821,13 @@ const dataModule = {
             let tokenURIResult = null;
             if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
               tokenURIResult = "https://metadata.ens.domains/mainnet/" + contract + "/" + tokenId;
-            } else if (contract == "0x15A2d6C2b4B9903C27f50Cb8B32160ab17F186E2") {
-              tokenURIResult = await interface.tokenURI(tokenId);
-              console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
-            } else {
+              console.log("ENS: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
+            // } else if (contract == "0x15A2d6C2b4B9903C27f50Cb8B32160ab17F186E2") {
+              // console.log("GOOP TROOP: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
               // tokenURIResult = await interface.tokenURI(tokenId);
+            } else {
+              tokenURIResult = await interface.tokenURI(tokenId);
+              console.log("OTHER: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
             }
             // console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
 
@@ -1834,16 +1836,13 @@ const dataModule = {
             let attributes = null;
             let imageSource = null;
             let image = null;
-
             if (tokenURIResult && tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
               const decodedJSON = atob(tokenURIResult.substring(29));
               const data = JSON.parse(decodedJSON);
-              console.log("data: " + JSON.stringify(data));
               name = data.name || undefined;
               description = data.description || undefined;
               attributes = data.attributes || {};
               image = data.image || undefined;
-              console.log("name: " + name + ", description: " + description);
               context.commit('addTokenMetadata', {
                 chainId: parameter.chainId,
                 contract,
@@ -1854,15 +1853,15 @@ const dataModule = {
                 image,
               });
             }
-            // if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
-            //   const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
-            //   // console.log("metadataFile: " + metadataFile);
-            //   try {
-            //     const metadataFileContent = await fetch(metadataFile).then(response => response.json());
-            //     // console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
-            //     // metadataFileContent: {
-            //     //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
-            //     // }
+            if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
+              const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
+              console.log("metadataFile: " + metadataFile);
+              try {
+                const metadataFileContent = await fetch(metadataFile).then(response => response.json());
+                console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
+                // metadataFileContent: {
+                //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
+                // }
             //     let expiredName = null;
             //     let expiry = null;
             //     let expired = false;
@@ -1929,13 +1928,17 @@ const dataModule = {
             //       // }
             //     }
             //     metadata.name = expired ? expiredName : (metadataFileContent.name || undefined);
+                name = metadataFileContent.name || undefined;
             //     metadata.description = expired ? ("Expired " + expiredName) : (metadataFileContent.description || undefined);
+                description = metadataFileContent.description || undefined;
             //     metadata.expiry = expiry;
             //     metadata.attributes = expired ? [] : (metadataFileContent.attributes || []);
-            //     metadata.attributes.sort((a, b) => {
-            //       return ('' + a.trait_type).localeCompare(b.trait_type);
-            //     });
+                attributes = metadataFileContent.attributes || [];
+                attributes.sort((a, b) => {
+                  return ('' + a.trait_type).localeCompare(b.trait_type);
+                });
             //     metadata.imageSource = expired ? null : metadataFileContent.image;
+                image = metadataFileContent.image;
             //     if (!expired) {
             //       const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
             //       const base64 = await imageUrlToBase64(imageFile);
@@ -1946,10 +1949,19 @@ const dataModule = {
             //     // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
             //     // console.log("metadata: " + JSON.stringify(metadata, null, 2));
             //     context.commit('setTokenMetadata', metadata);
-            //   } catch (e1) {
-            //     console.error(e1.message);
-            //   }
-            // }
+                context.commit('addTokenMetadata', {
+                  chainId: parameter.chainId,
+                  contract,
+                  tokenId,
+                  name,
+                  description,
+                  attributes,
+                  image,
+                });
+              } catch (e1) {
+                console.error(e1.message);
+              }
+            }
 
           } catch (e) {
             console.error(e.message);
@@ -1965,13 +1977,13 @@ const dataModule = {
           //   image: "Image Here",
           // });
           completed++;
-          // if (context.state.sync.halt || completed > 5) {
-          //   break;
-          // }
+          if (context.state.sync.halt) {
+            break;
+          }
         }
-        // if (context.state.sync.halt || completed > 5) {
-        //   break;
-        // }
+        if (context.state.sync.halt) {
+          break;
+        }
       }
 
       // for (const [key, value] of Object.entries(tokensToProcess)) {
