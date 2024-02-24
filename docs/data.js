@@ -335,7 +335,7 @@ const dataModule = {
       }
     },
     addTokenMetadata(state, info) {
-      logInfo("dataModule", "mutations.addTokenMetadata info: " + JSON.stringify(info, null, 2));
+      // logInfo("dataModule", "mutations.addTokenMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.metadata)) {
         Vue.set(state.metadata, info.chainId, {});
       }
@@ -343,12 +343,26 @@ const dataModule = {
         Vue.set(state.metadata[info.chainId], info.contract, {});
       }
       if (!(info.tokenId in state.metadata[info.chainId][info.contract])) {
-        Vue.set(state.metadata[info.chainId][info.contract], info.tokenId, {
-          name: info.name,
-          description: info.description,
-          attributes: info.attributes,
-          image: info.image,
-        });
+        if (info.contract == ENS_ERC721_ADDRESS || info.contract == ENS_ERC1155_ADDRESS) {
+          logInfo("dataModule", "mutations.addTokenMetadata ENS info: " + JSON.stringify(info, null, 2));
+          Vue.set(state.metadata[info.chainId][info.contract], info.tokenId, {
+            created: info.created || null,
+            registration: info.registration || null,
+            expiry: info.expiry,
+            name: info.name,
+            description: info.description,
+            image: info.image,
+            attributes: info.attributes,
+          });
+        } else {
+          logInfo("dataModule", "mutations.addTokenMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
+          Vue.set(state.metadata[info.chainId][info.contract], info.tokenId, {
+            name: info.name,
+            description: info.description,
+            image: info.image,
+            attributes: info.attributes,
+          });
+        }
       }
     },
     setTokenMetadata(state, info) {
@@ -1721,14 +1735,11 @@ const dataModule = {
       const contractsToProcess = {};
       const tokensToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
-        // console.log(contract + " => " + JSON.stringify(contractData));
         if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract]) {
-          // contractsToProcess.push(contract);
           contractsToProcess[contract] = contractData;
         }
-        if (/*contractData.type == "erc721" || */ contractData.type == "erc1155") {
+        if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
-            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
             if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract] || !context.state.metadata[parameter.chainId][contract][tokenId]) {
               if (!(contract in tokensToProcess)) {
                 tokensToProcess[contract] = {};
@@ -1738,10 +1749,6 @@ const dataModule = {
           }
         }
       }
-
-      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
-
-      return;
 
       if (false) { // TODO: Temp
         // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
@@ -1811,29 +1818,18 @@ const dataModule = {
       // No tokenURI                   0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85 ENS
       // TODO ?                        0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401 ENS Name Wrapper
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
-      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+      // console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
 
       for (const [contract, contractData] of Object.entries(tokensToProcess)) {
-        // console.log(contract + " => " + JSON.stringify(contractData));
         for (const [tokenId, tokenData] of Object.entries(contractData)) {
-          // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
-
           const interface = new ethers.Contract(contract, ERC721ABI, provider);
-
           try {
             let tokenURIResult = null;
             if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
               tokenURIResult = "https://metadata.ens.domains/mainnet/" + contract + "/" + tokenId;
-              console.log("ENS: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
-            // } else if (contract == "0x15A2d6C2b4B9903C27f50Cb8B32160ab17F186E2") {
-              // console.log("GOOP TROOP: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
-              // tokenURIResult = await interface.tokenURI(tokenId);
             } else {
               tokenURIResult = await interface.tokenURI(tokenId);
-              console.log("OTHER: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
             }
-            // console.log("tokenURIResult: " + JSON.stringify(tokenURIResult));
-
             let name = null;
             let description = null;
             let attributes = null;
@@ -1854,130 +1850,101 @@ const dataModule = {
                 tokenId,
                 name,
                 description,
-                attributes,
                 image,
+                attributes,
               });
-            }
-            if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
+            } else if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
               const metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
-              console.log("metadataFile: " + metadataFile);
               try {
                 const metadataFileContent = await fetch(metadataFile).then(response => response.json());
-                console.log("metadataFileContent: " + JSON.stringify(metadataFileContent, null, 2));
-                // metadataFileContent: {
-                //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
-                // }
-                if (/*contract == ENS_ERC721_ADDRESS || */contract == ENS_ERC1155_ADDRESS) {
+                if (contract == ENS_ERC721_ADDRESS /*|| contract == ENS_ERC1155_ADDRESS*/) {
                   if (metadataFileContent && metadataFileContent.message) {
-                    console.log("EXPIRED: " + metadataFileContent.message);
-            //         // const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
-            //         // expiry = moment.utc(dateString).unix();
+                    // metadataFileContent: {
+                    //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
+                    // }
+                    // console.log("EXPIRED: " + metadataFileContent.message);
                     let inputString;
                     [inputString, name, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
                     expiry = moment.utc(expiryString).unix();
                     console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
                     expired = true;
+                    context.commit('addTokenMetadata', {
+                      chainId: parameter.chainId,
+                      contract,
+                      tokenId,
+                      created: null,
+                      registration: null,
+                      expiry,
+                      name: name,
+                      description: "Expired '" + name + "'",
+                      image: null,
+                      attributes: [],
+                    });
                   } else { // if (metadataFileContent && metadataFileContent.attributes) {
-                    console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
-            //         const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
-            //         // console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
-            //         expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
+                    if (contract == ENS_ERC721_ADDRESS) {
+                      const createdRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Created Date");
+                      created = createdRecord.length == 1 && createdRecord[0].value / 1000 || null;
+                      const registrationRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Registration Date");
+                      registration = registrationRecord.length == 1 && registrationRecord[0].value / 1000 || null;
+                      const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
+                      expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
+                      metadataFileContent.attributes.sort((a, b) => {
+                        return ('' + a.trait_type).localeCompare(b.trait_type);
+                      });
+                      context.commit('addTokenMetadata', {
+                        chainId: parameter.chainId,
+                        contract,
+                        tokenId,
+                        created,
+                        registration,
+                        expiry,
+                        name: metadataFileContent.name || null,
+                        description: metadataFileContent.name || null,
+                        image: metadataFileContent.image || null,
+                        attributes: metadataFileContent.attributes || [],
+                      });
+                    } else if (contract == ENS_ERC1155_ADDRESS) {
+                      const createdRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Created Date");
+                      created = createdRecord.length == 1 && createdRecord[0].value / 1000 || null;
+                      const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Namewrapper Expiry Date");
+                      expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
+                      metadataFileContent.attributes.sort((a, b) => {
+                        return ('' + a.trait_type).localeCompare(b.trait_type);
+                      });
+                      context.commit('addTokenMetadata', {
+                        chainId: parameter.chainId,
+                        contract,
+                        tokenId,
+                        created,
+                        expiry,
+                        name: metadataFileContent.name || null,
+                        description: metadataFileContent.name || null,
+                        image: metadataFileContent.image || null,
+                        attributes: metadataFileContent.attributes || [],
+                      });
+                    } else {
+                      metadataFileContent.attributes.sort((a, b) => {
+                        return ('' + a.trait_type).localeCompare(b.trait_type);
+                      });
+                      context.commit('addTokenMetadata', {
+                        chainId: parameter.chainId,
+                        contract,
+                        tokenId,
+                        name: metadataFileContent.name || null,
+                        description: metadataFileContent.name || null,
+                        image: metadataFileContent.image || null,
+                        attributes: metadataFileContent.attributes || [],
+                      });
+                    }
                   }
-            //       // console.log("  expiry: " + expiry + " " + moment.utc(expiry * 1000).toString());
-            //
-            //       // metadataFileContent: {
-            //       //   "is_normalized": true,
-            //       //   "name": "mrfahrenheit.eth",
-            //       //   "description": "mrfahrenheit.eth, an ENS name.",
-            //       //   "attributes": [
-            //       //     {
-            //       //       "trait_type": "Created Date",
-            //       //       "display_type": "date",
-            //       //       "value": 1606865196000
-            //       //     },
-            //       //     {
-            //       //       "trait_type": "Length",
-            //       //       "display_type": "number",
-            //       //       "value": 12
-            //       //     },
-            //       //     {
-            //       //       "trait_type": "Segment Length",
-            //       //       "display_type": "number",
-            //       //       "value": 12
-            //       //     },
-            //       //     {
-            //       //       "trait_type": "Character Set",
-            //       //       "display_type": "string",
-            //       //       "value": "letter"
-            //       //     },
-            //       //     {
-            //       //       "trait_type": "Registration Date",
-            //       //       "display_type": "date",
-            //       //       "value": 1648611636000
-            //       //     },
-            //       //     {
-            //       //       "trait_type": "Expiration Date",
-            //       //       "display_type": "date",
-            //       //       "value": 3226459236000
-            //       //     }
-            //       //   ],
-            //       //   "url": "https://app.ens.domains/name/mrfahrenheit.eth",
-            //       //   "last_request_date": 1707286194502,
-            //       //   "version": 0,
-            //       //   "background_image": "https://metadata.ens.domains/mainnet/avatar/mrfahrenheit.eth",
-            //       //   "image": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image",
-            //       //   "image_url": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image"
-            //       // }
                 }
-            //     metadata.name = expired ? expiredName : (metadataFileContent.name || undefined);
-                name = metadataFileContent.name || undefined;
-            //     metadata.description = expired ? ("Expired " + expiredName) : (metadataFileContent.description || undefined);
-                description = metadataFileContent.description || undefined;
-            //     metadata.expiry = expiry;
-            //     metadata.attributes = expired ? [] : (metadataFileContent.attributes || []);
-                attributes = metadataFileContent.attributes || [];
-                attributes.sort((a, b) => {
-                  return ('' + a.trait_type).localeCompare(b.trait_type);
-                });
-            //     metadata.imageSource = expired ? null : metadataFileContent.image;
-                image = metadataFileContent.image;
-            //     if (!expired) {
-            //       const imageFile = metadataFileContent.image.substring(0, 7) == "ipfs://" ? "https://ipfs.io/ipfs/" + metadataFileContent.image.substring(7) : metadataFileContent.image;
-            //       const base64 = await imageUrlToBase64(imageFile);
-            //       metadata.image = base64 || undefined;
-            //     } else {
-            //       metadata.image = null;
-            //     }
-            //     // Vue.set(context.state.tokenContracts[parameter.chainId][address].tokenIds[tokenId], 'metadata', metadata);
-            //     // console.log("metadata: " + JSON.stringify(metadata, null, 2));
-            //     context.commit('setTokenMetadata', metadata);
-                context.commit('addTokenMetadata', {
-                  chainId: parameter.chainId,
-                  contract,
-                  tokenId,
-                  name,
-                  description,
-                  attributes,
-                  image,
-                });
               } catch (e1) {
                 console.error(e1.message);
               }
             }
-
           } catch (e) {
             console.error(e.message);
           }
-
-          // context.commit('addTokenMetadata', {
-          //   chainId: parameter.chainId,
-          //   contract,
-          //   tokenId,
-          //   name: "Name Here",
-          //   description: "Description Here",
-          //   attributes: {},
-          //   image: "Image Here",
-          // });
           completed++;
           if (context.state.sync.halt) {
             break;
@@ -1988,24 +1955,6 @@ const dataModule = {
         }
       }
 
-      // for (const [key, value] of Object.entries(tokensToProcess)) {
-      //   console.log(JSON.stringify(key) + " => " + JSON.stringify(value));
-      //   console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
-      //   context.commit('setSyncCompleted', completed);
-      //   const interface = new ethers.Contract(contract, ERC20ABI, provider);
-      //
-      //   completed++;
-      //   if (context.state.sync.halt) {
-      //     break;
-      //   }
-      // }
-
-      // for (const token of tokensToProcess) {
-      //   console.log("Processing: " + JSON.stringify(token));
-      //   context.commit('setSyncCompleted', completed);
-      //   // TODO
-      //   completed++;
-      // }
       await context.dispatch('saveData', ['metadata']);
       return;
 
