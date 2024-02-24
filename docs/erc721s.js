@@ -132,7 +132,7 @@ const ERC721s = {
           </template>
 
           <template #cell(info)="data">
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + data.item.tokenId" target="_blank">
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].nftTokenPrefix + data.item.contract + '/' + data.item.tokenId" target="_blank">
               <span v-if="data.item.name">
                 <font size="-1">{{ data.item.name }}</font>
               </span>
@@ -142,7 +142,7 @@ const ERC721s = {
             </b-link>
             <br />
 
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.collectionName }}</font>
             </b-link>
             <b-button size="sm" @click="toggleTokenContractJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
@@ -395,7 +395,7 @@ const ERC721s = {
             // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
 
             const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] && this.metadata[this.chainId][contract][tokenId] || {};
-            console.log("  metadata: " + JSON.stringify(metadata, null, 2));
+            // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
             // const metadata = this.contractMetadata[this.chainId] &&
             //   this.contractMetadata[this.chainId][contract] &&
             //   this.contractMetadata[this.chainId][contract][tokenId] ||
@@ -458,7 +458,7 @@ const ERC721s = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 

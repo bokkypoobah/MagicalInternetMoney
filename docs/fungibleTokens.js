@@ -1,4 +1,4 @@
-const ERC20s = {
+const FungibleTokens = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
@@ -333,7 +333,7 @@ const ERC20s = {
       return results;
     },
     pagedFilteredSortedItems() {
-      logInfo("ERC20s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("FungibleTokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -371,11 +371,11 @@ const ERC20s = {
     },
 
     toggleTokenContractJunk(item) {
-      logInfo("ERC20s", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
+      logInfo("FungibleTokens", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractJunk', item);
     },
     toggleTokenContractFavourite(item) {
-      logInfo("ERC20s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      logInfo("FungibleTokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
     },
     copyToClipboard(str) {
@@ -396,7 +396,7 @@ const ERC20s = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("ERC20s", "methods.saveSettings - erc20sSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("FungibleTokens", "methods.saveSettings - erc20sSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.erc20sSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -436,7 +436,7 @@ const ERC20s = {
       return null;
     },
     rowSelected(item) {
-      logInfo("ERC20s", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("FungibleTokens", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         this.transfer.item = item[0];
         this.transfer.stealthPrivateKey = null;
@@ -519,7 +519,7 @@ const ERC20s = {
     },
 
     async timeoutCallback() {
-      logDebug("ERC20s", "timeoutCallback() count: " + this.count);
+      logDebug("FungibleTokens", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -531,10 +531,10 @@ const ERC20s = {
     },
   },
   beforeDestroy() {
-    logDebug("ERC20s", "beforeDestroy()");
+    logDebug("FungibleTokens", "beforeDestroy()");
   },
   mounted() {
-    logDebug("ERC20s", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("FungibleTokens", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('erc20sSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.erc20sSettings);
@@ -544,7 +544,7 @@ const ERC20s = {
       }
     }
     this.reschedule = true;
-    logDebug("ERC20s", "Calling timeoutCallback()");
+    logDebug("FungibleTokens", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -552,7 +552,7 @@ const ERC20s = {
   },
 };
 
-const erc20sModule = {
+const fungibleTokensModule = {
   namespaced: true,
   state: {
     params: null,
@@ -565,16 +565,16 @@ const erc20sModule = {
   },
   mutations: {
     deQueue(state) {
-      logDebug("erc20sModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
+      logDebug("fungibleTokensModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
       state.executionQueue.shift();
     },
     updateParams(state, params) {
       state.params = params;
-      logDebug("erc20sModule", "updateParams('" + params + "')")
+      logDebug("fungibleTokensModule", "updateParams('" + params + "')")
     },
     updateExecuting(state, executing) {
       state.executing = executing;
-      logDebug("erc20sModule", "updateExecuting(" + executing + ")")
+      logDebug("fungibleTokensModule", "updateExecuting(" + executing + ")")
     },
   },
   actions: {

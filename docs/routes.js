@@ -15,9 +15,9 @@ const routes = [{
     component: ERC721s,
     name: 'ERC721s',
   }, {
-    path: '/erc20s',
-    component: ERC20s,
-    name: 'ERC20s',
+    path: '/fungibleTokens',
+    component: FungibleTokens,
+    name: 'FungibleTokens',
   }, {
     path: '/stealthtransfers',
     component: StealthTransfers,
