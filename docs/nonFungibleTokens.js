@@ -367,7 +367,7 @@ const NonFungibleTokens = {
     totalERC721Tokens() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
-        if (data.type == "erc721") {
+        if (data.type == "erc721" || data.type == "erc1155") {
           result += Object.keys(data.tokenIds).length;
         }
       }

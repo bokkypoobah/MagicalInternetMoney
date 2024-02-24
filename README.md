@@ -48,6 +48,25 @@ This project is currently heavily under development. Clear your browser's LocalS
 
 <br />
 
+#### Screenshots
+
+##### Feb 24 2024
+
+###### Addresses
+
+<kbd><img src="images/SampleScreen_Addresses_20240224.png" /></kbd>
+
+###### ERC-20 Fungible Tokens
+
+<kbd><img src="images/SampleScreen_FungibleTokens_20240224.png" /></kbd>
+
+###### ERC-721 and ERC-1155 Non-Fungible Tokens
+
+<kbd><img src="images/SampleScreen_NonFungibleTokens_20240224.png" /></kbd>
+
+
+<br />
+
 ---
 
 ## Old Stuff
