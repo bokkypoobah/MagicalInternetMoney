@@ -412,13 +412,13 @@ const NonFungibleTokens = {
             // if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
             //   include = false;
             // }
-            // if (include && regex) {
-            //   const name = metadata.name || null;
-            //   const description = metadata.description || null;
-            //   if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
-            //     include = false;
-            //   }
-            // }
+            if (include && regex) {
+              const name = metadata.name || null;
+              const description = metadata.description || null;
+              if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
+                include = false;
+              }
+            }
             if (include) {
               results.push({
                 contract,
