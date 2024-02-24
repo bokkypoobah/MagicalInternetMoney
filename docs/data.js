@@ -1726,7 +1726,7 @@ const dataModule = {
           // contractsToProcess.push(contract);
           contractsToProcess[contract] = contractData;
         }
-        if (contractData.type == "erc721") {
+        if (/*contractData.type == "erc721" || */ contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
             // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
             if (!context.state.metadata[parameter.chainId] || !context.state.metadata[parameter.chainId][contract] || !context.state.metadata[parameter.chainId][contract][tokenId]) {
@@ -1737,8 +1737,11 @@ const dataModule = {
             }
           }
         }
-        // TODO: ERC-1155
       }
+
+      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+
+      return;
 
       if (false) { // TODO: Temp
         // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
@@ -1836,6 +1839,8 @@ const dataModule = {
             let attributes = null;
             let imageSource = null;
             let image = null;
+            let expiry = null;
+            let expired = false;
             if (tokenURIResult && tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
               const decodedJSON = atob(tokenURIResult.substring(29));
               const data = JSON.parse(decodedJSON);
@@ -1862,25 +1867,22 @@ const dataModule = {
                 // metadataFileContent: {
                 //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
                 // }
-            //     let expiredName = null;
-            //     let expiry = null;
-            //     let expired = false;
-            //     if (address == ENS_ERC721_ADDRESS) {
-            //       if (metadataFileContent && metadataFileContent.message) {
-            //         // console.log("EXPIRED: " + metadataFileContent.message);
+                if (/*contract == ENS_ERC721_ADDRESS || */contract == ENS_ERC1155_ADDRESS) {
+                  if (metadataFileContent && metadataFileContent.message) {
+                    console.log("EXPIRED: " + metadataFileContent.message);
             //         // const dateString = metadataFileContent.message.replace(/^.*expired at /,'').replace(/\.$/, '+0');
             //         // expiry = moment.utc(dateString).unix();
-            //         let inputString;
-            //         [inputString, expiredName, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
-            //         expiry = moment.utc(expiryString).unix();
-            //         // console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
-            //         expired = true;
-            //       } else { // if (metadataFileContent && metadataFileContent.attributes) {
-            //         // console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
+                    let inputString;
+                    [inputString, name, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
+                    expiry = moment.utc(expiryString).unix();
+                    console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
+                    expired = true;
+                  } else { // if (metadataFileContent && metadataFileContent.attributes) {
+                    console.log("Attributes: " + JSON.stringify(metadataFileContent.attributes, null, 2));
             //         const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
             //         // console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
             //         expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
-            //       }
+                  }
             //       // console.log("  expiry: " + expiry + " " + moment.utc(expiry * 1000).toString());
             //
             //       // metadataFileContent: {
@@ -1926,7 +1928,7 @@ const dataModule = {
             //       //   "image": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image",
             //       //   "image_url": "https://metadata.ens.domains/mainnet/0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85/0xcedbe7c6447c2772e90473baf9da5bdc0194bcbe6855767ea929ed7fbd14708d/image"
             //       // }
-            //     }
+                }
             //     metadata.name = expired ? expiredName : (metadataFileContent.name || undefined);
                 name = metadataFileContent.name || undefined;
             //     metadata.description = expired ? ("Expired " + expiredName) : (metadataFileContent.description || undefined);
