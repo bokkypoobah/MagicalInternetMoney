@@ -472,7 +472,7 @@ const dataModule = {
       state.sync.total = info.total;
     },
     setSyncCompleted(state, completed) {
-      logInfo("dataModule", "mutations.setSyncCompleted completed: " + completed);
+      logInfo("dataModule", "mutations.setSyncCompleted completed: " + completed + (state.sync.total ? ("/" + state.sync.total) : ""));
       state.sync.completed = completed;
     },
     setSyncHalt(state, halt) {
