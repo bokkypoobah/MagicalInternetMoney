@@ -248,8 +248,8 @@ const FungibleTokens = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    metadata() {
-      return store.getters['data/metadata'];
+    contractMetadata() {
+      return store.getters['data/contractMetadata'];
     },
     tokenContracts() {
       return store.getters['data/tokenContracts'];
@@ -294,7 +294,7 @@ const FungibleTokens = {
         }
       }
       for (const [contract, contractData] of Object.entries(this.tokens[this.chainId] || {})) {
-        const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] || {};
+        const metadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         if (contractData.type == "erc20") {
           let include = true;
           // if (this.settings.junkFilter) {

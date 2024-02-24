@@ -336,14 +336,14 @@ const NonFungibleTokens = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    metadata() {
-      return store.getters['data/metadata'];
-    },
-    tokenContracts() {
-      return store.getters['data/tokenContracts'];
+    contractMetadata() {
+      return store.getters['data/contractMetadata'];
     },
     tokenMetadata() {
       return store.getters['data/tokenMetadata'];
+    },
+    tokenContracts() {
+      return store.getters['data/tokenContracts'];
     },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
@@ -385,7 +385,7 @@ const NonFungibleTokens = {
         }
       }
       for (const [contract, data] of Object.entries(this.tokens[this.chainId] || {})) {
-        const contractMetadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] || {};
+        const contractMetadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         // console.log(contract + " => " + JSON.stringify(contractMetadata, null, 2));
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
         if (data.type == "erc721" || data.type == "erc1155") {
@@ -393,8 +393,7 @@ const NonFungibleTokens = {
           const collectionName = contractMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
-
-            const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] && this.metadata[this.chainId][contract][tokenId] || {};
+            const metadata = this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][contract] && this.tokenMetadata[this.chainId][contract][tokenId] || {};
             // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
             // const metadata = this.contractMetadata[this.chainId] &&
             //   this.contractMetadata[this.chainId][contract] &&
