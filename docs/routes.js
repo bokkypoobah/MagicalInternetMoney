@@ -11,9 +11,9 @@ const routes = [{
   //   component: Account,
   //   name: 'Account',
   }, {
-    path: '/erc721s',
-    component: ERC721s,
-    name: 'ERC721s',
+    path: '/nonFungibleTokens',
+    component: NonFungibleTokens,
+    name: 'NonFungibleTokens',
   }, {
     path: '/fungibleTokens',
     component: FungibleTokens,

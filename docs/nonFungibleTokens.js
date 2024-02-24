@@ -1,4 +1,4 @@
-const ERC721s = {
+const NonFungibleTokens = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
@@ -458,7 +458,7 @@ const ERC721s = {
       return results;
     },
     pagedFilteredSortedItems() {
-      logInfo("ERC721s", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("NonFungibleTokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -496,11 +496,11 @@ const ERC721s = {
     },
 
     toggleTokenContractJunk(item) {
-      logInfo("ERC721s", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibleTokens", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractJunk', item);
     },
     toggleTokenContractFavourite(item) {
-      logInfo("ERC721s", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibleTokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
     },
     copyToClipboard(str) {
@@ -521,7 +521,7 @@ const ERC721s = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("ERC721s", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("NonFungibleTokens", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.erc721sSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -561,7 +561,7 @@ const ERC721s = {
       return null;
     },
     rowSelected(item) {
-      logInfo("ERC721s", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibleTokens", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewToken/viewToken', { address: item[0].address, tokenId: item[0].tokenId });
         this.$refs.tokenContractsTable.clearSelected();
@@ -614,7 +614,7 @@ const ERC721s = {
     },
 
     async timeoutCallback() {
-      logDebug("ERC721s", "timeoutCallback() count: " + this.count);
+      logDebug("NonFungibleTokens", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -626,10 +626,10 @@ const ERC721s = {
     },
   },
   beforeDestroy() {
-    logDebug("ERC721s", "beforeDestroy()");
+    logDebug("NonFungibleTokens", "beforeDestroy()");
   },
   mounted() {
-    logDebug("ERC721s", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("NonFungibleTokens", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('erc721sSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.erc721sSettings);
@@ -639,7 +639,7 @@ const ERC721s = {
       }
     }
     this.reschedule = true;
-    logDebug("ERC721s", "Calling timeoutCallback()");
+    logDebug("NonFungibleTokens", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -647,7 +647,7 @@ const ERC721s = {
   },
 };
 
-const erc721sModule = {
+const nonFungibleTokensModule = {
   namespaced: true,
   state: {
     params: null,
@@ -660,16 +660,16 @@ const erc721sModule = {
   },
   mutations: {
     deQueue(state) {
-      logDebug("erc721sModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
+      logDebug("nonFungibleTokensModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
       state.executionQueue.shift();
     },
     updateParams(state, params) {
       state.params = params;
-      logDebug("erc721sModule", "updateParams('" + params + "')")
+      logDebug("nonFungibleTokensModule", "updateParams('" + params + "')")
     },
     updateExecuting(state, executing) {
       state.executing = executing;
-      logDebug("erc721sModule", "updateExecuting(" + executing + ")")
+      logDebug("nonFungibleTokensModule", "updateExecuting(" + executing + ")")
     },
   },
   actions: {

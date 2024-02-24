@@ -63,7 +63,7 @@ const store = new Vuex.Store({
     registry: registryModule,
     stealthTransfers: stealthTransfersModule,
     fungibleTokens: fungibleTokensModule,
-    erc721s: erc721sModule,
+    nonFungibleTokens: nonFungibleTokensModule,
     newTransfer: newTransferModule,
     newAddress: newAddressModule,
     syncOptions: syncOptionsModule,
