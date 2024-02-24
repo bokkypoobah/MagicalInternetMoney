@@ -2,6 +2,8 @@ const NonFungibleTokens = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
+        <!-- <b-icon-eye-slash shift-v="+1" font-scale="1.0"></b-icon-eye-slash> -->
+        <!-- <b-icon-eye-slash-fill shift-v="+1" font-scale="1.0"></b-icon-eye-slash-fill> -->
 
         <!-- :MODALFAUCETS -->
         <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
@@ -150,7 +152,11 @@ const NonFungibleTokens = {
           </template>
 
           <template #cell(expiry)="data">
-            {{ formatTimestamp(data.item.expiry) }}
+            <font size="-1">{{ formatTimestamp(data.item.expiry) }}</font>
+          </template>
+
+          <template #cell(owner)="data">
+            <font v-if="data.item.owner" size="-1">{{ data.item.owner.substring(0, 10) + '...' + data.item.owner.slice(-8) }}</font>
           </template>
 
           <template #cell(attributes)="data">
@@ -294,6 +300,7 @@ const NonFungibleTokens = {
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -392,7 +399,7 @@ const NonFungibleTokens = {
           // console.log(contract + " => " + JSON.stringify(data, null, 2));
           const collectionName = contractMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const metadata = this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][contract] && this.tokenMetadata[this.chainId][contract][tokenId] || {};
             // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
             // const metadata = this.contractMetadata[this.chainId] &&
@@ -414,11 +421,13 @@ const NonFungibleTokens = {
             if (include && regex) {
               const name = metadata.name || null;
               const description = metadata.description || null;
-              if (!(regex.test(collectionName) || regex.test(name) || regex.test(description))) {
+              if (!(regex.test(tokenId) || regex.test(collectionName) || regex.test(name) || regex.test(description))) {
                 include = false;
               }
             }
             if (include) {
+              const owner = data.type == "erc721" ? tokenData : (Object.keys(tokenData).length > 0 ? Object.keys(tokenData)[0] : null);
+              console.log(contract + "/" + tokenId + " => " + owner + " " + JSON.stringify(tokenData));
               results.push({
                 contract,
                 junk: data.junk,
@@ -427,7 +436,7 @@ const NonFungibleTokens = {
                 collectionName: contractMetadata.name,
                 totalSupply: data.totalSupply,
                 tokenId,
-                owner: tokenData.owner,
+                owner,
                 name: metadata.name || null,
                 description: metadata.description || null,
                 expiry: metadata.expiry || undefined,
