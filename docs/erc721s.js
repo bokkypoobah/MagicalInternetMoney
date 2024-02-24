@@ -161,15 +161,13 @@ const ERC721s = {
             </b-row>
           </template>
 
-
-
           <template #cell(favourite)="data">
             <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
           </template>
 
           <template #cell(contract)="data">
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.address + '#code'" target="_blank">
-              <font size="-1">{{ data.item.address.substring(0, 10) + '...' + data.item.address.slice(-8) }}</font>
+            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
+              <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
           </template>
           <template #cell(type)="data">
@@ -386,21 +384,21 @@ const ERC721s = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
-        const tokenMetadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] || {};
-        // console.log(address + " => " + JSON.stringify(tokenMetadata, null, 2));
+      for (const [contract, data] of Object.entries(this.tokens[this.chainId] || {})) {
+        const contractMetadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] || {};
+        // console.log(contract + " => " + JSON.stringify(contractMetadata, null, 2));
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
-        if (data.type == "erc721") {
-          // console.log(address + " => " + JSON.stringify(data, null, 2));
-          const collectionName = tokenMetadata.name;
+        if (data.type == "erc721" || data.type == "erc1155") {
+          // console.log(contract + " => " + JSON.stringify(data, null, 2));
+          const collectionName = contractMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            // console.log(address + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
 
-            // const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][address] && this.metadata[this.chainId][address][tokenId] || {};
-            // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
-            // const metadata = this.tokenMetadata[this.chainId] &&
-            //   this.tokenMetadata[this.chainId][address] &&
-            //   this.tokenMetadata[this.chainId][address][tokenId] ||
+            const metadata = this.metadata[this.chainId] && this.metadata[this.chainId][contract] && this.metadata[this.chainId][contract][tokenId] || {};
+            console.log("  metadata: " + JSON.stringify(metadata, null, 2));
+            // const metadata = this.contractMetadata[this.chainId] &&
+            //   this.contractMetadata[this.chainId][contract] &&
+            //   this.contractMetadata[this.chainId][contract][tokenId] ||
             //   {};
 
             let include = true;
@@ -423,20 +421,20 @@ const ERC721s = {
             // }
             if (include) {
               results.push({
-                address,
+                contract,
                 junk: data.junk,
                 favourite: data.favourite,
-                collectionSymbol: tokenMetadata.symbol,
-                collectionName: tokenMetadata.name,
+                collectionSymbol: contractMetadata.symbol,
+                collectionName: contractMetadata.name,
                 totalSupply: data.totalSupply,
                 tokenId,
                 owner: tokenData.owner,
-                // name: metadata.name || null,
-                // description: metadata.description || null,
-                // expiry: metadata.expiry || undefined,
-                // attributes: metadata.attributes || null,
+                name: metadata.name || null,
+                description: metadata.description || null,
+                expiry: metadata.expiry || undefined,
+                attributes: metadata.attributes || null,
                 // imageSource: metadata.imageSource || null,
-                // image: metadata.image || null,
+                image: metadata.image || null,
                 // blockNumber: tokenData.blockNumber,
                 // logIndex: tokenData.logIndex,
               });
