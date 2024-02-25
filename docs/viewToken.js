@@ -297,7 +297,7 @@ const ViewToken = {
       if (data.tokens.length > 0) {
         const tokenData = data.tokens[0].token;
         // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
-        const base64 = await imageUrlToBase64(tokenData.image);
+        // const base64 = await imageUrlToBase64(tokenData.image);
         const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
         attributes.sort((a, b) => {
           return ('' + a.trait_type).localeCompare(b.trait_type);
