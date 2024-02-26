@@ -1279,7 +1279,7 @@ const dataModule = {
             // const testAddresses = parameter.devThing ? new Set(["0xB32979486938AA9694BFC898f35DBED459F44424","0x286E531F363768Fed5E18b468f5B76a9FFc33af5"]) : null;
             // if (eventRecord && (!testAddresses || testAddresses.has(contract)) && eventRecord.eventType == "erc1155") {
             // if (eventRecord && contract == "0xB32979486938AA9694BFC898f35DBED459F44424") {
-            if (eventRecord && contract == HASHMASK) {
+            if (eventRecord /*&& contract == HASHMASK*/) {
               records.push( {
                 chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
