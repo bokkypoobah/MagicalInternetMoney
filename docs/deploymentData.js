@@ -1,6 +1,6 @@
 const ENS_ERC721_ADDRESS = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
 const ENS_ERC1155_ADDRESS = "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401";
-
+const HASHMASK = "0xC2C747E0F7004F9E8817Db2ca4997657a7746928";
 
 const ENSREVERSERECORDSADDRESS = "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C";
 const ENSREVERSERECORDSABI = [{"inputs":[{"internalType":"contract ENS","name":"_ens","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address[]","name":"addresses","type":"address[]"}],"name":"getNames","outputs":[{"internalType":"string[]","name":"r","type":"string[]"}],"stateMutability":"view","type":"function"}];

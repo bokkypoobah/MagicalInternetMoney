@@ -453,7 +453,7 @@ const dataModule = {
       state.sync.total = info.total;
     },
     setSyncCompleted(state, completed) {
-      logInfo("dataModule", "mutations.setSyncCompleted completed: " + completed + (state.sync.total ? ("/" + state.sync.total) : ""));
+      logInfo("dataModule", "mutations.setSyncCompleted completed: " + completed + (state.sync.total ? ("/" + state.sync.total) : "") + " " + state.sync.section);
       state.sync.completed = completed;
     },
     setSyncHalt(state, halt) {
@@ -633,7 +633,7 @@ const dataModule = {
         await context.dispatch('collateRegistrations', parameter);
       }
 
-      if (options.tokens && !options.devThing) {
+      if (options.tokens /*&& !options.devThing*/) {
         await context.dispatch('syncTokenEvents', parameter);
       }
       if (options.timestamps && !options.devThing) {
@@ -645,7 +645,7 @@ const dataModule = {
       if (options.tokens || options.devThing) {
         await context.dispatch('collateTokens', parameter);
       }
-      if (options.metadata && !options.devThing) {
+      if (options.metadata || options.devThing) {
         await context.dispatch('syncTokenMetadata', parameter);
       }
 
@@ -1276,7 +1276,10 @@ const dataModule = {
             //     ((parameter.erc20 && eventRecord.eventType == "erc20") ||
             //      (parameter.erc721 && eventRecord.eventType == "erc721") ||
             //      (parameter.erc1155 && eventRecord.eventType == "erc1155"))) {
-            if (eventRecord) {
+            // const testAddresses = parameter.devThing ? new Set(["0xB32979486938AA9694BFC898f35DBED459F44424","0x286E531F363768Fed5E18b468f5B76a9FFc33af5"]) : null;
+            // if (eventRecord && (!testAddresses || testAddresses.has(contract)) && eventRecord.eventType == "erc1155") {
+            // if (eventRecord && contract == "0xB32979486938AA9694BFC898f35DBED459F44424") {
+            if (eventRecord && contract == HASHMASK) {
               records.push( {
                 chainId: parameter.chainId,
                 blockNumber: parseInt(log.blockNumber),
@@ -1694,6 +1697,9 @@ const dataModule = {
             let tokenURIResult = null;
             if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
               tokenURIResult = "https://metadata.ens.domains/mainnet/" + contract + "/" + tokenId;
+            // } else if (contract == HASHMASK) {
+            //   // Cannot access to server CORS configuration tokenURIResult = "https://hashmap.azurewebsites.net/getMask/" + tokenId;
+            //   tokenURIResult = "https://api.reservoir.tools/tokens/v7?tokens=" + contract + "%3A" + tokenId + "&includeAttributes=true";
             } else {
               if (contractType == "erc721") {
                 const interface = new ethers.Contract(contract, ERC721ABI, provider);
@@ -1704,7 +1710,7 @@ const dataModule = {
                 // console.log("ERC-1155 tokenURIResult: " + tokenURIResult);
               }
             }
-            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
+            console.log("FIRST: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
             let name = null;
             let description = null;
             let attributes = null;
@@ -1729,7 +1735,17 @@ const dataModule = {
                 attributes,
               });
             } else if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
-              let metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
+              let metadataFile = null;
+              if (tokenURIResult.substring(0, 12) == "ipfs://ipfs/") {
+                metadataFile = "https://ipfs.io/" + tokenURIResult.substring(7)
+              } else if (tokenURIResult.substring(0, 7) == "ipfs://") {
+                metadataFile = "https://ipfs.io/ipfs/" + tokenURIResult.substring(7);
+              } else {
+                metadataFile = tokenURIResult;
+              }
+              // let metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
+              console.log("metadataFile: " + metadataFile + ", tokenURIResult: " + tokenURIResult);
+
               // console.log("metadataFile: " + JSON.stringify(metadataFile, null, 2));
               if (contractType == "erc1155") {
                 // console.log("ERC-1155 metadataFile BEFORE: " + JSON.stringify(metadataFile, null, 2));
@@ -1737,7 +1753,9 @@ const dataModule = {
                 // console.log("ERC-1155 metadataFile AFTER: " + JSON.stringify(metadataFile, null, 2));
               }
               try {
-                const metadataFileContent = await fetch(metadataFile).then(response => response.json());
+                const metadataFileContent = await fetch(metadataFile, {mode: 'cors'}).then(response => response.json());
+                console.log("metadataFile: " + metadataFile + " => " + JSON.stringify(metadataFileContent, null, 2));
+
                 if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
                   if (metadataFileContent && metadataFileContent.message) {
                     // metadataFileContent: {
@@ -1769,7 +1787,8 @@ const dataModule = {
                       registration = registrationRecord.length == 1 && registrationRecord[0].value / 1000 || null;
                       const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
                       expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
-                      metadataFileContent.attributes.sort((a, b) => {
+                      const attributes = metadataFileContent.attributes || [];
+                      attributes.sort((a, b) => {
                         return ('' + a.trait_type).localeCompare(b.trait_type);
                       });
                       context.commit('addTokenMetadata', {
@@ -1782,14 +1801,15 @@ const dataModule = {
                         name: metadataFileContent.name || null,
                         description: metadataFileContent.name || null,
                         image: metadataFileContent.image || null,
-                        attributes: metadataFileContent.attributes || [],
+                        attributes,
                       });
                     } else if (contract == ENS_ERC1155_ADDRESS) {
                       const createdRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Created Date");
                       created = createdRecord.length == 1 && createdRecord[0].value / 1000 || null;
                       const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Namewrapper Expiry Date");
                       expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
-                      metadataFileContent.attributes.sort((a, b) => {
+                      const attributes = metadataFileContent.attributes || [];
+                      attributes.sort((a, b) => {
                         return ('' + a.trait_type).localeCompare(b.trait_type);
                       });
                       context.commit('addTokenMetadata', {
@@ -1801,23 +1821,27 @@ const dataModule = {
                         name: metadataFileContent.name || null,
                         description: metadataFileContent.name || null,
                         image: metadataFileContent.image || null,
-                        attributes: metadataFileContent.attributes || [],
-                      });
-                    } else {
-                      metadataFileContent.attributes.sort((a, b) => {
-                        return ('' + a.trait_type).localeCompare(b.trait_type);
-                      });
-                      context.commit('addTokenMetadata', {
-                        chainId: parameter.chainId,
-                        contract,
-                        tokenId,
-                        name: metadataFileContent.name || null,
-                        description: metadataFileContent.name || null,
-                        image: metadataFileContent.image || null,
-                        attributes: metadataFileContent.attributes || [],
+                        attributes,
                       });
                     }
                   }
+                } else {
+                  console.log("NON-ENS");
+                  const attributes = metadataFileContent.attributes || [];
+                  attributes.sort((a, b) => {
+                    return ('' + a.trait_type).localeCompare(b.trait_type);
+                  });
+                  const image = metadataFileContent.image || null;
+                  console.log(contract + "/" + tokenId + " => " + image);
+                  context.commit('addTokenMetadata', {
+                    chainId: parameter.chainId,
+                    contract,
+                    tokenId,
+                    name: metadataFileContent.name || null,
+                    description: metadataFileContent.name || null,
+                    image: metadataFileContent.image || null,
+                    attributes,
+                  });
                 }
               } catch (e1) {
                 console.error(e1.message);

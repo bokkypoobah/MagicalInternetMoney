@@ -133,7 +133,17 @@ const ViewToken = {
       return this.metadata && this.metadata.description || null;
     },
     image() {
-      return this.metadata && this.metadata.image || null;
+      let result = null;
+      if (this.metadata.image) {
+        if (this.metadata.image.substring(0, 12) == "ipfs://ipfs/") {
+          result = "https://ipfs.io/" + this.metadata.image.substring(7)
+        } else if (this.metadata.image.substring(0, 7) == "ipfs://") {
+          result = "https://ipfs.io/ipfs/" + this.metadata.image.substring(7);
+        } else {
+          result = this.metadata.image;
+        }
+      }
+      return result;
     },
     attributes() {
       return this.metadata && this.metadata.attributes || [];

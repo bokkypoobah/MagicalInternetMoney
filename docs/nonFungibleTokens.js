@@ -399,7 +399,7 @@ const NonFungibleTokens = {
           // console.log(contract + " => " + JSON.stringify(data, null, 2));
           const collectionName = contractMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
-            console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
+            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const metadata = this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][contract] && this.tokenMetadata[this.chainId][contract][tokenId] || {};
             // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
             // const metadata = this.contractMetadata[this.chainId] &&
@@ -427,7 +427,20 @@ const NonFungibleTokens = {
             }
             if (include) {
               const owner = data.type == "erc721" ? tokenData : (Object.keys(tokenData).length > 0 ? Object.keys(tokenData)[0] : null);
-              console.log(contract + "/" + tokenId + " => " + owner + " " + JSON.stringify(tokenData));
+              // console.log(contract + "/" + tokenId + " => " + owner + " " + JSON.stringify(tokenData));
+              // const image = metadata.image || null;
+
+              let image = null;
+              if (metadata.image) {
+                if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
+                  image = "https://ipfs.io/" + metadata.image.substring(7)
+                } else if (metadata.image.substring(0, 7) == "ipfs://") {
+                  image = "https://ipfs.io/ipfs/" + metadata.image.substring(7);
+                } else {
+                  image = metadata.image;
+                }
+              }
+
               results.push({
                 contract,
                 junk: data.junk,
@@ -442,7 +455,7 @@ const NonFungibleTokens = {
                 expiry: metadata.expiry || undefined,
                 attributes: metadata.attributes || null,
                 // imageSource: metadata.imageSource || null,
-                image: metadata.image || null,
+                image,
                 // blockNumber: tokenData.blockNumber,
                 // logIndex: tokenData.logIndex,
               });
