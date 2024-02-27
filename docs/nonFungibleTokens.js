@@ -391,6 +391,14 @@ const NonFungibleTokens = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
+      const selectedAddressesMap = {};
+      for (const [address, addressData] of Object.entries(this.addresses)) {
+        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
+          selectedAddressesMap[address] = true;
+        }
+      }
+      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+
       for (const [contract, data] of Object.entries(this.tokens[this.chainId] || {})) {
         const contractMetadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         // console.log(contract + " => " + JSON.stringify(contractMetadata, null, 2));

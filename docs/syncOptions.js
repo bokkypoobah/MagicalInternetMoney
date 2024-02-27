@@ -10,7 +10,7 @@ const SyncOptions = {
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20, ERC-721 and ERC-1155 Tokens'" class="ml-2 mt-1">Tokens</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Token Metadata</b-form-checkbox>
 
-        <b-form-checkbox v-if="false" size="sm" switch :disabled="true || chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">TODO: Mainnet ENS Names</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">ENS Names on ETH Mainnet</b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
 
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.timestamps" @input="saveSettings" v-b-popover.hover="'Timestamps'" class="ml-2 mt-1">Timestamps</b-form-checkbox>
