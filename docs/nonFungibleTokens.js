@@ -155,8 +155,17 @@ const NonFungibleTokens = {
             <font size="-1">{{ formatTimestamp(data.item.expiry) }}</font>
           </template>
 
-          <template #cell(owner)="data">
-            <font v-if="data.item.owner" size="-1">{{ data.item.owner.substring(0, 10) + '...' + data.item.owner.slice(-8) }}</font>
+          <template #cell(owners)="data">
+            <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '?a=' + info.owner + '#inventory'" target="_blank">
+                <font size="-1">
+                  {{ info.owner.substring(0, 10) + '...' + info.owner.slice(-8) }}
+                  <span v-if="data.item.type == 'erc1155'" class="small muted">
+                    {{ 'x' + info.count }}
+                  </span>
+                </font>
+              </b-link>
+            </div>
           </template>
 
           <template #cell(attributes)="data">
@@ -300,7 +309,7 @@ const NonFungibleTokens = {
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'owners', label: 'Owners', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -397,7 +406,7 @@ const NonFungibleTokens = {
           selectedAddressesMap[address] = true;
         }
       }
-      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
 
       for (const [contract, data] of Object.entries(this.tokens[this.chainId] || {})) {
         const contractMetadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
@@ -434,10 +443,7 @@ const NonFungibleTokens = {
               }
             }
             if (include) {
-              const owner = data.type == "erc721" ? tokenData : (Object.keys(tokenData).length > 0 ? Object.keys(tokenData)[0] : null);
-              // console.log(contract + "/" + tokenId + " => " + owner + " " + JSON.stringify(tokenData));
-              // const image = metadata.image || null;
-
+              // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
               let image = null;
               if (metadata.image) {
                 if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
@@ -448,25 +454,39 @@ const NonFungibleTokens = {
                   image = metadata.image;
                 }
               }
-
-              results.push({
-                contract,
-                junk: data.junk,
-                favourite: data.favourite,
-                collectionSymbol: contractMetadata.symbol,
-                collectionName: contractMetadata.name,
-                totalSupply: data.totalSupply,
-                tokenId,
-                owner,
-                name: metadata.name || null,
-                description: metadata.description || null,
-                expiry: metadata.expiry || undefined,
-                attributes: metadata.attributes || null,
-                // imageSource: metadata.imageSource || null,
-                image,
-                // blockNumber: tokenData.blockNumber,
-                // logIndex: tokenData.logIndex,
-              });
+              const owners = [];
+              if (data.type == "erc721") {
+                if (tokenData in selectedAddressesMap) {
+                  owners.push({ owner: tokenData });
+                }
+              } else {
+                for (const [owner, count] of Object.entries(tokenData)) {
+                  if (owner in selectedAddressesMap) {
+                    owners.push({ owner, count });
+                  }
+                }
+              }
+              if (owners.length > 0) {
+                results.push({
+                  contract,
+                  type: data.type,
+                  junk: data.junk,
+                  favourite: data.favourite,
+                  collectionSymbol: contractMetadata.symbol,
+                  collectionName: contractMetadata.name,
+                  totalSupply: data.totalSupply,
+                  tokenId,
+                  owners,
+                  name: metadata.name || null,
+                  description: metadata.description || null,
+                  expiry: metadata.expiry || undefined,
+                  attributes: metadata.attributes || null,
+                  // imageSource: metadata.imageSource || null,
+                  image,
+                  // blockNumber: tokenData.blockNumber,
+                  // logIndex: tokenData.logIndex,
+                });
+              }
             }
           }
         }
