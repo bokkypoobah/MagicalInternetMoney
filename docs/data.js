@@ -739,7 +739,8 @@ const dataModule = {
         logInfo("dataModule", "actions.syncStealthTransfers.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
-            address: null,
+            // TODO: address: null,
+            address: ERC5564ANNOUNCERADDRESS_SEPOLIA,
             fromBlock,
             toBlock,
             topics: [
@@ -848,8 +849,8 @@ const dataModule = {
 
       function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
         const result = {};
-        // console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
-        // console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+        console.log(moment().format("HH:mm:ss") + " processDataOld - checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+        console.log("    Check stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
         result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
         result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
         result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
@@ -895,39 +896,43 @@ const dataModule = {
             const viewingPrivateKey = account.viewingPrivateKey;
             const viewingPublicKey = account.viewingPublicKey;
             const spendingPublicKey = account.spendingPublicKey;
-            const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-            if (status && status.match) {
-              item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
-              item.iReceived = true;
-              if (stealthAddress in addresses) {
-                if (addresses[stealthAddress].type != "stealthAddress") {
-                  context.commit('updateToStealthAddress', {
+            try {
+              const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
+              if (status && status.match) {
+                item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
+                item.iReceived = true;
+                if (stealthAddress in addresses) {
+                  if (addresses[stealthAddress].type != "stealthAddress") {
+                    context.commit('updateToStealthAddress', {
+                      stealthAddress,
+                      type: "stealthAddress",
+                      linkedTo: {
+                        stealthMetaAddress: account.address,
+                        address: account.linkedToAddress,
+                      },
+                      mine: true,
+                    });
+                  }
+                } else {
+                  context.commit('addNewStealthAddress', {
                     stealthAddress,
                     type: "stealthAddress",
                     linkedTo: {
                       stealthMetaAddress: account.address,
                       address: account.linkedToAddress,
                     },
+                    source: "announcer",
                     mine: true,
+                    junk: false,
+                    favourite: false,
+                    name: null,
+                    notes: null,
                   });
                 }
-              } else {
-                context.commit('addNewStealthAddress', {
-                  stealthAddress,
-                  type: "stealthAddress",
-                  linkedTo: {
-                    stealthMetaAddress: account.address,
-                    address: account.linkedToAddress,
-                  },
-                  source: "announcer",
-                  mine: true,
-                  junk: false,
-                  favourite: false,
-                  name: null,
-                  notes: null,
-                });
+                break;
               }
-              break;
+            } catch (e) {
+              console.log("ERROR: " + e.message);
             }
           }
           writeRecords.push(item);
@@ -994,7 +999,7 @@ const dataModule = {
           if (!log.removed) {
             try {
               const logData = erc5564RegistryContract.interface.parseLog(log);
-              console.log("DEBUG 1");
+              console.log("logData: " + JSON.stringify(logData, null, 2));
               const contract = log.address;
               // if (selectedContracts.includes(contract)) {
                 records.push( {
@@ -1015,7 +1020,7 @@ const dataModule = {
                 });
               // }
             } catch (e) {
-              console.log("ERROR: " + JSON.stringify(log));
+              console.log("ERROR: " + e.message);
             }
           }
         }
