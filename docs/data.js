@@ -927,6 +927,7 @@ const dataModule = {
                     favourite: false,
                     name: null,
                     notes: null,
+                    check: [],
                   });
                 }
                 break;
@@ -999,7 +1000,7 @@ const dataModule = {
           if (!log.removed) {
             try {
               const logData = erc5564RegistryContract.interface.parseLog(log);
-              console.log("logData: " + JSON.stringify(logData, null, 2));
+              // console.log("logData: " + JSON.stringify(logData, null, 2));
               const contract = log.address;
               // if (selectedContracts.includes(contract)) {
                 records.push( {
@@ -1025,6 +1026,7 @@ const dataModule = {
           }
         }
         if (records.length) {
+          // console.log("syncRegistrations.bulkAdd: " + JSON.stringify(records));
           await db.registrations.bulkAdd(records).then (function(lastKey) {
             console.log("syncRegistrations.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
@@ -1036,7 +1038,8 @@ const dataModule = {
         logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
-            address: null,
+            // TODO: address: null,
+            address: ERC5564REGISTRYADDRESS_SEPOLIA,
             fromBlock,
             toBlock,
             topics: [

@@ -250,7 +250,7 @@ const Addresses = {
           </template>
           <template #cell(check)="data">
             <!-- <b-form-checkbox-group disabled size="sm" v-model="data.item.check" @change="setAddressField(data.item.account, 'check', $event)" :options="checkOptions" class="ml-2"></b-form-checkbox-group> -->
-            <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font>
+            <!-- TODO: <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font> -->
           </template>
         </b-table>
       </b-card>
@@ -428,7 +428,7 @@ const Addresses = {
       return results;
     },
     pagedFilteredSortedAddresses() {
-      // logInfo("Addresses", "filteredSortedAddresses - results[0..1]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 2), null, 2));
+      logInfo("Addresses", "filteredSortedAddresses - results[0..1]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 2), null, 2));
       return this.filteredSortedAddresses.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
   },
