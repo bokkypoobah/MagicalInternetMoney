@@ -992,26 +992,31 @@ const dataModule = {
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
-            const logData = erc5564RegistryContract.interface.parseLog(log);
-            const contract = log.address;
-            // if (selectedContracts.includes(contract)) {
-              records.push( {
-                chainId: parameter.chainId,
-                blockNumber: parseInt(log.blockNumber),
-                logIndex: parseInt(log.logIndex),
-                txIndex: parseInt(log.transactionIndex),
-                txHash: log.transactionHash,
-                contract,
-                name: logData.name,
-                registrant: ethers.utils.getAddress(logData.args[0]),
-                schemeId: parseInt(logData.args[1]),
-                stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
-                mine: false,
-                confirmations: parameter.blockNumber - log.blockNumber,
-                timestamp: null,
-                tx: null,
-              });
-            // }
+            try {
+              const logData = erc5564RegistryContract.interface.parseLog(log);
+              console.log("DEBUG 1");
+              const contract = log.address;
+              // if (selectedContracts.includes(contract)) {
+                records.push( {
+                  chainId: parameter.chainId,
+                  blockNumber: parseInt(log.blockNumber),
+                  logIndex: parseInt(log.logIndex),
+                  txIndex: parseInt(log.transactionIndex),
+                  txHash: log.transactionHash,
+                  contract,
+                  name: logData.name,
+                  registrant: ethers.utils.getAddress(logData.args[0]),
+                  schemeId: parseInt(logData.args[1]),
+                  stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
+                  mine: false,
+                  confirmations: parameter.blockNumber - log.blockNumber,
+                  timestamp: null,
+                  tx: null,
+                });
+              // }
+            } catch (e) {
+              console.log("ERROR: " + JSON.stringify(log));
+            }
           }
         }
         if (records.length) {
