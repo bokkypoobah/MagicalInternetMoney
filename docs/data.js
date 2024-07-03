@@ -670,7 +670,7 @@ const dataModule = {
 
       // Announcement (index_topic_1 uint256 schemeId, index_topic_2 address stealthAddress, index_topic_3 address caller, bytes ephemeralPublicKey, bytes metadata)
       // 0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7
-      const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS_SEPOLIA, ERC5564ANNOUNCERABI_SEPOLIA, provider);
+      const erc5564AnnouncerContract = new ethers.Contract(ERC5564ANNOUNCERADDRESS, ERC5564ANNOUNCERABI, provider);
       let total = 0;
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
@@ -740,7 +740,7 @@ const dataModule = {
         try {
           const filter = {
             // TODO: address: null,
-            address: ERC5564ANNOUNCERADDRESS_SEPOLIA,
+            address: ERC5564ANNOUNCERADDRESS,
             fromBlock,
             toBlock,
             topics: [
@@ -988,7 +988,7 @@ const dataModule = {
       // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
       // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
       // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
-      const erc5564RegistryContract = new ethers.Contract(ERC5564REGISTRYADDRESS_SEPOLIA, ERC5564REGISTRYABI_SEPOLIA, provider);
+      const erc5564RegistryContract = new ethers.Contract(ERC6538REGISTRYADDRESS, ERC6538REGISTRYABI, provider);
       let total = 0;
       let t = this;
       async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
@@ -1039,7 +1039,7 @@ const dataModule = {
         try {
           const filter = {
             // TODO: address: null,
-            address: ERC5564REGISTRYADDRESS_SEPOLIA,
+            address: ERC6538REGISTRYADDRESS,
             fromBlock,
             toBlock,
             topics: [
