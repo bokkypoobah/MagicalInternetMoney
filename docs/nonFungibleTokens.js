@@ -402,7 +402,7 @@ const NonFungibleTokens = {
       }
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(this.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
+        if (address.substring(0, 2) == "0x" && addressData.check && addressData.check.includes("tokens")) {
           selectedAddressesMap[address] = true;
         }
       }

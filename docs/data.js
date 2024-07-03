@@ -1376,7 +1376,7 @@ const dataModule = {
       context.commit('setSyncSection', { section: 'Token Events', total: null });
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
+        if (address.substring(0, 2) == "0x" && addressData.check && addressData.check.includes("tokens")) {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
@@ -1503,7 +1503,7 @@ const dataModule = {
       logInfo("dataModule", "actions.collateTokens BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.check.includes("tokens")) {
+        if (address.substring(0, 2) == "0x" && addressData.check && addressData.check.includes("tokens")) {
           selectedAddressesMap[address] = true;
         }
       }
