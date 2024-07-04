@@ -50,7 +50,25 @@ This project is currently heavily under development. Clear your browser's LocalS
 
 <br />
 
-#### Screenshots
+---
+
+## Deployments
+
+We are using the contracts listed in [Stealth Address - Deployments](https://stealthaddress.dev/contracts/deployments) on the Sepolia network:
+
+* [ERC5564Announcer @ 0x55649E01B5Df198D18D95b5cc5051630cfD45564](https://sepolia.etherscan.io/address/0x55649E01B5Df198D18D95b5cc5051630cfD45564#code)
+* [ERC6538Registry @ 0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538](https://sepolia.etherscan.io/address/0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538#code)
+
+Deployed on Sepolia:
+
+* [MagicInternetMoney.sol v0.8.3](deployed/MagicalInternetMoney_v0.8.3_Sepolia_0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2.sol) on Sepolia [0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2](https://sepolia.etherscan.io/address/0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2#code)
+
+
+<br />
+
+---
+
+## Screenshots
 
 ##### Feb 24 2024
 
@@ -190,17 +208,6 @@ Click on the [>] button to send ETH/ERC-20/ERC-721 tokens to that Stealth Meta-A
 
 <kbd><img src="images/SampleScreen_StealthTransfer_PrivateKeyEnteredInWeb3Wallet_20240115.png" /></kbd>
 
-
-
-<br />
-
----
-
-## Deployments
-
-* [ERC5564Announcer.sol v0.8.1](deployed/ERC5564Announcer_v0.8.1_Sepolia_0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365.sol) on Sepolia [0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365](https://sepolia.etherscan.io/address/0xFe6335f5dc5a469e74fB6a9FDAe116bFD5346365#code)
-* [ERC5564Registry.sol v0.8.1](deployed/ERC5564Registry_v0.8.1_Sepolia_0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde.sol) on Sepolia [0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde](https://sepolia.etherscan.io/address/0x5F8ac9e3B2DD28cA2c9bc7A992Ce36c3C4929Cde#code)
-* [MagicInternetMoney.sol v0.8.2](deployed/MagicalInternetMoney_v0.8.2_Sepolia_0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1.sol) on Sepolia [0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1](https://sepolia.etherscan.io/address/0x5B84e1706CD6Ae0d79486Dd6F30503B4330742E1#code)
 
 
 <br />
