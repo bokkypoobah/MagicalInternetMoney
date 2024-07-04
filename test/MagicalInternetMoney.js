@@ -13,18 +13,18 @@ describe("MagicalInternetMoney", function () {
     const ERC20Token = await ethers.getContractFactory("ERC20Token");
     const ERC721Token = await ethers.getContractFactory("ERC721Token");
     const erc5564Announcer = await ERC5564Announcer.deploy();
-    const erc5564Registry = await ERC6538Registry.deploy();
-    const stealthChad = await MagicalInternetMoney.deploy(erc5564Announcer);
+    const erc6538Registry = await ERC6538Registry.deploy();
+    const magicalInternetMoney = await MagicalInternetMoney.deploy(erc5564Announcer);
     const erc20Token = await ERC20Token.deploy("ERC-20", "ERC-20 Token", 18, 1000000000000000000000000n);
     const erc721Token = await ERC721Token.deploy();
 
     const ownerBalance = await erc20Token.balanceOf(owner);
     console.log("ownerBalance: " + ownerBalance);
 
-    const approveTx_1 = await erc20Token.approve(stealthChad, 123456789123456789n);
+    const approveTx_1 = await erc20Token.approve(magicalInternetMoney, 123456789123456789n);
     const approveReceipt_1 = await approveTx_1.wait();
 
-    const ownerAllowanceToMagicalInternetMoney = await erc20Token.allowance(owner, stealthChad);
+    const ownerAllowanceToMagicalInternetMoney = await erc20Token.allowance(owner, magicalInternetMoney);
     console.log("ownerAllowanceToMagicalInternetMoney: " + ownerAllowanceToMagicalInternetMoney);
 
     // const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
@@ -34,19 +34,19 @@ describe("MagicalInternetMoney", function () {
     // const Lock = await ethers.getContractFactory("Lock");
     // const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
 
-    return { erc5564Announcer, erc5564Registry, stealthChad, erc20Token, erc721Token, owner, otherAccount };
+    return { erc5564Announcer, erc6538Registry, magicalInternetMoney, erc20Token, erc721Token, owner, otherAccount };
   }
 
   describe("Deployment", function () {
 
     it.skip("Test Announcer - ETH Transfer", async function () {
-      const { erc5564Announcer, erc5564Registry, stealthChad, owner, otherAccount } = await loadFixture(deployContractsFixture);
+      const { erc5564Announcer, erc6538Registry, magicalInternetMoney, owner, otherAccount } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
-      const schemeId = 0;
+      const schemeId = 1;
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
       const viewTag = 0xff;
-      const transferEthAndAnnounceTx_1 = await stealthChad.transferEthAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, { value: 123456789123456789n });
+      const transferEthAndAnnounceTx_1 = await magicalInternetMoney.transferEthAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, { value: 123456789123456789n });
       const transferEthAndAnnounceReceipt_1 = await transferEthAndAnnounceTx_1.wait();
       transferEthAndAnnounceReceipt_1.logs.forEach((log) => {
         console.log("      transferEthAndAnnounceReceipt_1:\n" + util.inspect(erc5564Announcer.interface.parseLog(log)).replace(/^/gm, " ".repeat(8)));
@@ -54,15 +54,15 @@ describe("MagicalInternetMoney", function () {
     });
 
     it("Test Announcer - ETH & Tokens Transfer", async function () {
-      const { erc5564Announcer, erc5564Registry, stealthChad, erc20Token, owner, otherAccount } = await loadFixture(deployContractsFixture);
+      const { erc5564Announcer, erc6538Registry, magicalInternetMoney, erc20Token, owner, otherAccount } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
-      const schemeId = 0;
+      const schemeId = 1;
       const recipient = otherAccount;
       const ephemeralPubKey = "0x1234";
       const viewTag = 0xff;
       const tokenInfos = [[false, erc20Token.target, 12345]];
       console.log("      tokenInfos: " + JSON.stringify(tokenInfos));
-      const transferAndAnnounceTx_1 = await stealthChad.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokenInfos, { value: 123n });
+      const transferAndAnnounceTx_1 = await magicalInternetMoney.transferAndAnnounce(schemeId, recipient, ephemeralPubKey, viewTag, tokenInfos, { value: 123n });
       const transferAndAnnounceReceipt_1 = await transferAndAnnounceTx_1.wait();
       transferAndAnnounceReceipt_1.logs.forEach((log) => {
         if (log.address == erc5564Announcer.target) {
@@ -74,14 +74,14 @@ describe("MagicalInternetMoney", function () {
     });
 
     it("Test Registry", async function () {
-      const { erc5564Announcer, erc5564Registry, stealthChad, owner } = await loadFixture(deployContractsFixture);
+      const { erc5564Announcer, erc6538Registry, magicalInternetMoney, owner } = await loadFixture(deployContractsFixture);
       console.log("      owner: " + owner.address);
-      const schemeId = 0;
+      const schemeId = 1;
       const stealthMetaAddress = "st:eth:0x039441d882d0cf33565dda9c752910f9bb13186555495c081e9d33e391518456c403ea8baab0486a7b4b6056d77e35a8f0b5534550fdfe53a69180885ea10fbecb96";
-      const registerKeysTx_1 = await erc5564Registry.registerKeys(schemeId, ethers.hexlify(ethers.toUtf8Bytes(stealthMetaAddress)));
+      const registerKeysTx_1 = await erc6538Registry.registerKeys(schemeId, ethers.hexlify(ethers.toUtf8Bytes(stealthMetaAddress)));
       const registerKeysReceipt_1 = await registerKeysTx_1.wait();
       registerKeysReceipt_1.logs.forEach((log) => {
-        const parsedLog = erc5564Registry.interface.parseLog(log);
+        const parsedLog = erc6538Registry.interface.parseLog(log);
         console.log("      registerKeysReceipt_1:\n" + util.inspect(parsedLog).replace(/^/gm, " ".repeat(8)));
         const registrant = parsedLog.args[0];
         console.log("      registrant: " + registrant);
