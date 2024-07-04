@@ -308,7 +308,7 @@ const StealthTransfers = {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [blockNumber, logIndexes] of Object.entries(this.stealthTransfers[this.chainId] || {})) {
         for (const [logIndex, item] of Object.entries(logIndexes)) {
-          if (item.schemeId == 0) {
+          if (item.schemeId == 1) {
             results.push(item);
           }
         }

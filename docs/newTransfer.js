@@ -468,7 +468,7 @@ const NewTransfer = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const contract = new ethers.Contract(MAGICALINTERNETMONEYADDRESS_SEPOLIA, MAGICALINTERNETMONEYABI_SEPOLIA, provider);
       const contractWithSigner = contract.connect(provider.getSigner());
-      const schemeId = 0;
+      const schemeId = 1;
       const value = ethers.utils.parseEther(this.amount);
       const tokenInfos = [];
       for (const item of this.items) {
