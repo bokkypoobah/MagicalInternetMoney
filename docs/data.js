@@ -883,60 +883,62 @@ const dataModule = {
         logInfo("dataModule", "actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
-          const sender = item.tx && item.tx.from || null;
-          const senderData = sender && addresses[sender] || {};
-          console.log("sender: " + sender + " => " + JSON.stringify(senderData));
-          item.iSent = senderData.mine || false;
-          item.iReceived = false;
-          delete item.linkedTo;
-          const stealthAddress = item.stealthAddress;
-          // const stealthAddressData = this.addresses[stealthAddress];
-          const ephemeralPublicKey = item.ephemeralPublicKey;
-          for (const account of checkAddresses) {
-            const viewingPrivateKey = account.viewingPrivateKey;
-            const viewingPublicKey = account.viewingPublicKey;
-            const spendingPublicKey = account.spendingPublicKey;
-            try {
-              const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
-              if (status && status.match) {
-                item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
-                item.iReceived = true;
-                if (stealthAddress in addresses) {
-                  if (addresses[stealthAddress].type != "stealthAddress") {
-                    context.commit('updateToStealthAddress', {
+          if (item.schemeId == 1) {
+            const sender = item.tx && item.tx.from || null;
+            const senderData = sender && addresses[sender] || {};
+            console.log("sender: " + sender + " => " + JSON.stringify(senderData));
+            item.iSent = senderData.mine || false;
+            item.iReceived = false;
+            delete item.linkedTo;
+            const stealthAddress = item.stealthAddress;
+            // const stealthAddressData = this.addresses[stealthAddress];
+            const ephemeralPublicKey = item.ephemeralPublicKey;
+            for (const account of checkAddresses) {
+              const viewingPrivateKey = account.viewingPrivateKey;
+              const viewingPublicKey = account.viewingPublicKey;
+              const spendingPublicKey = account.spendingPublicKey;
+              try {
+                const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
+                if (status && status.match) {
+                  item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
+                  item.iReceived = true;
+                  if (stealthAddress in addresses) {
+                    if (addresses[stealthAddress].type != "stealthAddress") {
+                      context.commit('updateToStealthAddress', {
+                        stealthAddress,
+                        type: "stealthAddress",
+                        linkedTo: {
+                          stealthMetaAddress: account.address,
+                          address: account.linkedToAddress,
+                        },
+                        mine: true,
+                      });
+                    }
+                  } else {
+                    context.commit('addNewStealthAddress', {
                       stealthAddress,
                       type: "stealthAddress",
                       linkedTo: {
                         stealthMetaAddress: account.address,
                         address: account.linkedToAddress,
                       },
+                      source: "announcer",
                       mine: true,
+                      junk: false,
+                      favourite: false,
+                      name: null,
+                      notes: null,
+                      check: [],
                     });
                   }
-                } else {
-                  context.commit('addNewStealthAddress', {
-                    stealthAddress,
-                    type: "stealthAddress",
-                    linkedTo: {
-                      stealthMetaAddress: account.address,
-                      address: account.linkedToAddress,
-                    },
-                    source: "announcer",
-                    mine: true,
-                    junk: false,
-                    favourite: false,
-                    name: null,
-                    notes: null,
-                    check: [],
-                  });
+                  break;
                 }
-                break;
+              } catch (e) {
+                console.log("ERROR: " + e.message);
               }
-            } catch (e) {
-              console.log("ERROR: " + e.message);
             }
+            writeRecords.push(item);
           }
-          writeRecords.push(item);
         }
         if (writeRecords.length > 0) {
           await db.announcements.bulkPut(writeRecords).then (function() {
