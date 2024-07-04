@@ -1158,7 +1158,7 @@ const dataModule = {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         logInfo("dataModule", "actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (item.schemeId == 0) {
+          if (item.schemeId == 1) {
             // logInfo("dataModule", "actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
             const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
             registry[parameter.chainId][item.registrant] = stealthMetaAddress;
