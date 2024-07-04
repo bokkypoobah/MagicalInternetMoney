@@ -1,26 +1,43 @@
-pragma solidity ^0.8.19;
+// SPDX-License-Identifier: CC0-1.0
+pragma solidity 0.8.23;
 
-// ----------------------------------------------------------------------------
-// ERC5564Announcer v0.8.1 - Experiments in ERC-5564: Stealth Addresses
-//
-// From https://eips.ethereum.org/EIPS/eip-5564
-//
-// Deployed to Sepolia
-//
-// https://github.com/bokkypoobah/StealthChad
-//
-// SPDX-License-Identifier: MIT
-//
-// Enjoy. (c) BokkyPooBah / Bok Consulting Pty Ltd 2024
-// ----------------------------------------------------------------------------
+/// @notice `ERC5564Announcer` contract to emit an `Announcement` event to broadcast information
+/// about a transaction involving a stealth address. See
+/// [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) to learn more.
+contract ERC5564Announcer {
+  /// @notice Emitted when something is sent to a stealth address.
+  /// @param schemeId Identifier corresponding to the applied stealth address scheme, e.g. 1 for
+  /// secp256k1, as specified in ERC-5564.
+  /// @param stealthAddress The computed stealth address for the recipient.
+  /// @param caller The caller of the `announce` function that emitted this event.
+  /// @param ephemeralPubKey Ephemeral public key used by the sender to derive the `stealthAddress`.
+  /// @param metadata Arbitrary data to emit with the event. The first byte MUST be the view tag.
+  /// @dev The remaining metadata can be used by the senders however they like. See
+  /// [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) for recommendations on how to structure
+  /// this metadata.
+  event Announcement(
+    uint256 indexed schemeId,
+    address indexed stealthAddress,
+    address indexed caller,
+    bytes ephemeralPubKey,
+    bytes metadata
+  );
 
-import "./IERC5564Announcer.sol";
-
-// From https://eips.ethereum.org/EIPS/eip-5564
-
-/// @notice Announcing when something is sent to a stealth address.
-contract ERC5564Announcer is IERC5564Announcer {
-  function announce(uint256 schemeId, address stealthAddress, bytes memory ephemeralPubKey, bytes memory metadata) external {
+  /// @notice Called by integrators to emit an `Announcement` event.
+  /// @param schemeId Identifier corresponding to the applied stealth address scheme, e.g. 1 for
+  /// secp256k1, as specified in ERC-5564.
+  /// @param stealthAddress The computed stealth address for the recipient.
+  /// @param ephemeralPubKey Ephemeral public key used by the sender.
+  /// @param metadata Arbitrary data to emit with the event. The first byte MUST be the view tag.
+  /// @dev The remaining metadata can be used by the senders however they like. See
+  /// [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) for recommendations on how to structure
+  /// this metadata.
+  function announce(
+    uint256 schemeId,
+    address stealthAddress,
+    bytes memory ephemeralPubKey,
+    bytes memory metadata
+  ) external {
     emit Announcement(schemeId, stealthAddress, msg.sender, ephemeralPubKey, metadata);
   }
 }

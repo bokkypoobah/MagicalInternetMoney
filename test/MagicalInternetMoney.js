@@ -8,12 +8,12 @@ describe("MagicalInternetMoney", function () {
   async function deployContractsFixture() {
     const [owner, otherAccount] = await ethers.getSigners();
     const ERC5564Announcer = await ethers.getContractFactory("ERC5564Announcer");
-    const ERC5564Registry = await ethers.getContractFactory("ERC5564Registry");
+    const ERC6538Registry = await ethers.getContractFactory("ERC6538Registry");
     const MagicalInternetMoney = await ethers.getContractFactory("MagicalInternetMoney");
     const ERC20Token = await ethers.getContractFactory("ERC20Token");
     const ERC721Token = await ethers.getContractFactory("ERC721Token");
     const erc5564Announcer = await ERC5564Announcer.deploy();
-    const erc5564Registry = await ERC5564Registry.deploy();
+    const erc5564Registry = await ERC6538Registry.deploy();
     const stealthChad = await MagicalInternetMoney.deploy(erc5564Announcer);
     const erc20Token = await ERC20Token.deploy("ERC-20", "ERC-20 Token", 18, 1000000000000000000000000n);
     const erc721Token = await ERC721Token.deploy();
