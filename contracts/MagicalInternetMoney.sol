@@ -15,11 +15,6 @@ pragma solidity ^0.8.19;
 // import "hardhat/console.sol";
 
 
-function onePlus(uint x) pure returns (uint) {
-    unchecked { return 1 + x; }
-}
-
-
 /// @notice `ERC5564Announcer` contract to emit an `Announcement` event to broadcast information
 /// about a transaction involving a stealth address. See
 /// [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) to learn more.
@@ -110,11 +105,11 @@ contract MagicalInternetMoney {
         uint i;
         uint j;
         metadata[j++] = bytes1(viewTag);
-        for (; i < 24; i = onePlus(i)) {
+        for (; i < 24; i++) {
             metadata[j++] = 0xee;
         }
         bytes32 msgValueInBytes = bytes32(msg.value);
-        for (i = 0; i < 32; i = onePlus(i)) {
+        for (i = 0; i < 32; i++) {
             metadata[j++] = msgValueInBytes[i];
         }
         (bool sent, ) = recipient.call{value: msg.value}("");
@@ -139,11 +134,11 @@ contract MagicalInternetMoney {
         uint j;
         metadata[j++] = bytes1(viewTag);
         if (msg.value > 0) {
-            for (; i < 24; i = onePlus(i)) {
+            for (; i < 24; i++) {
                 metadata[j++] = 0xee;
             }
             bytes32 msgValueInBytes = bytes32(msg.value);
-            for (i = 0; i < 32; i = onePlus(i)) {
+            for (i = 0; i < 32; i++) {
                 metadata[j++] = msgValueInBytes[i];
             }
             (bool sent, ) = recipient.call{value: msg.value}("");
@@ -151,14 +146,14 @@ contract MagicalInternetMoney {
                 revert TransferFailure();
             }
         }
-        for (i = 0; i < tokenInfo.length; i = onePlus(i)) {
+        for (i = 0; i < tokenInfo.length; i++) {
             bytes memory selectorAndTokenContractInBytes = abi.encodePacked(TRANSFERFROM_SELECTOR, tokenInfo[i].token);
             uint k;
-            for (k = 0; k < 24; k = onePlus(k)) {
+            for (k = 0; k < 24; k++) {
                 metadata[j++] = selectorAndTokenContractInBytes[k];
             }
             bytes32 valueInBytes = bytes32(tokenInfo[i].value);
-            for (k = 0; k < 32; k = onePlus(k)) {
+            for (k = 0; k < 32; k++) {
                 metadata[j++] = valueInBytes[k];
             }
 
