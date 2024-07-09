@@ -131,10 +131,38 @@ const dataModule = {
   namespaced: true,
   state: {
     DB_PROCESSING_BATCH_SIZE: 123,
-    addresses: {}, // Address => Info
+    addresses: {}, // address => info
+
+    // "11155111": {
+    //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+    //     "type": "erc20",
+    //     "balances": {
+    //       "0x000001f568875F378Bf6d170B790967FE429C81A": "7002013838755293944542",
+    //       "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362": "11999205282222222222223"
+    //     }
+    //   },
+    //   "0x8b73448426797099b6b9a96c4343f528bbAfc55e": {
+    //     "type": "erc721",
+    //     "tokenIds": {
+    //       "60": "0x000001f568875F378Bf6d170B790967FE429C81A",
+    //       "6743": "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362"
+    //     }
+    //   },
+    //   "0x3F15A716888EFb6871872fC4358F638DEE495f3b": {
+    //     "type": "erc1155",
+    //     "tokenIds": {
+    //       "7": {
+    //         "0x000001f568875F378Bf6d170B790967FE429C81A": "1"
+    //       },
+    //       "8": {
+    //         "0x000001f568875F378Bf6d170B790967FE429C81A": "1"
+    //       }
+    //     }
+    //   }
+    // }
+    balances: {},
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
-    tokens: {}, // chainId -> contract -> tokenId => owner or balances
     contractMetadata: {}, // chainId -> contract => metadata
     tokenMetadata: {}, // chainId -> tokenContractAddress -> tokenId => metadata
     timestamps: {}, // chainId -> blockNumber => timestamp
@@ -171,9 +199,9 @@ const dataModule = {
   },
   getters: {
     addresses: state => state.addresses,
+    balances: state => state.balances,
 
     collection: state => state.collection,
-    tokens: state => state.tokens,
     contractMetadata: state => state.contractMetadata,
     tokenMetadata: state => state.tokenMetadata,
     timestamps: state => state.timestamps,
@@ -194,11 +222,10 @@ const dataModule = {
       // logInfo("dataModule", "mutations.setState - info: " + JSON.stringify(info, null, 2));
       Vue.set(state, info.name, info.data);
     },
-    updateTokens(state, tokens) {
-      // logInfo("dataModule", "mutations.updateTokens - tokens: " + JSON.stringify(tokens, null, 2));
+    updateBalances(state, info) {
+      logInfo("dataModule", "mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
       const chainId = store.getters['connection/chainId'];
-      // TODO: Incremental Syncing tokens to state.tokens
-      Vue.set(state.tokens, chainId, tokens);
+      Vue.set(state.balances, info.chainId, info.balances);
     },
     toggleAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
@@ -466,7 +493,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', 'contractMetadata', 'tokenMetadata', 'tokens', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'timestamps', 'txs', 'contractMetadata', 'tokenMetadata', 'balances', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -643,7 +670,7 @@ const dataModule = {
         await context.dispatch('syncTokenEventTxData', parameter);
       }
       if (options.tokens && !options.devThing) {
-        await context.dispatch('collateTokens', parameter);
+        await context.dispatch('computeBalances', parameter);
       }
       if (options.metadata && !options.devThing) {
         await context.dispatch('syncTokenMetadata', parameter);
@@ -1497,12 +1524,12 @@ const dataModule = {
       logInfo("dataModule", "actions.syncTokenEventTxData END");
     },
 
-    async collateTokens(context, parameter) {
-      logInfo("dataModule", "actions.collateTokens: " + JSON.stringify(parameter));
+    async computeBalances(context, parameter) {
+      logInfo("dataModule", "actions.computeBalances: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      logInfo("dataModule", "actions.collateTokens BEGIN");
+      logInfo("dataModule", "actions.computeBalances BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         if (address.substring(0, 2) == "0x" && addressData.check && addressData.check.includes("tokens")) {
@@ -1512,19 +1539,20 @@ const dataModule = {
       console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
       let rows = 0;
       let done = false;
-      const tokens = {};
+      const collator = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.collateTokens - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        logInfo("dataModule", "actions.computeBalances - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (!(item.contract in tokens)) {
+          const contract = item.contract;
+          if (!(contract in collator)) {
             if (item.eventType == "erc20") {
-              tokens[item.contract] = {
+              collator[contract] = {
                 type: item.eventType,
                 balances: {},
               };
             } else {
-              tokens[item.contract] = {
+              collator[contract] = {
                 type: item.eventType,
                 tokenIds: {},
               };
@@ -1532,63 +1560,63 @@ const dataModule = {
           }
           if (item.eventType == "erc20" && item.type == "Transfer") {
             if (item.from in selectedAddressesMap) {
-              if (!(item.from in tokens[item.contract].balances)) {
-                tokens[item.contract].balances[item.from] = "0";
+              if (!(item.from in collator[contract].balances)) {
+                collator[contract].balances[item.from] = "0";
               }
-              tokens[item.contract].balances[item.from] = ethers.BigNumber.from(tokens[item.contract].balances[item.from]).sub(item.tokens).toString();
+              collator[contract].balances[item.from] = ethers.BigNumber.from(collator[contract].balances[item.from]).sub(item.tokens).toString();
             }
             if (item.to in selectedAddressesMap) {
-              if (!(item.to in tokens[item.contract].balances)) {
-                tokens[item.contract].balances[item.to] = "0";
+              if (!(item.to in collator[contract].balances)) {
+                collator[contract].balances[item.to] = "0";
               }
-              tokens[item.contract].balances[item.to] = ethers.BigNumber.from(tokens[item.contract].balances[item.to]).add(item.tokens).toString();
+              collator[contract].balances[item.to] = ethers.BigNumber.from(collator[contract].balances[item.to]).add(item.tokens).toString();
             }
           } else if (item.eventType == "erc721" && item.type == "Transfer") {
             if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
-              tokens[item.contract].tokenIds[item.tokenId] = item.to;
+              collator[contract].tokenIds[item.tokenId] = item.to;
             }
           } else if (item.eventType == "erc1155" && item.type == "TransferSingle") {
             if (item.from in selectedAddressesMap) {
-              if (!(item.tokenId in tokens[item.contract].tokenIds)) {
-                tokens[item.contract].tokenIds[item.tokenId] = {};
+              if (!(item.tokenId in collator[contract].tokenIds)) {
+                collator[contract].tokenIds[item.tokenId] = {};
               }
-              if (item.from in tokens[item.contract].tokenIds[item.tokenId]) {
-                tokens[item.contract].tokenIds[item.tokenId][item.from] = ethers.BigNumber.from(tokens[item.contract].tokenIds[item.tokenId][item.from]).sub(item.value).toString();
-                if (tokens[item.contract].tokenIds[item.tokenId][item.from] == "0") {
-                  delete tokens[item.contract].tokenIds[item.tokenId][item.from];
+              if (item.from in collator[contract].tokenIds[item.tokenId]) {
+                collator[contract].tokenIds[item.tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokenIds[item.tokenId][item.from]).sub(item.value).toString();
+                if (collator[contract].tokenIds[item.tokenId][item.from] == "0") {
+                  delete collator[contract].tokenIds[item.tokenId][item.from];
                 }
               }
             }
             if (item.to in selectedAddressesMap) {
-              if (!(item.tokenId in tokens[item.contract].tokenIds)) {
-                tokens[item.contract].tokenIds[item.tokenId] = {};
+              if (!(item.tokenId in collator[contract].tokenIds)) {
+                collator[contract].tokenIds[item.tokenId] = {};
               }
-              if (!(item.to in tokens[item.contract].tokenIds[item.tokenId])) {
-                tokens[item.contract].tokenIds[item.tokenId][item.to] = "0";
+              if (!(item.to in collator[contract].tokenIds[item.tokenId])) {
+                collator[contract].tokenIds[item.tokenId][item.to] = "0";
               }
-              tokens[item.contract].tokenIds[item.tokenId][item.to] = ethers.BigNumber.from(tokens[item.contract].tokenIds[item.tokenId][item.to]).add(item.value).toString();
+              collator[contract].tokenIds[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokenIds[item.tokenId][item.to]).add(item.value).toString();
             }
           } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
             for (const [index, tokenId] of item.tokenIds.entries()) {
               if (item.from in selectedAddressesMap) {
-                if (!(tokenId in tokens[item.contract].tokenIds)) {
-                  tokens[item.contract].tokenIds[tokenId] = {};
+                if (!(tokenId in collator[contract].tokenIds)) {
+                  collator[contract].tokenIds[tokenId] = {};
                 }
-                if (item.from in tokens[item.contract].tokenIds[tokenId]) {
-                  tokens[item.contract].tokenIds[tokenId][item.from] = ethers.BigNumber.from(tokens[item.contract].tokenIds[tokenId][item.from]).sub(item.values[index]).toString();
-                  if (tokens[item.contract].tokenIds[tokenId][item.from] == "0") {
-                    delete tokens[item.contract].tokenIds[tokenId][item.from];
+                if (item.from in collator[contract].tokenIds[tokenId]) {
+                  collator[contract].tokenIds[tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokenIds[tokenId][item.from]).sub(item.values[index]).toString();
+                  if (collator[contract].tokenIds[tokenId][item.from] == "0") {
+                    delete collator[contract].tokenIds[tokenId][item.from];
                   }
                 }
               }
               if (item.to in selectedAddressesMap) {
-                if (!(tokenId in tokens[item.contract].tokenIds)) {
-                  tokens[item.contract].tokenIds[tokenId] = {};
+                if (!(tokenId in collator[contract].tokenIds)) {
+                  collator[contract].tokenIds[tokenId] = {};
                 }
-                if (!(item.to in tokens[item.contract].tokenIds[tokenId])) {
-                  tokens[item.contract].tokenIds[tokenId][item.to] = "0";
+                if (!(item.to in collator[contract].tokenIds[tokenId])) {
+                  collator[contract].tokenIds[tokenId][item.to] = "0";
                 }
-                tokens[item.contract].tokenIds[tokenId][item.to] = ethers.BigNumber.from(tokens[item.contract].tokenIds[tokenId][item.to]).add(item.values[index]).toString();
+                collator[contract].tokenIds[tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokenIds[tokenId][item.to]).add(item.values[index]).toString();
               }
             }
           }
@@ -1596,10 +1624,10 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log("tokens: " + JSON.stringify(tokens, null, 2));
-      context.commit('updateTokens', tokens);
-      await context.dispatch('saveData', ['tokens']);
-      logInfo("dataModule", "actions.collateTokens END");
+      console.log("collator: " + JSON.stringify(collator, null, 2));
+      context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
+      await context.dispatch('saveData', ['balances']);
+      logInfo("dataModule", "actions.computeBalances END");
     },
 
     async syncTokenMetadata(context, parameter) {

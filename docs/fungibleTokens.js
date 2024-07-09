@@ -245,8 +245,8 @@ const FungibleTokens = {
     registry() {
       return store.getters['data/registry'];
     },
-    tokens() {
-      return store.getters['data/tokens'];
+    balances() {
+      return store.getters['data/balances'];
     },
     contractMetadata() {
       return store.getters['data/contractMetadata'];
@@ -275,7 +275,7 @@ const FungibleTokens = {
 
     totalERC20Contracts() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc20") {
           result++;
         }
@@ -293,7 +293,7 @@ const FungibleTokens = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [contract, contractData] of Object.entries(this.tokens[this.chainId] || {})) {
+      for (const [contract, contractData] of Object.entries(this.balances[this.chainId] || {})) {
         const metadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         if (contractData.type == "erc20") {
           let include = true;

@@ -349,8 +349,8 @@ const NonFungibleTokens = {
     registry() {
       return store.getters['data/registry'];
     },
-    tokens() {
-      return store.getters['data/tokens'];
+    balances() {
+      return store.getters['data/balances'];
     },
     contractMetadata() {
       return store.getters['data/contractMetadata'];
@@ -382,7 +382,7 @@ const NonFungibleTokens = {
 
     totalERC721Tokens() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc721" || data.type == "erc1155") {
           result += Object.keys(data.tokenIds).length;
         }
@@ -408,7 +408,7 @@ const NonFungibleTokens = {
       }
       // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
 
-      for (const [contract, data] of Object.entries(this.tokens[this.chainId] || {})) {
+      for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
         const contractMetadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         // console.log(contract + " => " + JSON.stringify(contractMetadata, null, 2));
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
