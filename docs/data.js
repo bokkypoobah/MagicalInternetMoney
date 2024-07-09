@@ -1643,7 +1643,7 @@ const dataModule = {
       const tokensToProcess = {};
       let totalContractsToProcess = 0;
       let totalTokensToProcess = 0;
-      for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
+      for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (!context.state.contractMetadata[parameter.chainId] || !context.state.contractMetadata[parameter.chainId][contract]) {
           contractsToProcess[contract] = contractData;
           totalContractsToProcess++;
@@ -1734,7 +1734,7 @@ const dataModule = {
       // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
 
       for (const [contract, contractData] of Object.entries(tokensToProcess)) {
-        const contractType = context.state.tokens[parameter.chainId][contract].type;
+        const contractType = context.state.balances[parameter.chainId][contract].type;
         // console.log(contract + " => " + contractType);
         for (const [tokenId, tokenData] of Object.entries(contractData)) {
           context.commit('setSyncCompleted', completed);
