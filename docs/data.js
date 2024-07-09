@@ -1531,20 +1531,18 @@ const dataModule = {
             }
           }
           if (item.eventType == "erc20" && item.type == "Transfer") {
-            const balances = tokens[item.contract].balances || {};
             if (item.from in selectedAddressesMap) {
-              if (!(item.from in balances)) {
-                balances[item.from] = "0";
+              if (!(item.from in tokens[item.contract].balances)) {
+                tokens[item.contract].balances[item.from] = "0";
               }
-              balances[item.from] = ethers.BigNumber.from(balances[item.from]).sub(item.tokens).toString();
+              tokens[item.contract].balances[item.from] = ethers.BigNumber.from(tokens[item.contract].balances[item.from]).sub(item.tokens).toString();
             }
             if (item.to in selectedAddressesMap) {
-              if (!(item.to in balances)) {
-                balances[item.to] = "0";
+              if (!(item.to in tokens[item.contract].balances)) {
+                tokens[item.contract].balances[item.to] = "0";
               }
-              balances[item.to] = ethers.BigNumber.from(balances[item.to]).add(item.tokens).toString();
+              tokens[item.contract].balances[item.to] = ethers.BigNumber.from(tokens[item.contract].balances[item.to]).add(item.tokens).toString();
             }
-            tokens[item.contract].balances = balances;
           } else if (item.eventType == "erc721" && item.type == "Transfer") {
             if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
               tokens[item.contract].tokenIds[item.tokenId] = item.to;
@@ -1598,7 +1596,7 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      // console.log("tokens: " + JSON.stringify(tokens, null, 2));
+      console.log("tokens: " + JSON.stringify(tokens, null, 2));
       context.commit('updateTokens', tokens);
       await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.collateTokens END");
