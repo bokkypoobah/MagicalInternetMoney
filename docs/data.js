@@ -702,7 +702,7 @@ const dataModule = {
         await context.dispatch('syncFungiblesMetadata', parameter);
       }
       if (options.nonFungiblesMetadata && !options.devThing) {
-        // await context.dispatch('syncNonFungibleTokenMetadata', parameter);
+        await context.dispatch('syncNonFungiblesMetadata', parameter);
       }
       if (options.ens || options.devThing) {
         await context.dispatch('syncENS', parameter);
@@ -1665,20 +1665,18 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
-
       const contractsToProcess = {};
       let totalContractsToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc20") {
-          console.log(contract + " => " + JSON.stringify(contractData));
+          // console.log(contract + " => " + JSON.stringify(contractData));
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
             totalContractsToProcess++;
           }
         }
       }
-      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
-
+      // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
       context.commit('setSyncSection', { section: 'Fungible Token Metadata', total: totalContractsToProcess });
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
@@ -1723,21 +1721,19 @@ const dataModule = {
           break;
         }
       }
-      console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
+      // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
       await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.syncFungiblesMetadata END");
     },
 
 
-    async syncNonFungibleTokenMetadata(context, parameter) {
-
-      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata: " + JSON.stringify(parameter));
+    async syncNonFungiblesMetadata(context, parameter) {
+      logInfo("dataModule", "actions.syncNonFungiblesMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata BEGIN");
-
+      logInfo("dataModule", "actions.syncNonFungiblesMetadata BEGIN");
+      return;
       const contractsToProcess = {};
       const tokensToProcess = {};
       let totalContractsToProcess = 0;
@@ -2007,7 +2003,7 @@ const dataModule = {
         }
       }
       await context.dispatch('saveData', ['tokenMetadata']);
-      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata END");
+      logInfo("dataModule", "actions.syncNonFungiblesMetadata END");
     },
 
     async syncENS(context, parameter) {
