@@ -253,10 +253,11 @@ const dataModule = {
       Vue.set(state.addresses[info.address], info.field, info.value);
       logInfo("dataModule", "mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
-    toggleTokenContractFavourite(state, tokenContract) {
-      const chainId = store.getters['connection/chainId'];
-      Vue.set(state.tokenContracts[chainId][tokenContract.address], 'favourite', !state.tokenContracts[chainId][tokenContract.address].favourite);
-      logInfo("dataModule", "mutations.toggleTokenContractFavourite - tokenContract: " + JSON.stringify(state.tokenContracts[chainId][tokenContract.address]));
+    toggleFungibleTokenFavourite(state, info) {
+      // logInfo("dataModule", "mutations.toggleTokenContractFavourite - info: " + JSON.stringify(info));
+      if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
+        Vue.set(state.tokens[info.chainId][info.contract], 'favourite', !state.tokens[info.chainId][info.contract].favourite);
+      }
     },
     toggleTokenContractJunk(state, tokenContract) {
       const chainId = store.getters['connection/chainId'];
@@ -546,10 +547,10 @@ const dataModule = {
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
-    async toggleTokenContractFavourite(context, tokenContract) {
-      // logInfo("dataModule", "actions.toggleTokenContractFavourite - info: " + JSON.stringify(info));
-      await context.commit('toggleTokenContractFavourite', tokenContract);
-      await context.dispatch('saveData', ['tokenContracts']);
+    async toggleFungibleTokenFavourite(context, info) {
+      // logInfo("dataModule", "actions.toggleFungibleTokenFavourite - info: " + JSON.stringify(info));
+      await context.commit('toggleFungibleTokenFavourite', info);
+      await context.dispatch('saveData', ['tokens']);
     },
     async toggleTokenContractJunk(context, tokenContract) {
       logInfo("dataModule", "actions.toggleTokenContractJunk - tokenContract: " + JSON.stringify(tokenContract));
