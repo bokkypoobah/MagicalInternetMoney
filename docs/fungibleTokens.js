@@ -244,18 +244,12 @@ const FungibleTokens = {
     addresses() {
       return store.getters['data/addresses'];
     },
-    registry() {
-      return store.getters['data/registry'];
-    },
     balances() {
       return store.getters['data/balances'];
     },
     tokens() {
       return store.getters['data/tokens'];
     },
-    // tokenContracts() {
-    //   return store.getters['data/tokenContracts'];
-    // },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
     },
