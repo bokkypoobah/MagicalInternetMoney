@@ -142,7 +142,7 @@ const FungibleTokens = {
             <font size="-1">{{ data.item.name }}</font>
           </template>
           <template #cell(decimals)="data">
-            <font size="-1">{{ data.item.decimals }}</font>
+            <font size="-1">{{ data.item.decimals || '0' }}</font>
           </template>
           <template #cell(balance)="data">
             <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
