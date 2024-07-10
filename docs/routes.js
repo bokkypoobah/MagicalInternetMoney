@@ -11,13 +11,13 @@ const routes = [{
   //   component: Account,
   //   name: 'Account',
   }, {
-    path: '/nonFungibleTokens',
-    component: NonFungibleTokens,
-    name: 'NonFungibleTokens',
+    path: '/nonFungibles',
+    component: NonFungibles,
+    name: 'NonFungibles',
   }, {
-    path: '/fungibleTokens',
-    component: FungibleTokens,
-    name: 'FungibleTokens',
+    path: '/fungibles',
+    component: Fungibles,
+    name: 'Fungibles',
   }, {
     path: '/stealthtransfers',
     component: StealthTransfers,

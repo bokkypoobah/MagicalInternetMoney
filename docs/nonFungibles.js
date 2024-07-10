@@ -1,4 +1,4 @@
-const NonFungibleTokens = {
+const NonFungibles = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
@@ -507,7 +507,7 @@ const NonFungibleTokens = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // logInfo("NonFungibleTokens", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // logInfo("NonFungibles", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -545,11 +545,11 @@ const NonFungibleTokens = {
     },
 
     toggleTokenContractJunk(item) {
-      logInfo("NonFungibleTokens", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibles", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractJunk', item);
     },
     toggleTokenContractFavourite(item) {
-      logInfo("NonFungibleTokens", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibles", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleTokenContractFavourite', item);
     },
     copyToClipboard(str) {
@@ -570,7 +570,7 @@ const NonFungibleTokens = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("NonFungibleTokens", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("NonFungibles", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.erc721sSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -610,7 +610,7 @@ const NonFungibleTokens = {
       return null;
     },
     rowSelected(item) {
-      logInfo("NonFungibleTokens", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibles", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewToken/viewToken', { contract: item[0].contract, tokenId: item[0].tokenId });
         this.$refs.tokenContractsTable.clearSelected();
@@ -663,7 +663,7 @@ const NonFungibleTokens = {
     },
 
     async timeoutCallback() {
-      logDebug("NonFungibleTokens", "timeoutCallback() count: " + this.count);
+      logDebug("NonFungibles", "timeoutCallback() count: " + this.count);
 
       this.count++;
       var t = this;
@@ -675,10 +675,10 @@ const NonFungibleTokens = {
     },
   },
   beforeDestroy() {
-    logDebug("NonFungibleTokens", "beforeDestroy()");
+    logDebug("NonFungibles", "beforeDestroy()");
   },
   mounted() {
-    logDebug("NonFungibleTokens", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("NonFungibles", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('erc721sSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.erc721sSettings);
@@ -688,7 +688,7 @@ const NonFungibleTokens = {
       }
     }
     this.reschedule = true;
-    logDebug("NonFungibleTokens", "Calling timeoutCallback()");
+    logDebug("NonFungibles", "Calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -696,7 +696,7 @@ const NonFungibleTokens = {
   },
 };
 
-const nonFungibleTokensModule = {
+const nonFungiblesModule = {
   namespaced: true,
   state: {
     params: null,
@@ -709,16 +709,16 @@ const nonFungibleTokensModule = {
   },
   mutations: {
     deQueue(state) {
-      logDebug("nonFungibleTokensModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
+      logDebug("nonFungiblesModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
       state.executionQueue.shift();
     },
     updateParams(state, params) {
       state.params = params;
-      logDebug("nonFungibleTokensModule", "updateParams('" + params + "')")
+      logDebug("nonFungiblesModule", "updateParams('" + params + "')")
     },
     updateExecuting(state, executing) {
       state.executing = executing;
-      logDebug("nonFungibleTokensModule", "updateExecuting(" + executing + ")")
+      logDebug("nonFungiblesModule", "updateExecuting(" + executing + ")")
     },
   },
   actions: {
