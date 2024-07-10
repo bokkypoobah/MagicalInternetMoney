@@ -253,18 +253,18 @@ const dataModule = {
       Vue.set(state.addresses[info.address], info.field, info.value);
       logInfo("dataModule", "mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
-    toggleFungibleTokenFavourite(state, item) {
-      // logInfo("dataModule", "mutations.toggleTokenContractFavourite - item: " + JSON.stringify(item));
+    toggleFungibleFavourite(state, item) {
+      // logInfo("dataModule", "mutations.toggleFungibleFavourite - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'favourite', !state.tokens[item.chainId][item.contract].favourite);
       }
     },
-    toggleFungibleTokenJunk(state, item) {
-      // logInfo("dataModule", "mutations.toggleFungibleTokenJunk - item: " + JSON.stringify(item));
+    toggleFungibleJunk(state, item) {
+      // logInfo("dataModule", "mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
         if (state.tokens[item.chainId][item.contract].junk) {
-          Vue.set(state.tokens[item.chainId][item.contract], 'favourite', false);          
+          Vue.set(state.tokens[item.chainId][item.contract], 'favourite', false);
         }
       }
     },
@@ -551,14 +551,14 @@ const dataModule = {
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
-    async toggleFungibleTokenFavourite(context, item) {
-      // logInfo("dataModule", "actions.toggleFungibleTokenFavourite - item: " + JSON.stringify(item));
-      await context.commit('toggleFungibleTokenFavourite', item);
+    async toggleFungibleFavourite(context, item) {
+      // logInfo("dataModule", "actions.toggleFungibleFavourite - item: " + JSON.stringify(item));
+      await context.commit('toggleFungibleFavourite', item);
       await context.dispatch('saveData', ['tokens']);
     },
-    async toggleFungibleTokenJunk(context, item) {
-      // logInfo("dataModule", "actions.toggleFungibleTokenJunk - item: " + JSON.stringify(item));
-      await context.commit('toggleFungibleTokenJunk', item);
+    async toggleFungibleJunk(context, item) {
+      // logInfo("dataModule", "actions.toggleFungibleJunk - item: " + JSON.stringify(item));
+      await context.commit('toggleFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async addTokenMetadata(context, info) {

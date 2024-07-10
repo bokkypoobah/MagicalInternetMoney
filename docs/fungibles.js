@@ -120,8 +120,8 @@ const Fungibles = {
           </template>
 
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleFungibleTokenJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleTokenFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
           <template #cell(contract)="data">
@@ -398,13 +398,13 @@ const Fungibles = {
       }
     },
 
-    toggleFungibleTokenJunk(item) {
-      logInfo("Fungibles", ".methods.toggleFungibleTokenJunk - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleFungibleTokenJunk', item);
+    toggleFungibleJunk(item) {
+      logInfo("Fungibles", ".methods.toggleFungibleJunk - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleFungibleJunk', item);
     },
-    toggleFungibleTokenFavourite(item) {
-      logInfo("Fungibles", ".methods.toggleFungibleTokenFavourite - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleFungibleTokenFavourite', item);
+    toggleFungibleFavourite(item) {
+      logInfo("Fungibles", ".methods.toggleFungibleFavourite - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleFungibleFavourite', item);
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
