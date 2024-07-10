@@ -131,7 +131,9 @@ const dataModule = {
   namespaced: true,
   state: {
     DB_PROCESSING_BATCH_SIZE: 123,
-    addresses: {}, // address => info
+
+    // address => info
+    addresses: {},
 
     // "11155111": {
     //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
@@ -161,6 +163,21 @@ const dataModule = {
     //   }
     // }
     balances: {},
+
+    // chainId -> contract for ERC-20; chainId -> contract -> tokenId for ERC-721 and ERC-1155
+    // "11155111": {
+    //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+    //     "type": "erc20",
+    //     "symbol": "WEENUS",
+    //     "name": "Weenus 💪",
+    //     "decimals": 18,
+    //     "totalSupply": "1357000000000000000000000",
+    //     "junk": false,
+    //     "favourite": false,
+    //     "notes": null
+    //   },
+    // }
+    tokens: {},
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
     contractMetadata: {}, // chainId -> contract => metadata
@@ -200,6 +217,7 @@ const dataModule = {
   getters: {
     addresses: state => state.addresses,
     balances: state => state.balances,
+    tokens: state => state.tokens,
 
     collection: state => state.collection,
     contractMetadata: state => state.contractMetadata,
@@ -346,18 +364,21 @@ const dataModule = {
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
-    addTokenContractMetadata(state, info) {
-      logInfo("dataModule", "mutations.addTokenContractMetadata info: " + JSON.stringify(info, null, 2));
-      if (!(info.chainId in state.contractMetadata)) {
-        Vue.set(state.contractMetadata, info.chainId, {});
+    addFungibleTokenMetadata(state, info) {
+      logInfo("dataModule", "mutations.addFungibleTokenMetadata info: " + JSON.stringify(info, null, 2));
+      if (!(info.chainId in state.tokens)) {
+        Vue.set(state.tokens, info.chainId, {});
       }
-      if (!(info.contract in state.contractMetadata[info.chainId])) {
-        Vue.set(state.contractMetadata[info.chainId], info.contract, {
+      if (!(info.contract in state.tokens[info.chainId])) {
+        Vue.set(state.tokens[info.chainId], info.contract, {
           type: info.type,
           symbol: info.symbol,
           name: info.name,
           decimals: info.decimals,
           totalSupply: info.totalSupply,
+          junk: false,
+          favourite: false,
+          notes: null,
         });
       }
     },
@@ -493,7 +514,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', 'contractMetadata', 'tokenMetadata', 'balances', 'registry', 'stealthTransfers', 'tokenContracts', 'tokenMetadata']) {
+        for (let type of ['addresses', 'timestamps', 'txs', /*'contractMetadata', 'tokenMetadata',*/ 'tokens', 'balances', 'registry', 'stealthTransfers'/*, 'tokenContracts', 'tokenMetadata'*/]) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
@@ -672,8 +693,12 @@ const dataModule = {
       if (options.tokens && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
       }
+      if (options.metadata || options.devThing) {
+        await context.dispatch('syncFungibleTokenMetadata', parameter);
+      }
       if (options.metadata && !options.devThing) {
-        await context.dispatch('syncTokenMetadata', parameter);
+        // TODO
+        // await context.dispatch('syncNonFungibleTokenMetadata', parameter);
       }
       if (options.ens || options.devThing) {
         await context.dispatch('syncENS', parameter);
@@ -1630,14 +1655,84 @@ const dataModule = {
       logInfo("dataModule", "actions.computeBalances END");
     },
 
-    async syncTokenMetadata(context, parameter) {
+    async syncFungibleTokenMetadata(context, parameter) {
+      logInfo("dataModule", "actions.syncFungibleTokenMetadata: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      logInfo("dataModule", "actions.syncFungibleTokenMetadata BEGIN");
 
-      logInfo("dataModule", "actions.syncTokenMetadata: " + JSON.stringify(parameter));
+      const contractsToProcess = {};
+      let totalContractsToProcess = 0;
+      for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
+        if (contractData.type == "erc20") {
+          console.log(contract + " => " + JSON.stringify(contractData));
+          if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
+            contractsToProcess[contract] = contractData;
+            totalContractsToProcess++;
+          }
+        }
+      }
+      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
+
+      context.commit('setSyncSection', { section: 'Fungible Token Metadata', total: totalContractsToProcess });
+      let completed = 0;
+      for (const [contract, contractData] of Object.entries(contractsToProcess)) {
+        console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
+        context.commit('setSyncCompleted', completed);
+        const interface = new ethers.Contract(contract, ERC20ABI, provider);
+        let symbol = null;
+        let name = null;
+        let decimals = null;
+        let totalSupply = null;
+        try {
+          symbol = await interface.symbol();
+        } catch (e) {
+        }
+        try {
+          name = await interface.name();
+        } catch (e) {
+        }
+        try {
+          decimals = await interface.decimals();
+        } catch (e) {
+        }
+        try {
+          totalSupply = await interface.totalSupply();
+        } catch (e) {
+        }
+        console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        context.commit('addFungibleTokenMetadata', {
+          chainId: parameter.chainId,
+          contract,
+          symbol,
+          name,
+          decimals: decimals && parseInt(decimals) || null,
+          totalSupply: totalSupply && totalSupply.toString() || null,
+          ...contractData,
+        });
+        completed++;
+        if ((completed % 10) == 0) {
+          await context.dispatch('saveData', ['tokens']);
+        }
+        if (context.state.sync.halt) {
+          break;
+        }
+      }
+      console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
+      await context.dispatch('saveData', ['tokens']);
+      logInfo("dataModule", "actions.syncFungibleTokenMetadata END");
+    },
+
+
+    async syncNonFungibleTokenMetadata(context, parameter) {
+
+      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      logInfo("dataModule", "actions.syncTokenMetadata BEGIN");
+      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata BEGIN");
 
       const contractsToProcess = {};
       const tokensToProcess = {};
@@ -1701,7 +1796,7 @@ const dataModule = {
           } catch (e) {
           }
           // console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
-          context.commit('addTokenContractMetadata', {
+          context.commit('addFungibleTokenMetadata', {
             chainId: parameter.chainId,
             contract,
             symbol,
@@ -1908,7 +2003,7 @@ const dataModule = {
         }
       }
       await context.dispatch('saveData', ['tokenMetadata']);
-      logInfo("dataModule", "actions.syncTokenMetadata END");
+      logInfo("dataModule", "actions.syncNonFungibleTokenMetadata END");
     },
 
     async syncENS(context, parameter) {

@@ -248,12 +248,12 @@ const FungibleTokens = {
     balances() {
       return store.getters['data/balances'];
     },
-    contractMetadata() {
-      return store.getters['data/contractMetadata'];
+    tokens() {
+      return store.getters['data/tokens'];
     },
-    tokenContracts() {
-      return store.getters['data/tokenContracts'];
-    },
+    // tokenContracts() {
+    //   return store.getters['data/tokenContracts'];
+    // },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
     },
@@ -294,8 +294,8 @@ const FungibleTokens = {
         }
       }
       for (const [contract, contractData] of Object.entries(this.balances[this.chainId] || {})) {
-        const metadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         if (contractData.type == "erc20") {
+          const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
           let include = true;
           // if (this.settings.junkFilter) {
           //   if (this.settings.junkFilter == 'junk' && !contractData.junk) {
@@ -471,51 +471,6 @@ const FungibleTokens = {
         this.$bvModal.show('modal-transfer');
         this.$refs.tokenContractsTable.clearSelected();
       }
-    },
-
-    async revealTransferSpendingPrivateKey() {
-      function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
-        const result = {};
-        result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
-        result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-        const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
-        const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
-        result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
-        result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
-        result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
-        return result;
-      }
-
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - transfer: " + JSON.stringify(this.transfer, null, 2));
-      const stealthMetaAddressData = this.addresses[this.transfer.item.linkedTo.stealthMetaAddress];
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
-      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [phraseInHex, this.coinbase],
-      });
-      const signature1 = signature.slice(2, 66);
-      const signature2 = signature.slice(66, 130);
-      // Hash "v" and "r" values using SHA-256
-      const hashedV = ethers.utils.sha256("0x" + signature1);
-      const hashedR = ethers.utils.sha256("0x" + signature2);
-      const n = ethers.BigNumber.from(SECP256K1_N);
-      // Calculate the private keys by taking the hash values modulo the curve order
-      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
-      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
-      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-      const spendingPrivateKey = keyPair1.privateKey;
-      const viewingPrivateKey = keyPair2.privateKey;
-      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
-      // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
-      const computedStealthKey = computeStealthKey(this.transfer.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
-      const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
-      // Vue.set(this.transfer, 'stealthPrivateKey', stealthPrivateKey);
-      this.transfer.stealthPrivateKey = stealthPrivateKey;
-      console.log("this.transfer: " + JSON.stringify(this.transfer, null, 2));
     },
 
     async timeoutCallback() {
