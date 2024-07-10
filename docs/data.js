@@ -704,7 +704,7 @@ const dataModule = {
       if (options.nonFungiblesMetadata && !options.devThing) {
         await context.dispatch('syncNonFungiblesMetadata', parameter);
       }
-      if (options.ens || options.devThing) {
+      if (options.ens && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENS', parameter);
       }
 
@@ -1733,16 +1733,9 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata BEGIN");
-      return;
-      const contractsToProcess = {};
       const tokensToProcess = {};
-      let totalContractsToProcess = 0;
       let totalTokensToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (!context.state.contractMetadata[parameter.chainId] || !context.state.contractMetadata[parameter.chainId][contract]) {
-          contractsToProcess[contract] = contractData;
-          totalContractsToProcess++;
-        }
         if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
             if (!context.state.tokenMetadata[parameter.chainId] || !context.state.tokenMetadata[parameter.chainId][contract] || !context.state.tokenMetadata[parameter.chainId][contract][tokenId]) {
@@ -1755,69 +1748,10 @@ const dataModule = {
           }
         }
       }
-      // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
       console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+      return;
 
-      if (true) {
-        context.commit('setSyncSection', { section: 'Token Contract Metadata', total: totalContractsToProcess });
-        let completed = 0;
-        for (const [contract, contractData] of Object.entries(contractsToProcess)) {
-          console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
-          context.commit('setSyncCompleted', completed);
-          const interface = new ethers.Contract(contract, ERC20ABI, provider);
-          let symbol = null;
-          let name = null;
-          let decimals = null;
-          let totalSupply = null;
-          if (contract == ENS_ERC721_ADDRESS) {
-            symbol = "ENS";
-            name = "Ethereum Name Service";
-          } else if (contract == ENS_ERC1155_ADDRESS) {
-            symbol = "ENSW";
-            name = "Ethereum Name Service Name Wrapper";
-          } else {
-            try {
-              symbol = await interface.symbol();
-            } catch (e) {
-            }
-            try {
-              name = await interface.name();
-            } catch (e) {
-            }
-          }
-          if (contractData.type == "erc20") {
-              try {
-                decimals = await interface.decimals();
-              } catch (e) {
-              }
-          }
-          try {
-            totalSupply = await interface.totalSupply();
-          } catch (e) {
-          }
-          // console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
-          context.commit('addFungibleTokenMetadata', {
-            chainId: parameter.chainId,
-            contract,
-            symbol,
-            name,
-            decimals: decimals && parseInt(decimals) || null,
-            totalSupply: totalSupply && totalSupply.toString() || null,
-            ...contractData,
-          });
-          completed++;
-          if ((completed % 10) == 0) {
-            await context.dispatch('saveData', ['contractMetadata']);
-          }
-          if (context.state.sync.halt) {
-            break;
-          }
-        }
-        // console.log("context.state.metadata: " + JSON.stringify(context.state.metadata, null, 2));
-        await context.dispatch('saveData', ['contractMetadata']);
-      }
-
-      completed = 0;
+      let completed = 0;
       context.commit('setSyncSection', { section: 'Token Metadata', total: totalTokensToProcess });
       context.commit('setSyncCompleted', 0);
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
