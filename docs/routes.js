@@ -11,7 +11,7 @@ const routes = [{
   //   component: Account,
   //   name: 'Account',
   }, {
-    path: '/nonFungibles',
+    path: '/nonfungibles',
     component: NonFungibles,
     name: 'NonFungibles',
   }, {
