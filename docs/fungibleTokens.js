@@ -120,7 +120,7 @@ const FungibleTokens = {
           </template>
 
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleTokenContractJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleFungibleTokenJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
             <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleTokenFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
@@ -297,21 +297,21 @@ const FungibleTokens = {
         if (contractData.type == "erc20") {
           const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
           let include = true;
-          // if (this.settings.junkFilter) {
-          //   if (this.settings.junkFilter == 'junk' && !contractData.junk) {
-          //     include = false;
-          //   } else if (this.settings.junkFilter == 'excludejunk' && contractData.junk) {
-          //     include = false;
-          //   }
-          // }
-          // if (include && this.settings.favouritesOnly && (!contractData.favourite || contractData.junk)) {
-          //   include = false;
-          // }
-          // if (include && regex) {
-          //   if (!(regex.test(contractData.symbol) || regex.test(contractData.name) || regex.test(contract))) {
-          //     include = false;
-          //   }
-          // }
+          if (this.settings.junkFilter) {
+            if (this.settings.junkFilter == 'junk' && !metadata.junk) {
+              include = false;
+            } else if (this.settings.junkFilter == 'excludejunk' && metadata.junk) {
+              include = false;
+            }
+          }
+          if (include && this.settings.favouritesOnly && (!metadata.favourite || metadata.junk)) {
+            include = false;
+          }
+          if (include && regex) {
+            if (!(regex.test(metadata.symbol) || regex.test(metadata.name) || regex.test(contract))) {
+              include = false;
+            }
+          }
           if (include) {
             results.push({ chainId: this.chainId, contract, ...contractData, ...metadata });
           }
@@ -370,9 +370,9 @@ const FungibleTokens = {
       }
     },
 
-    toggleTokenContractJunk(item) {
-      logInfo("FungibleTokens", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleTokenContractJunk', item);
+    toggleFungibleTokenJunk(item) {
+      logInfo("FungibleTokens", ".methods.toggleFungibleTokenJunk - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleFungibleTokenJunk', item);
     },
     toggleFungibleTokenFavourite(item) {
       logInfo("FungibleTokens", ".methods.toggleFungibleTokenFavourite - item: " + JSON.stringify(item, null, 2));
