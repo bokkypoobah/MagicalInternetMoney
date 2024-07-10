@@ -570,8 +570,8 @@ const NonFungibles = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("NonFungibles", "methods.saveSettings - erc721sSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.erc721sSettings = JSON.stringify(this.settings);
+      logInfo("NonFungibles", "methods.saveSettings - nonFungiblesSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.nonFungiblesSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
       store.dispatch('syncOptions/viewSyncOptions');
@@ -680,8 +680,8 @@ const NonFungibles = {
   mounted() {
     logDebug("NonFungibles", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('erc721sSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.erc721sSettings);
+    if ('nonFungiblesSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.nonFungiblesSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;

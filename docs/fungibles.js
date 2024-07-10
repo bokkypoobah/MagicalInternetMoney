@@ -424,8 +424,8 @@ const Fungibles = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("Fungibles", "methods.saveSettings - fungibleTokensSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.fungibleTokensSettings = JSON.stringify(this.settings);
+      logInfo("Fungibles", "methods.saveSettings - fungiblesSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.fungiblesSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
       store.dispatch('syncOptions/viewSyncOptions');
@@ -519,8 +519,8 @@ const Fungibles = {
   mounted() {
     logDebug("Fungibles", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('fungibleTokensSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.fungibleTokensSettings);
+    if ('fungiblesSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.fungiblesSettings);
       if ('version' in tempSettings && tempSettings.version == this.settings.version) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
