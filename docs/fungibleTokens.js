@@ -161,7 +161,7 @@ const FungibleTokens = {
                 <span v-else-if="getTokenType(item.token) == 'erc20'">
                   <font size="-1">
                     {{ formatETH(item.value) }}
-                    <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
+                <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
                   </font>
                 </span>
                 <span v-else>
@@ -188,7 +188,7 @@ const FungibleTokens = {
         favouritesOnly: false,
         currentPage: 1,
         pageSize: 10,
-        sortOption: 'registrantasc',
+        sortOption: 'symbolasc',
         version: 0,
       },
       transfer: {
@@ -199,10 +199,12 @@ const FungibleTokens = {
         selectedFaucet: null,
       },
       sortOptions: [
-        // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
-        // { value: 'nameregistrantdsc', text: '▼ Name, ▲ Registrant' },
-        { value: 'registrantasc', text: '▲ Registrant' },
-        { value: 'registrantdsc', text: '▼ Registrant' },
+        { value: 'contractasc', text: '▲ Contract' },
+        { value: 'contractdsc', text: '▼ Contract' },
+        { value: 'symbolasc', text: '▲ Symbol, ▲ Contract' },
+        { value: 'symboldsc', text: '▼ Symbol, ▲ Contract' },
+        { value: 'nameasc', text: '▲ Name, ▲ Contract' },
+        { value: 'namedsc', text: '▼ Name, ▲ Contract' },
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -321,15 +323,47 @@ const FungibleTokens = {
     },
     filteredSortedItems() {
       const results = this.filteredItems;
-      // if (this.settings.sortOption == 'registrantasc') {
-      //   results.sort((a, b) => {
-      //     return ('' + a.registrant).localeCompare(b.registrant);
-      //   });
-      // } else if (this.settings.sortOption == 'registrantdsc') {
-      //   results.sort((a, b) => {
-      //     return ('' + b.registrant).localeCompare(a.registrant);
-      //   });
-      // }
+      if (this.settings.sortOption == 'contractasc') {
+        results.sort((a, b) => {
+          return ('' + a.contract).localeCompare(b.contract);
+        });
+      } else if (this.settings.sortOption == 'contractdsc') {
+        results.sort((a, b) => {
+          return ('' + b.contract).localeCompare(a.contract);
+        });
+      } else if (this.settings.sortOption == 'symbolasc') {
+        results.sort((a, b) => {
+          if (('' + a.symbol).localeCompare(b.symbol) == 0) {
+            return ('' + a.contract).localeCompare(b.contract);
+          } else {
+            return ('' + a.symbol).localeCompare(b.symbol);
+          }
+        });
+      } else if (this.settings.sortOption == 'symboldsc') {
+        results.sort((a, b) => {
+          if (('' + a.symbol).localeCompare(b.symbol) == 0) {
+            return ('' + a.contract).localeCompare(b.contract);
+          } else {
+            return ('' + b.symbol).localeCompare(a.symbol);
+          }
+        });
+      } else if (this.settings.sortOption == 'nameasc') {
+        results.sort((a, b) => {
+          if (('' + a.name).localeCompare(b.name) == 0) {
+            return ('' + a.contract).localeCompare(b.contract);
+          } else {
+            return ('' + a.name).localeCompare(b.name);
+          }
+        });
+      } else if (this.settings.sortOption == 'namedsc') {
+        results.sort((a, b) => {
+          if (('' + a.name).localeCompare(b.name) == 0) {
+            return ('' + a.contract).localeCompare(b.contract);
+          } else {
+            return ('' + b.name).localeCompare(a.name);
+          }
+        });
+      }
       return results;
     },
     pagedFilteredSortedItems() {
@@ -396,8 +430,8 @@ const FungibleTokens = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      logInfo("FungibleTokens", "methods.saveSettings - erc20sSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.erc20sSettings = JSON.stringify(this.settings);
+      logInfo("FungibleTokens", "methods.saveSettings - fungibleTokensSettings: " + JSON.stringify(this.settings, null, 2));
+      localStorage.fungibleTokensSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
       store.dispatch('syncOptions/viewSyncOptions');
@@ -491,9 +525,9 @@ const FungibleTokens = {
   mounted() {
     logDebug("FungibleTokens", "mounted() $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
-    if ('erc20sSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.erc20sSettings);
-      if ('version' in tempSettings && tempSettings.version == 0) {
+    if ('fungibleTokensSettings' in localStorage) {
+      const tempSettings = JSON.parse(localStorage.fungibleTokensSettings);
+      if ('version' in tempSettings && tempSettings.version == this.settings.version) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
       }
