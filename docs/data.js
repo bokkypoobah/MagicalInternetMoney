@@ -695,14 +695,13 @@ const dataModule = {
       if (options.txData && !options.devThing) {
         await context.dispatch('syncTokenEventTxData', parameter);
       }
-      if (options.tokens && !options.devThing) {
+      if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
       }
-      if (options.metadata || options.devThing) {
-        await context.dispatch('syncFungibleTokenMetadata', parameter);
+      if (options.fungiblesMetadata && !options.devThing) {
+        await context.dispatch('syncFungiblesMetadata', parameter);
       }
-      if (options.metadata && !options.devThing) {
-        // TODO
+      if (options.nonFungiblesMetadata && !options.devThing) {
         // await context.dispatch('syncNonFungibleTokenMetadata', parameter);
       }
       if (options.ens || options.devThing) {
@@ -1660,12 +1659,12 @@ const dataModule = {
       logInfo("dataModule", "actions.computeBalances END");
     },
 
-    async syncFungibleTokenMetadata(context, parameter) {
-      logInfo("dataModule", "actions.syncFungibleTokenMetadata: " + JSON.stringify(parameter));
+    async syncFungiblesMetadata(context, parameter) {
+      logInfo("dataModule", "actions.syncFungiblesMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      logInfo("dataModule", "actions.syncFungibleTokenMetadata BEGIN");
+      logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
 
       const contractsToProcess = {};
       let totalContractsToProcess = 0;
@@ -1726,7 +1725,7 @@ const dataModule = {
       }
       console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
       await context.dispatch('saveData', ['tokens']);
-      logInfo("dataModule", "actions.syncFungibleTokenMetadata END");
+      logInfo("dataModule", "actions.syncFungiblesMetadata END");
     },
 
 

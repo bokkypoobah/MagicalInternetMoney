@@ -8,7 +8,8 @@ const SyncOptions = {
         <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthMetaAddressRegistry" @input="saveSettings" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry entries'" class="ml-2 mt-1">Stealth Meta-Address Registry</b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.eth" @input="saveSettings" v-b-popover.hover="'Ether Balances'" class="ml-2 mt-1">TODO: Ether Balances</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20, ERC-721 and ERC-1155 Tokens'" class="ml-2 mt-1">Tokens</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.metadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Token Metadata</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.fungiblesMetadata" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Token metadata'" class="ml-2 mt-1">Fungibles Metadata</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.nonFungiblesMetadata" @input="saveSettings" v-b-popover.hover="'ERC-721 Non-Fungible Token metadata'" class="ml-2 mt-1">Non-Fungibles Metadata</b-form-checkbox>
 
         <b-form-checkbox size="sm" switch :disabled="chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">ENS Names on ETH Mainnet</b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">TODO: Exchange Rates</b-form-checkbox>
@@ -31,14 +32,15 @@ const SyncOptions = {
         stealthMetaAddressRegistry: true,
         ethers: true,
         tokens: true,
-        metadata: true,
+        fungiblesMetadata: true,
+        nonFungiblesMetadata: true,
         ens: true,
         exchangeRates: true,
         // incrementalSync: true,
         timestamps: true,
         txData: true,
         devThing: false,
-        version: 0,
+        version: 1,
       },
     }
   },
@@ -75,7 +77,8 @@ const SyncOptions = {
         stealthMetaAddressRegistry: this.settings.stealthMetaAddressRegistry,
         ethers: this.settings.ethers,
         tokens: this.settings.tokens,
-        metadata: this.settings.metadata,
+        fungiblesMetadata: this.settings.fungiblesMetadata,
+        nonFungiblesMetadata: this.settings.nonFungiblesMetadata,
         ens: this.settings.ens,
         exchangeRates: this.settings.exchangeRates,
         // incrementalSync: this.settings.incrementalSync,
@@ -90,7 +93,7 @@ const SyncOptions = {
     logDebug("SyncOptions", "mounted() $route: " + JSON.stringify(this.$route.params));
     if ('syncOptionsSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.syncOptionsSettings);
-      if ('version' in tempSettings && tempSettings.version == 0) {
+      if ('version' in tempSettings && tempSettings.version == this.settings.version) {
         this.settings = tempSettings;
       }
     }
