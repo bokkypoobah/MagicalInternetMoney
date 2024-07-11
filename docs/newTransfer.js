@@ -161,8 +161,8 @@ const NewTransfer = {
     transfers() {
       return store.getters['data/transfers'];
     },
-    tokenContracts() {
-      return store.getters['data/tokenContracts'];
+    tokens() {
+      return store.getters['data/tokens'];
     },
     stealthMetaAddressSpecified() {
       return store.getters['newTransfer/stealthMetaAddressSpecified'];
@@ -208,7 +208,7 @@ const NewTransfer = {
     additionalERC20TokensOptions() {
       const results = [];
       results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
         if (data.favourite) {
           // console.log(address + " => " + JSON.stringify(data));
           results.push({ value: address, text: (data.type == "erc20" ? "ERC-20 " : "ERC-721 ") + data.symbol + ' ' + data.name + ' @ ' + address.substring(0, 10) })
@@ -250,7 +250,7 @@ const NewTransfer = {
     filteredERC721Tokens() {
       logInfo("NewTransfer", "methods.filteredERC721Tokens BEGIN");
       const results = [];
-      const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       if (tokenContract.type == "erc721") {
         for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
           if (tokenData.owner == this.coinbase) {

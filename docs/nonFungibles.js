@@ -354,12 +354,6 @@ const NonFungibles = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    // tokenMetadata() {
-    //   return store.getters['data/tokenMetadata'];
-    // },
-    // tokenContracts() {
-    //   return store.getters['data/tokenContracts'];
-    // },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
     },

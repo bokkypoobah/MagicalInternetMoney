@@ -57,9 +57,6 @@ const Data = {
     stealthTransfers() {
       return store.getters['data/stealthTransfers'];
     },
-    tokenContracts() {
-      return store.getters['data/tokenContracts'];
-    },
     totalStealthTransfers() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [blockNumber, logIndexes] of Object.entries(this.stealthTransfers[this.chainId] || {})) {
@@ -71,20 +68,22 @@ const Data = {
     },
     totalERC20Contracts() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-        if (data.type == "erc20") {
-          result++;
-        }
-      }
+      // TODO
+      // for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      //   if (data.type == "erc20") {
+      //     result++;
+      //   }
+      // }
       return result;
     },
     totalERC721Tokens() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
-        if (data.type == "erc721") {
-          result += Object.keys(data.tokenIds).length;
-        }
-      }
+      // TODO
+      // for (const [address, data] of Object.entries(this.tokenContracts[this.chainId] || {})) {
+      //   if (data.type == "erc721") {
+      //     result += Object.keys(data.tokenIds).length;
+      //   }
+      // }
       return result;
     },
     // mappings() {
@@ -180,13 +179,11 @@ const dataModule = {
     tokens: {},
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
-    tokenMetadata: {}, // chainId -> tokenContractAddress -> tokenId => metadata
     timestamps: {}, // chainId -> blockNumber => timestamp
     txs: {}, // txHash => tx & txReceipt
 
     registry: {}, // Address => StealthMetaAddress
     stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
-    tokenContracts: {}, // ChainId, tokenContractAddress, tokenId => data
     ens: {},
     exchangeRates: {},
     forceRefresh: 0,
@@ -219,13 +216,11 @@ const dataModule = {
     tokens: state => state.tokens,
 
     collection: state => state.collection,
-    tokenMetadata: state => state.tokenMetadata,
     timestamps: state => state.timestamps,
     txs: state => state.txs,
 
     registry: state => state.registry,
     stealthTransfers: state => state.stealthTransfers,
-    tokenContracts: state => state.tokenContracts,
     ens: state => state.ens,
     exchangeRates: state => state.exchangeRates,
     forceRefresh: state => state.forceRefresh,
@@ -561,7 +556,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', /*'tokenMetadata',*/ 'tokens', 'balances', 'registry', 'stealthTransfers'/*, 'tokenContracts', 'tokenMetadata'*/]) {
+        for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));

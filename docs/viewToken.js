@@ -26,14 +26,6 @@ const ViewToken = {
           </b-input-group>
         </b-form-group>
 
-        <!-- <b-form-group label="Collection Symbol:" label-for="token-collectionsymbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-collectionsymbol" :value="collectionSymbol" class="px-2 w-100"></b-form-input>
-        </b-form-group> -->
-
-        <!-- <b-form-group label="Collection Name:" label-for="token-collectionname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-collectionname" :value="collectionName" class="px-2 w-100"></b-form-input>
-        </b-form-group> -->
-
         <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
         </b-form-group>
@@ -108,20 +100,8 @@ const ViewToken = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    tokenContracts() {
-      return store.getters['data/tokenContracts'];
-    },
-    tokenMetadata() {
-      return store.getters['data/tokenMetadata'];
-    },
-    // collectionSymbol() {
-    //   return this.contract && this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][this.contract] && this.contractMetadata[this.chainId][this.contract].symbol || null;
-    // },
-    // collectionName() {
-    //   return this.contract && this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][this.contract] && this.contractMetadata[this.chainId][this.contract].name || null;
-    // },
     metadata() {
-      return this.contract && this.tokenId && this.tokenMetadata[this.chainId] && this.tokenMetadata[this.chainId][this.contract] && this.tokenMetadata[this.chainId][this.contract][this.tokenId] || {};
+      return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
     },
     name() {
       return this.metadata && this.metadata.name || null;
