@@ -78,7 +78,7 @@ Deployed on Sepolia:
 
 ###### ERC-20 Fungible Tokens
 
-<kbd><img src="images/SampleScreen_FungibleTokens_20240710.png" /></kbd>
+<kbd><img src="images/SampleScreen_FungibleTokens_20240711.png" /></kbd>
 
 ###### ERC-721 and ERC-1155 Non-Fungible Tokens
 

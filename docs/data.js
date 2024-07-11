@@ -1738,7 +1738,7 @@ const dataModule = {
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
-            if (!context.state.tokenMetadata[parameter.chainId] || !context.state.tokenMetadata[parameter.chainId][contract] || !context.state.tokenMetadata[parameter.chainId][contract][tokenId]) {
+            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract][tokenId]) {
               if (!(contract in tokensToProcess)) {
                 tokensToProcess[contract] = {};
               }

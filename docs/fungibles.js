@@ -118,22 +118,23 @@ const Fungibles = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
-
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
-
+          <template #cell(logo)="data">
+            <b-img v-if="chainId == 1" button rounded width="75px;" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.contract + '/logo.png'" />
+          </template>
           <template #cell(contract)="data">
             <b-link :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
+            <!-- <br />
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button> -->
           </template>
           <template #cell(type)="data">
             <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
-          </template>
-          <template #cell(logo)="data">
-            <b-img v-if="chainId == 1" button rounded width="75px;" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.contract + '/logo.png'" />
           </template>
           <template #cell(symbol)="data">
             <font size="-1">{{ data.item.symbol }}</font>
@@ -208,17 +209,17 @@ const Fungibles = {
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
+        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
         // { key: 'firstEventBlockNumber', label: 'First Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'lastEventBlockNumber', label: 'Last Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'decimals', label: 'Decs', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
