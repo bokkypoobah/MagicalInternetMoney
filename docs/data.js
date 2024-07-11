@@ -1735,6 +1735,7 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata BEGIN");
+      const FETCH_TIMEOUT_MILLIS = 5000;
       const tokensToProcess = {};
       let totalTokensToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
@@ -1828,7 +1829,7 @@ const dataModule = {
                 // console.log("ERC-1155 metadataFile AFTER: " + JSON.stringify(metadataFile, null, 2));
               }
               try {
-                const metadataFileContent = await fetch(metadataFile, {mode: 'cors'}).then(response => response.json());
+                const metadataFileContent = await fetch(metadataFile, { mode: 'cors', signal: AbortSignal.timeout(FETCH_TIMEOUT_MILLIS) }).then(response => response.json());
                 // console.log("metadataFile: " + metadataFile + " => " + JSON.stringify(metadataFileContent, null, 2));
 
                 if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
@@ -1919,7 +1920,11 @@ const dataModule = {
                   });
                 }
               } catch (e1) {
-                console.error(e1.message);
+                if (e1.name === 'AbortError') {
+                  console.error("TIMEOUT: " + e1.message);
+                } else {
+                  console.error("ERROR: " + e1.message);
+                }
               }
             }
           } catch (e) {
