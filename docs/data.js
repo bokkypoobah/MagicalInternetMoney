@@ -163,18 +163,57 @@ const dataModule = {
     // }
     balances: {},
 
-    // chainId -> contract for ERC-20; chainId -> contract -> tokenId for ERC-721 and ERC-1155
-    // "11155111": {
-    //   "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
-    //     "type": "erc20",
-    //     "symbol": "WEENUS",
-    //     "name": "Weenus 💪",
-    //     "decimals": 18,
-    //     "totalSupply": "1357000000000000000000000",
-    //     "junk": false,
-    //     "favourite": false,
-    //     "notes": null
-    //   },
+    // {
+    //   "11155111": {
+    //     "0x8b73448426797099b6b9a96c4343f528bbAfc55e": {
+    //       "junk": false,
+    //       "tokens": {
+    //         "6743": {
+    //           "name": "CrypToadz #6743",
+    //           "description": "CrypToadz #6743",
+    //           "image": "ipfs://QmeWBcNJqTYvPoJ1au6h4xGR277QTcaH94Y9Z19UGaDejo",
+    //           "attributes": [
+    //             {
+    //               "trait_type": "Eyes",
+    //               "value": "Butthole"
+    //             }
+    //           ],
+    //           "favourite": false
+    //         }
+    //       }
+    //     },
+    //     "0x3F15A716888EFb6871872fC4358F638DEE495f3b": {
+    //       "junk": false,
+    //       "tokens": {
+    //         "8": {
+    //           "name": "feels good",
+    //           "description": "A piece that can be combined",
+    //           "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyIgaWQ9InBpeGVsIiAgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMzkgMzkiIHdpZHRoPSIzOTAiIGhlaWdodD0iMzkwIj4gPGltYWdlIHg9IjAiIHk9IjAiIHdpZHRoPSIzOSIgaGVpZ2h0PSIzOSIgaHJlZj0iZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTlRBd0lpQm9aV2xuYUhROUlqVXdNQ0lnZG1sbGQwSnZlRDBpTUNBd0lEVXdNQ0ExTURBaUlIWmxjbk5wYjI0OUlqRXVNaUlnZUcxc2JuTTlJbWgwZEhBNkx5OTNkM2N1ZHpNdWIzSm5Mekl3TURBdmMzWm5JaUJ6ZEhsc1pUMGlZbUZqYTJkeWIzVnVaQzFqYjJ4dmNqcDBjbUZ1YzNCaGNtVnVkRHRpWVdOclozSnZkVzVrTFdsdFlXZGxPblZ5YkNoa1lYUmhPbWx0WVdkbEwzQnVaenRpWVhObE5qUXNhVlpDVDFKM01FdEhaMjlCUVVGQlRsTlZhRVZWWjBGQlFVTmpRVUZCUVc1RFFWbEJRVUZEVFc4eFJURkJRVUZCUVZoT1UxSXdTVUZ5Y3pSak5sRkJRVUZRUmtwU1JVWlZWMGxZZEd4cVJVOW5ha0ZWVVVZclRuQXpSWGx6YW1kWlFuTXZRVU5TZURGalQwbFZWR2MwTm1WblRGQTBSMEZaV0VOQ1QxaEJZMjVITkZOSFUzSXJiWGt6T0V3MlZ5OHZOM2R6ZEV4aFFXOXBjVWx2YVhGS05FMU5URGg0YkVoUVJsRjBRMGwwWTBGaVJ6bDZRVTAzY25Bck1YZDRTVXh0UTFwWGVsbHRWMlJCY0VSTk4zQlNNV0Z3TDNadFJWRjNVa3MwYms1clVreGpVRkpqTURsR2NXWkpiemxrYTJOaVdEVTNNblppWVVWcFUyZGlUVTFhWjJwSVJ6SlBPSE0yZG01YVFWUjJVSFJyYjBwek16UnVabTVKSzNsVWRUTllUelZoWjFCa1kyeDJlRk5FTDFaclZuUnlVbWwxWm5oVGEwWllWalJLYW5KWmRVVmtOREJKYzJRNWFYTjFTSEpIYUVscVFtNDRLelZIU1dOM1pVRlRWREpTTWtsa016RkNOVEkxZERCNmJtSnZiSG80TUZBNFJDdFhWblJTVmtWVlNsTlpkbTR6V2xWMVJVZDNRVVEwUVVGQlFVRlRWVlpQVWtzMVExbEpTVDBwTzJKaFkydG5jbTkxYm1RdGNtVndaV0YwT201dkxYSmxjR1ZoZER0aVlXTnJaM0p2ZFc1a0xYTnBlbVU2WTI5dWRHRnBianRpWVdOclozSnZkVzVrTFhCdmMybDBhVzl1T21ObGJuUmxjanRwYldGblpTMXlaVzVrWlhKcGJtYzZMWGRsWW10cGRDMXZjSFJwYldsNlpTMWpiMjUwY21GemREc3RiWE10YVc1MFpYSndiMnhoZEdsdmJpMXRiMlJsT201bFlYSmxjM1F0Ym1WcFoyaGliM0k3YVcxaFoyVXRjbVZ1WkdWeWFXNW5PaTF0YjNvdFkzSnBjM0F0WldSblpYTTdhVzFoWjJVdGNtVnVaR1Z5YVc1bk9uQnBlR1ZzWVhSbFpEc2lQand2YzNablBnPT0iLz48c3R5bGU+I3BpeGVsIHtpbWFnZS1yZW5kZXJpbmc6IHBpeGVsYXRlZDsgaW1hZ2UtcmVuZGVyaW5nOiAtbW96LWNyaXNwLWVkZ2VzOyBpbWFnZS1yZW5kZXJpbmc6IC13ZWJraXQtY3Jpc3AtZWRnZXM7IC1tcy1pbnRlcnBvbGF0aW9uLW1vZGU6IG5lYXJlc3QtbmVpZ2hib3I7fTwvc3R5bGU+PC9zdmc+",
+    //           "attributes": [
+    //             {
+    //               "trait_type": "Tags",
+    //               "value": "frog"
+    //             },
+    //             {
+    //               "trait_type": "Tags",
+    //               "value": "derp"
+    //             }
+    //           ],
+    //           "favourite": true
+    //         }
+    //       }
+    //     },
+    //     "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9": {
+    //       "type": "erc20",
+    //       "symbol": "WEENUS",
+    //       "name": "Weenus 💪",
+    //       "decimals": 18,
+    //       "totalSupply": "1358000000000000000000000",
+    //       "junk": false,
+    //       "favourite": false,
+    //       "notes": null
+    //     },
+    //   }
     // }
     tokens: {},
 
@@ -559,7 +598,7 @@ const dataModule = {
         for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
-            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
+            // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
