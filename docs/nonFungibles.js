@@ -354,9 +354,6 @@ const NonFungibles = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    // contractMetadata() {
-    //   return store.getters['data/contractMetadata'];
-    // },
     // tokenMetadata() {
     //   return store.getters['data/tokenMetadata'];
     // },
@@ -411,21 +408,15 @@ const NonFungibles = {
       // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
 
       for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
-        // const contractMetadata = this.contractMetadata[this.chainId] && this.contractMetadata[this.chainId][contract] || {};
         // console.log(contract + " => " + JSON.stringify(data));
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
         if (data.type == "erc721" || data.type == "erc1155") {
           // console.log(contract + " => " + JSON.stringify(data, null, 2));
-          // const collectionName = contractMetadata.name;
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
             const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
             console.log("  metadata: " + JSON.stringify(metadata, null, 2));
-            // const metadata = this.contractMetadata[this.chainId] &&
-            //   this.contractMetadata[this.chainId][contract] &&
-            //   this.contractMetadata[this.chainId][contract][tokenId] ||
-            //   {};
 
             let include = true;
             if (this.settings.junkFilter) {
@@ -476,8 +467,6 @@ const NonFungibles = {
                   type: data.type,
                   junk,
                   favourite: metadata.favourite,
-                  // collectionSymbol: contractMetadata.symbol,
-                  // collectionName: contractMetadata.name,
                   totalSupply: data.totalSupply,
                   tokenId,
                   owners,

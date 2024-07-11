@@ -180,7 +180,6 @@ const dataModule = {
     tokens: {},
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
-    contractMetadata: {}, // chainId -> contract => metadata
     tokenMetadata: {}, // chainId -> tokenContractAddress -> tokenId => metadata
     timestamps: {}, // chainId -> blockNumber => timestamp
     txs: {}, // txHash => tx & txReceipt
@@ -220,7 +219,6 @@ const dataModule = {
     tokens: state => state.tokens,
 
     collection: state => state.collection,
-    contractMetadata: state => state.contractMetadata,
     tokenMetadata: state => state.tokenMetadata,
     timestamps: state => state.timestamps,
     txs: state => state.txs,
@@ -563,7 +561,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', /*'contractMetadata', 'tokenMetadata',*/ 'tokens', 'balances', 'registry', 'stealthTransfers'/*, 'tokenContracts', 'tokenMetadata'*/]) {
+        for (let type of ['addresses', 'timestamps', 'txs', /*'tokenMetadata',*/ 'tokens', 'balances', 'registry', 'stealthTransfers'/*, 'tokenContracts', 'tokenMetadata'*/]) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object));
