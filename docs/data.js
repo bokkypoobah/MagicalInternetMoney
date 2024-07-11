@@ -369,8 +369,8 @@ const dataModule = {
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
     },
-    addFungibleTokenMetadata(state, info) {
-      logInfo("dataModule", "mutations.addFungibleTokenMetadata info: " + JSON.stringify(info, null, 2));
+    addFungibleMetadata(state, info) {
+      logInfo("dataModule", "mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
         Vue.set(state.tokens, info.chainId, {});
       }
@@ -387,18 +387,20 @@ const dataModule = {
         });
       }
     },
-    addTokenMetadata(state, info) {
-      // logInfo("dataModule", "mutations.addTokenMetadata info: " + JSON.stringify(info, null, 2));
-      if (!(info.chainId in state.tokenMetadata)) {
-        Vue.set(state.tokenMetadata, info.chainId, {});
+    addNonFungibleMetadata(state, info) {
+      logInfo("dataModule", "mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
+      if (!(chainId in state.tokens)) {
+        Vue.set(state.tokens, chainId, {});
       }
-      if (!(info.contract in state.tokenMetadata[info.chainId])) {
-        Vue.set(state.tokenMetadata[info.chainId], info.contract, {});
+      if (!(contract in state.tokens[chainId])) {
+        Vue.set(state.tokens[chainId], contract, {});
       }
-      if (!(info.tokenId in state.tokenMetadata[info.chainId][info.contract])) {
-        if (info.contract == ENS_ERC721_ADDRESS || info.contract == ENS_ERC1155_ADDRESS) {
-          logInfo("dataModule", "mutations.addTokenMetadata ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokenMetadata[info.chainId][info.contract], info.tokenId, {
+      if (!(tokenId in state.tokens[chainId][contract])) {
+        if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
+          // TODO
+          logInfo("dataModule", "mutations.addNonFungibleMetadata ENS info: " + JSON.stringify(info, null, 2));
+          Vue.set(state.tokens[chainId][contract], tokenId, {
             created: info.created || null,
             registration: info.registration || null,
             expiry: info.expiry,
@@ -408,8 +410,8 @@ const dataModule = {
             attributes: info.attributes,
           });
         } else {
-          logInfo("dataModule", "mutations.addTokenMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokenMetadata[info.chainId][info.contract], info.tokenId, {
+          // logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
+          Vue.set(state.tokens[chainId][contract], tokenId, {
             name: info.name,
             description: info.description,
             image: info.image,
@@ -561,10 +563,10 @@ const dataModule = {
       await context.commit('toggleFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
-    async addTokenMetadata(context, info) {
-      logInfo("dataModule", "actions.addTokenMetadata - info: " + JSON.stringify(info, null, 2));
-      context.commit('addTokenMetadata', info);
-      await context.dispatch('saveData', ['tokenMetadata']);
+    async addNonFungibleMetadata(context, info) {
+      logInfo("dataModule", "actions.addNonFungibleMetadata - info: " + JSON.stringify(info, null, 2));
+      context.commit('addNonFungibleMetadata', info);
+      await context.dispatch('saveData', ['tokens']);
     },
 
     async deleteAddress(context, account) {
@@ -1653,7 +1655,7 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log("collator: " + JSON.stringify(collator, null, 2));
+      // console.log("collator: " + JSON.stringify(collator, null, 2));
       context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
       await context.dispatch('saveData', ['balances']);
       logInfo("dataModule", "actions.computeBalances END");
@@ -1704,7 +1706,7 @@ const dataModule = {
         } catch (e) {
         }
         console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
-        context.commit('addFungibleTokenMetadata', {
+        context.commit('addFungibleMetadata', {
           chainId: parameter.chainId,
           contract,
           symbol,
@@ -1749,7 +1751,6 @@ const dataModule = {
         }
       }
       console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
-      return;
 
       let completed = 0;
       context.commit('setSyncSection', { section: 'Token Metadata', total: totalTokensToProcess });
@@ -1764,7 +1765,7 @@ const dataModule = {
 
       for (const [contract, contractData] of Object.entries(tokensToProcess)) {
         const contractType = context.state.balances[parameter.chainId][contract].type;
-        // console.log(contract + " => " + contractType);
+        console.log(contract + " => " + contractType);
         for (const [tokenId, tokenData] of Object.entries(contractData)) {
           context.commit('setSyncCompleted', completed);
           try {
@@ -1799,7 +1800,7 @@ const dataModule = {
               description = data.description || undefined;
               attributes = data.attributes || {};
               image = data.image || undefined;
-              context.commit('addTokenMetadata', {
+              context.commit('addNonFungibleMetadata', {
                 chainId: parameter.chainId,
                 contract,
                 tokenId,
@@ -1818,7 +1819,7 @@ const dataModule = {
                 metadataFile = tokenURIResult;
               }
               // let metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
-              console.log("metadataFile: " + metadataFile + ", tokenURIResult: " + tokenURIResult);
+              // console.log("tokenURIResult: " + tokenURIResult + ", metadataFile: " + metadataFile);
 
               // console.log("metadataFile: " + JSON.stringify(metadataFile, null, 2));
               if (contractType == "erc1155") {
@@ -1828,7 +1829,7 @@ const dataModule = {
               }
               try {
                 const metadataFileContent = await fetch(metadataFile, {mode: 'cors'}).then(response => response.json());
-                console.log("metadataFile: " + metadataFile + " => " + JSON.stringify(metadataFileContent, null, 2));
+                // console.log("metadataFile: " + metadataFile + " => " + JSON.stringify(metadataFileContent, null, 2));
 
                 if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
                   if (metadataFileContent && metadataFileContent.message) {
@@ -1841,7 +1842,7 @@ const dataModule = {
                     expiry = moment.utc(expiryString).unix();
                     console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
                     expired = true;
-                    context.commit('addTokenMetadata', {
+                    context.commit('addNonFungibleMetadata', {
                       chainId: parameter.chainId,
                       contract,
                       tokenId,
@@ -1865,7 +1866,7 @@ const dataModule = {
                       attributes.sort((a, b) => {
                         return ('' + a.trait_type).localeCompare(b.trait_type);
                       });
-                      context.commit('addTokenMetadata', {
+                      context.commit('addNonFungibleMetadata', {
                         chainId: parameter.chainId,
                         contract,
                         tokenId,
@@ -1886,7 +1887,7 @@ const dataModule = {
                       attributes.sort((a, b) => {
                         return ('' + a.trait_type).localeCompare(b.trait_type);
                       });
-                      context.commit('addTokenMetadata', {
+                      context.commit('addNonFungibleMetadata', {
                         chainId: parameter.chainId,
                         contract,
                         tokenId,
@@ -1907,7 +1908,7 @@ const dataModule = {
                   });
                   const image = metadataFileContent.image || null;
                   console.log(contract + "/" + tokenId + " => " + image);
-                  context.commit('addTokenMetadata', {
+                  context.commit('addNonFungibleMetadata', {
                     chainId: parameter.chainId,
                     contract,
                     tokenId,
@@ -1926,7 +1927,7 @@ const dataModule = {
           }
           completed++;
           if ((completed % 10) == 0) {
-            await context.dispatch('saveData', ['tokenMetadata']);
+            await context.dispatch('saveData', ['tokens']);
           }
           if (context.state.sync.halt) {
             break;
@@ -1935,8 +1936,9 @@ const dataModule = {
         if (context.state.sync.halt) {
           break;
         }
+        console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
       }
-      await context.dispatch('saveData', ['tokenMetadata']);
+      await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata END");
     },
 
