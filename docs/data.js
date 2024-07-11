@@ -253,19 +253,31 @@ const dataModule = {
       Vue.set(state.addresses[info.address], info.field, info.value);
       logInfo("dataModule", "mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
+    toggleFungibleJunk(state, item) {
+      // logInfo("dataModule", "mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
+      if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
+        Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
+        // if (state.tokens[item.chainId][item.contract].junk) {
+        //   Vue.set(state.tokens[item.chainId][item.contract], 'favourite', false);
+        // }
+      }
+    },
     toggleFungibleFavourite(state, item) {
       // logInfo("dataModule", "mutations.toggleFungibleFavourite - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'favourite', !state.tokens[item.chainId][item.contract].favourite);
       }
     },
-    toggleFungibleJunk(state, item) {
-      // logInfo("dataModule", "mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
+    toggleNonFungibleJunk(state, item) {
+      logInfo("dataModule", "mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
-        if (state.tokens[item.chainId][item.contract].junk) {
-          Vue.set(state.tokens[item.chainId][item.contract], 'favourite', false);
-        }
+      }
+    },
+    toggleNonFungibleFavourite(state, item) {
+      logInfo("dataModule", "mutations.toggleNonFungibleFavourite - item: " + JSON.stringify(item));
+      if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract] && state.tokens[item.chainId][item.contract].tokens[item.tokenId]) {
+        Vue.set(state.tokens[item.chainId][item.contract].tokens[item.tokenId], 'favourite', !state.tokens[item.chainId][item.contract].tokens[item.tokenId].favourite);
       }
     },
 
@@ -394,13 +406,16 @@ const dataModule = {
         Vue.set(state.tokens, chainId, {});
       }
       if (!(contract in state.tokens[chainId])) {
-        Vue.set(state.tokens[chainId], contract, {});
+        Vue.set(state.tokens[chainId], contract, {
+          junk: false,
+          tokens: {},
+        });
       }
-      if (!(tokenId in state.tokens[chainId][contract])) {
+      if (!(tokenId in state.tokens[chainId][contract].tokens)) {
         if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
           // TODO
           logInfo("dataModule", "mutations.addNonFungibleMetadata ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokens[chainId][contract], tokenId, {
+          Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
             created: info.created || null,
             registration: info.registration || null,
             expiry: info.expiry,
@@ -408,14 +423,16 @@ const dataModule = {
             description: info.description,
             image: info.image,
             attributes: info.attributes,
+            favourite: false,
           });
         } else {
           // logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokens[chainId][contract], tokenId, {
+          Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
             name: info.name,
             description: info.description,
             image: info.image,
             attributes: info.attributes,
+            favourite: false,
           });
         }
       }
@@ -553,14 +570,24 @@ const dataModule = {
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
+    async toggleFungibleJunk(context, item) {
+      // logInfo("dataModule", "actions.toggleFungibleJunk - item: " + JSON.stringify(item));
+      await context.commit('toggleFungibleJunk', item);
+      await context.dispatch('saveData', ['tokens']);
+    },
     async toggleFungibleFavourite(context, item) {
       // logInfo("dataModule", "actions.toggleFungibleFavourite - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleFavourite', item);
       await context.dispatch('saveData', ['tokens']);
     },
-    async toggleFungibleJunk(context, item) {
-      // logInfo("dataModule", "actions.toggleFungibleJunk - item: " + JSON.stringify(item));
-      await context.commit('toggleFungibleJunk', item);
+    async toggleNonFungibleJunk(context, item) {
+      // logInfo("dataModule", "actions.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      await context.commit('toggleNonFungibleJunk', item);
+      await context.dispatch('saveData', ['tokens']);
+    },
+    async toggleNonFungibleFavourite(context, item) {
+      // logInfo("dataModule", "actions.toggleNonFungibleFavourite - item: " + JSON.stringify(item));
+      await context.commit('toggleNonFungibleFavourite', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async addNonFungibleMetadata(context, info) {
@@ -1741,7 +1768,7 @@ const dataModule = {
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
-            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract][tokenId]) {
+            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId]) {
               if (!(contract in tokensToProcess)) {
                 tokensToProcess[contract] = {};
               }

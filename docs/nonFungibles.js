@@ -147,8 +147,8 @@ const NonFungibles = {
             <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.collectionName }}</font>
             </b-link>
-            <b-button size="sm" @click="toggleTokenContractJunk(data.item);" variant="transparent" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleTokenContractFavourite(data.item);" variant="transparent" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
 
           <template #cell(expiry)="data">
@@ -169,15 +169,14 @@ const NonFungibles = {
           </template>
 
           <template #cell(attributes)="data">
-            <!-- {{ data.item.attributes }} -->
-            <b-row v-for="(attribute, i) in data.item.attributes"  v-bind:key="i" class="m-0 p-0">
+            <b-row v-for="(attribute, i) in data.item.attributes" v-bind:key="i" class="m-0 p-0">
               <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
               <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
             </b-row>
           </template>
 
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleTokenContractFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
+            <b-button size="sm" @click="toggleNonFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
           </template>
 
           <template #cell(contract)="data">
@@ -421,7 +420,8 @@ const NonFungibles = {
           const collectionName = "TODO";
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
-            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract][tokenId] || {};
+            const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
+            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
             console.log("  metadata: " + JSON.stringify(metadata, null, 2));
             // const metadata = this.contractMetadata[this.chainId] &&
             //   this.contractMetadata[this.chainId][contract] &&
@@ -472,10 +472,11 @@ const NonFungibles = {
               }
               if (owners.length > 0) {
                 results.push({
+                  chainId: this.chainId,
                   contract,
                   type: data.type,
-                  junk: data.junk,
-                  favourite: data.favourite,
+                  junk,
+                  favourite: metadata.favourite,
                   // collectionSymbol: contractMetadata.symbol,
                   // collectionName: contractMetadata.name,
                   totalSupply: data.totalSupply,
@@ -548,13 +549,13 @@ const NonFungibles = {
       }
     },
 
-    toggleTokenContractJunk(item) {
-      logInfo("NonFungibles", ".methods.toggleTokenContractJunk - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleTokenContractJunk', item);
+    toggleNonFungibleJunk(item) {
+      logInfo("NonFungibles", ".methods.toggleNonFungibleJunk - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleNonFungibleJunk', item);
     },
-    toggleTokenContractFavourite(item) {
-      logInfo("NonFungibles", ".methods.toggleTokenContractFavourite - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleTokenContractFavourite', item);
+    toggleNonFungibleFavourite(item) {
+      logInfo("NonFungibles", ".methods.toggleNonFungibleFavourite - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleNonFungibleFavourite', item);
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
