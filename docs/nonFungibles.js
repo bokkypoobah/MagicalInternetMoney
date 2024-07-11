@@ -14,7 +14,7 @@ const NonFungibles = {
 
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 pr-1" style="width: 200px;">
-            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
+            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover="'Regex filter by name, description or tokenId'" placeholder="🔍 name/desc/id regex"></b-form-input>
           </div>
           <div class="mt-0 pr-1">
             <b-dropdown size="sm" variant="link" v-b-popover.hover="'Junk filter'">
@@ -143,10 +143,10 @@ const NonFungibles = {
               </span>
             </b-link>
             <br />
-
             <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
-              <font size="-1">{{ data.item.collectionName }}</font>
+              <font size="-1">{{ data.item.description }}</font>
             </b-link>
+            <br />
             <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
             <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
           </template>
@@ -417,7 +417,6 @@ const NonFungibles = {
         if (data.type == "erc721" || data.type == "erc1155") {
           // console.log(contract + " => " + JSON.stringify(data, null, 2));
           // const collectionName = contractMetadata.name;
-          const collectionName = "TODO";
           for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
             console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
@@ -442,7 +441,7 @@ const NonFungibles = {
             if (include && regex) {
               const name = metadata.name || null;
               const description = metadata.description || null;
-              if (!(regex.test(tokenId) || regex.test(collectionName) || regex.test(name) || regex.test(description))) {
+              if (!(regex.test(tokenId) || regex.test(name) || regex.test(description))) {
                 include = false;
               }
             }

@@ -1787,7 +1787,7 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata BEGIN");
-      const FETCH_TIMEOUT_MILLIS = 5000;
+      const FETCH_TIMEOUT_MILLIS = 15000;
       const tokensToProcess = {};
       let totalTokensToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
