@@ -270,15 +270,40 @@ const dataModule = {
     },
     toggleNonFungibleJunk(state, item) {
       logInfo("dataModule", "mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
-      if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
-        Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
+      const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
+      if (!(chainId in state.tokens)) {
+        Vue.set(state.tokens, chainId, {});
       }
+      if (!(contract in state.tokens[chainId])) {
+        Vue.set(state.tokens[chainId], contract, {
+          junk: false,
+          tokens: {},
+        });
+      }
+      Vue.set(state.tokens[chainId][contract], 'junk', !state.tokens[chainId][contract].junk);
     },
     toggleNonFungibleFavourite(state, item) {
       logInfo("dataModule", "mutations.toggleNonFungibleFavourite - item: " + JSON.stringify(item));
-      if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract] && state.tokens[item.chainId][item.contract].tokens[item.tokenId]) {
-        Vue.set(state.tokens[item.chainId][item.contract].tokens[item.tokenId], 'favourite', !state.tokens[item.chainId][item.contract].tokens[item.tokenId].favourite);
+      const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
+      if (!(chainId in state.tokens)) {
+        Vue.set(state.tokens, chainId, {});
       }
+      if (!(contract in state.tokens[chainId])) {
+        Vue.set(state.tokens[chainId], contract, {
+          junk: false,
+          tokens: {},
+        });
+      }
+      if (!(tokenId in state.tokens[chainId][contract].tokens)) {
+        Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
+          name: null,
+          description: null,
+          image: null,
+          attributes: null,
+          favourite: false,
+        });
+      }
+      Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'favourite', !state.tokens[chainId][contract].tokens[tokenId].favourite);
     },
 
     addNewAddress(state, newAccount) {
@@ -1768,7 +1793,7 @@ const dataModule = {
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
-            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId]) {
+            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId].name) {
               if (!(contract in tokensToProcess)) {
                 tokensToProcess[contract] = {};
               }

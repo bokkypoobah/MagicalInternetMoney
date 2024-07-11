@@ -429,16 +429,16 @@ const NonFungibles = {
             //   {};
 
             let include = true;
-            // if (this.settings.junkFilter) {
-            //   if (this.settings.junkFilter == 'junk' && !data.junk) {
-            //     include = false;
-            //   } else if (this.settings.junkFilter == 'excludejunk' && data.junk) {
-            //     include = false;
-            //   }
-            // }
-            // if (include && this.settings.favouritesOnly && (!data.favourite || data.junk)) {
-            //   include = false;
-            // }
+            if (this.settings.junkFilter) {
+              if (this.settings.junkFilter == 'junk' && !junk) {
+                include = false;
+              } else if (this.settings.junkFilter == 'excludejunk' && junk) {
+                include = false;
+              }
+            }
+            if (include && this.settings.favouritesOnly && (!metadata.favourite || junk)) {
+              include = false;
+            }
             if (include && regex) {
               const name = metadata.name || null;
               const description = metadata.description || null;
