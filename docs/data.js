@@ -274,7 +274,6 @@ const dataModule = {
     },
     updateBalances(state, info) {
       logInfo("dataModule", "mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
-      const chainId = store.getters['connection/chainId'];
       Vue.set(state.balances, info.chainId, info.balances);
     },
     toggleAddressField(state, info) {
@@ -289,9 +288,6 @@ const dataModule = {
       // logInfo("dataModule", "mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
-        // if (state.tokens[item.chainId][item.contract].junk) {
-        //   Vue.set(state.tokens[item.chainId][item.contract], 'favourite', false);
-        // }
       }
     },
     toggleFungibleFavourite(state, item) {
