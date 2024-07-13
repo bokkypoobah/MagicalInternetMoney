@@ -42,14 +42,14 @@ const ViewStealthMetaAddress = {
           </b-input-group>
         </b-form-group>
         <b-form-group v-if="phrase" label="Viewing Private Key:" label-for="stealthmetaddress-viewingprivatekey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="stealthmetaddress-viewingprivatekey" v-model.trim="viewingPrivateKey" class="px-2 w-100"></b-form-input>
+          <b-form-input size="sm" :type="spendingPrivateKey ? 'text' : 'password'" plaintext id="stealthmetaddress-viewingprivatekey" v-model.trim="viewingPrivateKey" class="px-2 w-100"></b-form-input>
         </b-form-group>
-        <b-form-group v-if="phrase" label="Spending Public Key:" label-for="stealthmetaddress-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group v-if="phrase" label="Spending Public Key:" label-for="stealthmetaddress-spendingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="stealthmetaddress-spendingpublickey" v-model.trim="spendingPublicKey" class="px-2 w-100"></b-form-input>
-        </b-form-group>
-        <b-form-group v-if="phrase" label="Viewing Public Key:" label-for="stealthmetaddress-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        </b-form-group> -->
+        <!-- <b-form-group v-if="phrase" label="Viewing Public Key:" label-for="stealthmetaddress-viewingpublickey" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="stealthmetaddress-viewingpublickey" v-model.trim="viewingPublicKey" class="px-2 w-100"></b-form-input>
-        </b-form-group>
+        </b-form-group> -->
         <b-form-group label="Source:" label-for="stealthmetaddress-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="stealthmetaddress-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
         </b-form-group>
