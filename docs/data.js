@@ -649,8 +649,9 @@ const dataModule = {
       await context.dispatch('saveData', ['tokens']);
     },
 
-    async deleteAddress(context, account) {
-      await context.commit('deleteAddress', account);
+    async deleteAddress(context, address) {
+      logInfo("dataModule", "actions.deleteAddress - address: " + JSON.stringify(address, null, 2));
+      await context.commit('deleteAddress', address);
       await context.dispatch('saveData', ['addresses']);
     },
     async saveTxTags(context, info) {

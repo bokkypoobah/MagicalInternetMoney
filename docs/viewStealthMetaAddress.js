@@ -53,6 +53,9 @@ const ViewStealthMetaAddress = {
         <b-form-group label="Source:" label-for="stealthmetaddress-source" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="stealthmetaddress-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
         </b-form-group>
+        <b-form-group v-if="address" label="Registry" label-for="address-registry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" @click="addAddressToRegistry(address);" variant="link" v-b-popover.hover.top="'Add address ' + address.substring(0, 17) + '...' + address.slice(-8) + ' to the ERC-6538 Stealth Meta-Address Registry?'"><b-icon-plus shift-v="+1" font-scale="1.1" variant="primary"></b-icon-plus></b-button>
+        </b-form-group>
         <b-form-group v-if="address" label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 17) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
@@ -179,12 +182,27 @@ const ViewStealthMetaAddress = {
     setShow(show) {
       store.dispatch('viewStealthMetaAddress/setShow', show);
     },
-    async deleteAddress(account) {
-      this.$bvModal.msgBoxConfirm('Are you sure?')
+    async deleteAddress(address) {
+      logInfo("ViewStealthMetaAddress", "deleteAddress - address: " + JSON.stringify(address));
+      this.$bvModal.msgBoxConfirm("Delete " + address.substring(0, 17) + '...' + address.slice(-8) + "?")
         .then(value => {
           if (value) {
-            store.dispatch('data/deleteAddress', account);
+            store.dispatch('data/deleteAddress', address);
             this.$refs['viewstealthmetaaddress'].hide();
+          }
+        })
+        .catch(err => {
+          // An error occurred
+        })
+    },
+    async addAddressToRegistry(address) {
+      logInfo("ViewStealthMetaAddress", "addAddressToRegistry - address: " + JSON.stringify(address));
+      this.$bvModal.msgBoxConfirm("Add " + address.substring(0, 17) + '...' + address.slice(-8) + " to the ERC-6538 Registry?")
+        .then(value => {
+          if (value) {
+            console.log("TODO: Add address to registry");
+            // store.dispatch('data/addAddressToRegistry', address);
+            // this.$refs['viewstealthmetaaddress'].hide();
           }
         })
         .catch(err => {

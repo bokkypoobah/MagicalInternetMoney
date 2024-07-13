@@ -292,11 +292,12 @@ const ViewAddress = {
     setShow(show) {
       store.dispatch('viewAddress/setShow', show);
     },
-    async deleteAddress(account) {
-      this.$bvModal.msgBoxConfirm('Are you sure?')
+    async deleteAddress(address) {
+      logInfo("ViewAddress", "deleteAddress - address: " + JSON.stringify(address));
+      this.$bvModal.msgBoxConfirm("Delete " + address.substring(0, 10) + '...' + address.slice(-8) + "?")
         .then(value => {
           if (value) {
-            store.dispatch('data/deleteAddress', account);
+            store.dispatch('data/deleteAddress', address);
             this.$refs['viewaddress'].hide();
           }
         })
