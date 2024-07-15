@@ -49,10 +49,12 @@ const NETWORKS = {
   42161: {
     name: "Arbitrum",
     explorer: "https://arbiscan.io/",
+    nonFungibleViewer: "https://opensea.io/assets/arbitrum/${contract}/${tokenId}",
   },
   8453: {
     name: "Base",
     explorer: "https://basescan.org/",
+    nonFungibleViewer: "https://opensea.io/assets/base/${contract}/${tokenId}",
   },
   100: {
     name: "Gnosis Chain",
@@ -61,10 +63,12 @@ const NETWORKS = {
   10: {
     name: "Optimism",
     explorer: "https://optimistic.etherscan.io/",
+    nonFungibleViewer: "https://opensea.io/assets/optimism/${contract}/${tokenId}",
   },
   137: {
     name: "Polygon Matic",
     explorer: "https://polygonscan.com/",
+    nonFungibleViewer: "https://opensea.io/assets/matic/${contract}/${tokenId}",
   },
   534352: {
     name: "Scroll",
@@ -82,10 +86,12 @@ const NETWORKS = {
   421614: {
     name: "Arbitrum Sepolia",
     explorer: "https://sepolia.arbiscan.io/",
+    nonFungibleViewer: "https://testnets.opensea.io/assets/arbitrum-sepolia/${contract}/${tokenId}",
   },
   84532: {
     name: "Base Sepolia",
     explorer: "https://sepolia.basescan.org/",
+    nonFungibleViewer: "https://testnets.opensea.io/assets/base-sepolia/${contract}/${tokenId}",
   },
   11155420: {
     name: "Optimism Sepolia",
@@ -100,5 +106,5 @@ function nonFungibleURL(chainId, contract, tokenId) {
   return url;
 }
 
-const output = nonFungibleURL(11155111, "0x1234", 123456);
+const output = nonFungibleURL(84532, "0x1234", 123456);
 console.log("output: " + output);
