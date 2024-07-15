@@ -35,6 +35,11 @@ const NETWORKS = {
   },
   11155111: {
     name: "Sepolia",
+    transferHelper: {
+      // TODO: ABI & versions
+      name: "MagicalInternetMoney-0.8.3",
+      address: "0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2",
+    },
     explorer: "https://sepolia.etherscan.io/",
     nonFungibleViewer: "https://testnets.opensea.io/assets/sepolia/${contract}/${tokenId}",
   },

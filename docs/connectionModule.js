@@ -158,7 +158,7 @@ const Connection = {
             logInfo("Connection", "execWeb3() handleChainChanged: " + JSON.stringify(_chainId));
             // alert('Ethereum chain has changed - reloading this page.')
             // window.location.reload();
-            store.dispatch('connection/setChainId', parseInt(_chainId));
+            store.dispatch('connection/setNetworkData', parseInt(_chainId));
             // const signer = provider.getSigner();
             // const coinbase = await signer.getAddress();
             // const balance = await provider.getBalance(coinbase);
@@ -196,7 +196,7 @@ const Connection = {
             const network = await provider.getNetwork();
             // console.log("this.chainId: " + this.chainId + ", network.chainId: " + network.chainId);
             if (this.chainId != network.chainId) {
-              store.dispatch('connection/setChainId', network.chainId);
+              store.dispatch('connection/setNetworkData', network.chainId);
             }
             // store.dispatch('connection/setNetwork', network);
             // logInfo("Connection", "execWeb3() network: " + JSON.stringify(this.network));
@@ -296,6 +296,10 @@ const connectionModule = {
     connected: false,
     connectionError: null,
     chainId: null,
+    networkSupported: null,
+    transferHelper: null,
+    explorer: null,
+    nonFungibleViewer: null,
     coinbase: null,
     coinbaseUpdated: false,
     balance: null,
@@ -310,10 +314,13 @@ const connectionModule = {
     connectionError: state => state.connectionError,
     connection: state => state.connection,
     chainId: state => state.chainId,
+    networkSupported: state => state.networkSupported,
+    transferHelper: state => state.transferHelper,
+    explorer: state => state.explorer,
+    nonFungibleViewer: state => state.nonFungibleViewer,
     coinbase: state => state.coinbase,
     coinbaseUpdated: state => state.coinbaseUpdated,
     balance: state => state.balance,
-
     block: state => state.block,
     blockUpdated: state => state.blockUpdated,
     txs: state => state.txs,
@@ -332,9 +339,14 @@ const connectionModule = {
       logDebug("connectionModule", "mutations.setConnectionError(" + error + ")");
       state.connectionError = error;
     },
-    setChainId(state, chainId) {
-      logInfo("connectionModule", "mutations.setChainId(" + chainId + ")");
-      state.chainId = chainId;
+    setNetworkData(state, info) {
+      logInfo("connectionModule", "mutations.setNetworkData(" + JSON.stringify(info) + ")");
+      state.chainId = info.chainId;
+      state.networkSupported = info.networkSupported;
+      state.transferHelper = info.transferHelper;
+      state.explorer = info.explorer;
+      state.nonFungibleViewer = info.nonFungibleViewer;
+      logInfo("connectionModule", "state: " + JSON.stringify(state, null, 2));
     },
     setCoinbase(state, coinbase) {
       logDebug("connectionModule", "mutations.setCoinbase(" + coinbase + ")");
@@ -398,8 +410,13 @@ const connectionModule = {
       logDebug("connectionModule", "actions.setConnectionError(" + error + ")");
       context.commit('setConnectionError', error);
     },
-    setChainId(context, chainId) {
-      context.commit('setChainId', chainId);
+    setNetworkData(context, chainId) {
+      logInfo("connectionModule", "actions.setNetworkData(" + chainId + ")");
+      const networkSupported = ('' + chainId) in NETWORKS;
+      const transferHelper = NETWORKS['' + chainId] && NETWORKS['' + chainId].transferHelper || null;
+      const explorer = NETWORKS['' + chainId] && NETWORKS['' + chainId].explorer || "unknown";
+      const nonFungibleViewer = NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer || "unknown";
+      context.commit('setNetworkData', { chainId, networkSupported, transferHelper, explorer, nonFungibleViewer });
     },
     setCoinbase(context, cb) {
       context.commit('setCoinbase', cb);

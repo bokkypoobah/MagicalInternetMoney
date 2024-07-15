@@ -123,14 +123,8 @@ const app = new Vue({
     powerOn() {
       return store.getters['connection/powerOn'];
     },
-    chainId() {
-      return store.getters['connection/chainId'];
-    },
-    networks() {
-      return Object.keys(NETWORKS);
-    },
-    explorer() {
-      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
     },
     spinnerVariant1() {
       var sv = store.getters['connection/spinnerVariant'];

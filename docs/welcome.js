@@ -11,16 +11,9 @@ const Welcome = {
               <b-card-text>
                 <h5>Welcome</h5>
 
-                Magical Internet Money is an lightweight serverless multi-chain implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link> (using <i>address</i> instead of <i>bytes</i>). Status: <b>WIP</b>
-
+                Magical Internet Money is an lightweight serverless multi-chain implementation of <b-link href="https://eips.ethereum.org/EIPS/eip-5564" target="_blank">ERC-5564: Stealth Addresses</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-6538" target="_blank">ERC-6538: Stealth Meta-Address Registry</b-link>.
                 <br />
-                <br />
-
-                <!--
-                Sync All: <b-button size="sm" @click="syncIt({ sections: ['syncAnnouncements', 'syncRegistrations', 'syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
-                Tokens: <b-button size="sm" @click="syncIt({ sections: ['syncTokens'], parameters: [] })" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-cloud-download shift-v="+1" font-scale="1.2"></b-icon-cloud-download></b-button>
-                -->
-
+                Status: <b>WIP</b>
               </b-card-text>
 
               <b-card-text v-if="false" class="mt-3 mb-2">
@@ -92,7 +85,7 @@ const Welcome = {
                 <h6>Supported Networks</h6>
                 <ul>
                   <li>
-                    <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">https://stealthaddress.dev/contracts/deployments</b-link> (TODO: Only Sepolia currently)
+                    <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">https://stealthaddress.dev/contracts/deployments</b-link> (TODO: Transfer Helper only on Sepolia currently)
                   </li>
                 </ul>
               </b-card-text>
@@ -100,14 +93,38 @@ const Welcome = {
               <b-card-text class="mt-3 mb-2">
                 <h6>Contracts</h6>
                 <ul>
-                  <li v-if="networks.includes('' + chainId)">
-                    ERC5564Announcer: <b-link :href="explorer + 'address/0x55649E01B5Df198D18D95b5cc5051630cfD45564#code'" target="_blank">0x55649E01B5Df198D18D95b5cc5051630cfD45564</b-link>
+                  <li>
+                    ERC5564Announcer:
+                      <span v-if="networkSupported">
+                        <b-link :href="explorer + 'address/0x55649E01B5Df198D18D95b5cc5051630cfD45564#code'" target="_blank">0x55649E01B5Df198D18D95b5cc5051630cfD45564</b-link>
+                      </span>
+                      <span v-else-if="networkSupported === false">
+                        Not Supported
+                      </span>
                   </li>
-                  <li v-if="networks.includes('' + chainId)">
-                    ERC6538Registry: <b-link :href="explorer + 'address/0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538#code'" target="_blank">0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538</b-link>
+                  <li>
+                    ERC6538Registry:
+                      <span v-if="networkSupported">
+                        <b-link :href="explorer + 'address/0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538#code'" target="_blank">0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538</b-link>
+                      </span>
+                      <span v-else-if="networkSupported === false">
+                        Not Supported
+                      </span>
                   </li>
-                  <li v-if="networks.includes('' + chainId) && chainId == 11155111">
-                    MagicalInternetMoney: <b-link :href="explorer + 'address/0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2#code'" target="_blank">0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2</b-link>
+                  <li>
+                    Transfer Helper:
+                    <span v-if="networkSupported">
+                      <span v-if="transferHelper">
+                        {{ transferHelper.name }}
+                        <b-link :href="explorer + 'address/' + transferHelper.address + '#code'" target="_blank">{{ transferHelper.address }}</b-link>
+                      </span>
+                      <span v-else>
+                        Not Configured. Check out Sepolia
+                      </span>
+                    </span>
+                    <span v-else-if="networkSupported === false">
+                      Not Supported
+                    </span>
                   </li>
                 </ul>
               </b-card-text>
@@ -143,32 +160,19 @@ const Welcome = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
     },
-    explorer () {
-      return store.getters['connection/explorer'];
-    },
-    coinbase() {
-      return store.getters['connection/coinbase'];
-    },
-    chainId() {
-      return store.getters['connection/chainId'];
-    },
-    networks() {
-      return Object.keys(NETWORKS);
+    transferHelper() {
+      return store.getters['connection/transferHelper'];
     },
     explorer() {
-      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
+      return store.getters['connection/explorer'];
     },
   },
   methods: {
-    async syncIt(info) {
-      store.dispatch('data/syncIt', info);
-    },
     async timeoutCallback() {
       logDebug("Welcome", "timeoutCallback() count: " + this.count);
-
       this.count++;
       var t = this;
       if (this.reschedule) {
