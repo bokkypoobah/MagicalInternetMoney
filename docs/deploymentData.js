@@ -41,52 +41,54 @@ const MAGICALINTERNETMONEYABI_SEPOLIA = [{"inputs":[{"internalType":"address pay
 
 // https://stealthaddress.dev/contracts/deployments
 const NETWORKS = {
-  // Mainnet
   1: {
+    name: "Ethereum Mainnet",
     explorer: "https://etherscan.io/",
+    nonFungibleViewer: "https://opensea.io/assets/ethereum/${contract}/${tokenId}",
   },
-  // Arbitrum
   42161: {
+    name: "Arbitrum",
     explorer: "https://arbiscan.io/",
   },
-  // Base
   8453: {
+    name: "Base",
     explorer: "https://basescan.org/",
   },
-  // Gnosis Chain
   100: {
+    name: "Gnosis Chain",
     explorer: "https://gnosisscan.io/",
   },
-  // Optimism
   10: {
+    name: "Optimism",
     explorer: "https://optimistic.etherscan.io/",
   },
-  // Polygon Matic
   137: {
+    name: "Polygon Matic",
     explorer: "https://polygonscan.com/",
   },
-  // Scroll
   534352: {
+    name: "Scroll",
     explorer: "https://scrollscan.com/",
   },
-  // Sepolia
   11155111: {
+    name: "Sepolia",
     explorer: "https://sepolia.etherscan.io/",
+    nonFungibleViewer: "https://testnets.opensea.io/assets/sepolia/${contract}/${tokenId}",
   },
-  // Holešky
   17000: {
+    name: "Holešky",
     explorer: "https://holesky.etherscan.io/",
   },
-  // Arbitrum Sepolia
   421614: {
+    name: "Arbitrum Sepolia",
     explorer: "https://sepolia.arbiscan.io/",
   },
-  // Base Sepolia
   84532: {
+    name: "Base Sepolia",
     explorer: "https://sepolia.basescan.org/",
   },
-  // Optimism Sepolia
   11155420: {
+    name: "Optimism Sepolia",
     explorer: "https://sepolia-optimism.etherscan.io/",
   },
 };
