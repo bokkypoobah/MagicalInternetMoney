@@ -89,6 +89,30 @@ const Welcome = {
               </b-card-text>
 
               <b-card-text class="mt-3 mb-2">
+                <h6>Supported Networks</h6>
+                <ul>
+                  <li>
+                    <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">https://stealthaddress.dev/contracts/deployments</b-link> (TODO: Only Sepolia currently)
+                  </li>
+                </ul>
+              </b-card-text>
+
+              <b-card-text class="mt-3 mb-2">
+                <h6>Contracts</h6>
+                <ul>
+                  <li v-if="networks.includes('' + chainId)">
+                    ERC5564Announcer: <b-link :href="explorer + 'address/0x55649E01B5Df198D18D95b5cc5051630cfD45564#code'" target="_blank">0x55649E01B5Df198D18D95b5cc5051630cfD45564</b-link>
+                  </li>
+                  <li v-if="networks.includes('' + chainId)">
+                    ERC6538Registry: <b-link :href="explorer + 'address/0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538#code'" target="_blank">0x6538E6bf4B0eBd30A8Ea093027Ac2422ce5d6538</b-link>
+                  </li>
+                  <li v-if="networks.includes('' + chainId) && chainId == 11155111">
+                    MagicalInternetMoney: <b-link :href="explorer + 'address/0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2#code'" target="_blank">0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2</b-link>
+                  </li>
+                </ul>
+              </b-card-text>
+
+              <b-card-text class="mt-3 mb-2">
                 <h6>This Web3 Dapp</h6>
                 <ul>
                   <li>
@@ -130,6 +154,12 @@ const Welcome = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    networks() {
+      return Object.keys(NETWORKS);
+    },
+    explorer() {
+      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
     },
   },
   methods: {
