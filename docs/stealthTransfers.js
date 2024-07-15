@@ -214,6 +214,7 @@ const StealthTransfers = {
             </div>
           </template>
           <template #cell(tokens)="data">
+            <!-- TODO -->
             <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
               <b-col>
                 <span v-if="getTokenType(item.token) == 'eth'">

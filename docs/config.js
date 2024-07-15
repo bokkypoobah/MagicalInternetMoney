@@ -402,6 +402,7 @@ const configModule = {
       { value: 2500, text: '2.5k' },
       { value: 10000, text: '10k' },
     ],
+    // TODO: Delete
     chainInfo: {
       "1": {
         name: "Ethereum Mainnet",
