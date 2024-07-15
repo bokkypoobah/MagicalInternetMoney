@@ -2,10 +2,6 @@ const Addresses = {
   template: `
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
-
-        <!-- {{ networks }} -->
-        <!-- {{ explorer }} -->
-
         <!-- :TOOLBAR -->
         <div class="d-flex flex-wrap m-0 p-0">
           <div v-if="false" class="mt-0 pr-1">
@@ -241,7 +237,7 @@ const Addresses = {
               {{ formatAddress(data.item.account) }}
             </div>
             <div v-else>
-              <b-link size="sm" :href="'https://sepolia.etherscan.io/address/' + data.item.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
+              <b-link size="sm" :href="explorer + 'address/' + data.item.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
             </div>
           </template>
           <template #cell(name)="data">
