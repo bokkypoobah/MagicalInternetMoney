@@ -119,12 +119,12 @@ const Addresses = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="block == null" @click="viewModalAddAccount" variant="link" v-b-popover.hover="'Add new account'"><b-icon-plus shift-v="+1" font-scale="1.2"></b-icon-plus></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewModalAddAccount" variant="link" v-b-popover.hover="'Add new account'"><b-icon-plus shift-v="+1" font-scale="1.2"></b-icon-plus></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="viewSyncOptions" variant="link" v-b-popover.hover="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
             <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover="'Click the button on the right to stop. This process can be continued later'">
@@ -142,7 +142,7 @@ const Addresses = {
             <b-button size="sm" @click="exportAccounts" variant="link" v-b-popover.hover="'Export accounts'"><b-icon-file-earmark-spreadsheet shift-v="+1" font-scale="1.2"></b-icon-file-earmark-spreadsheet></b-button>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -321,23 +321,14 @@ const Addresses = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
     },
-    coinbase() {
-      return store.getters['connection/coinbase'];
-    },
-    block() {
-      return store.getters['connection/block'];
-    },
-    chainId() {
-      return store.getters['connection/chainId'];
-    },
-    networks() {
-      return Object.keys(NETWORKS);
+    transferHelper() {
+      return store.getters['connection/transferHelper'];
     },
     explorer() {
-      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
+      return store.getters['connection/explorer'];
     },
     addresses() {
       return store.getters['data/addresses'];
@@ -347,9 +338,6 @@ const Addresses = {
     },
     sync() {
       return store.getters['data/sync'];
-    },
-    coinbaseIncluded() {
-      return this.addresses[this.coinbase] && true || false;
     },
     checkOptions() {
       return store.getters['data/checkOptions'];
@@ -489,8 +477,8 @@ const Addresses = {
       store.dispatch('data/addNewAddress', this.newAccount);
     },
     addCoinbase() {
-      logInfo("Addresses", "methods.addCoinbase - coinbase: " + this.coinbase);
-      store.dispatch('data/addNewAddress', this.coinbase);
+      logInfo("Addresses", "methods.addCoinbase - coinbase: " + store.getters['connection/coinbase']);
+      store.dispatch('data/addNewAddress', store.getters['connection/coinbase']);
     },
     toggleSelectedAccounts(items) {
       let someFalse = false;
