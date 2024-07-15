@@ -126,6 +126,12 @@ const app = new Vue({
     chainId() {
       return store.getters['connection/chainId'];
     },
+    networks() {
+      return Object.keys(NETWORKS);
+    },
+    explorer() {
+      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
+    },
     spinnerVariant1() {
       var sv = store.getters['connection/spinnerVariant'];
       logInfo("index.js - computed.spinnerVariant", sv);

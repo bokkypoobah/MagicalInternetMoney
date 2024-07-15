@@ -3,6 +3,9 @@ const Addresses = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
+        <!-- {{ networks }} -->
+        <!-- {{ explorer }} -->
+
         <!-- :TOOLBAR -->
         <div class="d-flex flex-wrap m-0 p-0">
           <div v-if="false" class="mt-0 pr-1">
@@ -330,6 +333,15 @@ const Addresses = {
     },
     block() {
       return store.getters['connection/block'];
+    },
+    chainId() {
+      return store.getters['connection/chainId'];
+    },
+    networks() {
+      return Object.keys(NETWORKS);
+    },
+    explorer() {
+      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
     },
     addresses() {
       return store.getters['data/addresses'];
