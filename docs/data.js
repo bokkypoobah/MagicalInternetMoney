@@ -759,13 +759,13 @@ const dataModule = {
         await context.dispatch('collateStealthTransfers', parameter);
       }
 
-      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
         await context.dispatch('syncRegistrations', parameter);
       }
-      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
         await context.dispatch('syncRegistrationsData', parameter);
       }
-      if (options.stealthMetaAddressRegistry && chainId == 11155111 && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
         await context.dispatch('collateRegistrations', parameter);
       }
 
