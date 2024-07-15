@@ -94,12 +94,12 @@
             </b-navbar-brand>
             <b-navbar-nav class="ml-auto">
               <!-- <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover="'Welcome'">Home</b-nav-item> -->
-              <b-nav-item size="sm" to="/addresses" active-class="active" v-b-popover.hover="'View or Edit Your Addresses'">Addresses</b-nav-item>
-              <b-nav-item size="sm" to="/fungibles" active-class="active" v-b-popover.hover="'ERC-20 Fungible Tokens'">Fungibles</b-nav-item>
-              <b-nav-item size="sm" to="/nonfungibles" active-class="active" v-b-popover.hover="'ERC-721 and ERC-1155 Non-Fungible Tokens'">Non-Fungibles</b-nav-item>
-              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'ERC-6538 Stealth Meta-Address Registry'">Registry</b-nav-item>
-              <b-nav-item size="sm" to="/stealthtransfers" active-class="active" v-b-popover.hover="'ERC-5564 Stealth Transfers'">Stealth Transfers</b-nav-item>
-              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'">Config</b-nav-item>
+              <b-nav-item size="sm" to="/addresses" active-class="active" v-b-popover.hover="'View or Edit Your Addresses'" class="mx-2">Addresses</b-nav-item>
+              <b-nav-item size="sm" to="/fungibles" active-class="active" v-b-popover.hover="'ERC-20 Fungible Tokens'" class="mx-2">Fungibles</b-nav-item>
+              <b-nav-item size="sm" to="/nonfungibles" active-class="active" v-b-popover.hover="'ERC-721 and ERC-1155 Non-Fungible Tokens'" class="mx-2">Non-Fungibles</b-nav-item>
+              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'ERC-6538 Stealth Meta-Address Registry'" class="mx-2">Registry</b-nav-item>
+              <b-nav-item size="sm" to="/stealthtransfers" active-class="active" v-b-popover.hover="'ERC-5564 Stealth Transfers'" class="mx-2">Stealth Transfers</b-nav-item>
+              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'" class="mx-2">Config</b-nav-item>
               <b-nav-form>
                 <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
                 <b-button size="sm" variant="link" v-b-popover.hover="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
