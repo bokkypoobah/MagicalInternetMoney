@@ -63,12 +63,12 @@ const NETWORKS = {
   },
 };
 
-function nonFungibleURL(chainId, contract, tokenId) {
-  let url = NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer || NETWORKS["1"].nonFungibleViewer;
-  url = url.replace(/\${contract}/, contract);
-  url = url.replace(/\${tokenId}/, tokenId);
-  return url;
-}
+// function nonFungibleURL(chainId, contract, tokenId) {
+//   let url = NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer || NETWORKS["1"].nonFungibleViewer;
+//   url = url.replace(/\${contract}/, contract);
+//   url = url.replace(/\${tokenId}/, tokenId);
+//   return url;
+// }
 
-const output = nonFungibleURL(84532, "0x1234", 123456);
-console.log("output: " + output);
+// const output = nonFungibleURL(84532, "0x1234", 123456);
+// console.log("output: " + output);

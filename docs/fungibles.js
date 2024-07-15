@@ -153,29 +153,6 @@ const Fungibles = {
           <template #cell(totalSupply)="data">
             <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
           </template>
-          <template #cell(tokens)="data">
-            /* TODO */
-            <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
-              <b-col>
-                <span v-if="getTokenType(item.token) == 'eth'">
-                  <font size="-1">{{ formatETH(item.value) + ' ETH'}}</font>
-                </span>
-                <span v-else-if="getTokenType(item.token) == 'erc20'">
-                  <font size="-1">
-                    {{ formatETH(item.value) }}
-                <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
-                  </font>
-                </span>
-                <span v-else>
-                  <font size="-1">
-                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
-                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
-                  </font>
-                </span>
-              </b-col>
-            </b-row>
-          </template>
-
         </b-table>
       </b-card>
     </div>
@@ -218,9 +195,6 @@ const Fungibles = {
         { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'firstEventBlockNumber', label: 'First Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'lastEventBlockNumber', label: 'Last Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
