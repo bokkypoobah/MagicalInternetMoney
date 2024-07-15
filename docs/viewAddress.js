@@ -8,7 +8,7 @@ const ViewAddress = {
             <b-form-input size="sm" plaintext id="address-address" v-model.trim="address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="explorer + 'address/' + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -27,7 +27,7 @@ const ViewAddress = {
             <b-form-input size="sm" plaintext id="address-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="explorer + 'address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -52,12 +52,12 @@ const ViewAddress = {
           </b-row>
           <b-row v-for="(item, index) of stealthTransfers" v-bind:key="item.txHash" class="px-2">
             <b-col cols="4" class="px-0 mt-1">
-              <b-button size="sm" :href="'https://sepolia.etherscan.io/tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+              <b-button size="sm" :href="explorer + 'tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
                 {{ formatTimestamp(item.timestamp) }}
               </b-button>
             </b-col>
             <b-col cols="4" class="px-0 mt-1">
-              <b-button v-if="item.tx && item.tx.from" size="sm" :href="'https://sepolia.etherscan.io/address/' + item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+              <b-button v-if="item.tx && item.tx.from" size="sm" :href="explorer + 'address/' + item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
                 {{ item.tx.from.substring(0, 10) + '...' + item.tx.from.slice(-8) }}
               </b-button>
             </b-col>
@@ -132,6 +132,12 @@ const ViewAddress = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    networks() {
+      return Object.keys(NETWORKS);
+    },
+    explorer() {
+      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
     },
     checkOptions() {
       return store.getters['data/checkOptions'];
