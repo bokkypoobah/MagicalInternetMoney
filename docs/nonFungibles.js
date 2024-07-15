@@ -134,7 +134,7 @@ const NonFungibles = {
           </template>
 
           <template #cell(info)="data">
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].nftTokenPrefix + data.item.contract + '/' + data.item.tokenId" target="_blank">
+            <b-link v-if="networkSupported" :href="nonFungibleViewerURL(data.item.contract, data.item.tokenId)" target="_blank">
               <span v-if="data.item.name">
                 <font size="-1">{{ data.item.name }}</font>
               </span>
@@ -143,9 +143,7 @@ const NonFungibles = {
               </span>
             </b-link>
             <br />
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
-              <font size="-1">{{ data.item.description }}</font>
-            </b-link>
+            <font size="-1">{{ data.item.description }}</font>
             <br />
             <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
             <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
@@ -157,7 +155,7 @@ const NonFungibles = {
 
           <template #cell(owners)="data">
             <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '?a=' + info.owner + '#inventory'" target="_blank">
+              <b-link v-if="networkSupported" :href="explorer + 'token/' + data.item.contract + '?a=' + info.owner" target="_blank">
                 <font size="-1">
                   {{ info.owner.substring(0, 10) + '...' + info.owner.slice(-8) }}
                   <span v-if="data.item.type == 'erc1155'" class="small muted">
@@ -178,94 +176,6 @@ const NonFungibles = {
           <template #cell(favourite)="data">
             <b-button size="sm" @click="toggleNonFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
           </template>
-
-          <template #cell(contract)="data">
-            <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
-              <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
-            </b-link>
-          </template>
-          <template #cell(type)="data">
-            <!-- <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font> -->
-          </template>
-          <template #cell(symbol)="data">
-            <!-- <font size="-1">{{ data.item.symbol }}</font> -->
-          </template>
-          <template #cell(name)="data">
-            <!-- <font size="-1">{{ data.item.name }}</font> -->
-          </template>
-          <template #cell(firstEventBlockNumber)="data">
-            <!-- <font size="-1">{{ commify0(data.item.firstEventBlockNumber) }}</font> -->
-          </template>
-          <template #cell(lastEventBlockNumber)="data">
-            <!-- <font size="-1">{{ commify0(data.item.lastEventBlockNumber) }}</font> -->
-          </template>
-          <template #cell(decimals)="data">
-            <!-- <font size="-1">{{ data.item.type == "erc20" ? parseInt(data.item.decimals) : "" }}</font> -->
-          </template>
-          <template #cell(balance)="data">
-            <!-- <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-              <b-button size="sm" :href="'https://sepolia.etherscan.io/token/' + data.item.address + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
-            </span>
-            <span v-if="data.item.type == 'erc721'">
-              <font size="-1">
-                <span v-for="(tokenData, tokenId) of data.item.tokenIds">
-                  <b-button v-if="chainInfo[chainId]" size="sm" :href="chainInfo[chainId].nftTokenPrefix + data.item.address + '/' + tokenId" variant="link" v-b-popover.hover="tokenId" class="m-0 ml-2 p-0" target="_blank">{{ tokenId.toString().length > 20 ? (tokenId.toString().substring(0, 8) + '...' + tokenId.toString().slice(-8)) : tokenId.toString() }}</b-button>
-                </span>
-              </font>
-            </span> -->
-          </template>
-
-          <template #cell(totalSupply)="data">
-            <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
-          </template>
-
-
-          <template #cell(timestamp)="data">
-            <b-link :href="'https://sepolia.etherscan.io/tx/' + data.item.txHash" v-b-popover.hover="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-              <span v-if="data.item.timestamp">
-                {{ formatTimestamp(data.item.timestamp) }}
-              </span>
-              <span v-else>
-                {{ '#' + commify0(data.item.blockNumber) }}
-              </span>
-            </b-link>
-          </template>
-          <template #cell(sender)="data">
-            <div v-if="data.item.tx && data.item.tx.from">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.tx.from" v-b-popover.hover="'View in etherscan.io'" target="_blank">
-                {{ data.item.tx.from }}
-              </b-link>
-            </div>
-          </template>
-          <template #cell(receiver)="data">
-            <div v-if="data.item.stealthAddress">
-              <b-link :href="'https://sepolia.etherscan.io/address/' + data.item.stealthAddress" v-b-popover.hover="'View in etherscan.io'" target="_blank">
-                {{ data.item.stealthAddress }}
-              </b-link>
-            </div>
-          </template>
-          <template #cell(tokens)="data">
-            <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
-              <b-col>
-                <span v-if="getTokenType(item.token) == 'eth'">
-                  <font size="-1">{{ formatETH(item.value) + ' ETH'}}</font>
-                </span>
-                <span v-else-if="getTokenType(item.token) == 'erc20'">
-                  <font size="-1">
-                    {{ formatETH(item.value) }}
-                    <b-link :href="chainInfo.explorerTokenPrefix + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
-                  </font>
-                </span>
-                <span v-else>
-                  <font size="-1">
-                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
-                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
-                  </font>
-                </span>
-              </b-col>
-            </b-row>
-          </template>
-
         </b-table>
       </b-card>
     </div>
@@ -324,9 +234,6 @@ const NonFungibles = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
@@ -341,10 +248,6 @@ const NonFungibles = {
     },
     nonFungibleViewer() {
       return store.getters['connection/nonFungibleViewer'];
-    },
-    // TODO: Delete
-    chainInfo() {
-      return store.getters['config/chainInfo'];
     },
     sync() {
       return store.getters['data/sync'];
