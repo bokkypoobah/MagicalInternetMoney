@@ -38,3 +38,13 @@ const ERC6538REGISTRYABI = [{"inputs":[],"stateMutability":"nonpayable","type":"
 
 const MAGICALINTERNETMONEYADDRESS_SEPOLIA = "0xAd4EFaB0A1c32184c6254e07eb6D26A3AaEB0Ae2";
 const MAGICALINTERNETMONEYABI_SEPOLIA = [{"inputs":[{"internalType":"address payable","name":"_announcer","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"InsufficientERC20Allowance","type":"error"},{"inputs":[],"name":"NotERC721TokenOwner","type":"error"},{"inputs":[],"name":"NothingToTransfer","type":"error"},{"inputs":[],"name":"TransferFailure","type":"error"},{"inputs":[{"internalType":"uint256","name":"schemeId","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"bytes","name":"ephemeralPubKey","type":"bytes"},{"internalType":"uint8","name":"viewTag","type":"uint8"},{"components":[{"internalType":"bool","name":"isERC721","type":"bool"},{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"internalType":"struct TokenInfo[]","name":"tokenInfo","type":"tuple[]"}],"name":"transferAndAnnounce","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"schemeId","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"bytes","name":"ephemeralPubKey","type":"bytes"},{"internalType":"uint8","name":"viewTag","type":"uint8"}],"name":"transferEthAndAnnounce","outputs":[],"stateMutability":"payable","type":"function"}];
+
+// https://stealthaddress.dev/contracts/deployments
+const NETWORKS = {
+  1: {
+    explorer: "https://etherscan.io/",
+  },
+  11155111: {
+    explorer: "https://sepolia.etherscan.io/",
+  },
+};
