@@ -333,6 +333,16 @@ const NonFungibles = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
+    },
+    explorer() {
+      return store.getters['connection/explorer'];
+    },
+    nonFungibleViewer() {
+      return store.getters['connection/nonFungibleViewer'];
+    },
+    // TODO: Delete
     chainInfo() {
       return store.getters['config/chainInfo'];
     },
@@ -500,6 +510,9 @@ const NonFungibles = {
 
   },
   methods: {
+    nonFungibleViewerURL(contract, tokenId) {
+      return this.nonFungibleViewer.replace(/\${contract}/, contract).replace(/\${tokenId}/, tokenId);
+    },
     viewFaucets() {
       console.log(moment().format("HH:mm:ss") + " viewFaucets");
       this.$bvModal.show('modal-faucets');
