@@ -9,19 +9,19 @@ const Connection = {
           Please use the <b-link href="https://metamask.io" target="_blank">MetaMask</b-link> addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser to view this page
         </b-card-text>
       </b-card>
-      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ chainInfo[chainId] && chainInfo[chainId].name || ("Chain Id: " + chainId) }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
+      <b-button v-b-toggle.connection size="sm" block variant="outline-info" v-if="connected">{{ networkName }} <b-spinner class="float-right mt-1" :variant="spinnerVariant" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning" /></b-button>
       <b-collapse id="connection" visible class="mt-2">
         <b-card no-body class="border-0" v-if="connected">
           <b-row>
             <b-col cols="5" class="small px-1 text-right">Block:</b-col>
             <b-col class="small px-1 truncate" cols="7" >
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerBlockPrefix + blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
+              <b-link v-if="networkSupported" :href="explorer + 'block/'+ blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
             </b-col>
           </b-row>
           <b-row>
             <b-col cols="5" v-b-popover.hover="'Your Web3 attached account'" class="small px-1 text-right">Attached Account:</b-col>
             <b-col class="small px-1 truncate" cols="7">
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
+              <b-link v-if="networkSupported" :href="explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
               <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
             </b-col>
           </b-row>
@@ -82,6 +82,15 @@ const Connection = {
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
+    },
+    networkName() {
+      return store.getters['connection/networkName'];
+    },
+    explorer() {
+      return store.getters['connection/explorer'];
     },
     chainInfo() {
       return store.getters['config/chainInfo'];
@@ -297,6 +306,7 @@ const connectionModule = {
     connectionError: null,
     chainId: null,
     networkSupported: null,
+    networkName: null,
     transferHelper: null,
     explorer: null,
     nonFungibleViewer: null,
@@ -315,6 +325,7 @@ const connectionModule = {
     connection: state => state.connection,
     chainId: state => state.chainId,
     networkSupported: state => state.networkSupported,
+    networkName: state => state.networkName,
     transferHelper: state => state.transferHelper,
     explorer: state => state.explorer,
     nonFungibleViewer: state => state.nonFungibleViewer,
@@ -343,6 +354,7 @@ const connectionModule = {
       logInfo("connectionModule", "mutations.setNetworkData(" + JSON.stringify(info) + ")");
       state.chainId = info.chainId;
       state.networkSupported = info.networkSupported;
+      state.networkName = info.networkName;
       state.transferHelper = info.transferHelper;
       state.explorer = info.explorer;
       state.nonFungibleViewer = info.nonFungibleViewer;
@@ -413,10 +425,11 @@ const connectionModule = {
     setNetworkData(context, chainId) {
       logInfo("connectionModule", "actions.setNetworkData(" + chainId + ")");
       const networkSupported = ('' + chainId) in NETWORKS;
-      const transferHelper = NETWORKS['' + chainId] && NETWORKS['' + chainId].transferHelper || null;
-      const explorer = NETWORKS['' + chainId] && NETWORKS['' + chainId].explorer || "unknown";
-      const nonFungibleViewer = NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer || "unknown";
-      context.commit('setNetworkData', { chainId, networkSupported, transferHelper, explorer, nonFungibleViewer });
+      const networkName = networkSupported && NETWORKS['' + chainId].name || "Chain Id: " + chainId;
+      const transferHelper = networkSupported && NETWORKS['' + chainId].transferHelper || null;
+      const explorer = networkSupported && NETWORKS['' + chainId].explorer || "unknown";
+      const nonFungibleViewer = networkSupported && NETWORKS['' + chainId].nonFungibleViewer || "unknown";
+      context.commit('setNetworkData', { chainId, networkSupported, networkName, transferHelper, explorer, nonFungibleViewer });
     },
     setCoinbase(context, cb) {
       context.commit('setCoinbase', cb);
