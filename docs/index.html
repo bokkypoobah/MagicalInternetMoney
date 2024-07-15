@@ -131,8 +131,8 @@
         <div class="mt-5 pt-2">
           <b-card no-header no-body class="m-0 p-0 border-0">
             <b-card-body class="m-0 p-0">
-              <b-alert v-if="chainId && chainId != 1 && chainId != 11155111" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
-                Please install the MetaMask extension, connect to the Sepolia testnet and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button> on the top right. <br />You will be able to sync your testnet addresses to Ethereum mainnet ENS names shortly.
+              <b-alert v-if="chainId && !networks.includes('' + chainId)" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
+                Please install the MetaMask extension, connect to one of the <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">supported networks</b-link> and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button> on the top right and refresh again. <br />Stealth Transfers only supported on Sepolia; ENS names can be synced by connecting to the Ethereum mainnet (TODO).
               </b-alert>
             </b-card-body>
           </b-card>
