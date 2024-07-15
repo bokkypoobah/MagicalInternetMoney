@@ -41,10 +41,52 @@ const MAGICALINTERNETMONEYABI_SEPOLIA = [{"inputs":[{"internalType":"address pay
 
 // https://stealthaddress.dev/contracts/deployments
 const NETWORKS = {
+  // Mainnet
   1: {
     explorer: "https://etherscan.io/",
   },
+  // Arbitrum
+  42161: {
+    explorer: "https://arbiscan.io/",
+  },
+  // Base
+  8453: {
+    explorer: "https://basescan.org/",
+  },
+  // Gnosis Chain
+  100: {
+    explorer: "https://gnosisscan.io/",
+  },
+  // Optimism
+  10: {
+    explorer: "https://optimistic.etherscan.io/",
+  },
+  // Polygon Matic
+  137: {
+    explorer: "https://polygonscan.com/",
+  },
+  // Scroll
+  534352: {
+    explorer: "https://scrollscan.com/",
+  },
+  // Sepolia
   11155111: {
     explorer: "https://sepolia.etherscan.io/",
+  },
+  // Holešky
+  17000: {
+    explorer: "https://holesky.etherscan.io/",
+  },
+  // Arbitrum Sepolia
+  421614: {
+    explorer: "https://sepolia.arbiscan.io/",
+  },
+  // Base Sepolia
+  84532: {
+    explorer: "https://sepolia.basescan.org/",
+  },
+  // Optimism Sepolia
+  11155420: {
+    explorer: "https://sepolia-optimism.etherscan.io/",
   },
 };
