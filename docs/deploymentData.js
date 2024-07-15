@@ -92,3 +92,16 @@ const NETWORKS = {
     explorer: "https://sepolia-optimism.etherscan.io/",
   },
 };
+
+function nonFungibleURL(chainId, contract, tokenId) {
+  let url = NETWORKS["1"].nonFungibleViewer;
+  if (NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer) {
+    url = NETWORKS['' + chainId].nonFungibleViewer;
+  }
+  url = url.replace(/\${contract}/, contract);
+  url = url.replace(/\${tokenId}/, tokenId);
+  return url;
+}
+
+const output = nonFungibleURL(11155111, "0x1234", 123456);
+console.log("output: " + output);
