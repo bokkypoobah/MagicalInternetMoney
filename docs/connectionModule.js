@@ -15,13 +15,23 @@ const Connection = {
           <b-row>
             <b-col cols="5" class="small px-1 text-right">Block:</b-col>
             <b-col class="small px-1 truncate" cols="7" >
-              <b-link v-if="networkSupported" :href="explorer + 'block/'+ blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
+              <div v-if="networkSupported">
+                <b-link :href="explorer + 'block/'+ blockNumber" class="card-link" target="_blank">{{ blockNumberString }}</b-link>&nbsp;&nbsp;<font size="-3">{{ lastBlockTimeDiff }}</font>
+              </div>
+              <div v-else>
+                {{ blockNumberString }}
+              </div>
             </b-col>
           </b-row>
           <b-row>
             <b-col cols="5" v-b-popover.hover="'Your Web3 attached account'" class="small px-1 text-right">Attached Account:</b-col>
             <b-col class="small px-1 truncate" cols="7">
-              <b-link v-if="networkSupported" :href="explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
+              <div v-if="networkSupported">
+                <b-link :href="explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
+              </div>
+              <div v-else>
+                {{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}
+              </div>
               <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
             </b-col>
           </b-row>
@@ -91,9 +101,6 @@ const Connection = {
     },
     explorer() {
       return store.getters['connection/explorer'];
-    },
-    chainInfo() {
-      return store.getters['config/chainInfo'];
     },
     coinbase() {
       return store.getters['connection/coinbase'];
