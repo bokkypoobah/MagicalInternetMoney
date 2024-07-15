@@ -33,6 +33,9 @@ Magical Internet Money is here to help manage your crypto assets.
 This project is currently heavily under development. Clear your browser's LocalStorage and IndexedDB if this dapp is not operating as expected as the configuration data may have a new format.
 
 
+#### TODOs
+* Base ERC-20/721/1155 event log scraping slow - add max number of blocks of 20k
+
 #### References
 
 * [ERC-5564: Stealth Addresses](https://eips.ethereum.org/EIPS/eip-5564)

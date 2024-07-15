@@ -126,7 +126,7 @@ const Fungibles = {
             <b-img v-if="chainId == 1" button rounded width="75px;" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.contract + '/logo.png'" />
           </template>
           <template #cell(contract)="data">
-            <b-link :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '#code'" target="_blank">
+            <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
             <!-- <br />
@@ -147,13 +147,14 @@ const Fungibles = {
           </template>
           <template #cell(balance)="data">
             <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-              <b-button size="sm" :href="chainInfo[chainId].explorerTokenPrefix + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
+              <b-button size="sm" :href="explorer + 'token/' + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
             </span>
           </template>
           <template #cell(totalSupply)="data">
             <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
           </template>
           <template #cell(tokens)="data">
+            /* TODO */
             <b-row v-for="(item, index) of data.item.transfers" v-bind:key="item.token">
               <b-col>
                 <span v-if="getTokenType(item.token) == 'eth'">
@@ -233,8 +234,11 @@ const Fungibles = {
     chainId() {
       return store.getters['connection/chainId'];
     },
-    chainInfo() {
-      return store.getters['config/chainInfo'];
+    networks() {
+      return Object.keys(NETWORKS);
+    },
+    explorer() {
+      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
     },
     sync() {
       return store.getters['data/sync'];
