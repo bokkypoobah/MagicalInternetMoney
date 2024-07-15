@@ -198,9 +198,20 @@ const ViewStealthMetaAddress = {
     async addAddressToRegistry(address) {
       logInfo("ViewStealthMetaAddress", "addAddressToRegistry - address: " + JSON.stringify(address));
       this.$bvModal.msgBoxConfirm("Add " + address.substring(0, 17) + '...' + address.slice(-8) + " to the ERC-6538 Registry?")
-        .then(value => {
+        .then(async value => {
           if (value) {
             console.log("TODO: Add address to registry");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(ERC6538REGISTRYADDRESS, ERC6538REGISTRYABI, provider);
+            const contractWithSigner = contract.connect(provider.getSigner());
+            console.log("HERE");
+            const SCHEME_ID = 1;
+            try {
+              const tx = await contractWithSigner.registerKeys(SCHEME_ID, ethers.utils.toUtf8Bytes(address));
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("ViewStealthMetaAddress registry.registerKeys(...) error: " + e.message);
+            }
             // store.dispatch('data/addAddressToRegistry', address);
             // this.$refs['viewstealthmetaaddress'].hide();
           }

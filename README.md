@@ -70,8 +70,6 @@ Deployed on Sepolia:
 
 ## Screenshots
 
-##### Feb 24 2024
-
 ###### Addresses
 
 <kbd><img src="images/SampleScreen_Addresses_20240224.png" /></kbd>
@@ -88,6 +86,13 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_ViewNonFungibleTokens_20240711.png" /></kbd>
 
+###### Add Stealth Meta-Address To Registry
+
+<kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_1_20240715.png" /></kbd>
+
+<kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_2_20240715.png" /></kbd>
+
+<kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_3_20240715.png" /></kbd>
 
 <br />
 
