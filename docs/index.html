@@ -149,9 +149,33 @@
         </div>
         <hr />
         <b-card no-header body-class="m-0 p-0" class="m-0 p-0 border-0">
-          <b-card-text class="text-right">
-            gm, and enjoy! <i>Magical Internet Money</i> &copy; Bok Consulting Pty Ltd 2024
-          </b-card-text>
+
+          <div class="d-flex flex-wrap m-0 p-0">
+            <div class="ml-0 mt-0 pl-1">
+              <font v-if="networkSupported" size="-2">
+                <b-link :href="explorer" v-b-popover.hover.bottom="'Explorer'" target="_blank">
+                  {{ networkName }}
+                </b-link>
+                <!-- <b-link v-if="coinbase" :href="'https://etherscan.io/address/' + coinbase" v-b-popover.hover.bottom="'Coinbase'" target="_blank">
+                  {{ coinbase.substring(0, 10) }}
+                </b-link> -->
+                <!-- <b-link v-if="chainId" :href="'https://etherscan.io/'" v-b-popover.hover.bottom="'Network'" target="_blank">
+                  {{ chains[chainId] && chains[chainId].name || ('ChainId: ' + chainId) }}
+                </b-link> -->
+                <b-link v-if="blockNumber" :href="explorer + 'block/' + blockNumber" v-b-popover.hover.bottom="'Latest block'" target="_blank">
+                  {{ '#' + commify0(blockNumber) }}
+                </b-link>
+                <b-link v-if="blockNumber" :href="explorer + 'block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
+                  {{ formatTimeDiff(timestamp) }}
+                </b-link>
+              </font>
+            </div>
+            <div class="mt-0 flex-grow-1">
+            </div>
+            <div class="mt-0 pl-1 pr-1">
+              gm, and enjoy! <i>Magical Internet Money</i> &copy; Bok Consulting Pty Ltd 2024
+            </div>
+          </div>
         </b-card>
       </b-container>
     </div>

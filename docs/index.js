@@ -126,6 +126,18 @@ const app = new Vue({
     networkSupported() {
       return store.getters['connection/networkSupported'];
     },
+    networkName() {
+      return store.getters['connection/networkName'];
+    },
+    explorer() {
+      return store.getters['connection/explorer'];
+    },
+    blockNumber() {
+      return store.getters['connection/block'] == null ? 0 : store.getters['connection/block'].number;
+    },
+    timestamp() {
+      return store.getters['connection/block'] == null ? 0 : store.getters['connection/block'].timestamp;
+    },
     spinnerVariant1() {
       var sv = store.getters['connection/spinnerVariant'];
       logInfo("index.js - computed.spinnerVariant", sv);
@@ -191,6 +203,30 @@ const app = new Vue({
       setTimeout(function() {
         t.statusSidebar = false;
       }, 1500);
+    },
+    commify0(n) {
+      if (n != null) {
+        return Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+      return null;
+    },
+    formatTimestamp(ts) {
+      if (ts != null) {
+        // TODO
+        // if (this.settings.reportingDateTime == 1) {
+        //   return moment.unix(ts).utc().format("YYYY-MM-DD HH:mm:ss");
+        // } else {
+          return moment.unix(ts).format("YYYY-MM-DD HH:mm:ss");
+        // }
+      }
+      return null;
+    },
+    formatTimeDiff(unixtime) {
+      if (!unixtime) {
+        return "";
+      } else {
+        return moment.unix(unixtime).fromNow();
+      }
     },
     timeoutCallback() {
       // logInfo("app", "timeoutCallback() Called");

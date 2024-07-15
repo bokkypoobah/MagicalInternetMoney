@@ -34,7 +34,7 @@ const NETWORKS = {
     explorer: "https://scrollscan.com/",
   },
   11155111: {
-    name: "Sepolia",
+    name: "Sepolia Testnet",
     transferHelper: {
       // TODO: ABI & versions
       name: "MagicalInternetMoney-0.8.3",
@@ -44,31 +44,21 @@ const NETWORKS = {
     nonFungibleViewer: "https://testnets.opensea.io/assets/sepolia/${contract}/${tokenId}",
   },
   17000: {
-    name: "Holešky",
+    name: "Holešky Testnet",
     explorer: "https://holesky.etherscan.io/",
   },
   421614: {
-    name: "Arbitrum Sepolia",
+    name: "Arbitrum Sepolia Testnet",
     explorer: "https://sepolia.arbiscan.io/",
     nonFungibleViewer: "https://testnets.opensea.io/assets/arbitrum-sepolia/${contract}/${tokenId}",
   },
   84532: {
-    name: "Base Sepolia",
+    name: "Base Sepolia Testnet",
     explorer: "https://sepolia.basescan.org/",
     nonFungibleViewer: "https://testnets.opensea.io/assets/base-sepolia/${contract}/${tokenId}",
   },
   11155420: {
-    name: "Optimism Sepolia",
+    name: "Optimism Sepolia Testnet",
     explorer: "https://sepolia-optimism.etherscan.io/",
   },
 };
-
-// function nonFungibleURL(chainId, contract, tokenId) {
-//   let url = NETWORKS['' + chainId] && NETWORKS['' + chainId].nonFungibleViewer || NETWORKS["1"].nonFungibleViewer;
-//   url = url.replace(/\${contract}/, contract);
-//   url = url.replace(/\${tokenId}/, tokenId);
-//   return url;
-// }
-
-// const output = nonFungibleURL(84532, "0x1234", 123456);
-// console.log("output: " + output);
