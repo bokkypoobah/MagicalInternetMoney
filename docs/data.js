@@ -746,26 +746,26 @@ const dataModule = {
       }
 
       const parameter = { chainId, coinbase, blockNumber, confirmations, cryptoCompareAPIKey, ...options };
-      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('syncStealthTransfers', parameter);
       }
-      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('syncStealthTransfersData', parameter);
       }
-      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('identifyMyStealthTransfers', parameter);
       }
-      if (options.stealthTransfers && chainId == 11155111 && !options.devThing) {
+      if (options.stealthTransfers && !options.devThing) {
         await context.dispatch('collateStealthTransfers', parameter);
       }
 
-      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('syncRegistrations', parameter);
       }
-      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('syncRegistrationsData', parameter);
       }
-      if (options.stealthMetaAddressRegistry && (chainId == 1 || chainId == 11155111) && !options.devThing) {
+      if (options.stealthMetaAddressRegistry && !options.devThing) {
         await context.dispatch('collateRegistrations', parameter);
       }
 
@@ -1129,7 +1129,7 @@ const dataModule = {
       const erc5564RegistryContract = new ethers.Contract(ERC6538REGISTRYADDRESS, ERC6538REGISTRYABI, provider);
       let total = 0;
       let t = this;
-      async function processLogs(fromBlock, toBlock, selectedContracts, logs) {
+      async function processLogs(fromBlock, toBlock, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
         logInfo("dataModule", "actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
@@ -1172,7 +1172,7 @@ const dataModule = {
           });
         }
       }
-      async function getLogs(fromBlock, toBlock, selectedContracts, processLogs) {
+      async function getLogs(fromBlock, toBlock, processLogs) {
         logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
@@ -1189,8 +1189,8 @@ const dataModule = {
           await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
         } catch (e) {
           const mid = parseInt((fromBlock + toBlock) / 2);
-          await getLogs(fromBlock, mid, selectedContracts, processLogs);
-          await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, processLogs);
+          await getLogs(fromBlock, mid, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, processLogs);
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
@@ -1199,7 +1199,7 @@ const dataModule = {
       const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
       // TODO: Handle incrementalSync?
       const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
-      await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
+      await getLogs(startBlock, parameter.blockNumber, processLogs);
       logInfo("dataModule", "actions.syncRegistrations END");
     },
 

@@ -4,8 +4,8 @@ const SyncOptions = {
       <b-modal ref="syncoptions" v-model="show" hide-footer body-bg-variant="light" size="sm">
         <template #modal-title>Sync Data</template>
 
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 11155111" v-model="settings.stealthTransfers" @input="saveSettings" v-b-popover.hover="'ERC-5564: Stealth Addresses announcements'" class="ml-2 mt-1">Stealth Transfers</b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || (chainId != 1 && chainId != 11155111)" v-model="settings.stealthMetaAddressRegistry" @input="saveSettings" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry entries'" class="ml-2 mt-1">Stealth Meta-Address Registry</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || !networkSupported" v-model="settings.stealthTransfers" @input="saveSettings" v-b-popover.hover="'ERC-5564: Stealth Addresses announcements'" class="ml-2 mt-1">Stealth Transfers</b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || !networkSupported" v-model="settings.stealthMetaAddressRegistry" @input="saveSettings" v-b-popover.hover="'ERC-6538: Stealth Meta-Address Registry entries'" class="ml-2 mt-1">Stealth Meta-Address Registry</b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.eth" @input="saveSettings" v-b-popover.hover="'Ether Balances'" class="ml-2 mt-1">TODO: Ether Balances</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover="'ERC-20, ERC-721 and ERC-1155 Tokens'" class="ml-2 mt-1">Tokens</b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.fungiblesMetadata" @input="saveSettings" v-b-popover.hover="'ERC-20 Fungible Token metadata'" class="ml-2 mt-1">Fungibles Metadata</b-form-checkbox>
@@ -47,6 +47,9 @@ const SyncOptions = {
   computed: {
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
     },
     show: {
       get: function () {
