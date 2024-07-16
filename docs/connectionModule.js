@@ -431,11 +431,12 @@ const connectionModule = {
     },
     setNetworkData(context, chainId) {
       logInfo("connectionModule", "actions.setNetworkData(" + chainId + ")");
-      const networkSupported = ('' + chainId) in NETWORKS;
-      const networkName = networkSupported && NETWORKS['' + chainId].name || "Chain Id: " + chainId;
-      const transferHelper = networkSupported && NETWORKS['' + chainId].transferHelper || null;
-      const explorer = networkSupported && NETWORKS['' + chainId].explorer || "unknown";
-      const nonFungibleViewer = networkSupported && NETWORKS['' + chainId].nonFungibleViewer || "unknown";
+      const network = NETWORKS['' + chainId] || null;
+      const networkSupported = network != null;
+      const networkName = network && network.name || "Chain Id: " + chainId;
+      const transferHelper = network && network.transferHelper || null;
+      const explorer = network && network.explorer || "unknown"; // || NETWORKS["1"].explorer ?
+      const nonFungibleViewer = network && network.nonFungibleViewer || "unknown";
       context.commit('setNetworkData', { chainId, networkSupported, networkName, transferHelper, explorer, nonFungibleViewer });
     },
     setCoinbase(context, cb) {
