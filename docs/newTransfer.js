@@ -143,9 +143,6 @@ const NewTransfer = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
@@ -154,6 +151,9 @@ const NewTransfer = {
     },
     addresses() {
       return store.getters['data/addresses'];
+    },
+    tokens() {
+      return store.getters['data/tokens'];
     },
     registry() {
       return store.getters['data/registry'];
@@ -332,7 +332,8 @@ const NewTransfer = {
       logInfo("NewTransfer", "methods.additionalTokenSelected - this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       if (this.modalAddTokensToNewTransfer.token) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+        console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
+        const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
         console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
         Vue.set(this.modalAddTokensToNewTransfer, 'type', tokenContract.type || null);
         if (tokenContract.type == "erc20") {
@@ -391,7 +392,7 @@ const NewTransfer = {
 
     addERC20TokenToTransfer() {
       console.log(moment().format("HH:mm:ss") + " addERC20TokenToTransfer");
-      const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
       const symbol = tokenContract.symbol || null;
       const name = tokenContract.name || null;
@@ -408,7 +409,7 @@ const NewTransfer = {
 
     addERC721TokenToTransfer() {
       console.log(moment().format("HH:mm:ss") + " addERC721TokenToTransfer");
-      const tokenContract = this.tokenContracts[this.chainId] && this.tokenContracts[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
       console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       if (tokenContract.type == "erc721") {
