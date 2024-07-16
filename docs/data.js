@@ -1174,23 +1174,32 @@ const dataModule = {
       }
       async function getLogs(fromBlock, toBlock, processLogs) {
         logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
-        try {
-          const filter = {
-            address: ERC6538REGISTRYADDRESS,
-            fromBlock,
-            toBlock,
-            topics: [
-              '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
-              null,
-              null
-            ]
-          };
-          const eventLogs = await provider.getLogs(filter);
-          await processLogs(fromBlock, toBlock, selectedContracts, eventLogs);
-        } catch (e) {
+        let split = false;
+        const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
+        if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
+          try {
+            const filter = {
+              address: ERC6538REGISTRYADDRESS,
+              fromBlock,
+              toBlock,
+              topics: [
+                '0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9',
+                null,
+                null
+              ]
+            };
+            const eventLogs = await provider.getLogs(filter);
+            await processLogs(fromBlock, toBlock, eventLogs);
+          } catch (e) {
+            split = true;
+          }
+        } else {
+          split = true;
+        }
+        if (split) {
           const mid = parseInt((fromBlock + toBlock) / 2);
           await getLogs(fromBlock, mid, processLogs);
-          await getLogs(parseInt(mid) + 1, toBlock, processLogs);
+          await getLogs(parseInt(mid) + 1, toBlock, processLogs);          
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
