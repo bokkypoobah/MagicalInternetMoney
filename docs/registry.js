@@ -6,7 +6,7 @@ const Registry = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="viewSyncOptions" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
             <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
@@ -95,11 +95,11 @@ const Registry = {
     }
   },
   computed: {
-    coinbase() {
-      return store.getters['connection/coinbase'];
-    },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    networkSupported() {
+      return store.getters['connection/networkSupported'];
     },
     transferHelper() {
       return store.getters['connection/transferHelper'];
