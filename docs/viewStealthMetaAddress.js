@@ -211,9 +211,8 @@ const ViewStealthMetaAddress = {
             const contract = new ethers.Contract(ERC6538REGISTRYADDRESS, ERC6538REGISTRYABI, provider);
             const contractWithSigner = contract.connect(provider.getSigner());
             console.log("HERE");
-            const SCHEME_ID = 1;
             try {
-              const tx = await contractWithSigner.registerKeys(SCHEME_ID, ethers.utils.toUtf8Bytes(address));
+              const tx = await contractWithSigner.registerKeys(ONLY_SUPPORTED_SCHEME_ID, ethers.utils.toUtf8Bytes(address));
               console.log("tx: " + JSON.stringify(tx));
             } catch (e) {
               console.log("ViewStealthMetaAddress registry.registerKeys(...) error: " + e.message);

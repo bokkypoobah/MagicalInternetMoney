@@ -1124,10 +1124,7 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      // Note: Following is ERC-6538: Stealth Meta-Address Registry with registrant being bytes32 instead of bytes
-      // OLD StealthMetaAddressSet (index_topic_1 bytes32 registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
-      // OLD 0x0bb4b5456abb9a4e7e0624d821e95e2fcc8a761c9227b5d761ae0da4a3fda233
-      // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 scheme, bytes stealthMetaAddress)
+      // StealthMetaAddressSet (index_topic_1 address registrant, index_topic_2 uint256 schemeId, bytes stealthMetaAddress)
       // 0x4e739a47dfa4fd3cfa92f8fe760cebe125565927e5c422cb28e7aa388a067af9
       const erc5564RegistryContract = new ethers.Contract(ERC6538REGISTRYADDRESS, ERC6538REGISTRYABI, provider);
       let total = 0;
@@ -1142,8 +1139,8 @@ const dataModule = {
             try {
               const logData = erc5564RegistryContract.interface.parseLog(log);
               // console.log("logData: " + JSON.stringify(logData, null, 2));
-              const contract = log.address;
-              // if (selectedContracts.includes(contract)) {
+              const [ contract, schemeId ] = [ log.address, parseInt(logData.args[1]) ];
+              if (schemeId == ONLY_SUPPORTED_SCHEME_ID) {
                 records.push( {
                   chainId: parameter.chainId,
                   blockNumber: parseInt(log.blockNumber),
@@ -1153,14 +1150,14 @@ const dataModule = {
                   contract,
                   name: logData.name,
                   registrant: ethers.utils.getAddress(logData.args[0]),
-                  schemeId: parseInt(logData.args[1]),
+                  schemeId,
                   stealthMetaAddress: ethers.utils.toUtf8String(logData.args[2]),
                   mine: false,
                   confirmations: parameter.blockNumber - log.blockNumber,
                   timestamp: null,
                   tx: null,
                 });
-              // }
+              }
             } catch (e) {
               console.log("ERROR: " + e.message);
             }
@@ -1179,7 +1176,6 @@ const dataModule = {
         logInfo("dataModule", "actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
         try {
           const filter = {
-            // TODO: address: null,
             address: ERC6538REGISTRYADDRESS,
             fromBlock,
             toBlock,
@@ -1199,20 +1195,11 @@ const dataModule = {
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
       context.commit('setSyncSection', { section: 'Stealth Meta-Address Registry', total: null });
-      const selectedContracts = [];
-      // for (const [chainId, chainData] of Object.entries(this.contracts)) {
-      //   for (const [contract, contractData] of Object.entries(chainData)) {
-      //     if (contractData.type == "registry" && contractData.read) {
-      //       selectedContracts.push(contract);
-      //     }
-      //   }
-      // }
-      // if (selectedContracts.length > 0) {
-        const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
-        const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
-        const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
-        await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
-      // }
+      const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
+      const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
+      // TODO: Handle incrementalSync?
+      const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
+      await getLogs(startBlock, parameter.blockNumber, selectedContracts, processLogs);
       logInfo("dataModule", "actions.syncRegistrations END");
     },
 
