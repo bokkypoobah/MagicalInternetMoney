@@ -132,6 +132,9 @@ const app = new Vue({
     explorer() {
       return store.getters['connection/explorer'];
     },
+    coinbase() {
+      return store.getters['connection/coinbase'];
+    },
     blockNumber() {
       return store.getters['connection/block'] == null ? 0 : store.getters['connection/block'].number;
     },
