@@ -14,6 +14,7 @@ const NETWORKS = {
     name: "Base",
     explorer: "https://basescan.org/",
     nonFungibleViewer: "https://opensea.io/assets/base/${contract}/${tokenId}",
+    maxLogScrapingSize: 10_000, // TODO: Base RPC server fails for > 10k blocks for ERC-20 event log scraping
   },
   100: {
     name: "Gnosis Chain",
