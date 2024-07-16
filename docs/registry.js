@@ -21,7 +21,7 @@ const Registry = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -60,7 +60,7 @@ const Registry = {
             {{ data.item.registrant }}
           </template>
           <template #cell(transfer)="data">
-            <b-button size="sm" @click="newTransfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </template>
           <template #cell(stealthMetaAddress)="data">
             {{ data.item.stealthMetaAddress }}
@@ -95,14 +95,14 @@ const Registry = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
-    },
     coinbase() {
       return store.getters['connection/coinbase'];
     },
     chainId() {
       return store.getters['connection/chainId'];
+    },
+    transferHelper() {
+      return store.getters['connection/transferHelper'];
     },
     sync() {
       return store.getters['data/sync'];

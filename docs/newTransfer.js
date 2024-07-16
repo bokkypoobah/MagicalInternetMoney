@@ -149,6 +149,9 @@ const NewTransfer = {
     chainId() {
       return store.getters['connection/chainId'];
     },
+    transferHelper() {
+      return store.getters['connection/transferHelper'];
+    },
     addresses() {
       return store.getters['data/addresses'];
     },

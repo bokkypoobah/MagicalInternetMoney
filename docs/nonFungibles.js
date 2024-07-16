@@ -85,7 +85,7 @@ const NonFungibles = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!coinbase" @click="newTransfer(null); " variant="link" v-b-popover.hover="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -242,6 +242,9 @@ const NonFungibles = {
     },
     networkSupported() {
       return store.getters['connection/networkSupported'];
+    },
+    transferHelper() {
+      return store.getters['connection/transferHelper'];
     },
     explorer() {
       return store.getters['connection/explorer'];

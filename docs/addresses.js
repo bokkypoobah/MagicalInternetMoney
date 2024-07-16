@@ -227,7 +227,7 @@ const Addresses = {
           </template>
           <template #cell(icons)="data">
             <span v-if="data.item.account.substring(0, 3) == 'st:'">
-              <b-button size="sm" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+              <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
             </span>
             <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
             <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAddressField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
