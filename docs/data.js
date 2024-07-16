@@ -876,21 +876,30 @@ const dataModule = {
       }
       async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
         logInfo("dataModule", "actions.syncStealthTransfers.getLogs: " + fromBlock + " - " + toBlock);
-        try {
-          const filter = {
-            // TODO: address: null,
-            address: ERC5564ANNOUNCERADDRESS,
-            fromBlock,
-            toBlock,
-            topics: [
-              '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
-              null,
-              null
-            ]
-          };
-          const eventLogs = await provider.getLogs(filter);
-          await processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, eventLogs);
-        } catch (e) {
+        let split = false;
+        const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
+        if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
+          try {
+            const filter = {
+              // TODO: address: null,
+              address: ERC5564ANNOUNCERADDRESS,
+              fromBlock,
+              toBlock,
+              topics: [
+                '0x5f0eab8057630ba7676c49b4f21a0231414e79474595be8e4c432fbf6bf0f4e7',
+                null,
+                null
+              ]
+            };
+            const eventLogs = await provider.getLogs(filter);
+            await processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, eventLogs);
+          } catch (e) {
+            split = true;
+          }
+        } else {
+          split = true;
+        }
+        if (split) {
           const mid = parseInt((fromBlock + toBlock) / 2);
           await getLogs(fromBlock, mid, selectedContracts, selectedCallers, processLogs);
           await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
@@ -1199,7 +1208,7 @@ const dataModule = {
         if (split) {
           const mid = parseInt((fromBlock + toBlock) / 2);
           await getLogs(fromBlock, mid, processLogs);
-          await getLogs(parseInt(mid) + 1, toBlock, processLogs);          
+          await getLogs(parseInt(mid) + 1, toBlock, processLogs);
         }
       }
       logInfo("dataModule", "actions.syncRegistrations BEGIN");
