@@ -58,7 +58,7 @@ const Fungibles = {
             </b-dropdown>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show favourited only'"><b-icon :icon="settings.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.95" variant="danger"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -170,11 +170,11 @@ const Fungibles = {
       settings: {
         filter: null,
         junkFilter: null,
-        favouritesOnly: false,
+        activeOnly: false,
         currentPage: 1,
         pageSize: 10,
         sortOption: 'symbolasc',
-        version: 0,
+        version: 1,
       },
       transfer: {
         item: null,
@@ -288,7 +288,7 @@ const Fungibles = {
               include = false;
             }
           }
-          if (include && this.settings.favouritesOnly && (!metadata.favourite || metadata.junk)) {
+          if (include && this.settings.activeOnly && (!metadata.active || metadata.junk)) {
             include = false;
           }
           if (include && regex) {
