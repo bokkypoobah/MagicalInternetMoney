@@ -365,7 +365,7 @@ const connectionModule = {
       state.transferHelper = info.transferHelper;
       state.explorer = info.explorer;
       state.nonFungibleViewer = info.nonFungibleViewer;
-      logInfo("connectionModule", "state: " + JSON.stringify(state, null, 2));
+      // logInfo("connectionModule", "state: " + JSON.stringify(state, null, 2));
     },
     setCoinbase(state, coinbase) {
       logDebug("connectionModule", "mutations.setCoinbase(" + coinbase + ")");
