@@ -365,6 +365,7 @@ const Addresses = {
           results.push({
             account,
             ...accountData,
+            viewingPrivateKey: undefined,
           });
         }
       }
