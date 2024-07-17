@@ -416,9 +416,11 @@ const dataModule = {
         type: info.type,
         linkedTo: info.linkedTo,
         source: info.source,
-        mine: info.mine,
         junk: info.junk,
-        favourite: info.favourite,
+        mine: info.mine,
+        watch: info.watch,
+        sendFrom: info.sendFrom,
+        sendTo: info.sendTo,
         name: info.name,
         notes: info.notes,
       });
@@ -427,7 +429,10 @@ const dataModule = {
       // logInfo("dataModule", "mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
       Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
       Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
+      Vue.set(state.addresses[info.stealthAddress], 'junk', info.junk);
       Vue.set(state.addresses[info.stealthAddress], 'mine', info.mine);
+      Vue.set(state.addresses[info.stealthAddress], 'sendFrom', info.sendFrom);
+      Vue.set(state.addresses[info.stealthAddress], 'sendTo', info.sendTo);
     },
     deleteAddress(state, address) {
       Vue.delete(state.addresses, address);
@@ -1048,7 +1053,11 @@ const dataModule = {
                           stealthMetaAddress: account.address,
                           address: account.linkedToAddress,
                         },
+                        junk: false,
                         mine: true,
+                        watch: true,
+                        sendFrom: false,
+                        sendTo: false,
                       });
                     }
                   } else {
@@ -1060,9 +1069,11 @@ const dataModule = {
                         address: account.linkedToAddress,
                       },
                       source: "announcer",
-                      mine: true,
                       junk: false,
-                      favourite: false,
+                      mine: true,
+                      watch: true,
+                      sendFrom: false,
+                      sendTo: false,
                       name: null,
                       notes: null,
                       check: [],
