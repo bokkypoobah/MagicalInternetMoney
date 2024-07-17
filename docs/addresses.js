@@ -232,23 +232,23 @@ const Addresses = {
               </b-icon>
             </b-button>
 
-            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="data.item.mine ? 'My account' : 'Not my account'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
+            <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="data.item.mine ? 'My account' : 'Not my account'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" :variant="data.item.junk ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
 
-            <b-button size="sm" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
+            <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ' + (data.item.account.substring(0, 3) == 'st:' ? 'and ERC-721 stealth ' : 'ERC-721 and ERC-1155 ') + 'transfers'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" :variant="data.item.junk ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
 
-            <b-button size="sm" :pressed.sync="data.item.sendFrom" @click="toggleAddressField(data.item.account, 'sendFrom')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            <b-button size="sm" :disabled="data.item.junk || !data.item.mine || data.item.account.substring(0, 3) == 'st:'" :pressed.sync="data.item.sendFrom" @click="toggleAddressField(data.item.account, 'sendFrom')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" :variant="data.item.junk || !data.item.mine || data.item.account.substring(0, 3) == 'st:' ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
 
-            <b-button size="sm" :pressed.sync="data.item.sendTo" @click="toggleAddressField(data.item.account, 'sendTo')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.sendTo" @click="toggleAddressField(data.item.account, 'sendTo')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" :variant="data.item.junk ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
 

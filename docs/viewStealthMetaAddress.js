@@ -15,6 +15,10 @@ const ViewStealthMetaAddress = {
             <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
+          <b-button size="sm" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 stealth transfers'" class="m-0 mx-2 p-0">
+            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
           <b-button size="sm" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
             <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
@@ -122,6 +126,15 @@ const ViewStealthMetaAddress = {
       set: function (mine) {
         store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'mine', value: mine });
         store.dispatch('viewStealthMetaAddress/setMine', mine);
+      },
+    },
+    watch: {
+      get: function () {
+        return store.getters['viewStealthMetaAddress/watch'];
+      },
+      set: function (watch) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'watch', value: watch });
+        store.dispatch('viewStealthMetaAddress/setWatch', watch);
       },
     },
     sendTo: {
@@ -265,6 +278,7 @@ const viewStealthMetaAddressModule = {
     phrase: null,
     junk: null,
     mine: null,
+    watch: null,
     sendTo: null,
     name: null,
     notes: null,
@@ -282,6 +296,7 @@ const viewStealthMetaAddressModule = {
     phrase: state => state.phrase,
     junk: state => state.junk,
     mine: state => state.mine,
+    watch: state => state.watch,
     sendTo: state => state.sendTo,
     name: state => state.name,
     notes: state => state.notes,
@@ -302,6 +317,7 @@ const viewStealthMetaAddressModule = {
       state.phrase = data.phrase;
       state.junk = data.junk;
       state.mine = data.mine;
+      state.watch = data.watch;
       state.sendTo = data.sendTo;
       state.name = data.name;
       state.notes = data.notes;
@@ -319,6 +335,10 @@ const viewStealthMetaAddressModule = {
     setMine(state, mine) {
       logInfo("viewStealthMetaAddressModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
+    },
+    setWatch(state, watch) {
+      logInfo("viewStealthMetaAddressModule", "mutations.setWatch - watch: " + watch);
+      state.watch = watch;
     },
     setSendTo(state, sendTo) {
       logInfo("viewStealthMetaAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
@@ -352,6 +372,10 @@ const viewStealthMetaAddressModule = {
     async setMine(context, mine) {
       logInfo("viewStealthMetaAddressModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
+    },
+    async setWatch(context, watch) {
+      logInfo("viewStealthMetaAddressModule", "actions.setWatch - watch: " + watch);
+      await context.commit('setWatch', watch);
     },
     async setSendTo(context, sendTo) {
       logInfo("viewStealthMetaAddressModule", "actions.setSendTo - sendTo: " + sendTo);
