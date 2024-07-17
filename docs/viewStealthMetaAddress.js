@@ -6,21 +6,21 @@ const ViewStealthMetaAddress = {
         <b-form-group label="Address:" label-for="stealthmetaddress-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" plaintext id="stealthmetaddress-address" v-model.trim="address" rows="3" max-rows="4" class="px-2"></b-form-textarea>
         </b-form-group>
-        <b-form-group label="Options:" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
+        <b-form-group label="" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
           <b-button size="sm" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
-            <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="0.95" variant="primary">
+            <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" variant="primary">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
-            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" :variant="junk ? 'secondary' : 'primary'">
+            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="1.2" :variant="junk ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 stealth transfers'" class="m-0 mx-2 p-0">
-            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" :variant="junk ? 'secondary' : 'primary'">
+            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="junk ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
-            <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" :variant="junk ? 'secondary' : 'primary'">
+            <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="1.2" :variant="junk ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
         </b-form-group>
