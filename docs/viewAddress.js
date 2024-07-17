@@ -90,7 +90,7 @@ const ViewAddress = {
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk || !mine" id="address-sendfrom" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 mx-2 p-0">
-            <b-icon :icon="(sendFrom && !junk && mine) ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine || !sendFrom) ? 'secondary' : 'primary'">
+            <b-icon :icon="(sendFrom && mine && !junk) ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine || !sendFrom) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" id="address-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
