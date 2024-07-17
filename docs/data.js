@@ -244,10 +244,6 @@ const dataModule = {
       },
       updated: null,
     },
-    checkOptions: [
-      { value: 'ethers', text: 'Ethers' },
-      { value: 'tokens', text: 'ERC-20, ERC-721 and ERC-1155 Tokens' },
-    ],
   },
   getters: {
     addresses: state => state.addresses,
@@ -265,7 +261,6 @@ const dataModule = {
     forceRefresh: state => state.forceRefresh,
     sync: state => state.sync,
     db: state => state.db,
-    checkOptions: state => state.checkOptions,
   },
   mutations: {
     setState(state, info) {

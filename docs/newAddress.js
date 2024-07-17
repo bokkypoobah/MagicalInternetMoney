@@ -30,18 +30,39 @@ const NewAddress = {
         <b-form-group v-if="action == 'generateStealthMetaAddress' && linkedToAddress" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="addnewaddress-coinbase" :value="linkedToAddress" class="px-2 w-75"></b-form-input>
         </b-form-group>
+
         <b-form-group v-if="action == 'addAddress' || action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-mine" :pressed.sync="mine" variant="transparent"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          <b-button size="sm" id="addnewaddress-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'">
+            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" :variant="mine ? 'warning' : 'secondary'">
+            </b-icon>
+          </b-button>
         </b-form-group>
-        <b-form-group label="Favourite:" label-for="addnewaddress-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-favourite" :pressed.sync="favourite" variant="transparent"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+
+        <b-form-group v-if="action == 'addCoinbase' || action == 'addAddress'" label="Watch This Address:" label-for="addnewaddress-checkethers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="addnewaddress-checkethers" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'">
+            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
         </b-form-group>
-        <b-form-group v-if="action == 'addCoinbase' || action == 'addAddress'" label="Check:" label-for="addnewaddress-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-checkbox-group size="sm" id="addnewaddress-check" v-model="check" :options="checkOptions" class="ml-2"></b-form-checkbox-group>
+
+        <b-form-group v-if="action == 'addCoinbase' || action == 'addAddress'" label="Send From:" label-for="addnewaddress-send" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="addnewaddress-send" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'">
+            <b-icon :icon="sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
         </b-form-group>
+
+        <b-form-group label="Send To:" label-for="addnewaddress-sendto" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="addnewaddress-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'">
+            <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
         <b-form-group label="Name:" label-for="addnewaddress-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="addnewaddress-name" v-model.trim="name" debounce="600" placeholder="optional" class="w-50"></b-form-input>
         </b-form-group>
+
         <b-form-group label="" label-for="addnewaddress-submit" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="addNewAddressFeedback" class="mx-0 my-1 p-0">
           <!-- <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button> -->
           <b-button size="sm" :disabled="!!addNewAddressFeedback" id="addnewaddress-submit" @click="addNewAddress" variant="primary">Add/Update</b-button>
@@ -73,9 +94,6 @@ const NewAddress = {
     },
     chainId() {
       return store.getters['connection/chainId'];
-    },
-    checkOptions() {
-      return store.getters['data/checkOptions'];
     },
     action: {
       get: function () {
@@ -118,20 +136,28 @@ const NewAddress = {
         store.dispatch('newAddress/setMine', mine);
       },
     },
-    favourite: {
+    watch: {
       get: function () {
-        return store.getters['newAddress/favourite'];
+        return store.getters['newAddress/watch'];
       },
-      set: function (favourite) {
-        store.dispatch('newAddress/setFavourite', favourite);
+      set: function (watch) {
+        store.dispatch('newAddress/setWatch', watch);
       },
     },
-    check: {
+    sendFrom: {
       get: function () {
-        return store.getters['newAddress/check'];
+        return store.getters['newAddress/sendFrom'];
       },
-      set: function (check) {
-        store.dispatch('newAddress/setCheck', check);
+      set: function (sendFrom) {
+        store.dispatch('newAddress/setSendFrom', sendFrom);
+      },
+    },
+    sendTo: {
+      get: function () {
+        return store.getters['newAddress/sendTo'];
+      },
+      set: function (sendTo) {
+        store.dispatch('newAddress/setSendTo', sendTo);
       },
     },
     name: {
@@ -298,8 +324,9 @@ const NewAddress = {
         linkedToAddress: this.linkedToAddress,
         phrase: this.phrase,
         mine: this.mine,
-        favourite: this.favourite,
-        check: this.check,
+        watch: this.watch,
+        sendFrom: this.sendFrom,
+        sendTo: this.sendTo,
         name: this.name,
         notes: this.notes,
         viewingPrivateKey: this.viewingPrivateKey,
@@ -333,8 +360,9 @@ const newAddressModule = {
     linkedToAddress: null,
     phrase: "I want to login into my stealth wallet on Ethereum mainnet.",
     mine: null,
-    favourite: null,
-    check: [],
+    watch: null,
+    sendFrom: null,
+    sendTo: null,
     name: null,
     notes: null,
     viewingPrivateKey: null,
@@ -349,8 +377,9 @@ const newAddressModule = {
     linkedToAddress: state => state.linkedToAddress,
     phrase: state => state.phrase,
     mine: state => state.mine,
-    favourite: state => state.favourite,
-    check: state => state.check,
+    watch: state => state.watch,
+    sendFrom: state => state.sendFrom,
+    sendTo: state => state.sendTo,
     name: state => state.name,
     notes: state => state.notes,
     viewingPrivateKey: state => state.viewingPrivateKey,
@@ -367,8 +396,9 @@ const newAddressModule = {
       state.linkedToAddress = null;
       state.phrase = "I want to login into my stealth wallet on Ethereum mainnet.";
       state.mine = false;
-      state.favourite = false;
-      state.check = [];
+      state.watch = true;
+      state.sendFrom = false;
+      state.sendTo = false;
       state.name = null;
       state.notes = null;
       state.source = null;
@@ -403,13 +433,17 @@ const newAddressModule = {
       logInfo("newAddressModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
-    setFavourite(state, favourite) {
-      logInfo("newAddressModule", "mutations.setFavourite - favourite: " + favourite);
-      state.favourite = favourite;
+    setWatch(state, watch) {
+      logInfo("newAddressModule", "mutations.setWatch - watch: " + watch);
+      state.watch = watch;
     },
-    setCheck(state, check) {
-      logInfo("newAddressModule", "mutations.setCheck - check: " + JSON.stringify(check));
-      state.check = check;
+    setSendFrom(state, sendFrom) {
+      logInfo("newAddressModule", "mutations.setSendFrom - sendFrom: " + sendFrom);
+      state.sendFrom = sendFrom;
+    },
+    setSendTo(state, sendTo) {
+      logInfo("newAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
+      state.sendTo = sendTo;
     },
     setName(state, name) {
       logInfo("newAddressModule", "mutations.setName - name: " + name);
@@ -452,13 +486,17 @@ const newAddressModule = {
       logInfo("newAddressModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
-    async setFavourite(context, favourite) {
-      logInfo("newAddressModule", "actions.setFavourite - favourite: " + favourite);
-      await context.commit('setFavourite', favourite);
+    async setWatch(context, watch) {
+      logInfo("newAddressModule", "actions.setWatch - watch: " + watch);
+      await context.commit('setWatch', watch);
     },
-    async setCheck(context, check) {
-      logInfo("newAddressModule", "actions.setCheck - check: " + JSON.stringify(check));
-      await context.commit('setCheck', check);
+    async setSendFrom(context, sendFrom) {
+      logInfo("newAddressModule", "actions.setSendFrom - sendFrom: " + sendFrom);
+      await context.commit('setSendFrom', sendFrom);
+    },
+    async setSendTo(context, sendTo) {
+      logInfo("newAddressModule", "actions.setSendTo - sendTo: " + sendTo);
+      await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
       logInfo("newAddressModule", "actions.setName - name: " + name);
