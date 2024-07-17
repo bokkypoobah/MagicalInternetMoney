@@ -730,15 +730,6 @@ const dataModule = {
       const confirmations = store.getters['config/settings'].confirmations && parseInt(store.getters['config/settings'].confirmations) || 10;
       const blockNumber = block && block.number || null;
       const cryptoCompareAPIKey = store.getters['config/settings'].cryptoCompareAPIKey && store.getters['config/settings'].cryptoCompareAPIKey.length > 0 && store.getters['config/settings'].cryptoCompareAPIKey || null;
-      const processFilters = store.getters['config/processFilters'];
-
-      const accountsToSync = [];
-      // for (const [account, addressData] of Object.entries(context.state.accounts)) {
-      //   const accountsInfo = context.state.accountsInfo[account] || {};
-      //   if ((info.parameters.length == 0 && accountsInfo.sync) || info.parameters.includes(account)) {
-      //       accountsToSync.push(account);
-      //   }
-      // }
       const chainId = store.getters['connection/chainId'];
       const coinbase = store.getters['connection/coinbase'];
       if (!(coinbase in context.state.addresses) && Object.keys(context.state.addresses).length == 0) {

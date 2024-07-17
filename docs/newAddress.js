@@ -310,18 +310,6 @@ const NewAddress = {
       this.$refs['newaddress'].hide();
     },
 
-    async deleteAddress(account) {
-      this.$bvModal.msgBoxConfirm('Are you sure?')
-        .then(value => {
-          if (value) {
-            store.dispatch('data/deleteAddress', account);
-            this.$refs['viewaddress'].hide();
-          }
-        })
-        .catch(err => {
-          // An error occurred
-        })
-    },
   },
   beforeDestroy() {
     logDebug("NewAddress", "beforeDestroy()");

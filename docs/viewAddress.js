@@ -133,11 +133,8 @@ const ViewAddress = {
     chainId() {
       return store.getters['connection/chainId'];
     },
-    networks() {
-      return Object.keys(NETWORKS);
-    },
     explorer() {
-      return this.chainId && NETWORKS[this.chainId] && NETWORKS[this.chainId].explorer || "https://etherscan.io/";
+      return store.getters['connection/explorer'];
     },
     checkOptions() {
       return store.getters['data/checkOptions'];
