@@ -226,14 +226,39 @@ const Addresses = {
             </div> -->
           </template>
           <template #cell(icons)="data">
-            <span v-if="data.item.account.substring(0, 3) == 'st:'">
-              <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
-            </span>
-            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="addressTypeInfo[data.item.type].name" class="m-0 ml-1 p-0"><b-icon :icon="data.item.mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[data.item.type].variant"></b-icon></b-button>
-            <b-button size="sm" :pressed.sync="data.item.favourite" @click="toggleAddressField(data.item.account, 'favourite')" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+
+            <b-button size="sm" :pressed.sync="data.item.junk" @click="toggleAddressField(data.item.account, 'junk')" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="0.95" variant="primary">
+              </b-icon>
+            </b-button>
+
+            <b-button size="sm" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="data.item.mine ? 'My account' : 'Not my account'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
+              </b-icon>
+            </b-button>
+
+            <b-button size="sm" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
+              </b-icon>
+            </b-button>
+
+            <b-button size="sm" :pressed.sync="data.item.sendFrom" @click="toggleAddressField(data.item.account, 'sendFrom')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+              </b-icon>
+            </b-button>
+
+            <b-button size="sm" :pressed.sync="data.item.sendTo" @click="toggleAddressField(data.item.account, 'sendTo')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+              </b-icon>
+            </b-button>
+
           </template>
           <template #cell(account)="data">
             <div v-if="data.item.account.substring(0, 3) == 'st:'">
+              <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-1 p-0">
+                <b-icon-caret-right shift-v="+1" font-scale="1.1">
+                </b-icon-caret-right>
+              </b-button>
               {{ formatAddress(data.item.account) }}
             </div>
             <div v-else>
@@ -313,7 +338,7 @@ const Addresses = {
       ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'icons', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'icons', label: 'Options', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
         { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 25%;', tdClass: 'text-truncate' },
         { key: 'check', label: 'Check', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
