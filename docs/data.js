@@ -1647,7 +1647,7 @@ const dataModule = {
       logInfo("dataModule", "actions.computeBalances BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.check && addressData.check.includes("tokens")) {
+        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
           selectedAddressesMap[address] = true;
         }
       }
