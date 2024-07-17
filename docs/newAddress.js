@@ -30,30 +30,21 @@ const NewAddress = {
         <b-form-group v-if="action == 'generateStealthMetaAddress' && linkedToAddress" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="addnewaddress-coinbase" :value="linkedToAddress" class="px-2 w-75"></b-form-input>
         </b-form-group>
-
-        <b-form-group v-if="action == 'addAddress' || action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'">
+        
+        <b-form-group label="Options:" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
+          <b-button v-if="action == 'addAddress' || action == 'addStealthMetaAddress'" size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
             <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
-        </b-form-group>
-
-        <b-form-group v-if="action == 'addCoinbase' || action == 'addAddress'" label="Watch This Address:" label-for="addnewaddress-checkethers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-checkethers" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'">
+          <b-button v-if="action == 'addCoinbase' || action == 'addAddress'" size="sm" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'" class="m-0 mx-2 p-0">
             <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
-        </b-form-group>
-
-        <b-form-group v-if="action == 'addCoinbase' || action == 'addAddress'" label="Send From:" label-for="addnewaddress-send" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-send" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'">
+          <b-button v-if="action == 'addCoinbase' || action == 'addAddress'" size="sm" id="addnewaddress-send" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 mx-2 p-0">
             <b-icon :icon="sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
-        </b-form-group>
-
-        <b-form-group label="Send To:" label-for="addnewaddress-sendto" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="addnewaddress-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'">
+          <b-button size="sm" id="addnewaddress-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
             <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
