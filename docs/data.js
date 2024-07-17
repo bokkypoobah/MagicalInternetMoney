@@ -372,18 +372,20 @@ const dataModule = {
           Vue.set(state.addresses[address], 'viewingPublicKey', newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined);
         }
         Vue.set(state.addresses[address], 'mine', mine);
-        Vue.set(state.addresses[address], 'favourite', newAccount.favourite);
-        Vue.set(state.addresses[address], 'check', newAccount.check);
+        Vue.set(state.addresses[address], 'watch', newAccount.watch);
+        Vue.set(state.addresses[address], 'sendFrom', newAccount.sendFrom);
+        Vue.set(state.addresses[address], 'sendTo', newAccount.sendTo);
         Vue.set(state.addresses[address], 'name', newAccount.name);
       } else {
         if (type == "address") {
           Vue.set(state.addresses, address, {
             type,
             source,
-            mine,
             junk: false,
-            favourite: newAccount.favourite,
-            check: newAccount.check,
+            mine,
+            watch: newAccount.watch,
+            sendFrom: newAccount.sendFrom,
+            sendTo: newAccount.sendTo,
             name: newAccount.name,
             notes: null,
           });
@@ -396,10 +398,11 @@ const dataModule = {
             spendingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.spendingPublicKey : undefined,
             viewingPublicKey: newAccount.action == "generateStealthMetaAddress" ? newAccount.viewingPublicKey : undefined,
             source,
-            mine,
             junk: false,
-            favourite: newAccount.favourite,
-            check: newAccount.check,
+            mine,
+            watch: newAccount.watch,
+            sendFrom: newAccount.sendFrom,
+            sendTo: newAccount.sendTo,
             name: newAccount.name,
             notes: null,
           });

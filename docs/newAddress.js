@@ -33,7 +33,7 @@ const NewAddress = {
 
         <b-form-group v-if="action == 'addAddress' || action == 'addStealthMetaAddress'" label="Mine:" label-for="addnewaddress-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" id="addnewaddress-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'">
-            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" :variant="mine ? 'warning' : 'secondary'">
+            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
           </b-button>
         </b-form-group>

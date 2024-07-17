@@ -76,17 +76,48 @@ const ViewAddress = {
           </b-row>
         </b-form-group>
 
+        <b-form-group label="Junk:" label-for="address-junk" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'">
+            <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
         <b-form-group label="Mine:" label-for="address-mine" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="address-mine" :pressed.sync="mine" variant="transparent"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="mine ? 'warning' : 'secondary'"></b-icon></b-button>
+          <b-button size="sm" id="address-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'">
+            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
         </b-form-group>
 
-        <b-form-group label="Favourite:" label-for="address-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Watch This Address:" label-for="address-watch" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-watch" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 movements'">
+            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
+        <b-form-group label="Send From:" label-for="address-sendfrom" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-sendfrom" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'">
+            <b-icon :icon="sendFrom ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
+        <b-form-group label="Send To:" label-for="address-sendto" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'">
+            <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
+        <!-- <b-form-group label="Favourite:" label-for="address-favourite" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" id="address-favourite" :pressed.sync="favourite" variant="transparent"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
-        </b-form-group>
+        </b-form-group> -->
 
-        <b-form-group label="Check:" label-for="address-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group label="Check:" label-for="address-check" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-checkbox-group size="sm" id="address-check" v-model="check" :options="checkOptions" class="ml-2"></b-form-checkbox-group>
-        </b-form-group>
+        </b-form-group> -->
 
         <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
@@ -151,6 +182,15 @@ const ViewAddress = {
     type() {
       return store.getters['viewAddress/type'];
     },
+    junk: {
+      get: function () {
+        return store.getters['viewAddress/junk'];
+      },
+      set: function (junk) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'junk', value: junk });
+        store.dispatch('viewAddress/setJunk', junk);
+      },
+    },
     mine: {
       get: function () {
         return store.getters['viewAddress/mine'];
@@ -160,22 +200,31 @@ const ViewAddress = {
         store.dispatch('viewAddress/setMine', mine);
       },
     },
-    favourite: {
+    watch: {
       get: function () {
-        return store.getters['viewAddress/favourite'];
+        return store.getters['viewAddress/watch'];
       },
-      set: function (favourite) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewAddress/setFavourite', favourite);
+      set: function (watch) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'watch', value: watch });
+        store.dispatch('viewAddress/setWatch', watch);
       },
     },
-    check: {
+    sendFrom: {
       get: function () {
-        return store.getters['viewAddress/check'];
+        return store.getters['viewAddress/sendFrom'];
       },
-      set: function (check) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'check', value: check });
-        store.dispatch('viewAddress/setCheck', check);
+      set: function (sendFrom) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'sendFrom', value: sendFrom });
+        store.dispatch('viewAddress/setSendFrom', sendFrom);
+      },
+    },
+    sendTo: {
+      get: function () {
+        return store.getters['viewAddress/sendTo'];
+      },
+      set: function (sendTo) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'sendTo', value: sendTo });
+        store.dispatch('viewAddress/setSendTo', sendTo);
       },
     },
     name: {
@@ -332,8 +381,11 @@ const viewAddressModule = {
       stealthMetaAddress: null,
     },
     type: null,
+    junk: null,
     mine: null,
-    favourite: null,
+    watch: null,
+    sendFrom: null,
+    sendTo: null,
     name: null,
     notes: null,
     source: null,
@@ -343,9 +395,11 @@ const viewAddressModule = {
     address: state => state.address,
     linkedTo: state => state.linkedTo,
     type: state => state.type,
+    junk: state => state.junk,
     mine: state => state.mine,
-    favourite: state => state.favourite,
-    check: state => state.check,
+    watch: state => state.watch,
+    sendFrom: state => state.sendFrom,
+    sendTo: state => state.sendTo,
     name: state => state.name,
     notes: state => state.notes,
     source: state => state.source,
@@ -359,9 +413,11 @@ const viewAddressModule = {
       state.address = address;
       state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
       state.type = data.type;
+      state.junk = data.junk;
       state.mine = data.mine;
-      state.favourite = data.favourite;
-      state.check = data.check;
+      state.watch = data.watch;
+      state.sendFrom = data.sendFrom;
+      state.sendTo = data.sendTo;
       state.name = data.name;
       state.notes = data.notes;
       state.source = data.source;
@@ -379,17 +435,25 @@ const viewAddressModule = {
       Vue.set(state, 'stealthTransfers', stealthTransfers);
       state.show = true;
     },
+    setJunk(state, junk) {
+      logInfo("viewAddressModule", "mutations.setJunk - junk: " + junk);
+      state.junk = junk;
+    },
     setMine(state, mine) {
       logInfo("viewAddressModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
-    setFavourite(state, favourite) {
-      logInfo("viewAddressModule", "mutations.setFavourite - favourite: " + favourite);
-      state.favourite = favourite;
+    setWatch(state, watch) {
+      logInfo("viewAddressModule", "mutations.setWatch - watch: " + watch);
+      state.watch = watch;
     },
-    setCheck(state, check) {
-      logInfo("viewAddressModule", "mutations.setCheck - check: " + check);
-      state.check = check;
+    setSendFrom(state, sendFrom) {
+      logInfo("viewAddressModule", "mutations.setSendFrom - sendFrom: " + sendFrom);
+      state.sendFrom = sendFrom;
+    },
+    setSendTo(state, sendTo) {
+      logInfo("viewAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
+      state.sendTo = sendTo;
     },
     setName(state, name) {
       logInfo("viewAddressModule", "mutations.setName - name: " + name);
@@ -408,17 +472,25 @@ const viewAddressModule = {
       logInfo("viewAddressModule", "actions.viewAddress - address: " + address);
       await context.commit('viewAddress', address);
     },
+    async setJunk(context, junk) {
+      logInfo("viewAddressModule", "actions.setJunk - junk: " + junk);
+      await context.commit('setJunk', junk);
+    },
     async setMine(context, mine) {
       logInfo("viewAddressModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
-    async setFavourite(context, favourite) {
-      logInfo("viewAddressModule", "actions.setFavourite - favourite: " + favourite);
-      await context.commit('setFavourite', favourite);
+    async setWatch(context, favourite) {
+      logInfo("viewAddressModule", "actions.setWatch - favourite: " + favourite);
+      await context.commit('setWatch', favourite);
     },
-    async setCheck(context, check) {
-      logInfo("viewAddressModule", "actions.setCheck - check: " + check);
-      await context.commit('setCheck', check);
+    async setSendFrom(context, check) {
+      logInfo("viewAddressModule", "actions.setSendFrom - check: " + check);
+      await context.commit('setSendFrom', check);
+    },
+    async setSendTo(context, sendTo) {
+      logInfo("viewAddressModule", "actions.setSendTo - sendTo: " + sendTo);
+      await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
       logInfo("viewAddressModule", "actions.setName - name: " + name);
