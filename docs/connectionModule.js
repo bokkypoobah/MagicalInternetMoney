@@ -35,12 +35,12 @@ const Connection = {
               <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
             </b-col>
           </b-row>
-          <!-- <b-row>
+          <b-row>
             <b-col cols="4" class="small">ETH Balance</b-col>
             <b-col class="small truncate" cols="8">
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ formatETH(balance) }}</b-link>
+              <!-- <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + coinbase" class="card-link" target="_blank">{{ formatETH(balance) }}</b-link> -->
             </b-col>
-          </b-row> -->
+          </b-row>
           <b-row v-show="Object.keys(txs).length">
             <b-col cols="4" class="small">
               Transactions
