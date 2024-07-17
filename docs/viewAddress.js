@@ -82,11 +82,11 @@ const ViewAddress = {
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" id="address-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
-            <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine) ? 'secondary' : 'primary'">
+            <b-icon :icon="(mine && !junk) ? 'person-fill' : 'person'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk" id="address-watch" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 transfers'" class="m-0 mx-2 p-0">
-            <b-icon :icon="watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="(junk || !watch) ? 'secondary' : 'primary'">
+            <b-icon :icon="(watch && !junk) ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="(junk || !watch) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
           <b-button size="sm" :disabled="junk || !mine" id="address-sendfrom" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 mx-2 p-0">
