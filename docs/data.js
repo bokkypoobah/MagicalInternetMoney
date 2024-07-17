@@ -285,10 +285,10 @@ const dataModule = {
         Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
       }
     },
-    toggleFungibleFavourite(state, item) {
-      // logInfo("dataModule", "mutations.toggleFungibleFavourite - item: " + JSON.stringify(item));
+    toggleFungibleActive(state, item) {
+      logInfo("dataModule", "mutations.toggleFungibleActive - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
-        Vue.set(state.tokens[item.chainId][item.contract], 'favourite', !state.tokens[item.chainId][item.contract].favourite);
+        Vue.set(state.tokens[item.chainId][item.contract], 'active', !state.tokens[item.chainId][item.contract].active);
       }
     },
     toggleNonFungibleJunk(state, item) {
@@ -450,7 +450,7 @@ const dataModule = {
           decimals: info.decimals,
           totalSupply: info.totalSupply,
           junk: false,
-          favourite: false,
+          active: false,
           notes: null,
         });
       }
@@ -631,9 +631,9 @@ const dataModule = {
       await context.commit('toggleFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
-    async toggleFungibleFavourite(context, item) {
-      // logInfo("dataModule", "actions.toggleFungibleFavourite - item: " + JSON.stringify(item));
-      await context.commit('toggleFungibleFavourite', item);
+    async toggleFungibleActive(context, item) {
+      logInfo("dataModule", "actions.toggleFungibleActive - item: " + JSON.stringify(item));
+      await context.commit('toggleFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleJunk(context, item) {

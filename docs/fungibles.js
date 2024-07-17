@@ -118,13 +118,13 @@ const Fungibles = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
-          <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0">
+          <template #cell(active)="data">
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.favourite & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="data.item.junk ? 'dark' : 'danger'">
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
+              <b-icon :icon="(data.item.active & !data.item.junk) ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
           </template>
@@ -137,7 +137,7 @@ const Fungibles = {
             </b-link>
             <!-- <br />
             <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button> -->
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.active & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.active ? 'dark' : 'danger'"></b-icon></b-button> -->
           </template>
           <template #cell(type)="data">
             <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
@@ -193,7 +193,7 @@ const Fungibles = {
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'favourite', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'active', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
@@ -390,9 +390,9 @@ const Fungibles = {
       logInfo("Fungibles", ".methods.toggleFungibleJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleFungibleJunk', item);
     },
-    toggleFungibleFavourite(item) {
-      logInfo("Fungibles", ".methods.toggleFungibleFavourite - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleFungibleFavourite', item);
+    toggleFungibleActive(item) {
+      logInfo("Fungibles", ".methods.toggleFungibleActive - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleFungibleActive', item);
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
