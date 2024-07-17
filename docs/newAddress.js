@@ -30,7 +30,7 @@ const NewAddress = {
         <b-form-group v-if="action == 'generateStealthMetaAddress' && linkedToAddress" label="Linked To Address:" label-for="addnewaddress-generatedlinkedtoaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" description="Attached web3 address" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="addnewaddress-coinbase" :value="linkedToAddress" class="px-2 w-75"></b-form-input>
         </b-form-group>
-        
+
         <b-form-group label="Options:" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
           <b-button v-if="action == 'addAddress' || action == 'addStealthMetaAddress'" size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
             <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">

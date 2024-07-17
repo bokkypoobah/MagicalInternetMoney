@@ -76,7 +76,7 @@ const ViewAddress = {
           </b-row>
         </b-form-group>
 
-        <b-form-group label="" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
+        <b-form-group label="Options:" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
           <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
             <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="0.95" variant="primary">
             </b-icon>
