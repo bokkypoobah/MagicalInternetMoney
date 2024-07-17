@@ -11,8 +11,18 @@ const ViewStealthMetaAddress = {
             <b-form-input size="sm" id="stealthmetaddress-name" v-model.trim="name" debounce="600" placeholder="optional" class="w-50"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="addressTypeInfo['stealthMetaAddress'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo['stealthMetaAddress'].variant"></b-icon></b-button>
-                <b-button size="sm" :pressed.sync="favourite" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                <b-button size="sm" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 ml-5 p-0">
+                  <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="0.95" variant="primary">
+                  </b-icon>
+                </b-button>
+                <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 ml-2 p-0">
+                  <b-icon :icon="mine ? 'person-fill' : 'person'" shift-v="+1" font-scale="0.95" variant="primary">
+                  </b-icon>
+                </b-button>
+                <b-button size="sm" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 ml-2 p-0">
+                  <b-icon :icon="sendTo ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="0.95" variant="primary">
+                  </b-icon>
+                </b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -99,6 +109,15 @@ const ViewStealthMetaAddress = {
     phrase() {
       return store.getters['viewStealthMetaAddress/phrase'];
     },
+    junk: {
+      get: function () {
+        return store.getters['viewStealthMetaAddress/junk'];
+      },
+      set: function (junk) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'junk', value: junk });
+        store.dispatch('viewStealthMetaAddress/setJunk', junk);
+      },
+    },
     mine: {
       get: function () {
         return store.getters['viewStealthMetaAddress/mine'];
@@ -108,13 +127,13 @@ const ViewStealthMetaAddress = {
         store.dispatch('viewStealthMetaAddress/setMine', mine);
       },
     },
-    favourite: {
+    sendTo: {
       get: function () {
-        return store.getters['viewStealthMetaAddress/favourite'];
+        return store.getters['viewStealthMetaAddress/sendTo'];
       },
-      set: function (favourite) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewStealthMetaAddress/setFavourite', favourite);
+      set: function (sendTo) {
+        store.dispatch('data/setAddressField', { address: store.getters['viewStealthMetaAddress/address'], field: 'sendTo', value: sendTo });
+        store.dispatch('viewStealthMetaAddress/setSendTo', sendTo);
       },
     },
     name: {
@@ -247,8 +266,9 @@ const viewStealthMetaAddressModule = {
     type: null,
     linkedToAddress: null,
     phrase: null,
+    junk: null,
     mine: null,
-    favourite: null,
+    sendTo: null,
     name: null,
     notes: null,
     spendingPrivateKey: 'null abc',
@@ -263,8 +283,9 @@ const viewStealthMetaAddressModule = {
     type: state => state.type,
     linkedToAddress: state => state.linkedToAddress,
     phrase: state => state.phrase,
+    junk: state => state.junk,
     mine: state => state.mine,
-    favourite: state => state.favourite,
+    sendTo: state => state.sendTo,
     name: state => state.name,
     notes: state => state.notes,
     spendingPrivateKey: state => state.spendingPrivateKey,
@@ -282,8 +303,9 @@ const viewStealthMetaAddressModule = {
       state.type = data.type;
       state.linkedToAddress = data.linkedToAddress;
       state.phrase = data.phrase;
+      state.junk = data.junk;
       state.mine = data.mine;
-      state.favourite = data.favourite;
+      state.sendTo = data.sendTo;
       state.name = data.name;
       state.notes = data.notes;
       state.spendingPrivateKey = null;
@@ -293,13 +315,17 @@ const viewStealthMetaAddressModule = {
       state.source = data.source;
       state.show = true;
     },
+    setJunk(state, junk) {
+      logInfo("viewStealthMetaAddressModule", "mutations.setJunk - junk: " + junk);
+      state.junk = junk;
+    },
     setMine(state, mine) {
       logInfo("viewStealthMetaAddressModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
-    setFavourite(state, favourite) {
-      logInfo("viewStealthMetaAddressModule", "mutations.setFavourite - favourite: " + favourite);
-      state.favourite = favourite;
+    setSendTo(state, sendTo) {
+      logInfo("viewStealthMetaAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
+      state.sendTo = sendTo;
     },
     setName(state, name) {
       logInfo("viewStealthMetaAddressModule", "mutations.setName - name: " + name);
@@ -322,13 +348,17 @@ const viewStealthMetaAddressModule = {
       logInfo("viewStealthMetaAddressModule", "actions.viewStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       await context.commit('viewStealthMetaAddress', stealthMetaAddress);
     },
+    async setJunk(context, junk) {
+      logInfo("viewStealthMetaAddressModule", "actions.setJunk - junk: " + junk);
+      await context.commit('setJunk', junk);
+    },
     async setMine(context, mine) {
       logInfo("viewStealthMetaAddressModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
-    async setFavourite(context, favourite) {
-      logInfo("viewStealthMetaAddressModule", "actions.setFavourite - favourite: " + favourite);
-      await context.commit('setFavourite', favourite);
+    async setSendTo(context, sendTo) {
+      logInfo("viewStealthMetaAddressModule", "actions.setSendTo - sendTo: " + sendTo);
+      await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
       logInfo("viewStealthMetaAddressModule", "actions.setName - name: " + name);
