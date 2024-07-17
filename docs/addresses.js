@@ -237,7 +237,7 @@ const Addresses = {
               </b-icon>
             </b-button>
 
-            <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ' + (data.item.account.substring(0, 3) == 'st:' ? 'and ERC-721 stealth ' : 'ERC-721 and ERC-1155 ') + 'transfers'" class="m-0 ml-1 p-0">
+            <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20' + (data.item.account.substring(0, 3) == 'st:' ? ' and ERC-721 stealth ' : ', ERC-721 and ERC-1155 ') + 'transfers'" class="m-0 ml-1 p-0">
               <b-icon :icon="data.item.watch ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="data.item.junk ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
