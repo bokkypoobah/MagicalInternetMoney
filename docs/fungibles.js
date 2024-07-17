@@ -119,8 +119,14 @@ const Fungibles = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
+              </b-icon>
+            </b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.favourite & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="data.item.junk ? 'dark' : 'danger'">
+              </b-icon>
+            </b-button>
           </template>
           <template #cell(logo)="data">
             <b-img v-if="chainId == 1" button rounded width="75px;" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.contract + '/logo.png'" />
