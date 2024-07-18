@@ -202,7 +202,8 @@ const NewTransfer = {
       const results = [];
       results.push({ value: null, text: "(Select from your approved Stealth Meta-Addresses)"})
       for (const [address, addressData] of Object.entries(this.addresses)) {
-        if (addressData.type == "stealthMetaAddress" && addressData.sendTo) {
+        // console.log(address + " => " + JSON.stringify(addressData));
+        if (addressData.type == "stealthMetaAddress" && !addressData.junk && addressData.sendTo) {
           results.push({ value: address, text: (addressData.name ? (addressData.name + ' ') : '') + address.substring(0, 17) + '...' + address.slice(-8) + ' / ' + (addressData.linkedToAddress ? (addressData.linkedToAddress.substring(0, 10) + '...' + addressData.linkedToAddress.slice(-8)) : '') });
         }
       }
@@ -211,10 +212,10 @@ const NewTransfer = {
     additionalERC20TokensOptions() {
       const results = [];
       results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
-      for (const [address, data] of Object.entries(this.tokens[this.chainId] || {})) {
-        if (data.favourite) {
-          // console.log(address + " => " + JSON.stringify(data));
-          results.push({ value: address, text: (data.type == "erc20" ? "ERC-20 " : "ERC-721 ") + data.symbol + ' ' + data.name + ' @ ' + address.substring(0, 10) })
+      for (const [address, tokenData] of Object.entries(this.tokens[this.chainId] || {})) {
+        // console.log(address + " => " + JSON.stringify(tokenData));
+        if (!tokenData.junk && tokenData.active) {
+          results.push({ value: address, text: (tokenData.type == "erc20" ? "ERC-20 " : "ERC-721 ") + tokenData.symbol + ' ' + tokenData.name + ' @ ' + address.substring(0, 10) })
         }
       }
       return results;
