@@ -145,8 +145,14 @@ const NonFungibles = {
             <br />
             <font size="-1">{{ data.item.description }}</font>
             <br />
-            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleFavourite(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="data.item.favourite & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'"></b-icon></b-button>
+            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'">
+              </b-icon>
+            </b-button>
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'">
+              </b-icon>
+            </b-button>
           </template>
 
           <template #cell(expiry)="data">
@@ -173,9 +179,9 @@ const NonFungibles = {
             </b-row>
           </template>
 
-          <template #cell(favourite)="data">
-            <b-button size="sm" @click="toggleNonFungibleFavourite(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button>
-          </template>
+          <!-- <template #cell(favourite)="data"> -->
+            <!-- <b-button size="sm" @click="toggleNonFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button> -->
+          <!-- </template> -->
         </b-table>
       </b-card>
     </div>
@@ -376,7 +382,7 @@ const NonFungibles = {
                   contract,
                   type: data.type,
                   junk,
-                  favourite: metadata.favourite,
+                  active: metadata.active,
                   totalSupply: data.totalSupply,
                   tokenId,
                   owners,
@@ -454,9 +460,9 @@ const NonFungibles = {
       logInfo("NonFungibles", ".methods.toggleNonFungibleJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleNonFungibleJunk', item);
     },
-    toggleNonFungibleFavourite(item) {
-      logInfo("NonFungibles", ".methods.toggleNonFungibleFavourite - item: " + JSON.stringify(item, null, 2));
-      store.dispatch('data/toggleNonFungibleFavourite', item);
+    toggleNonFungibleActive(item) {
+      logInfo("NonFungibles", ".methods.toggleNonFungibleActive - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('data/toggleNonFungibleActive', item);
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);

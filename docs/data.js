@@ -305,8 +305,8 @@ const dataModule = {
       }
       Vue.set(state.tokens[chainId][contract], 'junk', !state.tokens[chainId][contract].junk);
     },
-    toggleNonFungibleFavourite(state, item) {
-      logInfo("dataModule", "mutations.toggleNonFungibleFavourite - item: " + JSON.stringify(item));
+    toggleNonFungibleActive(state, item) {
+      logInfo("dataModule", "mutations.toggleNonFungibleActive - item: " + JSON.stringify(item));
       const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
@@ -323,10 +323,10 @@ const dataModule = {
           description: null,
           image: null,
           attributes: null,
-          favourite: false,
+          active: false,
         });
       }
-      Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'favourite', !state.tokens[chainId][contract].tokens[tokenId].favourite);
+      Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'active', !state.tokens[chainId][contract].tokens[tokenId].active);
     },
 
     addNewAddress(state, newAccount) {
@@ -479,7 +479,7 @@ const dataModule = {
             description: info.description,
             image: info.image,
             attributes: info.attributes,
-            favourite: false,
+            active: false,
           });
         } else {
           // logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
@@ -488,7 +488,7 @@ const dataModule = {
             description: info.description,
             image: info.image,
             attributes: info.attributes,
-            favourite: false,
+            active: false,
           });
         }
       }
@@ -641,9 +641,9 @@ const dataModule = {
       await context.commit('toggleNonFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
-    async toggleNonFungibleFavourite(context, item) {
-      // logInfo("dataModule", "actions.toggleNonFungibleFavourite - item: " + JSON.stringify(item));
-      await context.commit('toggleNonFungibleFavourite', item);
+    async toggleNonFungibleActive(context, item) {
+      // logInfo("dataModule", "actions.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      await context.commit('toggleNonFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async addNonFungibleMetadata(context, info) {
