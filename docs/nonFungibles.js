@@ -60,7 +60,7 @@ const NonFungibles = {
             </b-dropdown>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.favouritesOnly" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show favourited only'"><b-icon :icon="settings.favouritesOnly ? 'heart-fill' : 'heart'" font-scale="0.95" variant="danger"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -145,12 +145,12 @@ const NonFungibles = {
             <br />
             <font size="-1">{{ data.item.description }}</font>
             <br />
-            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="'Junk?'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'">
+            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="0.9" :variant="data.item.junk ? 'dark' : 'danger'">
+            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Token active' : 'Token inactive'" class="m-0 ml-1 p-0">
+              <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
           </template>
@@ -193,11 +193,11 @@ const NonFungibles = {
       settings: {
         filter: null,
         junkFilter: null,
-        favouritesOnly: false,
+        activeOnly: false,
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
-        version: 0,
+        version: 1,
       },
       transfer: {
         item: null,
@@ -342,7 +342,7 @@ const NonFungibles = {
                 include = false;
               }
             }
-            if (include && this.settings.favouritesOnly && (!metadata.favourite || junk)) {
+            if (include && this.settings.activeOnly && (!metadata.active || junk)) {
               include = false;
             }
             if (include && regex) {
@@ -594,7 +594,7 @@ const NonFungibles = {
     store.dispatch('data/restoreState');
     if ('nonFungiblesSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.nonFungiblesSettings);
-      if ('version' in tempSettings && tempSettings.version == 0) {
+      if ('version' in tempSettings && tempSettings.version == this.settings.version) {
         this.settings = tempSettings;
         this.settings.currentPage = 1;
       }
