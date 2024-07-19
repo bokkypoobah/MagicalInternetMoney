@@ -268,7 +268,7 @@ const NewTransfer = {
       const results = [];
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       if (tokenContract.type == "erc721") {
-        for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
+        for (const [tokenId, tokenData] of Object.entries(tokenContract.tokens)) {
           if (tokenData.owner == this.coinbase) {
             const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
             results.push({ tokenId, ...tokenData, selected });
