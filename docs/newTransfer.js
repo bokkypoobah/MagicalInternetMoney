@@ -63,7 +63,7 @@ const NewTransfer = {
 
       <b-modal ref="newtransfer" v-model="show" id="modal-newtransfer" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>New Stealth Transfer</template>
-        <b-form-group label="Attached Web3 Address:" label-for="newtransfer-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Attached Web3 Address:" label-for="newtransfer-coinbase" label-size="sm" label-cols-sm="3" label-align-sm="right" :state="!coinbase ||coinbaseFeedback == null" :invalid-feedback="coinbaseFeedback" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="newtransfer-coinbase" :value="coinbase" class="px-2 w-75"></b-form-input>
         </b-form-group>
         <b-form-group v-if="stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -236,6 +236,18 @@ const NewTransfer = {
       return results;
     },
 
+    coinbaseFeedback() {
+      if (!(this.coinbase in this.addresses)) {
+        return "Attached address not in addresses";
+      } else {
+        const addressData = this.addresses[this.coinbase];
+        if (addressData.junk || !addressData.sendFrom) {
+          return "Attached address is not permitted to send tokens";
+        }
+      }
+      return null;
+    },
+
     newTransferAmountFeedback() {
       if (!this.amount) {
         return "Enter Amount";
@@ -250,6 +262,14 @@ const NewTransfer = {
     },
 
     newTransferFeedback() {
+      if (!(this.coinbase in this.addresses)) {
+        return "Attached address not in addresses";
+      } else {
+        const addressData = this.addresses[this.coinbase];
+        if (addressData.junk || !addressData.sendFrom) {
+          return "Attached address is not permitted to send tokens";
+        }
+      }
       if (!this.amount) {
         return "Enter Amount";
       }
