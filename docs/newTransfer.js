@@ -211,10 +211,22 @@ const NewTransfer = {
     },
     additionalERC20TokensOptions() {
       const results = [];
-      results.push({ value: null, text: "(select ERC-20 or ERC-721 token from active list)"})
+      results.push({ value: null, text: "(select active ERC-20 or ERC-721 token)"})
       for (const [address, tokenData] of Object.entries(this.tokens[this.chainId] || {})) {
-        // console.log(address + " => " + JSON.stringify(tokenData));
-        if (!tokenData.junk && tokenData.active) {
+        let active = false;
+        console.log(address + " => " + JSON.stringify(tokenData));
+        if (tokenData.type == "erc20") {
+          active = !tokenData.junk && tokenData.active;
+        } else {
+          for (const [tokenId, data] of Object.entries(tokenData.tokens || {})) {
+            console.log(address + "/" + tokenId + " => " + JSON.stringify(data));
+            if (data.active) {
+              active = true;
+              break;
+            }
+          }
+        }
+        if (active) {
           results.push({ value: address, text: (tokenData.type == "erc20" ? "ERC-20 " : "ERC-721 ") + tokenData.symbol + ' ' + tokenData.name + ' @ ' + address.substring(0, 10) })
         }
       }
