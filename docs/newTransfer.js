@@ -399,7 +399,7 @@ const NewTransfer = {
     },
 
     async updateApproval() {
-      console.log(moment().format("HH:mm:ss") + " updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
+      logInfo("NewTransfer", "methods.updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       if (this.modalAddTokensToNewTransfer.type == "erc20") {
         const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
@@ -421,21 +421,21 @@ const NewTransfer = {
           console.log("updateApproval - ERC721.setApprovalForAll(...) error: " + JSON.stringify(e));
         }
       }
-      console.log(moment().format("HH:mm:ss") + " updateApproval END");
+      logInfo("NewTransfer", "methods.updateApproval END");
     },
 
     erc721TokenIdToggle(tokenId) {
-      // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - tokenId: " + tokenId);
+      logInfo("NewTransfer", "methods.erc721TokenIdToggle - tokenId: " + tokenId);
       if (tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds) {
         Vue.delete(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId);
       } else {
         Vue.set(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId, true);
       }
-      // console.log(moment().format("HH:mm:ss") + " erc721TokenIdToggle - this.modalAddTokensToNewTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, null, 2));
+      logInfo("NewTransfer", "methods.erc721TokenIdToggle - this.modalAddTokensToNewTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToNewTransfer.selectedERC721TokenIds));
     },
 
     addERC20TokenToTransfer() {
-      console.log(moment().format("HH:mm:ss") + " addERC20TokenToTransfer");
+      logInfo("NewTransfer", "methods.addERC20TokenToTransfer");
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
       const symbol = tokenContract.symbol || null;
@@ -452,13 +452,15 @@ const NewTransfer = {
     },
 
     addERC721TokenToTransfer() {
-      console.log(moment().format("HH:mm:ss") + " addERC721TokenToTransfer");
+      logInfo("NewTransfer", "methods.addERC721TokenToTransfer");
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
-      console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
-      console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
+      const balances = this.balances[this.chainId] && this.balances[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      // console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
+      // console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       if (tokenContract.type == "erc721") {
         for (const [tokenId, tokenData] of Object.entries(tokenContract.tokens)) {
-          if (tokenData.owner == this.coinbase) {
+          const owner = balances.tokens[tokenId] || null;
+          if (owner == this.coinbase) {
             const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
             if (selected) {
               // console.log(tokenId + " " + selected + " => " + JSON.stringify(tokenData));
