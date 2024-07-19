@@ -455,6 +455,21 @@ const dataModule = {
         });
       }
     },
+    addNonFungibleContractMetadata(state, info) {
+      logInfo("dataModule", "mutations.addNonFungibleContractMetadata info: " + JSON.stringify(info, null, 2));
+      if (!(info.chainId in state.tokens)) {
+        Vue.set(state.tokens, info.chainId, {});
+      }
+      if (!(info.contract in state.tokens[info.chainId])) {
+        Vue.set(state.tokens[info.chainId], info.contract, {
+          type: info.type,
+          symbol: info.symbol,
+          name: info.name,
+          junk: false,
+          tokens: {},
+        });
+      }
+    },
     addNonFungibleMetadata(state, info) {
       logInfo("dataModule", "mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
@@ -462,9 +477,12 @@ const dataModule = {
         Vue.set(state.tokens, chainId, {});
       }
       if (!(contract in state.tokens[chainId])) {
+        // Should be ERC-1155 only
         Vue.set(state.tokens[chainId], contract, {
+          type: info.type,
+          symbol: null,
+          name: null,
           junk: false,
-          // TODO
           tokens: {},
         });
       }
@@ -1828,9 +1846,15 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata BEGIN");
       const FETCH_TIMEOUT_MILLIS = 15000;
+      const contractsToProcess = {};
       const tokensToProcess = {};
       let totalTokensToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
+        if (contractData.type == "erc721") {
+          if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
+            contractsToProcess[contract] = contractData;
+          }
+        }
         if (contractData.type == "erc721" || contractData.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
             if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId].name) {
@@ -1843,10 +1867,45 @@ const dataModule = {
           }
         }
       }
-      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess, null, 2));
+      // console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
 
+      context.commit('setSyncSection', { section: 'Non-Fungibles Contract Metadata', total: Object.keys(contractsToProcess).length });
       let completed = 0;
-      context.commit('setSyncSection', { section: 'Token Metadata', total: totalTokensToProcess });
+      for (const [contract, contractData] of Object.entries(contractsToProcess)) {
+        console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
+        context.commit('setSyncCompleted', completed);
+        const interface = new ethers.Contract(contract, ERC721ABI, provider);
+        let symbol = null;
+        let name = null;
+        try {
+          symbol = await interface.symbol();
+        } catch (e) {
+        }
+        try {
+          name = await interface.name();
+        } catch (e) {
+        }
+        logInfo("dataModule", "actions.syncNonFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name);
+        context.commit('addNonFungibleContractMetadata', {
+          chainId: parameter.chainId,
+          contract,
+          symbol,
+          name,
+          ...contractData,
+        });
+        completed++;
+        if ((completed % 10) == 0) {
+          await context.dispatch('saveData', ['tokens']);
+        }
+        if (context.state.sync.halt) {
+          break;
+        }
+      }
+      await context.dispatch('saveData', ['tokens']);
+
+      completed = 0;
+      context.commit('setSyncSection', { section: 'Non-Fungible Token Metadata', total: totalTokensToProcess });
       context.commit('setSyncCompleted', 0);
       // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
       // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
