@@ -299,7 +299,7 @@ const NonFungibles = {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
       for (const [address, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc721" || data.type == "erc1155") {
-          result += Object.keys(data.tokenIds).length;
+          result += Object.keys(data.tokens).length;
         }
       }
       return result;
@@ -328,7 +328,7 @@ const NonFungibles = {
         // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
         if (data.type == "erc721" || data.type == "erc1155") {
           // console.log(contract + " => " + JSON.stringify(data, null, 2));
-          for (const [tokenId, tokenData] of Object.entries(data.tokenIds)) {
+          for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
             // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
             const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};

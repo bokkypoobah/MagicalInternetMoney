@@ -155,6 +155,9 @@ const NewTransfer = {
     addresses() {
       return store.getters['data/addresses'];
     },
+    balances() {
+      return store.getters['data/balances'];
+    },
     tokens() {
       return store.getters['data/tokens'];
     },
@@ -267,14 +270,19 @@ const NewTransfer = {
       logInfo("NewTransfer", "methods.filteredERC721Tokens BEGIN");
       const results = [];
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      const balances = this.balances[this.chainId] && this.balances[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
+      logInfo("NewTransfer", "methods.filteredERC721Tokens - tokenContract: " + JSON.stringify(tokenContract, null, 2));
       if (tokenContract.type == "erc721") {
         for (const [tokenId, tokenData] of Object.entries(tokenContract.tokens)) {
-          if (tokenData.owner == this.coinbase) {
+          // console.log(this.modalAddTokensToNewTransfer.token + "/" + tokenId + " => " + JSON.stringify(tokenData));
+          const owner = balances.tokens[tokenId] || null;
+          if (tokenData.active && owner == this.coinbase) {
             const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
             results.push({ tokenId, ...tokenData, selected });
           }
         }
       }
+      logInfo("NewTransfer", "methods.filteredERC721Tokens - results: " + JSON.stringify(results, null, 2));
       return results;
     },
     filteredSortedERC721Tokens() {
@@ -429,7 +437,7 @@ const NewTransfer = {
       console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
       console.log("this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       if (tokenContract.type == "erc721") {
-        for (const [tokenId, tokenData] of Object.entries(tokenContract.tokenIds)) {
+        for (const [tokenId, tokenData] of Object.entries(tokenContract.tokens)) {
           if (tokenData.owner == this.coinbase) {
             const selected = tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds;
             if (selected) {

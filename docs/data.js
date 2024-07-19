@@ -1699,7 +1699,7 @@ const dataModule = {
             } else {
               collator[contract] = {
                 type: item.eventType,
-                tokenIds: {},
+                tokens: {},
               };
             }
           }
@@ -1718,50 +1718,50 @@ const dataModule = {
             }
           } else if (item.eventType == "erc721" && item.type == "Transfer") {
             if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
-              collator[contract].tokenIds[item.tokenId] = item.to;
+              collator[contract].tokens[item.tokenId] = item.to;
             }
           } else if (item.eventType == "erc1155" && item.type == "TransferSingle") {
             if (item.from in selectedAddressesMap) {
-              if (!(item.tokenId in collator[contract].tokenIds)) {
-                collator[contract].tokenIds[item.tokenId] = {};
+              if (!(item.tokenId in collator[contract].tokens)) {
+                collator[contract].tokens[item.tokenId] = {};
               }
-              if (item.from in collator[contract].tokenIds[item.tokenId]) {
-                collator[contract].tokenIds[item.tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokenIds[item.tokenId][item.from]).sub(item.value).toString();
-                if (collator[contract].tokenIds[item.tokenId][item.from] == "0") {
-                  delete collator[contract].tokenIds[item.tokenId][item.from];
+              if (item.from in collator[contract].tokens[item.tokenId]) {
+                collator[contract].tokens[item.tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.from]).sub(item.value).toString();
+                if (collator[contract].tokens[item.tokenId][item.from] == "0") {
+                  delete collator[contract].tokens[item.tokenId][item.from];
                 }
               }
             }
             if (item.to in selectedAddressesMap) {
-              if (!(item.tokenId in collator[contract].tokenIds)) {
-                collator[contract].tokenIds[item.tokenId] = {};
+              if (!(item.tokenId in collator[contract].tokens)) {
+                collator[contract].tokens[item.tokenId] = {};
               }
-              if (!(item.to in collator[contract].tokenIds[item.tokenId])) {
-                collator[contract].tokenIds[item.tokenId][item.to] = "0";
+              if (!(item.to in collator[contract].tokens[item.tokenId])) {
+                collator[contract].tokens[item.tokenId][item.to] = "0";
               }
-              collator[contract].tokenIds[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokenIds[item.tokenId][item.to]).add(item.value).toString();
+              collator[contract].tokens[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.to]).add(item.value).toString();
             }
           } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
-            for (const [index, tokenId] of item.tokenIds.entries()) {
+            for (const [index, tokenId] of item.tokens.entries()) {
               if (item.from in selectedAddressesMap) {
-                if (!(tokenId in collator[contract].tokenIds)) {
-                  collator[contract].tokenIds[tokenId] = {};
+                if (!(tokenId in collator[contract].tokens)) {
+                  collator[contract].tokens[tokenId] = {};
                 }
-                if (item.from in collator[contract].tokenIds[tokenId]) {
-                  collator[contract].tokenIds[tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokenIds[tokenId][item.from]).sub(item.values[index]).toString();
-                  if (collator[contract].tokenIds[tokenId][item.from] == "0") {
-                    delete collator[contract].tokenIds[tokenId][item.from];
+                if (item.from in collator[contract].tokens[tokenId]) {
+                  collator[contract].tokens[tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.from]).sub(item.values[index]).toString();
+                  if (collator[contract].tokens[tokenId][item.from] == "0") {
+                    delete collator[contract].tokens[tokenId][item.from];
                   }
                 }
               }
               if (item.to in selectedAddressesMap) {
-                if (!(tokenId in collator[contract].tokenIds)) {
-                  collator[contract].tokenIds[tokenId] = {};
+                if (!(tokenId in collator[contract].tokens)) {
+                  collator[contract].tokens[tokenId] = {};
                 }
-                if (!(item.to in collator[contract].tokenIds[tokenId])) {
-                  collator[contract].tokenIds[tokenId][item.to] = "0";
+                if (!(item.to in collator[contract].tokens[tokenId])) {
+                  collator[contract].tokens[tokenId][item.to] = "0";
                 }
-                collator[contract].tokenIds[tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokenIds[tokenId][item.to]).add(item.values[index]).toString();
+                collator[contract].tokens[tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.to]).add(item.values[index]).toString();
               }
             }
           }
@@ -1849,14 +1849,14 @@ const dataModule = {
       const contractsToProcess = {};
       const tokensToProcess = {};
       let totalTokensToProcess = 0;
-      for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (contractData.type == "erc721") {
+      for (const [contract, balance] of Object.entries(context.state.balances[parameter.chainId] || {})) {
+        if (balance.type == "erc721") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
-            contractsToProcess[contract] = contractData;
+            contractsToProcess[contract] = balance;
           }
         }
-        if (contractData.type == "erc721" || contractData.type == "erc1155") {
-          for (const [tokenId, tokenData] of Object.entries(contractData.tokenIds)) {
+        if (balance.type == "erc721" || balance.type == "erc1155") {
+          for (const [tokenId, tokenData] of Object.entries(balance.tokens)) {
             if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId].name) {
               if (!(contract in tokensToProcess)) {
                 tokensToProcess[contract] = {};
