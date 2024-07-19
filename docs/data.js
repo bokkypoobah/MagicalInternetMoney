@@ -1742,7 +1742,7 @@ const dataModule = {
               collator[contract].tokens[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.to]).add(item.value).toString();
             }
           } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
-            for (const [index, tokenId] of item.tokens.entries()) {
+            for (const [index, tokenId] of item.tokenIds.entries()) {
               if (item.from in selectedAddressesMap) {
                 if (!(tokenId in collator[contract].tokens)) {
                   collator[contract].tokens[tokenId] = {};
