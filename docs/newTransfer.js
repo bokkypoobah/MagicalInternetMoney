@@ -214,12 +214,12 @@ const NewTransfer = {
       results.push({ value: null, text: "(select active ERC-20 or ERC-721 token)"})
       for (const [address, tokenData] of Object.entries(this.tokens[this.chainId] || {})) {
         let active = false;
-        console.log(address + " => " + JSON.stringify(tokenData));
+        // console.log(address + " => " + JSON.stringify(tokenData));
         if (tokenData.type == "erc20") {
           active = !tokenData.junk && tokenData.active;
         } else {
           for (const [tokenId, data] of Object.entries(tokenData.tokens || {})) {
-            console.log(address + "/" + tokenId + " => " + JSON.stringify(data));
+            // console.log(address + "/" + tokenId + " => " + JSON.stringify(data));
             if (data.active) {
               active = true;
               break;

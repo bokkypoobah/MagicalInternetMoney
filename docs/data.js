@@ -268,7 +268,7 @@ const dataModule = {
       Vue.set(state, info.name, info.data);
     },
     updateBalances(state, info) {
-      logInfo("dataModule", "mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
+      // logInfo("dataModule", "mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
       Vue.set(state.balances, info.chainId, info.balances);
     },
     toggleAddressField(state, info) {
@@ -438,7 +438,7 @@ const dataModule = {
       Vue.delete(state.addresses, address);
     },
     addFungibleMetadata(state, info) {
-      logInfo("dataModule", "mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      // logInfo("dataModule", "mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
         Vue.set(state.tokens, info.chainId, {});
       }
@@ -464,6 +464,7 @@ const dataModule = {
       if (!(contract in state.tokens[chainId])) {
         Vue.set(state.tokens[chainId], contract, {
           junk: false,
+          // TODO
           tokens: {},
         });
       }
@@ -1662,7 +1663,7 @@ const dataModule = {
           selectedAddressesMap[address] = true;
         }
       }
-      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
       let rows = 0;
       let done = false;
       const collator = {};
@@ -1763,21 +1764,17 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
-      let totalContractsToProcess = 0;
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc20") {
-          // console.log(contract + " => " + JSON.stringify(contractData));
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
-            totalContractsToProcess++;
           }
         }
       }
-      // console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
-      context.commit('setSyncSection', { section: 'Fungible Token Metadata', total: totalContractsToProcess });
+      context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
-        console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
+        // console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
         context.commit('setSyncCompleted', completed);
         const interface = new ethers.Contract(contract, ERC20ABI, provider);
         let symbol = null;
@@ -1800,7 +1797,7 @@ const dataModule = {
           totalSupply = await interface.totalSupply();
         } catch (e) {
         }
-        console.log(contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        logInfo("dataModule", "actions.syncFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
         context.commit('addFungibleMetadata', {
           chainId: parameter.chainId,
           contract,
