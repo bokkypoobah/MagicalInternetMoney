@@ -449,6 +449,7 @@ const dataModule = {
           name: info.name,
           decimals: info.decimals,
           totalSupply: info.totalSupply,
+          image: info.image,
           junk: false,
           active: false,
           notes: null,
@@ -1782,8 +1783,8 @@ const dataModule = {
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (contractData.type == "erc20") {
         // if (contractData.type == "erc20" && contract == "0xa74476443119A942dE498590Fe1f2454d7D4aC0d") {
+        if (contractData.type == "erc20") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
           }
@@ -1817,13 +1818,12 @@ const dataModule = {
         } catch (e) {
         }
 
-        // const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
-        // let image = null;
-        // for (const erc20Logo of erc20Logos) {
-        //   console.log("erc20Logo: " + erc20Logo);
-        //   const url = erc20Logo.replace(/\${contract}/, contract);
-        //   console.log("url: " + url);
-        // }
+        const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
+        let image = null;
+        for (let i = 0; i < erc20Logos.length && !image; i++) {
+          const url = erc20Logos[i].replace(/\${contract}/, contract);
+          image = await imageUrlToBase64(url);
+        }
 
         logInfo("dataModule", "actions.syncFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
         context.commit('addFungibleMetadata', {
@@ -1833,6 +1833,7 @@ const dataModule = {
           name,
           decimals: decimals && parseInt(decimals) || null,
           totalSupply: totalSupply && totalSupply.toString() || null,
+          image,
           ...contractData,
         });
         completed++;
