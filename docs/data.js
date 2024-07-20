@@ -1782,8 +1782,8 @@ const dataModule = {
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        // TODO if (contractData.type == "erc20") {
-        if (contractData.type == "erc20" && contract == "0xa74476443119A942dE498590Fe1f2454d7D4aC0d") {
+        if (contractData.type == "erc20") {
+        // if (contractData.type == "erc20" && contract == "0xa74476443119A942dE498590Fe1f2454d7D4aC0d") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
           }
@@ -1791,7 +1791,6 @@ const dataModule = {
       }
       console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
       context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
-      return; // TODO
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
         // console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
@@ -1817,6 +1816,15 @@ const dataModule = {
           totalSupply = await interface.totalSupply();
         } catch (e) {
         }
+
+        // const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
+        // let image = null;
+        // for (const erc20Logo of erc20Logos) {
+        //   console.log("erc20Logo: " + erc20Logo);
+        //   const url = erc20Logo.replace(/\${contract}/, contract);
+        //   console.log("url: " + url);
+        // }
+
         logInfo("dataModule", "actions.syncFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
         context.commit('addFungibleMetadata', {
           chainId: parameter.chainId,
