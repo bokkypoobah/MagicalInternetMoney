@@ -477,7 +477,6 @@ const dataModule = {
         Vue.set(state.tokens, chainId, {});
       }
       if (!(contract in state.tokens[chainId])) {
-        // Should be ERC-1155 only
         Vue.set(state.tokens[chainId], contract, {
           type: info.type,
           symbol: null,
