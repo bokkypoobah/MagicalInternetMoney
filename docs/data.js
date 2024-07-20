@@ -1368,6 +1368,15 @@ const dataModule = {
       // WETH Withdrawal (index_topic_1 address src, uint256 wad)
       // 0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65
 
+      // CryptoPunks 0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D & 0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB
+      // CryptoCats 0x9508008227b6b3391959334604677d60169EF540 0x19c320b43744254ebdBcb1F1BD0e2a3dc08E01dc 0x088C6Ad962812b5Aa905BA6F3c5c145f9D4C079f
+      // Assign (index_topic_1 address to, uint256 punkIndex)
+      // 0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba
+
+      // MoonCats 0x60cd862c9C687A9dE49aecdC3A99b74A4fc54aB6
+      // CatRescued (index_topic_1 address to, index_topic_2 bytes5 catId)
+      // 0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd
+
       // // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
       // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
       // // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
@@ -1420,6 +1429,15 @@ const dataModule = {
               const from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
               tokens = ethers.BigNumber.from(log.data).toString();
               eventRecord = { type: "Transfer", from, to: ADDRESS0, tokens, eventType: "erc20" };
+            } else if (log.topics[0] == "0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba") {
+              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+              // tokens = ethers.BigNumber.from(log.data).toString();
+              tokens = 1;
+              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
+            } else if (log.topics[0] == "0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd") {
+              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
+              tokens = 1;
+              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
             } else if (log.topics[0] == "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925") {
               if (log.topics.length == 4) {
                 const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
@@ -1488,6 +1506,7 @@ const dataModule = {
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
         if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
+          const address = null;
           try {
             let topics = null;
             if (section == 0) {
@@ -1497,11 +1516,13 @@ const dataModule = {
                   '0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65',
                   '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
                   '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31',
+                  '0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba',
+                  '0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd',
                 ],
                 selectedAddresses,
                 null
               ];
-              const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+              const logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
               await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 1) {
               topics = [[
@@ -1510,7 +1531,7 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+              const logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
               await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 2) {
               topics = [[
@@ -1520,7 +1541,7 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+              logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
               await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 3) {
               topics = [ [
@@ -1531,7 +1552,7 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+              logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
               await processLogs(fromBlock, toBlock, section, logs);
             }
           } catch (e) {
