@@ -1783,7 +1783,6 @@ const dataModule = {
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        // if (contractData.type == "erc20" && contract == "0xa74476443119A942dE498590Fe1f2454d7D4aC0d") {
         if (contractData.type == "erc20") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
