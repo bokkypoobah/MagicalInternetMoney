@@ -144,14 +144,14 @@ const dataModule = {
     //   },
     //   "0x8b73448426797099b6b9a96c4343f528bbAfc55e": {
     //     "type": "erc721",
-    //     "tokenIds": {
+    //     "tokens": {
     //       "60": "0x000001f568875F378Bf6d170B790967FE429C81A",
     //       "6743": "0x5d446D064757Cc92eFe92548F2D7b7a3eab30362"
     //     }
     //   },
     //   "0x3F15A716888EFb6871872fC4358F638DEE495f3b": {
     //     "type": "erc1155",
-    //     "tokenIds": {
+    //     "tokens": {
     //       "7": {
     //         "0x000001f568875F378Bf6d170B790967FE429C81A": "1"
     //       },
