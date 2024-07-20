@@ -129,7 +129,7 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    DB_PROCESSING_BATCH_SIZE: 123,
+    DB_PROCESSING_BATCH_SIZE: 1234,
 
     // address => info
     addresses: {},
@@ -1782,13 +1782,16 @@ const dataModule = {
       logInfo("dataModule", "actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (contractData.type == "erc20") {
+        // TODO if (contractData.type == "erc20") {
+        if (contractData.type == "erc20" && contract == "0xa74476443119A942dE498590Fe1f2454d7D4aC0d") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = contractData;
           }
         }
       }
+      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
       context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
+      return; // TODO
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
         // console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
