@@ -1850,12 +1850,10 @@ const dataModule = {
       const tokensToProcess = {};
       let totalTokensToProcess = 0;
       for (const [contract, balance] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (balance.type == "erc721") {
+        if (balance.type == "erc721" || balance.type == "erc1155") {
           if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
             contractsToProcess[contract] = balance;
           }
-        }
-        if (balance.type == "erc721" || balance.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(balance.tokens)) {
             if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId].name) {
               if (!(contract in tokensToProcess)) {
@@ -1878,13 +1876,15 @@ const dataModule = {
         const interface = new ethers.Contract(contract, ERC721ABI, provider);
         let symbol = null;
         let name = null;
-        try {
-          symbol = await interface.symbol();
-        } catch (e) {
-        }
-        try {
-          name = await interface.name();
-        } catch (e) {
+        if (contractData.type == "erc721") {
+          try {
+            symbol = await interface.symbol();
+          } catch (e) {
+          }
+          try {
+            name = await interface.name();
+          } catch (e) {
+          }          
         }
         logInfo("dataModule", "actions.syncNonFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name);
         context.commit('addNonFungibleContractMetadata', {
