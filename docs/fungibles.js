@@ -129,7 +129,7 @@ const Fungibles = {
             </b-button>
           </template>
           <template #cell(logo)="data">
-            <b-img v-if="chainId == 1" button rounded width="75px;" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.contract + '/logo.png'" />
+            <b-img v-if="data.item.image" button rounded width="75px;" :src="data.item.image" />
           </template>
           <template #cell(contract)="data">
             <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
@@ -349,7 +349,7 @@ const Fungibles = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // logInfo("Fungibles", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      logInfo("Fungibles", "pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
