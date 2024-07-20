@@ -1884,7 +1884,7 @@ const dataModule = {
           try {
             name = await interface.name();
           } catch (e) {
-          }          
+          }
         }
         logInfo("dataModule", "actions.syncNonFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name);
         context.commit('addNonFungibleContractMetadata', {
@@ -2092,7 +2092,7 @@ const dataModule = {
         if (context.state.sync.halt) {
           break;
         }
-        console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
+        // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
       }
       await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata END");
