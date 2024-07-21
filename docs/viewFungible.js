@@ -34,6 +34,10 @@ const ViewFungible = {
           <b-form-input size="sm" id="token-name" v-model.trim="name" debounce="600" class="px-2 w-100"></b-form-input>
         </b-form-group>
 
+        <b-form-group label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
+        </b-form-group>
+
         <!-- <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
@@ -53,16 +57,16 @@ const ViewFungible = {
           <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
             <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
           <!-- </b-avatar> -->
-
-          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 300px;">
-            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 100px;">
           </b-img>
-
-
           <!-- <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
           </b-img> -->
-
         </b-form-group>
+
+        <b-form-group label="Update Image:" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <input @change="handleImage" type="file" accept="image/*" alt="Upload New Image" />
+        </b-form-group>
+
         <!-- <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">
             <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
@@ -83,11 +87,28 @@ const ViewFungible = {
   data: function () {
     return {
       stealthPrivateKey: null,
-      addressTypeInfo: {
-        "address": { variant: "warning", name: "My Address" },
-        "stealthAddress": { variant: "dark", name: "My Stealth Address" },
-        "stealthMetaAddress": { variant: "success", name: "My Stealth Meta-Address" },
-      },
+      decimalsOptions: [
+        { value: null, text: 'Select' },
+        { value: 0, text: '0' },
+        { value: 1, text: '1' },
+        { value: 2, text: '2' },
+        { value: 3, text: '3' },
+        { value: 4, text: '4' },
+        { value: 5, text: '5' },
+        { value: 6, text: '6' },
+        { value: 7, text: '7' },
+        { value: 8, text: '8' },
+        { value: 9, text: '9' },
+        { value: 10, text: '10' },
+        { value: 11, text: '11' },
+        { value: 12, text: '12' },
+        { value: 13, text: '13' },
+        { value: 14, text: '14' },
+        { value: 15, text: '15' },
+        { value: 16, text: '16' },
+        { value: 17, text: '17' },
+        { value: 18, text: '18' },
+      ],
     }
   },
   computed: {
@@ -100,12 +121,6 @@ const ViewFungible = {
     explorer() {
       return store.getters['connection/explorer'];
     },
-    nonFungibleViewer() {
-      return store.getters['connection/nonFungibleViewer'];
-    },
-    addresses() {
-      return store.getters['data/addresses'];
-    },
     address() {
       return store.getters['viewFungible/address'];
     },
@@ -117,9 +132,6 @@ const ViewFungible = {
     },
     tokens() {
       return store.getters['data/tokens'];
-    },
-    metadata() {
-      return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
     },
     symbol: {
       get: function () {
@@ -154,6 +166,9 @@ const ViewFungible = {
     balances() {
       return store.getters['viewFungible/balances'];
     },
+    image() {
+      return store.getters['viewFungible/image'];
+    },
     junk: {
       get: function () {
         return store.getters['viewFungible/junk'];
@@ -172,19 +187,6 @@ const ViewFungible = {
         store.dispatch('viewFungible/toggleFungibleActive');
       },
     },
-    image() {
-      let result = null;
-      if (this.metadata.image) {
-        if (this.metadata.image.substring(0, 12) == "ipfs://ipfs/") {
-          result = "https://ipfs.io/" + this.metadata.image.substring(7)
-        } else if (this.metadata.image.substring(0, 7) == "ipfs://") {
-          result = "https://ipfs.io/ipfs/" + this.metadata.image.substring(7);
-        } else {
-          result = this.metadata.image;
-        }
-      }
-      return result;
-    },
     show: {
       get: function () {
         return store.getters['viewFungible/show'];
@@ -195,8 +197,15 @@ const ViewFungible = {
     },
   },
   methods: {
-    nonFungibleViewerURL(contract, tokenId) {
-      return this.nonFungibleViewer.replace(/\${contract}/, contract).replace(/\${tokenId}/, tokenId);
+    async handleImage(e) {
+      const selectedImage = e.target.files[0];
+      try {
+        const image = await toBase64(selectedImage);
+        store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'image', value: image });
+        store.dispatch('viewFungible/setImage', image);
+      } catch (e) {
+        logInfo("ViewFungible", "methods.handleImage - error: " + e.message);
+      }
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
@@ -321,6 +330,7 @@ const viewFungibleModule = {
     decimals: null,
     totalSupply: null,
     balances: {},
+    image: null,
     junk: null,
     active: null,
     show: false,
@@ -332,6 +342,7 @@ const viewFungibleModule = {
     decimals: state => state.decimals,
     totalSupply: state => state.totalSupply,
     balances: state => state.balances,
+    image: state => state.image,
     junk: state => state.junk,
     active: state => state.active,
     show: state => state.show,
@@ -345,6 +356,7 @@ const viewFungibleModule = {
       state.decimals = info.decimals;
       state.totalSupply = info.totalSupply;
       state.balances = info.balances;
+      state.image = info.image;
       state.junk = info.junk;
       state.active = info.active;
       state.show = true;
@@ -360,6 +372,10 @@ const viewFungibleModule = {
     setDecimals(state, decimals) {
       logInfo("viewFungibleModule", "mutations.setDecimals - decimals: " + decimals);
       state.decimals = decimals;
+    },
+    setImage(state, image) {
+      logInfo("viewFungibleModule", "mutations.setImage - image: " + image);
+      state.image = image;
     },
     toggleFungibleJunk(state) {
       logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
@@ -378,14 +394,15 @@ const viewFungibleModule = {
       logInfo("viewFungibleModule", "actions.viewFungible - info: " + JSON.stringify(info));
       const chainId = store.getters['connection/chainId'] || null;
       const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
-      console.log("token: " + JSON.stringify(token, null, 2));
       await context.commit('viewFungible', {
         chainId,
         contract: info.contract,
         symbol: token.symbol,
         name: token.name,
+        decimals: token.decimals,
         totalSupply: token.totalSupply,
         balances: token.balances,
+        image: token.image,
         junk: token.junk,
         active: token.active,
       });
@@ -401,6 +418,10 @@ const viewFungibleModule = {
     async setDecimals(context, decimals) {
       logInfo("viewFungibleModule", "actions.setDecimals - decimals: " + decimals);
       await context.commit('setDecimals', decimals);
+    },
+    async setImage(context, image) {
+      logInfo("viewFungibleModule", "actions.setImage - image: " + image);
+      await context.commit('setImage', image);
     },
     async toggleFungibleJunk(context) {
       logInfo("viewFungibleModule", "actions.toggleFungibleJunk");

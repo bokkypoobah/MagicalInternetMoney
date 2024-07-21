@@ -283,6 +283,14 @@ const imageUrlToBase64 = async url => {
   }
 };
 
+// https://stackoverflow.com/questions/36280818/how-to-convert-file-to-base64-in-javascript/36281449#36281449
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+});
+
 function getTimeDiff(ts) {
   if (ts > 0) {
     var secs = parseInt(new Date() / 1000 - ts);
