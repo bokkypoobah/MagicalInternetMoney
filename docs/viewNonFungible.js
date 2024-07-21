@@ -1,4 +1,4 @@
-const ViewToken = {
+const ViewNonFungible = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
@@ -92,10 +92,10 @@ const ViewToken = {
       return store.getters['data/addresses'];
     },
     contract() {
-      return store.getters['viewToken/contract'];
+      return store.getters['viewNonFungible/contract'];
     },
     tokenId() {
-      return store.getters['viewToken/tokenId'];
+      return store.getters['viewNonFungible/tokenId'];
     },
     tokens() {
       return store.getters['data/tokens'];
@@ -127,50 +127,50 @@ const ViewToken = {
     },
 
     linkedTo() {
-      return store.getters['viewToken/linkedTo'];
+      return store.getters['viewNonFungible/linkedTo'];
     },
     type() {
-      return store.getters['viewToken/type'];
+      return store.getters['viewNonFungible/type'];
     },
     mine: {
       get: function () {
-        return store.getters['viewToken/mine'];
+        return store.getters['viewNonFungible/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'mine', value: mine });
-        store.dispatch('viewToken/setMine', mine);
+        store.dispatch('data/setAddressField', { address: store.getters['viewNonFungible/address'], field: 'mine', value: mine });
+        store.dispatch('viewNonFungible/setMine', mine);
       },
     },
     favourite: {
       get: function () {
-        return store.getters['viewToken/favourite'];
+        return store.getters['viewNonFungible/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewToken/setFavourite', favourite);
+        store.dispatch('data/setAddressField', { address: store.getters['viewNonFungible/address'], field: 'favourite', value: favourite });
+        store.dispatch('viewNonFungible/setFavourite', favourite);
       },
     },
     notes: {
       get: function () {
-        return store.getters['viewToken/notes'];
+        return store.getters['viewNonFungible/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewToken/address'], field: 'notes', value: notes });
-        store.dispatch('viewToken/setNotes', notes);
+        store.dispatch('data/setAddressField', { address: store.getters['viewNonFungible/address'], field: 'notes', value: notes });
+        store.dispatch('viewNonFungible/setNotes', notes);
       },
     },
     source() {
-      return store.getters['viewToken/source'];
+      return store.getters['viewNonFungible/source'];
     },
     stealthTransfers() {
-      return store.getters['viewToken/stealthTransfers'];
+      return store.getters['viewNonFungible/stealthTransfers'];
     },
     show: {
       get: function () {
-        return store.getters['viewToken/show'];
+        return store.getters['viewNonFungible/show'];
       },
       set: function (show) {
-        store.dispatch('viewToken/setShow', show);
+        store.dispatch('viewNonFungible/setShow', show);
       },
     },
   },
@@ -206,11 +206,11 @@ const ViewToken = {
       return null;
     },
     saveSettings() {
-      logInfo("ViewToken", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
+      logInfo("ViewNonFungible", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     setShow(show) {
-      store.dispatch('viewToken/setShow', show);
+      store.dispatch('viewNonFungible/setShow', show);
     },
 
     async refreshTokenMetadata() {
@@ -228,7 +228,7 @@ const ViewToken = {
         });
       };
 
-      logInfo("ViewToken", "refreshTokenMetadata()");
+      logInfo("ViewNonFungible", "refreshTokenMetadata()");
       const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
       console.log("url: " + url);
       const data = await fetch(url).then(response => response.json());
@@ -279,10 +279,10 @@ const ViewToken = {
     },
   },
   beforeDestroy() {
-    logDebug("ViewToken", "beforeDestroy()");
+    logDebug("ViewNonFungible", "beforeDestroy()");
   },
   mounted() {
-    logDebug("ViewToken", "mounted() $route: " + JSON.stringify(this.$route.params));
+    logDebug("ViewNonFungible", "mounted() $route: " + JSON.stringify(this.$route.params));
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
@@ -292,7 +292,7 @@ const ViewToken = {
   },
 };
 
-const viewTokenModule = {
+const viewNonFungibleModule = {
   namespaced: true,
   state: {
     contract: null,
@@ -323,8 +323,8 @@ const viewTokenModule = {
     show: state => state.show,
   },
   mutations: {
-    viewToken(state, info) {
-      logInfo("viewTokenModule", "mutations.viewToken - info: " + JSON.stringify(info));
+    viewNonFungible(state, info) {
+      logInfo("viewNonFungibleModule", "mutations.viewNonFungible - info: " + JSON.stringify(info));
 
       // const data = store.getters['data/addresses'][address] || {};
       state.contract = info.contract;
@@ -351,19 +351,19 @@ const viewTokenModule = {
       state.show = true;
     },
     setMine(state, mine) {
-      logInfo("viewTokenModule", "mutations.setMine - mine: " + mine);
+      logInfo("viewNonFungibleModule", "mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setFavourite(state, favourite) {
-      logInfo("viewTokenModule", "mutations.setFavourite - favourite: " + favourite);
+      logInfo("viewNonFungibleModule", "mutations.setFavourite - favourite: " + favourite);
       state.favourite = favourite;
     },
     setName(state, name) {
-      logInfo("viewTokenModule", "mutations.setName - name: " + name);
+      logInfo("viewNonFungibleModule", "mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      logInfo("viewTokenModule", "mutations.setNotes - notes: " + notes);
+      logInfo("viewNonFungibleModule", "mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setShow(state, show) {
@@ -371,28 +371,28 @@ const viewTokenModule = {
     },
   },
   actions: {
-    async viewToken(context, info) {
-      logInfo("viewTokenModule", "actions.viewToken - info: " + JSON.stringify(info));
-      await context.commit('viewToken', info);
+    async viewNonFungible(context, info) {
+      logInfo("viewNonFungibleModule", "actions.viewNonFungible - info: " + JSON.stringify(info));
+      await context.commit('viewNonFungible', info);
     },
     async setMine(context, mine) {
-      logInfo("viewTokenModule", "actions.setMine - mine: " + mine);
+      logInfo("viewNonFungibleModule", "actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setFavourite(context, favourite) {
-      logInfo("viewTokenModule", "actions.setFavourite - favourite: " + favourite);
+      logInfo("viewNonFungibleModule", "actions.setFavourite - favourite: " + favourite);
       await context.commit('setFavourite', favourite);
     },
     async setName(context, name) {
-      logInfo("viewTokenModule", "actions.setName - name: " + name);
+      logInfo("viewNonFungibleModule", "actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      logInfo("viewTokenModule", "actions.setNotes - notes: " + notes);
+      logInfo("viewNonFungibleModule", "actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setSource(context, source) {
-      logInfo("viewTokenModule", "actions.setSource - source: " + source);
+      logInfo("viewNonFungibleModule", "actions.setSource - source: " + source);
       await context.commit('setSource', source);
     },
     async setShow(context, show) {

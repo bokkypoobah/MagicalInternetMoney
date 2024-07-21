@@ -11,7 +11,7 @@ Vue.component('new-transfer', NewTransfer);
 Vue.component('sync-options', SyncOptions);
 Vue.component('view-address', ViewAddress);
 Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
-Vue.component('view-token', ViewToken);
+Vue.component('view-nonfungible', ViewNonFungible);
 // Vue.component('flat-pickr', VueFlatpickr);
 
 // hljs.registerLanguage('solidity', window.hljsDefineSolidity);
@@ -69,7 +69,7 @@ const store = new Vuex.Store({
     syncOptions: syncOptionsModule,
     viewAddress: viewAddressModule,
     viewStealthMetaAddress: viewStealthMetaAddressModule,
-    viewToken: viewTokenModule,
+    viewNonFungible: viewNonFungibleModule,
     config: configModule,
     // mappings: mappingsModule,
     data: dataModule,
