@@ -26,15 +26,15 @@ const ViewFungible = {
           </b-button>
         </b-form-group>
 
-        <b-form-group label="Symbol:" label-for="token-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Symbol:" label-for="token-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractSymbol && symbol != contractSymbol ? ('Contract value: ' + contractSymbol) : ''" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="token-symbol" v-model.trim="symbol" debounce="600" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractName && name != contractName ? ('Contract value: ' + contractName) : ''" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="token-name" v-model.trim="name" debounce="600" class="px-2 w-100"></b-form-input>
         </b-form-group>
 
-        <b-form-group label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
           <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
         </b-form-group>
 
@@ -142,6 +142,18 @@ const ViewFungible = {
     },
     image() {
       return store.getters['viewFungible/image'];
+    },
+    contractSymbol() {
+      return store.getters['viewFungible/contractSymbol'];
+    },
+    contractName() {
+      return store.getters['viewFungible/contractName'];
+    },
+    contractDecimals() {
+      return store.getters['viewFungible/contractDecimals'];
+    },
+    contractTotalSupply() {
+      return store.getters['viewFungible/contractTotalSupply'];
     },
     junk: {
       get: function () {
@@ -307,6 +319,10 @@ const viewFungibleModule = {
     image: null,
     junk: null,
     active: null,
+    contractSymbol: null,
+    contractName: null,
+    contractDecimals: null,
+    contracTotalSupply: null,
     show: false,
   },
   getters: {
@@ -319,6 +335,10 @@ const viewFungibleModule = {
     image: state => state.image,
     junk: state => state.junk,
     active: state => state.active,
+    contractSymbol: state => state.contractSymbol,
+    contractName: state => state.contractName,
+    contractDecimals: state => state.contractDecimals,
+    contractTotalSupply: state => state.contracTotalSupply,
     show: state => state.show,
   },
   mutations: {
@@ -359,6 +379,14 @@ const viewFungibleModule = {
       logInfo("viewFungibleModule", "mutations.toggleFungibleActive");
       state.active = !state.active;
     },
+    setContractValues(state, info) {
+      logInfo("viewFungibleModule", "mutations.setContractValues - info: " + JSON.stringify(info));
+      state.contractSymbol = info.contractSymbol;
+      state.contractName = info.contractName;
+      state.contractDecimals = info.contractDecimals;
+      state.contractTotalSupply = info.contractTotalSupply;
+      logInfo("viewFungibleModule", "mutations.setContractValues - state: " + JSON.stringify(state));
+    },
     setShow(state, show) {
       state.show = show;
     },
@@ -379,6 +407,35 @@ const viewFungibleModule = {
         image: token.image,
         junk: token.junk,
         active: token.active,
+      });
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
+      let symbol = null;
+      let name = null;
+      let decimals = null;
+      let totalSupply = null;
+      try {
+        symbol = await interface.symbol();
+      } catch (e) {
+      }
+      try {
+        name = await interface.name();
+      } catch (e) {
+      }
+      try {
+        decimals = await interface.decimals();
+      } catch (e) {
+      }
+      try {
+        totalSupply = await interface.totalSupply();
+      } catch (e) {
+      }
+      await context.commit('setContractValues', {
+        contractSymbol: symbol,
+        contractName: name,
+        contractDecimals: decimals && decimals.toString() || null,
+        contractTotalSupply: totalSupply && totalSupply.toString() || null,
       });
     },
     async setSymbol(context, symbol) {
