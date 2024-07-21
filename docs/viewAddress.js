@@ -167,7 +167,7 @@ const ViewAddress = {
         return store.getters['viewAddress/junk'];
       },
       set: function (junk) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'junk', value: junk });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'junk', value: junk });
         store.dispatch('viewAddress/setJunk', junk);
       },
     },
@@ -176,7 +176,7 @@ const ViewAddress = {
         return store.getters['viewAddress/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'mine', value: mine });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'mine', value: mine });
         store.dispatch('viewAddress/setMine', mine);
       },
     },
@@ -185,7 +185,7 @@ const ViewAddress = {
         return store.getters['viewAddress/watch'];
       },
       set: function (watch) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'watch', value: watch });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'watch', value: watch });
         store.dispatch('viewAddress/setWatch', watch);
       },
     },
@@ -194,7 +194,7 @@ const ViewAddress = {
         return store.getters['viewAddress/sendFrom'];
       },
       set: function (sendFrom) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'sendFrom', value: sendFrom });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'sendFrom', value: sendFrom });
         store.dispatch('viewAddress/setSendFrom', sendFrom);
       },
     },
@@ -203,7 +203,7 @@ const ViewAddress = {
         return store.getters['viewAddress/sendTo'];
       },
       set: function (sendTo) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'sendTo', value: sendTo });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'sendTo', value: sendTo });
         store.dispatch('viewAddress/setSendTo', sendTo);
       },
     },
@@ -212,7 +212,7 @@ const ViewAddress = {
         return store.getters['viewAddress/name'];
       },
       set: function (name) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'name', value: name });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'name', value: name });
         store.dispatch('viewAddress/setName', name);
       },
     },
@@ -221,7 +221,7 @@ const ViewAddress = {
         return store.getters['viewAddress/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewAddress/address'], field: 'notes', value: notes });
+        store.dispatch('data/setAddressField', { address: this.address, field: 'notes', value: notes });
         store.dispatch('viewAddress/setNotes', notes);
       },
     },
