@@ -331,33 +331,13 @@ const viewFungibleModule = {
   mutations: {
     viewFungible(state, info) {
       logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
-
       state.contract = info.contract;
-      const chainId = store.getters['connection/chainId'] || null;
-      const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
-      console.log("token: " + JSON.stringify(token, null, 2));
-      state.symbol = token.symbol;
-      state.name = token.name;
-      // const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
-      // state.tokenId = info.tokenId;
-      // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
-      // state.type = data.type;
-      // state.mine = data.mine;
-      // state.favourite = data.favourite;
-      // state.notes = data.notes;
-      // state.source = data.source;
-      // const stealthTransfers = [];
-      // if (data.type == "stealthAddress") {
-      //   const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
-      //   for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
-      //     for (const [logIndex, item] of Object.entries(logIndexes)) {
-      //       if (item.schemeId == 0 && item.stealthAddress == address) {
-      //         stealthTransfers.push(item);
-      //       }
-      //     }
-      //   }
-      // }
-      // Vue.set(state, 'stealthTransfers', stealthTransfers);
+      state.symbol = info.symbol;
+      state.name = info.name;
+      state.totalSupply = info.totalSupply;
+      state.balances = info.balances;
+      state.junk = info.junk;
+      state.active = info.active;
       state.show = true;
     },
     setSymbol(state, symbol) {
@@ -388,7 +368,19 @@ const viewFungibleModule = {
   actions: {
     async viewFungible(context, info) {
       logInfo("viewFungibleModule", "actions.viewFungible - info: " + JSON.stringify(info));
-      await context.commit('viewFungible', info);
+      const chainId = store.getters['connection/chainId'] || null;
+      const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
+      console.log("token: " + JSON.stringify(token, null, 2));
+      await context.commit('viewFungible', {
+        chainId,
+        contract: info.contract,
+        symbol: token.symbol,
+        name: token.name,
+        totalSupply: token.totalSupply,
+        balances: token.balances,
+        junk: token.junk,
+        active: token.active,
+      });
     },
     async setSymbol(context, symbol) {
       logInfo("viewFungibleModule", "actions.setSymbol - symbol: " + symbol);
