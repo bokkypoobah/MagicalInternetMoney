@@ -15,6 +15,17 @@ const ViewFungible = {
           </b-input-group>
         </b-form-group>
 
+        <b-form-group label="" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
+            <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="junk ? 'primary' : 'secondary'">
+            </b-icon>
+          </b-button>
+          <b-button size="sm" :disabled="junk" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
+            <b-icon :icon="(active && !junk) ? 'check-circle-fill' : 'check-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !active) ? 'secondary' : 'primary'">
+            </b-icon>
+          </b-button>
+        </b-form-group>
+
         <b-form-group label="Symbol:" label-for="token-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" id="token-symbol" v-model.trim="symbol" debounce="600" class="px-2 w-100"></b-form-input>
         </b-form-group>
@@ -128,9 +139,29 @@ const ViewFungible = {
         store.dispatch('viewFungible/setName', name);
       },
     },
-
-    description() {
-      return this.metadata && this.metadata.description || null;
+    totalSupply() {
+      return store.getters['viewFungible/totalSupply'];
+    },
+    balances() {
+      return store.getters['viewFungible/balances'];
+    },
+    junk: {
+      get: function () {
+        return store.getters['viewFungible/junk'];
+      },
+      set: function (junk) {
+        store.dispatch('data/toggleFungibleJunk', { chainId: this.chainId, contract: this.contract });
+        store.dispatch('viewFungible/toggleFungibleJunk');
+      },
+    },
+    active: {
+      get: function () {
+        return store.getters['viewFungible/active'];
+      },
+      set: function (active) {
+        store.dispatch('data/toggleFungibleActive', { chainId: this.chainId, contract: this.contract });
+        store.dispatch('viewFungible/toggleFungibleActive');
+      },
     },
     image() {
       let result = null;
@@ -144,40 +175,6 @@ const ViewFungible = {
         }
       }
       return result;
-    },
-    attributes() {
-      return this.metadata && this.metadata.attributes || [];
-    },
-
-    linkedTo() {
-      return store.getters['viewFungible/linkedTo'];
-    },
-    type() {
-      return store.getters['viewFungible/type'];
-    },
-    favourite: {
-      get: function () {
-        return store.getters['viewFungible/favourite'];
-      },
-      set: function (favourite) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewFungible/setFavourite', favourite);
-      },
-    },
-    notes: {
-      get: function () {
-        return store.getters['viewFungible/notes'];
-      },
-      set: function (notes) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'notes', value: notes });
-        store.dispatch('viewFungible/setNotes', notes);
-      },
-    },
-    source() {
-      return store.getters['viewFungible/source'];
-    },
-    stealthTransfers() {
-      return store.getters['viewFungible/stealthTransfers'];
     },
     show: {
       get: function () {
@@ -348,19 +345,14 @@ const viewFungibleModule = {
       logInfo("viewFungibleModule", "mutations.setName - name: " + name);
       state.name = name;
     },
-
-    // setMine(state, mine) {
-    //   logInfo("viewFungibleModule", "mutations.setMine - mine: " + mine);
-    //   state.mine = mine;
-    // },
-    // setFavourite(state, favourite) {
-    //   logInfo("viewFungibleModule", "mutations.setFavourite - favourite: " + favourite);
-    //   state.favourite = favourite;
-    // },
-    // setNotes(state, notes) {
-    //   logInfo("viewFungibleModule", "mutations.setNotes - notes: " + notes);
-    //   state.notes = notes;
-    // },
+    toggleFungibleJunk(state) {
+      logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
+      state.junk = !state.junk;
+    },
+    toggleFungibleActive(state) {
+      logInfo("viewFungibleModule", "mutations.toggleFungibleActive");
+      state.active = !state.active;
+    },
     setShow(state, show) {
       state.show = show;
     },
@@ -390,23 +382,14 @@ const viewFungibleModule = {
       logInfo("viewFungibleModule", "actions.setName - name: " + name);
       await context.commit('setName', name);
     },
-
-    // async setMine(context, mine) {
-    //   logInfo("viewFungibleModule", "actions.setMine - mine: " + mine);
-    //   await context.commit('setMine', mine);
-    // },
-    // async setFavourite(context, favourite) {
-    //   logInfo("viewFungibleModule", "actions.setFavourite - favourite: " + favourite);
-    //   await context.commit('setFavourite', favourite);
-    // },
-    // async setNotes(context, notes) {
-    //   logInfo("viewFungibleModule", "actions.setNotes - notes: " + notes);
-    //   await context.commit('setNotes', notes);
-    // },
-    // async setSource(context, source) {
-    //   logInfo("viewFungibleModule", "actions.setSource - source: " + source);
-    //   await context.commit('setSource', source);
-    // },
+    async toggleFungibleJunk(context) {
+      logInfo("viewFungibleModule", "actions.toggleFungibleJunk");
+      await context.commit('toggleFungibleJunk');
+    },
+    async toggleFungibleActive(context) {
+      logInfo("viewFungibleModule", "actions.toggleFungibleActive");
+      await context.commit('toggleFungibleActive');
+    },
     async setShow(context, show) {
       await context.commit('setShow', show);
     },

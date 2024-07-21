@@ -660,7 +660,7 @@ const dataModule = {
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleActive(context, item) {
-      logInfo("dataModule", "actions.toggleFungibleActive - item: " + JSON.stringify(item));
+      // logInfo("dataModule", "actions.toggleFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
