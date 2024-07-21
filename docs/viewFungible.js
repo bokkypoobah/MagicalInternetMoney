@@ -48,6 +48,10 @@ const ViewFungible = {
           </b-form-file>
         </b-form-group>
 
+        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Current contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
+        </b-form-group>
+
         <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group> -->
@@ -207,6 +211,13 @@ const ViewFungible = {
       }
       return e.toFixed(precision);
     },
+    formatERC20(e, decimals = 18) {
+      try {
+        return e ? ethers.utils.formatUnits(e, decimals) : null;
+      } catch (err) {
+      }
+      return e.toString();
+    },
     formatTimestamp(ts) {
       if (ts != null) {
         if (ts > 1000000000000n) {
@@ -322,7 +333,7 @@ const viewFungibleModule = {
     contractSymbol: null,
     contractName: null,
     contractDecimals: null,
-    contracTotalSupply: null,
+    contractTotalSupply: null,
     show: false,
   },
   getters: {
@@ -338,7 +349,7 @@ const viewFungibleModule = {
     contractSymbol: state => state.contractSymbol,
     contractName: state => state.contractName,
     contractDecimals: state => state.contractDecimals,
-    contractTotalSupply: state => state.contracTotalSupply,
+    contractTotalSupply: state => state.contractTotalSupply,
     show: state => state.show,
   },
   mutations: {
