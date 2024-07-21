@@ -213,7 +213,7 @@ const ViewFungible = {
     },
     formatERC20(e, decimals = 18) {
       try {
-        return e ? ethers.utils.formatUnits(e, decimals) : null;
+        return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
       } catch (err) {
       }
       return e.toString();
