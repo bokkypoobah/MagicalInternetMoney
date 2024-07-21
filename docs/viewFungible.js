@@ -38,41 +38,15 @@ const ViewFungible = {
           <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
         </b-form-group>
 
-        <!-- <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
-            <b-input-group-append>
-              <div>
-                <b-button v-if="networkSupported" size="sm" :href="nonFungibleViewerURL(contract, tokenId)" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group> -->
-
-        <!-- <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
-        </b-form-group> -->
-
         <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
-            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-          <!-- </b-avatar> -->
           <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 100px;">
           </b-img>
-          <!-- <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
-          </b-img> -->
         </b-form-group>
 
-        <b-form-group label="Update Image:" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <input @change="handleImage" type="file" accept="image/*" alt="Upload New Image" />
+        <b-form-group label="" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Select file to replace image">
+          </b-form-file>
         </b-form-group>
-
-        <!-- <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">
-            <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
-            <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
-          </b-row>
-        </b-form-group> -->
 
         <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
