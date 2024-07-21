@@ -2,7 +2,7 @@ const ViewFungible = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>ERC-20 Fungible</template>
+        <template #modal-title>ERC-20 Fungible Token</template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -15,7 +15,15 @@ const ViewFungible = {
           </b-input-group>
         </b-form-group>
 
-        <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Symbol:" label-for="token-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="token-symbol" v-model.trim="symbol" debounce="600" class="px-2 w-100"></b-form-input>
+        </b-form-group>
+
+        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" id="token-name" v-model.trim="name" debounce="600" class="px-2 w-100"></b-form-input>
+        </b-form-group>
+
+        <!-- <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
             <b-input-group-append>
@@ -24,15 +32,11 @@ const ViewFungible = {
               </div>
             </b-input-group-append>
           </b-input-group>
-        </b-form-group>
+        </b-form-group> -->
 
-        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
-        </b-form-group>
-
-        <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
-        </b-form-group>
+        </b-form-group> -->
 
         <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
@@ -48,20 +52,20 @@ const ViewFungible = {
           </b-img> -->
 
         </b-form-group>
-        <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row v-for="(attribute, i) in attributes"  v-bind:key="i" class="m-0 p-0">
             <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
             <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
           </b-row>
-        </b-form-group>
+        </b-form-group> -->
 
-        <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
-        </b-form-group>
+        </b-form-group> -->
 
-        <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <!-- <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
-        </b-form-group>
+        </b-form-group> -->
       </b-modal>
     </div>
   `,
@@ -91,6 +95,9 @@ const ViewFungible = {
     addresses() {
       return store.getters['data/addresses'];
     },
+    address() {
+      return store.getters['viewFungible/address'];
+    },
     contract() {
       return store.getters['viewFungible/contract'];
     },
@@ -103,9 +110,25 @@ const ViewFungible = {
     metadata() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
     },
-    name() {
-      return this.metadata && this.metadata.name || null;
+    symbol: {
+      get: function () {
+        return store.getters['viewFungible/symbol'];
+      },
+      set: function (symbol) {
+        store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'symbol', value: symbol });
+        store.dispatch('viewFungible/setSymbol', symbol);
+      },
     },
+    name: {
+      get: function () {
+        return store.getters['viewFungible/name'];
+      },
+      set: function (name) {
+        store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'name', value: name });
+        store.dispatch('viewFungible/setName', name);
+      },
+    },
+
     description() {
       return this.metadata && this.metadata.description || null;
     },
@@ -131,15 +154,6 @@ const ViewFungible = {
     },
     type() {
       return store.getters['viewFungible/type'];
-    },
-    mine: {
-      get: function () {
-        return store.getters['viewFungible/mine'];
-      },
-      set: function (mine) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'mine', value: mine });
-        store.dispatch('viewFungible/setMine', mine);
-      },
     },
     favourite: {
       get: function () {
@@ -318,14 +332,18 @@ const viewFungibleModule = {
     viewFungible(state, info) {
       logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
 
-      // const data = store.getters['data/addresses'][address] || {};
       state.contract = info.contract;
+      const chainId = store.getters['connection/chainId'] || null;
+      const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
+      console.log("token: " + JSON.stringify(token, null, 2));
+      state.symbol = token.symbol;
+      state.name = token.name;
+      // const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
       // state.tokenId = info.tokenId;
       // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
       // state.type = data.type;
       // state.mine = data.mine;
       // state.favourite = data.favourite;
-      // state.name = data.name;
       // state.notes = data.notes;
       // state.source = data.source;
       // const stealthTransfers = [];
@@ -342,22 +360,27 @@ const viewFungibleModule = {
       // Vue.set(state, 'stealthTransfers', stealthTransfers);
       state.show = true;
     },
-    setMine(state, mine) {
-      logInfo("viewFungibleModule", "mutations.setMine - mine: " + mine);
-      state.mine = mine;
-    },
-    setFavourite(state, favourite) {
-      logInfo("viewFungibleModule", "mutations.setFavourite - favourite: " + favourite);
-      state.favourite = favourite;
+    setSymbol(state, symbol) {
+      logInfo("viewFungibleModule", "mutations.setSymbol - symbol: " + symbol);
+      state.symbol = symbol;
     },
     setName(state, name) {
       logInfo("viewFungibleModule", "mutations.setName - name: " + name);
       state.name = name;
     },
-    setNotes(state, notes) {
-      logInfo("viewFungibleModule", "mutations.setNotes - notes: " + notes);
-      state.notes = notes;
-    },
+
+    // setMine(state, mine) {
+    //   logInfo("viewFungibleModule", "mutations.setMine - mine: " + mine);
+    //   state.mine = mine;
+    // },
+    // setFavourite(state, favourite) {
+    //   logInfo("viewFungibleModule", "mutations.setFavourite - favourite: " + favourite);
+    //   state.favourite = favourite;
+    // },
+    // setNotes(state, notes) {
+    //   logInfo("viewFungibleModule", "mutations.setNotes - notes: " + notes);
+    //   state.notes = notes;
+    // },
     setShow(state, show) {
       state.show = show;
     },
@@ -367,26 +390,31 @@ const viewFungibleModule = {
       logInfo("viewFungibleModule", "actions.viewFungible - info: " + JSON.stringify(info));
       await context.commit('viewFungible', info);
     },
-    async setMine(context, mine) {
-      logInfo("viewFungibleModule", "actions.setMine - mine: " + mine);
-      await context.commit('setMine', mine);
-    },
-    async setFavourite(context, favourite) {
-      logInfo("viewFungibleModule", "actions.setFavourite - favourite: " + favourite);
-      await context.commit('setFavourite', favourite);
+    async setSymbol(context, symbol) {
+      logInfo("viewFungibleModule", "actions.setSymbol - symbol: " + symbol);
+      await context.commit('setSymbol', symbol);
     },
     async setName(context, name) {
       logInfo("viewFungibleModule", "actions.setName - name: " + name);
       await context.commit('setName', name);
     },
-    async setNotes(context, notes) {
-      logInfo("viewFungibleModule", "actions.setNotes - notes: " + notes);
-      await context.commit('setNotes', notes);
-    },
-    async setSource(context, source) {
-      logInfo("viewFungibleModule", "actions.setSource - source: " + source);
-      await context.commit('setSource', source);
-    },
+
+    // async setMine(context, mine) {
+    //   logInfo("viewFungibleModule", "actions.setMine - mine: " + mine);
+    //   await context.commit('setMine', mine);
+    // },
+    // async setFavourite(context, favourite) {
+    //   logInfo("viewFungibleModule", "actions.setFavourite - favourite: " + favourite);
+    //   await context.commit('setFavourite', favourite);
+    // },
+    // async setNotes(context, notes) {
+    //   logInfo("viewFungibleModule", "actions.setNotes - notes: " + notes);
+    //   await context.commit('setNotes', notes);
+    // },
+    // async setSource(context, source) {
+    //   logInfo("viewFungibleModule", "actions.setSource - source: " + source);
+    //   await context.commit('setSource', source);
+    // },
     async setShow(context, show) {
       await context.commit('setShow', show);
     },

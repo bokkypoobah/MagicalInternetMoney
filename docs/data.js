@@ -291,6 +291,15 @@ const dataModule = {
         Vue.set(state.tokens[item.chainId][item.contract], 'active', !state.tokens[item.chainId][item.contract].active);
       }
     },
+    setFungibleField(state, info) {
+      logInfo("dataModule", "mutations.setFungibleField: " + JSON.stringify(info, null, 2));
+      // Vue.set(state.addresses[info.address], info.field, info.value);
+
+      if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
+        Vue.set(state.tokens[info.chainId][info.contract], info.field, info.value);
+      }
+      logInfo("dataModule", "mutations.setFungibleField - contract[" + info.contract + "]." + info.field + " = " + JSON.stringify(state.tokens[info.chainId][info.contract]));
+    },
     toggleNonFungibleJunk(state, item) {
       logInfo("dataModule", "mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
@@ -653,6 +662,11 @@ const dataModule = {
     async toggleFungibleActive(context, item) {
       logInfo("dataModule", "actions.toggleFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleActive', item);
+      await context.dispatch('saveData', ['tokens']);
+    },
+    async setFungibleField(context, item) {
+      logInfo("dataModule", "actions.setFungibleField - item: " + JSON.stringify(item));
+      await context.commit('setFungibleField', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleJunk(context, item) {
