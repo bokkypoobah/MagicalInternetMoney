@@ -2,7 +2,7 @@ const ViewFungible = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>ERC-721 Token</template>
+        <template #modal-title>ERC-20 Fungible</template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -92,10 +92,10 @@ const ViewFungible = {
       return store.getters['data/addresses'];
     },
     contract() {
-      return store.getters['viewFungibleModule/contract'];
+      return store.getters['viewFungible/contract'];
     },
     tokenId() {
-      return store.getters['viewFungibleModule/tokenId'];
+      return store.getters['viewFungible/tokenId'];
     },
     tokens() {
       return store.getters['data/tokens'];
@@ -127,50 +127,50 @@ const ViewFungible = {
     },
 
     linkedTo() {
-      return store.getters['viewFungibleModule/linkedTo'];
+      return store.getters['viewFungible/linkedTo'];
     },
     type() {
-      return store.getters['viewFungibleModule/type'];
+      return store.getters['viewFungible/type'];
     },
     mine: {
       get: function () {
-        return store.getters['viewFungibleModule/mine'];
+        return store.getters['viewFungible/mine'];
       },
       set: function (mine) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungibleModule/address'], field: 'mine', value: mine });
-        store.dispatch('viewFungibleModule/setMine', mine);
+        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'mine', value: mine });
+        store.dispatch('viewFungible/setMine', mine);
       },
     },
     favourite: {
       get: function () {
-        return store.getters['viewFungibleModule/favourite'];
+        return store.getters['viewFungible/favourite'];
       },
       set: function (favourite) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungibleModule/address'], field: 'favourite', value: favourite });
-        store.dispatch('viewFungibleModule/setFavourite', favourite);
+        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'favourite', value: favourite });
+        store.dispatch('viewFungible/setFavourite', favourite);
       },
     },
     notes: {
       get: function () {
-        return store.getters['viewFungibleModule/notes'];
+        return store.getters['viewFungible/notes'];
       },
       set: function (notes) {
-        store.dispatch('data/setAddressField', { address: store.getters['viewFungibleModule/address'], field: 'notes', value: notes });
-        store.dispatch('viewFungibleModule/setNotes', notes);
+        store.dispatch('data/setAddressField', { address: store.getters['viewFungible/address'], field: 'notes', value: notes });
+        store.dispatch('viewFungible/setNotes', notes);
       },
     },
     source() {
-      return store.getters['viewFungibleModule/source'];
+      return store.getters['viewFungible/source'];
     },
     stealthTransfers() {
-      return store.getters['viewFungibleModule/stealthTransfers'];
+      return store.getters['viewFungible/stealthTransfers'];
     },
     show: {
       get: function () {
-        return store.getters['viewFungibleModule/show'];
+        return store.getters['viewFungible/show'];
       },
       set: function (show) {
-        store.dispatch('viewFungibleModule/setShow', show);
+        store.dispatch('viewFungible/setShow', show);
       },
     },
   },
@@ -323,12 +323,12 @@ const viewFungibleModule = {
     show: state => state.show,
   },
   mutations: {
-    viewFungibleModule(state, info) {
-      logInfo("viewFungibleModule", "mutations.viewFungibleModule - info: " + JSON.stringify(info));
+    viewFungible(state, info) {
+      logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
 
       // const data = store.getters['data/addresses'][address] || {};
       state.contract = info.contract;
-      state.tokenId = info.tokenId;
+      // state.tokenId = info.tokenId;
       // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
       // state.type = data.type;
       // state.mine = data.mine;
@@ -371,9 +371,9 @@ const viewFungibleModule = {
     },
   },
   actions: {
-    async viewFungibleModule(context, info) {
-      logInfo("viewFungibleModule", "actions.viewFungibleModule - info: " + JSON.stringify(info));
-      await context.commit('viewFungibleModule', info);
+    async viewFungible(context, info) {
+      logInfo("viewFungibleModule", "actions.viewFungible - info: " + JSON.stringify(info));
+      await context.commit('viewFungible', info);
     },
     async setMine(context, mine) {
       logInfo("viewFungibleModule", "actions.setMine - mine: " + mine);

@@ -453,40 +453,47 @@ const Fungibles = {
     },
     rowSelected(item) {
       logInfo("Fungibles", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
-      if (item && item.length > 0) {
-        this.transfer.item = item[0];
-        this.transfer.stealthPrivateKey = null;
 
-        // const account = item[0].account;
-        // if (account.substring(0, 3) == "st:") {
-        //   this.stealthMetaAccount.account = item[0].account;
-        //   this.stealthMetaAccount.type = item[0].type;
-        //   this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
-        //   this.stealthMetaAccount.phrase = item[0].phrase;
-        //   this.stealthMetaAccount.mine = item[0].mine;
-        //   this.stealthMetaAccount.favourite = item[0].favourite;
-        //   this.stealthMetaAccount.name = item[0].name;
-        //   this.stealthMetaAccount.notes = item[0].notes;
-        //   this.stealthMetaAccount.spendingPrivateKey = null;
-        //   this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
-        //   this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
-        //   this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
-        //   this.stealthMetaAccount.source = item[0].source;
-        //   this.$bvModal.show('modal-stealthmetaccount');
-        // } else {
-        //   this.account.account = item[0].account;
-        //   this.account.type = item[0].type;
-        //   this.account.ensName = item[0].ensName;
-        //   this.account.mine = item[0].mine;
-        //   this.account.favourite = item[0].favourite;
-        //   this.account.name = item[0].name;
-        //   this.account.notes = item[0].notes;
-        //   this.account.source = item[0].source;
-        //   this.$bvModal.show('modal-address');
-        // }
-        this.$bvModal.show('modal-transfer');
+      if (item && item.length > 0) {
+        store.dispatch('viewFungible/viewFungible', { contract: item[0].contract });
         this.$refs.tokenContractsTable.clearSelected();
       }
+
+
+      // if (item && item.length > 0) {
+      //   this.transfer.item = item[0];
+      //   this.transfer.stealthPrivateKey = null;
+      //
+      //   // const account = item[0].account;
+      //   // if (account.substring(0, 3) == "st:") {
+      //   //   this.stealthMetaAccount.account = item[0].account;
+      //   //   this.stealthMetaAccount.type = item[0].type;
+      //   //   this.stealthMetaAccount.linkedToAddress = item[0].linkedToAddress;
+      //   //   this.stealthMetaAccount.phrase = item[0].phrase;
+      //   //   this.stealthMetaAccount.mine = item[0].mine;
+      //   //   this.stealthMetaAccount.favourite = item[0].favourite;
+      //   //   this.stealthMetaAccount.name = item[0].name;
+      //   //   this.stealthMetaAccount.notes = item[0].notes;
+      //   //   this.stealthMetaAccount.spendingPrivateKey = null;
+      //   //   this.stealthMetaAccount.viewingPrivateKey = item[0].viewingPrivateKey || null;
+      //   //   this.stealthMetaAccount.spendingPublicKey = item[0].spendingPublicKey || null;
+      //   //   this.stealthMetaAccount.viewingPublicKey = item[0].viewingPublicKey || null;
+      //   //   this.stealthMetaAccount.source = item[0].source;
+      //   //   this.$bvModal.show('modal-stealthmetaccount');
+      //   // } else {
+      //   //   this.account.account = item[0].account;
+      //   //   this.account.type = item[0].type;
+      //   //   this.account.ensName = item[0].ensName;
+      //   //   this.account.mine = item[0].mine;
+      //   //   this.account.favourite = item[0].favourite;
+      //   //   this.account.name = item[0].name;
+      //   //   this.account.notes = item[0].notes;
+      //   //   this.account.source = item[0].source;
+      //   //   this.$bvModal.show('modal-address');
+      //   // }
+      //   this.$bvModal.show('modal-transfer');
+      //   this.$refs.tokenContractsTable.clearSelected();
+      // }
     },
 
     async timeoutCallback() {
