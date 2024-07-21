@@ -139,6 +139,15 @@ const ViewFungible = {
         store.dispatch('viewFungible/setName', name);
       },
     },
+    decimals: {
+      get: function () {
+        return store.getters['viewFungible/decimals'];
+      },
+      set: function (decimals) {
+        store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'decimals', value: decimals });
+        store.dispatch('viewFungible/setDecimals', decimals);
+      },
+    },
     totalSupply() {
       return store.getters['viewFungible/totalSupply'];
     },
@@ -309,6 +318,7 @@ const viewFungibleModule = {
     contract: null,
     symbol: null,
     name: null,
+    decimals: null,
     totalSupply: null,
     balances: {},
     junk: null,
@@ -319,6 +329,7 @@ const viewFungibleModule = {
     contract: state => state.contract,
     symbol: state => state.symbol,
     name: state => state.name,
+    decimals: state => state.decimals,
     totalSupply: state => state.totalSupply,
     balances: state => state.balances,
     junk: state => state.junk,
@@ -331,6 +342,7 @@ const viewFungibleModule = {
       state.contract = info.contract;
       state.symbol = info.symbol;
       state.name = info.name;
+      state.decimals = info.decimals;
       state.totalSupply = info.totalSupply;
       state.balances = info.balances;
       state.junk = info.junk;
@@ -344,6 +356,10 @@ const viewFungibleModule = {
     setName(state, name) {
       logInfo("viewFungibleModule", "mutations.setName - name: " + name);
       state.name = name;
+    },
+    setDecimals(state, decimals) {
+      logInfo("viewFungibleModule", "mutations.setDecimals - decimals: " + decimals);
+      state.decimals = decimals;
     },
     toggleFungibleJunk(state) {
       logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
@@ -381,6 +397,10 @@ const viewFungibleModule = {
     async setName(context, name) {
       logInfo("viewFungibleModule", "actions.setName - name: " + name);
       await context.commit('setName', name);
+    },
+    async setDecimals(context, decimals) {
+      logInfo("viewFungibleModule", "actions.setDecimals - decimals: " + decimals);
+      await context.commit('setDecimals', decimals);
     },
     async toggleFungibleJunk(context) {
       logInfo("viewFungibleModule", "actions.toggleFungibleJunk");
