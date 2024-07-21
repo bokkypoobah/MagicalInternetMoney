@@ -27,7 +27,7 @@ const ViewFungible = {
         </b-form-group>
 
         <b-form-group label="Symbol:" label-for="token-symbol" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" id="token-symbol" v-model.trim="symbol" debounce="600" class="px-2 w-100"></b-form-input>
+          <b-form-input size="sm" id="token-symbol" v-model.trim="symbol" debounce="600" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
         <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -44,7 +44,7 @@ const ViewFungible = {
         </b-form-group>
 
         <b-form-group label="" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Select file to replace image">
+          <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Select file to replace image" class="w-50">
           </b-form-file>
         </b-form-group>
 
