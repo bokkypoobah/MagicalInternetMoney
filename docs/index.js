@@ -11,6 +11,7 @@ Vue.component('new-transfer', NewTransfer);
 Vue.component('sync-options', SyncOptions);
 Vue.component('view-address', ViewAddress);
 Vue.component('view-stealthmetaddress', ViewStealthMetaAddress);
+Vue.component('view-fungible', ViewFungible);
 Vue.component('view-nonfungible', ViewNonFungible);
 // Vue.component('flat-pickr', VueFlatpickr);
 
@@ -69,6 +70,7 @@ const store = new Vuex.Store({
     syncOptions: syncOptionsModule,
     viewAddress: viewAddressModule,
     viewStealthMetaAddress: viewStealthMetaAddressModule,
+    viewFungible: viewFungibleModule,
     viewNonFungible: viewNonFungibleModule,
     config: configModule,
     // mappings: mappingsModule,
