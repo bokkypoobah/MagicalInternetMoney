@@ -182,7 +182,7 @@ const Addresses = {
           </div>
         </b-card>
 
-        <b-table ref="accountsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="accountsFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
+        <b-table ref="addressesTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="accountsFields" :items="pagedFilteredSortedAddresses" show-empty empty-html="Click [+] above to add accounts" head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div v-if="totalAddresses == 0">
@@ -247,6 +247,7 @@ const Addresses = {
             <div v-else>
               <b-link size="sm" :href="explorer + 'address/' + data.item.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
             </div>
+            <b-badge v-if="data.item.ensName" variant="info" v-b-popover.hover="'ENS name'">{{ data.item.ensName }}</b-badge>
           </template>
           <template #cell(name)="data">
             {{ data.item.name }}
@@ -348,6 +349,9 @@ const Addresses = {
     addresses() {
       return store.getters['data/addresses'];
     },
+    ens() {
+      return store.getters['data/ens'];
+    },
     pageSizes() {
       return store.getters['config/pageSizes'];
     },
@@ -365,6 +369,7 @@ const Addresses = {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       const filterLower = this.settings.filter && this.settings.filter.toLowerCase() || null;
       for (const [account, accountData] of Object.entries(this.addresses)) {
+        const ensName = this.ens && account.substring(0, 2) == "0x" && this.ens[account] || null;
         const accountName = accountData.name || null;
         let include = filterLower == null ||
           (account.toLowerCase().includes(filterLower)) ||
@@ -379,6 +384,7 @@ const Addresses = {
         if (include) {
           results.push({
             account,
+            ensName,
             ...accountData,
             viewingPrivateKey: undefined,
           });
@@ -483,7 +489,7 @@ const Addresses = {
         } else {
           store.dispatch('viewAddress/viewAddress', item[0].account);
         }
-        this.$refs.accountsTable.clearSelected();
+        this.$refs.addressesTable.clearSelected();
       }
     },
 

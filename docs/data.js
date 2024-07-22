@@ -2191,6 +2191,10 @@ const dataModule = {
           for (let j = 0; j < batch.length; j++) {
             const address = batch[j];
             const name = allnames[j] && ethers.utils.isValidName(allnames[j]) && allnames[j] || null;
+            // const imageUrl = name && ("https://metadata.ens.domains/mainnet/avatar/" + name) || null;
+            // console.log("imageUrl: " + JSON.stringify(imageUrl));
+            // const image = name && imageUrlToBase64(imageUrl) || null;
+            // console.log("image: " + JSON.stringify(image));
             context.commit('setENS', { address, name });
           }
         } catch (e) {
