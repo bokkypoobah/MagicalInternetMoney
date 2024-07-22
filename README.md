@@ -77,7 +77,7 @@ Deployed on Sepolia:
 
 ###### Addresses
 
-<kbd><img src="images/SampleScreen_Addresses_20240722.png" /></kbd>
+<kbd><img src="images/SampleScreen_Addresses_20240723.png" /></kbd>
 
 ###### ERC-20 Fungible Tokens
 

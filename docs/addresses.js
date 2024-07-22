@@ -248,6 +248,12 @@ const Addresses = {
               <b-link size="sm" :href="explorer + 'address/' + data.item.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
             </div>
             <font size="-1">
+              <b-badge v-if="data.item.type == 'stealthMetaAddress'" variant="secondary" v-b-popover.hover="'Stealth Meta-Address'">
+                stm
+              </b-badge>
+              <b-badge v-else-if="data.item.type == 'stealthAddress'" variant="secondary" v-b-popover.hover="'Stealth Address'">
+                sa
+              </b-badge>
               <b-badge v-if="data.item.ensName" :href="'https://app.ens.domains/' + data.item.ensName" variant="info" v-b-popover.hover="'Click to view in the ENS dapp'" target="_blank">
                 {{ data.item.ensName }}
               </b-badge>
