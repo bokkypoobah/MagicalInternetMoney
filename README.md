@@ -81,6 +81,8 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_FungibleTokens_20240711.png" /></kbd>
 
+<kbd><img src="images/SampleScreen_Fungible_20240722.png" /></kbd>
+
 ###### ERC-721 and ERC-1155 Non-Fungible Tokens
 
 <kbd><img src="images/SampleScreen_NonFungibleTokens_20240711.png" /></kbd>

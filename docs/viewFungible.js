@@ -52,7 +52,29 @@ const ViewFungible = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        {{ balances }}
+        <b-form-group v-if="balances.length > 0" label="" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Current contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
+          <b-row class="m-0 p-0">
+            <b-col cols="6" class="m-0 px-2">
+              <font size="-1">Address</font>
+            </b-col>
+            <b-col cols="6" class="m-0 px-2">
+              <font size="-1">Balance</font>
+            </b-col>
+          </b-row>
+          <b-row v-for="(b, i) in balances" v-bind:key="i" class="m-0 p-0">
+            <b-col cols="6" class="m-0 px-2">
+              <b-link :href="explorer + 'address/' + b.address" target="_blank">
+                <font size="-1">{{ b.address.substring(0, 10) + '...' + b.address.slice(-8) }}</font>
+              </b-link>
+            </b-col>
+            <b-col cols="6" class="m-0 px-2">
+              <b-link :href="explorer + 'token/' + contract + '?a=' + b.address" target="_blank">
+                <font size="-1">{{ formatERC20(b.balance, decimals) }}</font>
+              </b-link>
+            </b-col>
+          </b-row>
+        </b-form-group>
+
         <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group> -->
@@ -327,7 +349,7 @@ const viewFungibleModule = {
     name: null,
     decimals: null,
     totalSupply: null,
-    balances: {},
+    balances: [],
     image: null,
     junk: null,
     active: null,
@@ -453,7 +475,6 @@ const viewFungibleModule = {
         contractDecimals: decimals && decimals.toString() || null,
         contractTotalSupply: totalSupply && totalSupply.toString() || null,
       });
-      // const addresses = store.getters['data/addresses'] || {};
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
         if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
@@ -461,9 +482,9 @@ const viewFungibleModule = {
         }
       }
       const balances = chainId && store.getters['data/balances'] && store.getters['data/balances'][chainId] && store.getters['data/balances'][chainId][info.contract] && store.getters['data/balances'][chainId][info.contract].balances || {};
-      const balancesResults = {};
+      const balancesResults = [];
       for (const [address, balance] of Object.entries(balances)) {
-        balancesResults[address] = balance;
+        balancesResults.push({ address, balance });
       }
       await context.commit('setBalances', balancesResults);
     },
