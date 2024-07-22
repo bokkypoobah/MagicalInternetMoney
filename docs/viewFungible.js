@@ -44,7 +44,7 @@ const ViewFungible = {
         </b-form-group>
 
         <b-form-group label="" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Select file to replace image" class="w-50">
+          <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Update image" class="w-50">
           </b-form-file>
         </b-form-group>
 
@@ -52,6 +52,7 @@ const ViewFungible = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
+        {{ balances }}
         <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group> -->
@@ -360,7 +361,6 @@ const viewFungibleModule = {
       state.name = info.name;
       state.decimals = info.decimals;
       state.totalSupply = info.totalSupply;
-      state.balances = info.balances;
       state.image = info.image;
       state.junk = info.junk;
       state.active = info.active;
@@ -396,6 +396,11 @@ const viewFungibleModule = {
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
       state.contractTotalSupply = info.contractTotalSupply;
+      // logInfo("viewFungibleModule", "mutations.setContractValues - state: " + JSON.stringify(state));
+    },
+    setBalances(state, balances) {
+      logInfo("viewFungibleModule", "mutations.setBalances - balances: " + JSON.stringify(balances));
+      state.balances = balances;
       logInfo("viewFungibleModule", "mutations.setContractValues - state: " + JSON.stringify(state));
     },
     setShow(state, show) {
@@ -414,11 +419,11 @@ const viewFungibleModule = {
         name: token.name,
         decimals: token.decimals,
         totalSupply: token.totalSupply,
-        balances: token.balances,
         image: token.image,
         junk: token.junk,
         active: token.active,
       });
+      console.log("token.balances: " + JSON.stringify(token.balances));
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
@@ -448,6 +453,19 @@ const viewFungibleModule = {
         contractDecimals: decimals && decimals.toString() || null,
         contractTotalSupply: totalSupply && totalSupply.toString() || null,
       });
+      // const addresses = store.getters['data/addresses'] || {};
+      const selectedAddressesMap = {};
+      for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
+        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
+          selectedAddressesMap[address] = true;
+        }
+      }
+      const balances = chainId && store.getters['data/balances'] && store.getters['data/balances'][chainId] && store.getters['data/balances'][chainId][info.contract] && store.getters['data/balances'][chainId][info.contract].balances || {};
+      const balancesResults = {};
+      for (const [address, balance] of Object.entries(balances)) {
+        balancesResults[address] = balance;
+      }
+      await context.commit('setBalances', balancesResults);
     },
     async setSymbol(context, symbol) {
       logInfo("viewFungibleModule", "actions.setSymbol - symbol: " + symbol);
