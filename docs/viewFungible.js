@@ -52,7 +52,7 @@ const ViewFungible = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="balances.length > 0" label="" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Current contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
+        <b-form-group v-if="balances.length > 0" label="" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="6" class="m-0 px-2">
               <font size="-1">Address</font>
