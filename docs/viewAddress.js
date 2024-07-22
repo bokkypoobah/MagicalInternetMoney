@@ -3,6 +3,7 @@ const ViewAddress = {
     <div>
       <b-modal ref="viewaddress" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>{{ type == 'stealthAddress' ? 'Stealth Address' : 'Address' }}</template>
+
         <b-form-group label="Address:" label-for="address-address" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="address-address" v-model.trim="address" class="px-2"></b-form-input>
@@ -34,9 +35,6 @@ const ViewAddress = {
         </b-form-group>
         <b-form-group v-if="type == 'stealthAddress'" label="Via Stealth Meta-Address:" label-for="address-linkedtostealthmetaaddress" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" plaintext id="address-linkedtostealthmetaaddress" v-model.trim="linkedTo.stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
-        </b-form-group>
-        <b-form-group v-if="false" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="address-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
         </b-form-group>
         <b-form-group v-if="type == 'stealthAddress'" label="Created Via Stealth Transfers:" label-for="address-stealthtransfers" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="px-2">
@@ -99,6 +97,22 @@ const ViewAddress = {
           </b-button>
         </b-form-group>
 
+        <b-form-group v-if="ensName" label="ENS Name:" label-for="address-ensname" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-input-group size="sm" class="w-100">
+            <b-form-input size="sm" plaintext id="address-ensname" :value="ensName" class="px-2"></b-form-input>
+            <b-input-group-append>
+              <div>
+                <b-button size="sm" :href="'https://app.ens.domains/' + ensName" variant="link" v-b-popover.hover="'View in ENS dapp'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+              </div>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+
+        <b-form-group v-if="ensName" label="" label-for="address-avatar" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-img button rounded fluid size="15rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensName" class="mx-2" style="width: 60px;">
+          </b-img>
+        </b-form-group>
+
         <b-form-group label="Name:" label-for="address-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-75">
             <b-form-input size="sm" type="text" id="address-name" v-model.trim="name" debounce="600" placeholder="optional"></b-form-input>
@@ -153,8 +167,14 @@ const ViewAddress = {
     addresses() {
       return store.getters['data/addresses'];
     },
+    ens() {
+      return store.getters['data/ens'];
+    },
     address() {
       return store.getters['viewAddress/address'];
+    },
+    ensName() {
+      return this.address && this.ens[this.address] || null;
     },
     linkedTo() {
       return store.getters['viewAddress/linkedTo'];
