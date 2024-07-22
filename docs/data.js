@@ -537,6 +537,16 @@ const dataModule = {
         Vue.set(state.stealthTransfers[info.chainId][info.blockNumber], info.logIndex, info);
       }
     },
+    setENS(state, info) {
+      logInfo("dataModule", "mutations.setENS info: " + JSON.stringify(info));
+      if (info.name) {
+        Vue.set(state.ens, info.address, info.name);
+      } else {
+        if (state.ens[info.address]) {
+          Vue.delete(state.ens, info.address);
+        }
+      }
+    },
     addTimestamp(state, info) {
       logInfo("dataModule", "mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.timestamps)) {
@@ -626,7 +636,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['addresses', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
+        for (let type of ['ens', 'addresses', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
@@ -832,12 +842,10 @@ const dataModule = {
       if (options.ens && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENS', parameter);
       }
-
       // if (options.devThing) {
       //   console.log("Dev Thing");
       // }
-
-      context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
+      // context.dispatch('saveData', ['addresses', 'registry' /*, 'blocks', 'txs', 'ensMap'*/]);
       context.commit('setSyncSection', { section: null, total: null });
       context.commit('setSyncHalt', false);
       context.commit('forceRefresh');
@@ -2165,28 +2173,14 @@ const dataModule = {
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-      let rows = 0;
-      let done = false;
-
-      return;
-
-      let collection = null;
-      const tokens = {};
       const owners = {};
-      do {
-        let data = await db.tokens.where('[chainId+contract+tokenId]').between([parameter.chainId, context.state.selectedCollection, Dexie.minKey],[parameter.chainId, context.state.selectedCollection, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        logInfo("dataModule", "actions.syncENS - tokens - data.length: " + data.length + ", first[0..1]: " + JSON.stringify(data.slice(0, 2).map(e => e.contract + '/' + e.tokenId )));
-        for (const item of data) {
-          if (!(item.owner in owners)) {
-            owners[item.owner] = [];
-          }
-          owners[item.owner].push(item.tokenId);
+      for (const [address, addressData] of Object.entries(context.state.addresses)) {
+        console.log(address + " => " + JSON.stringify(addressData));
+        if (addressData.type == "address" && !addressData.junk) {
+          owners[address] = true;
         }
-        rows = parseInt(rows) + data.length;
-        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
-      } while (!done);
-      // console.log("owners: " + JSON.stringify(owners, null, 2));
-
+      }
+      logInfo("dataModule", "actions.syncENS - owners: " + JSON.stringify(owners));
       context.commit('setSyncSection', { section: "ENS", total: Object.keys(owners).length });
       let completed = 0;
 
@@ -2199,23 +2193,16 @@ const dataModule = {
           const allnames = await ensReverseRecordsContract.getNames(batch);
           for (let j = 0; j < batch.length; j++) {
             const address = batch[j];
-            const name = allnames[j];
-            // const normalized = normalize(address);
-            if (name) {
-              console.log(address + " => " + name);
-              context.commit('setENS', { address, name });
-            }
+            const name = allnames[j] && ethers.utils.isValidName(allnames[j]) && allnames[j] || null;
+            context.commit('setENS', { address, name });
           }
         } catch (e) {
           for (let j = 0; j < batch.length; j++) {
             try {
               const address = batch[j];
               const allnames = await ensReverseRecordsContract.getNames([address]);
-              const name = allnames[0];
-              if (name) {
-                console.log(address + " => " + name);
-                context.commit('setENS', { address, name });
-              }
+              const name = allnames[0] && ethers.utils.isValidName(allnames[0]) && allnames[0] || null;
+              context.commit('setENS', { address, name });
             } catch (e1) {
               console.log("Error - address: " + batch[j] + ", message: " + e1.message);
             }
