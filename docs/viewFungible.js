@@ -48,7 +48,7 @@ const ViewFungible = {
           </b-form-file>
         </b-form-group>
 
-        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Current contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
+        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Latest contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
@@ -377,7 +377,7 @@ const viewFungibleModule = {
   },
   mutations: {
     viewFungible(state, info) {
-      logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
+      // logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.symbol = info.symbol;
       state.name = info.name;
@@ -389,41 +389,39 @@ const viewFungibleModule = {
       state.show = true;
     },
     setSymbol(state, symbol) {
-      logInfo("viewFungibleModule", "mutations.setSymbol - symbol: " + symbol);
+      // logInfo("viewFungibleModule", "mutations.setSymbol - symbol: " + symbol);
       state.symbol = symbol;
     },
     setName(state, name) {
-      logInfo("viewFungibleModule", "mutations.setName - name: " + name);
+      // logInfo("viewFungibleModule", "mutations.setName - name: " + name);
       state.name = name;
     },
     setDecimals(state, decimals) {
-      logInfo("viewFungibleModule", "mutations.setDecimals - decimals: " + decimals);
+      // logInfo("viewFungibleModule", "mutations.setDecimals - decimals: " + decimals);
       state.decimals = decimals;
     },
     setImage(state, image) {
-      logInfo("viewFungibleModule", "mutations.setImage - image: " + image);
+      // logInfo("viewFungibleModule", "mutations.setImage - image: " + image);
       state.image = image;
     },
     toggleFungibleJunk(state) {
-      logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
+      // logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
       state.junk = !state.junk;
     },
     toggleFungibleActive(state) {
-      logInfo("viewFungibleModule", "mutations.toggleFungibleActive");
+      // logInfo("viewFungibleModule", "mutations.toggleFungibleActive");
       state.active = !state.active;
     },
     setContractValues(state, info) {
-      logInfo("viewFungibleModule", "mutations.setContractValues - info: " + JSON.stringify(info));
+      // logInfo("viewFungibleModule", "mutations.setContractValues - info: " + JSON.stringify(info));
       state.contractSymbol = info.contractSymbol;
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
       state.contractTotalSupply = info.contractTotalSupply;
-      // logInfo("viewFungibleModule", "mutations.setContractValues - state: " + JSON.stringify(state));
     },
     setBalances(state, balances) {
-      logInfo("viewFungibleModule", "mutations.setBalances - balances: " + JSON.stringify(balances));
+      // logInfo("viewFungibleModule", "mutations.setBalances - balances: " + JSON.stringify(balances));
       state.balances = balances;
-      logInfo("viewFungibleModule", "mutations.setContractValues - state: " + JSON.stringify(state));
     },
     setShow(state, show) {
       state.show = show;
@@ -445,7 +443,6 @@ const viewFungibleModule = {
         junk: token.junk,
         active: token.active,
       });
-      console.log("token.balances: " + JSON.stringify(token.balances));
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
@@ -467,6 +464,8 @@ const viewFungibleModule = {
       }
       try {
         totalSupply = await interface.totalSupply();
+        // TODO: Update totalSupply for Fungible
+        // store.dispatch('data/setTotalSupply', { chainId, contract, totalSupply });
       } catch (e) {
       }
       await context.commit('setContractValues', {
