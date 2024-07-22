@@ -214,51 +214,34 @@ const Addresses = {
               {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
             <!-- </b-form-checkbox> -->
           </template>
-          <template #cell(image)="data">
-            <!-- <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
-              <b-avatar rounded variant="light" size="3.0rem" :src="data.item.image" v-b-popover.hover="'ERC-721 collection'"></b-avatar>
-            </div>
-            <div v-else-if="data.item.type == 'eoa' && data.item.account != ensOrAccount(data.item.account)">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAccount(data.item.account)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
-            </div>
-            <div v-else-if="data.item.type == 'erc20'">
-              <b-avatar rounded variant="light" size="3.0rem" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.account + '/logo.png'" v-b-popover.hover="'ERC-20 logo if available'"></b-avatar>
-            </div> -->
-          </template>
-          <template #cell(icons)="data">
-
+          <template #cell(options)="data">
             <b-button size="sm" :pressed.sync="data.item.junk" @click="toggleAddressField(data.item.account, 'junk')" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-
             <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.mine" @click="toggleAddressField(data.item.account, 'mine')" variant="transparent" v-b-popover.hover="data.item.mine ? 'My account' : 'Not my account'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.mine && !data.item.junk) ? 'person-fill' : 'person'" shift-v="+1" font-scale="1.2" :variant="(data.item.junk || !data.item.mine) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
-
             <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.watch" @click="toggleAddressField(data.item.account, 'watch')" variant="transparent" v-b-popover.hover="(data.item.watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20' + (data.item.account.substring(0, 3) == 'st:' ? ' and ERC-721 stealth ' : ', ERC-721 and ERC-1155 ') + 'transfers'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.watch && !data.item.junk) ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="(data.item.junk || !data.item.watch) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
-
             <b-button size="sm" :disabled="data.item.junk || !data.item.mine || data.item.account.substring(0, 3) == 'st:'" :pressed.sync="data.item.sendFrom" @click="toggleAddressField(data.item.account, 'sendFrom')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.sendFrom && data.item.mine && !data.item.junk) ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="1.2" :variant="(data.item.junk || !data.item.sendFrom) || !data.item.mine || data.item.account.substring(0, 3) == 'st:' ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
-
             <b-button size="sm" :disabled="data.item.junk" :pressed.sync="data.item.sendTo" @click="toggleAddressField(data.item.account, 'sendTo')" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (data.item.sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.sendTo && !data.item.junk) ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="1.2" :variant="(data.item.junk || !data.item.sendTo) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
-
+            <b-button v-if="data.item.account.substring(0, 3) == 'st:'" size="sm" :disabled="!transferHelper || data.item.junk || !data.item.sendTo" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-1 p-0">
+              <b-icon-caret-right shift-v="+1" font-scale="1.2">
+              </b-icon-caret-right>
+            </b-button>
           </template>
-          <template #cell(account)="data">
+          <template #cell(address)="data">
             <div v-if="data.item.account.substring(0, 3) == 'st:'">
-              <b-button size="sm" :disabled="!transferHelper || data.item.junk || !data.item.sendTo" @click="newTransfer(data.item.account);" variant="link" v-b-popover.hover="'New Stealth Transfer to ' + data.item.account" class="m-0 ml-1 p-0">
-                <b-icon-caret-right shift-v="+1" font-scale="1.2">
-                </b-icon-caret-right>
-              </b-button>
               {{ formatAddress(data.item.account) }}
             </div>
             <div v-else>
@@ -272,9 +255,16 @@ const Addresses = {
               {{ data.item.notes || '&nbsp;' }}
             </font>
           </template>
-          <template #cell(check)="data">
-            <!-- <b-form-checkbox-group disabled size="sm" v-model="data.item.check" @change="setAddressField(data.item.account, 'check', $event)" :options="checkOptions" class="ml-2"></b-form-checkbox-group> -->
-            <!-- TODO: <font size="-1">{{ data.item.check.map(e1 => checkOptions.filter(e2 => e2.value == e1)[0].text).join(", ") }}</font> -->
+          <template #cell(image)="data">
+            <!-- <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
+              <b-avatar rounded variant="light" size="3.0rem" :src="data.item.image" v-b-popover.hover="'ERC-721 collection'"></b-avatar>
+            </div>
+            <div v-else-if="data.item.type == 'eoa' && data.item.account != ensOrAccount(data.item.account)">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAccount(data.item.account)" v-b-popover.hover="'ENS avatar if set'"></b-avatar>
+            </div>
+            <div v-else-if="data.item.type == 'erc20'">
+              <b-avatar rounded variant="light" size="3.0rem" :src="'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/' + data.item.account + '/logo.png'" v-b-popover.hover="'ERC-20 logo if available'"></b-avatar>
+            </div> -->
           </template>
         </b-table>
       </b-card>
@@ -338,10 +328,10 @@ const Addresses = {
       ],
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'icons', label: 'Options', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'account', label: 'Account', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+        { key: 'options', label: 'Options', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+        { key: 'address', label: 'Account', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-truncate' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
-        { key: 'check', label: 'Check', sortable: false, thStyle: 'width: 30%;', tdClass: 'text-truncate' },
+        { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
       ],
     }
   },
