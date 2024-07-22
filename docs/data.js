@@ -2172,10 +2172,8 @@ const dataModule = {
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-
       const owners = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        console.log(address + " => " + JSON.stringify(addressData));
         if (addressData.type == "address" && !addressData.junk) {
           owners[address] = true;
         }
@@ -2183,7 +2181,6 @@ const dataModule = {
       logInfo("dataModule", "actions.syncENS - owners: " + JSON.stringify(owners));
       context.commit('setSyncSection', { section: "ENS", total: Object.keys(owners).length });
       let completed = 0;
-
       const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
       const addresses = Object.keys(owners);
       const ENSOWNERBATCHSIZE = 25; // Can do 200, but incorrectly misconfigured reverse ENS causes the whole call to fail
@@ -2211,7 +2208,6 @@ const dataModule = {
         completed += batch.length;
         context.commit('setSyncCompleted', completed);
       }
-      console.log("context.state.ens: " + JSON.stringify(context.state.ens, null, 2));
       context.dispatch('saveData', ['ens']);
     },
 
