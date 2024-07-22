@@ -257,6 +257,9 @@ const Addresses = {
             </font>
           </template>
           <template #cell(image)="data">
+            <b-img v-if="data.item.ensName" button rounded fluid size="15rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + data.item.ensName" class="m-2" style="width: 60px;">
+            </b-img>
+
             <!-- <div v-if="data.item.type == 'preerc721' || data.item.type == 'erc721' || data.item.type == 'erc1155'">
               <b-avatar rounded variant="light" size="3.0rem" :src="data.item.image" v-b-popover.hover="'ERC-721 collection'"></b-avatar>
             </div>
