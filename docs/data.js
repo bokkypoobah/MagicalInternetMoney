@@ -293,12 +293,16 @@ const dataModule = {
     },
     setFungibleField(state, info) {
       logInfo("dataModule", "mutations.setFungibleField: " + JSON.stringify(info, null, 2));
-      // Vue.set(state.addresses[info.address], info.field, info.value);
-
       if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
         Vue.set(state.tokens[info.chainId][info.contract], info.field, info.value);
       }
       logInfo("dataModule", "mutations.setFungibleField - contract[" + info.contract + "]." + info.field + " = " + JSON.stringify(state.tokens[info.chainId][info.contract]));
+    },
+    updateFungibleTotalSupply(state, info) {
+      logInfo("dataModule", "mutations.updateFungibleTotalSupply: " + JSON.stringify(info, null, 2));
+      if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
+        Vue.set(state.tokens[info.chainId][info.contract], 'totalSupply', info.totalSupply);
+      }
     },
     toggleNonFungibleJunk(state, item) {
       logInfo("dataModule", "mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
@@ -653,6 +657,17 @@ const dataModule = {
       // logInfo("dataModule", "actions.setAddressField - info: " + JSON.stringify(info));
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
+    },
+    async updateFungibleTotalSupply(context, info) {
+      logInfo("dataModule", "actions.updateFungibleTotalSupply - info: " + JSON.stringify(info));
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
+      try {
+        const totalSupply = await interface.totalSupply();
+        await context.commit('updateFungibleTotalSupply', { ...info, totalSupply: totalSupply && totalSupply.toString() || null });
+      } catch (e) {
+      }
+      // await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleJunk(context, item) {
       // logInfo("dataModule", "actions.toggleFungibleJunk - item: " + JSON.stringify(item));

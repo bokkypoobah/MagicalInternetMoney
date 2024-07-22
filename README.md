@@ -35,6 +35,8 @@ This project is currently heavily under development. Clear your browser's LocalS
 
 #### TODOs
 * Base ERC-20/721/1155 event log scraping very slow - has a max number of blocks of ~10k
+* Disable unhandled Fungibles e.g. CryptoPunks, MoonCats, CryptoCats
+* Display total and individual Fungible balances
 
 #### References
 

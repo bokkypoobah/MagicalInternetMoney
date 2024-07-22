@@ -48,7 +48,7 @@ const ViewFungible = {
           </b-form-file>
         </b-form-group>
 
-        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractTotalSupply && totalSupply != contractTotalSupply ? ('Latest contract value: ' + formatERC20(contractTotalSupply, contractDecimals)) : ''" class="mx-0 my-1 p-0">
+        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
@@ -162,7 +162,7 @@ const ViewFungible = {
       },
     },
     totalSupply() {
-      return store.getters['viewFungible/totalSupply'];
+      return this.chainId && this.contract && store.getters['data/tokens'] && store.getters['data/tokens'][this.chainId] && store.getters['data/tokens'][this.chainId][this.contract] && store.getters['data/tokens'][this.chainId][this.contract].totalSupply;
     },
     balances() {
       return store.getters['viewFungible/balances'];
@@ -178,9 +178,6 @@ const ViewFungible = {
     },
     contractDecimals() {
       return store.getters['viewFungible/contractDecimals'];
-    },
-    contractTotalSupply() {
-      return store.getters['viewFungible/contractTotalSupply'];
     },
     junk: {
       get: function () {
@@ -348,7 +345,6 @@ const viewFungibleModule = {
     symbol: null,
     name: null,
     decimals: null,
-    totalSupply: null,
     balances: [],
     image: null,
     junk: null,
@@ -356,7 +352,6 @@ const viewFungibleModule = {
     contractSymbol: null,
     contractName: null,
     contractDecimals: null,
-    contractTotalSupply: null,
     show: false,
   },
   getters: {
@@ -364,7 +359,6 @@ const viewFungibleModule = {
     symbol: state => state.symbol,
     name: state => state.name,
     decimals: state => state.decimals,
-    totalSupply: state => state.totalSupply,
     balances: state => state.balances,
     image: state => state.image,
     junk: state => state.junk,
@@ -372,7 +366,6 @@ const viewFungibleModule = {
     contractSymbol: state => state.contractSymbol,
     contractName: state => state.contractName,
     contractDecimals: state => state.contractDecimals,
-    contractTotalSupply: state => state.contractTotalSupply,
     show: state => state.show,
   },
   mutations: {
@@ -382,10 +375,13 @@ const viewFungibleModule = {
       state.symbol = info.symbol;
       state.name = info.name;
       state.decimals = info.decimals;
-      state.totalSupply = info.totalSupply;
+      state.balances = [];
       state.image = info.image;
       state.junk = info.junk;
       state.active = info.active;
+      state.contractSymbol = null;
+      state.contractName = null;
+      state.contractDecimals = null;
       state.show = true;
     },
     setSymbol(state, symbol) {
@@ -417,7 +413,6 @@ const viewFungibleModule = {
       state.contractSymbol = info.contractSymbol;
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
-      state.contractTotalSupply = info.contractTotalSupply;
     },
     setBalances(state, balances) {
       // logInfo("viewFungibleModule", "mutations.setBalances - balances: " + JSON.stringify(balances));
@@ -438,7 +433,6 @@ const viewFungibleModule = {
         symbol: token.symbol,
         name: token.name,
         decimals: token.decimals,
-        totalSupply: token.totalSupply,
         image: token.image,
         junk: token.junk,
         active: token.active,
@@ -449,7 +443,6 @@ const viewFungibleModule = {
       let symbol = null;
       let name = null;
       let decimals = null;
-      let totalSupply = null;
       try {
         symbol = await interface.symbol();
       } catch (e) {
@@ -462,17 +455,10 @@ const viewFungibleModule = {
         decimals = await interface.decimals();
       } catch (e) {
       }
-      try {
-        totalSupply = await interface.totalSupply();
-        // TODO: Update totalSupply for Fungible
-        // store.dispatch('data/setTotalSupply', { chainId, contract, totalSupply });
-      } catch (e) {
-      }
       await context.commit('setContractValues', {
         contractSymbol: symbol,
         contractName: name,
         contractDecimals: decimals && decimals.toString() || null,
-        contractTotalSupply: totalSupply && totalSupply.toString() || null,
       });
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
