@@ -8,6 +8,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api.reservoir.tools/",
   },
   42161: {
     name: "Arbitrum",
@@ -17,6 +18,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/arbitrum/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-arbitrum.reservoir.tools/",
   },
   8453: {
     name: "Base",
@@ -26,6 +28,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/base/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-base.reservoir.tools/",
     maxLogScrapingSize: 10_000, // TODO: Base RPC server fails for > 10k blocks for ERC-20 event log scraping
   },
   100: {
@@ -40,6 +43,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/optimism/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-optimism.reservoir.tools/",
   },
   137: {
     name: "Polygon Matic",
@@ -49,6 +53,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/polygon/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-polygon.reservoir.tools/",
   },
   534352: {
     name: "Scroll",
@@ -57,6 +62,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/scroll/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/scroll/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-scroll.reservoir.tools/",
   },
   11155111: {
     name: "Sepolia Testnet",
@@ -71,6 +77,7 @@ const NETWORKS = {
         "https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/sepolia/assets/${contract}/logo.png",
         "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/sepolia/assets/${contract}/logo.png",
     ],
+    reservoir: "https://api-sepolia.reservoir.tools/",
   },
   17000: {
     name: "Holešky Testnet",
@@ -85,6 +92,7 @@ const NETWORKS = {
     name: "Base Sepolia Testnet",
     explorer: "https://sepolia.basescan.org/",
     nonFungibleViewer: "https://testnets.opensea.io/assets/base-sepolia/${contract}/${tokenId}",
+    reservoir: "https://api-base-sepolia.reservoir.tools/",
   },
   11155420: {
     name: "Optimism Sepolia Testnet",
