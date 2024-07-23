@@ -752,6 +752,10 @@ const dataModule = {
                 // console.log("record: " + JSON.stringify(record, null, 2));
                 const data = parseReservoirTokenData(record);
                 console.log("data: " + JSON.stringify(data, null, 2));
+                // if (data.image) {
+                //   const imageBase64 = await imageUrlToBase64(data.image);
+                //   console.log("imageBase64: " + JSON.stringify(imageBase64, null, 2));
+                // }
                 // context.commit('addAccountToken', record.token);
               }
             }
