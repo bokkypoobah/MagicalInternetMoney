@@ -123,7 +123,7 @@ const Fungibles = {
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
+            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.active & !data.item.junk) ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
@@ -135,9 +135,6 @@ const Fungibles = {
             <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
-            <!-- <br />
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent"><b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="0.9" :variant="data.item.junk ? 'info' : 'secondary'"></b-icon></b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.active & !data.item.junk ? 'heart-fill' : 'heart'" font-scale="0.9" :variant="data.item.active ? 'dark' : 'danger'"></b-icon></b-button> -->
           </template>
           <template #cell(type)="data">
             <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
@@ -149,7 +146,16 @@ const Fungibles = {
             <font size="-1">{{ data.item.name }}</font>
           </template>
           <template #cell(decimals)="data">
-            <font size="-1">{{ data.item.decimals || '0' }}</font>
+            <div v-if="data.item.decimals !== null">
+              <font size="-1">{{ data.item.decimals || '0' }}</font>
+            </div>
+            <div v-else>
+              <font size="-1">
+                <b-badge variant="warning" v-b-popover.hover="'Please set decimals as the fungible contract has not provided this information'">
+                  To Configure
+                </b-badge>
+              </font>
+            </div>
           </template>
           <template #cell(balance)="data">
             <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">

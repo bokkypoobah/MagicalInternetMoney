@@ -20,7 +20,7 @@ const ViewFungible = {
             <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="junk ? 'primary' : 'secondary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk || decimals === null" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
             <b-icon :icon="(active && !junk) ? 'check-circle-fill' : 'check-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !active) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
