@@ -4,7 +4,7 @@ const ViewFungible = {
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>ERC-20 Fungible Token</template>
 
-        <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="unsupported ? 'Unsupported Non-Standard ERC-20' : ''" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
             <b-form-input size="sm" plaintext id="token-contract" v-model.trim="contract" class="px-2"></b-form-input>
             <b-input-group-append>
@@ -20,7 +20,7 @@ const ViewFungible = {
             <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="junk ? 'primary' : 'secondary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk || decimals === null" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk || decimals === null || unsupported" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
             <b-icon :icon="(active && !junk) ? 'check-circle-fill' : 'check-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !active) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
@@ -127,6 +127,12 @@ const ViewFungible = {
     },
     contract() {
       return store.getters['viewFungible/contract'];
+    },
+    unsupported() {
+      return this.contract in UNSUPPORTED_ERC20S;
+    },
+    contractDecimals() {
+      return store.getters['viewFungible/contractDecimals'];
     },
     tokenId() {
       return store.getters['viewFungible/tokenId'];
@@ -259,57 +265,57 @@ const ViewFungible = {
       store.dispatch('viewFungibleModule/setShow', show);
     },
 
-    async refreshTokenMetadata() {
-      const imageUrlToBase64 = async url => {
-        const response = await fetch(url /*, { mode: 'cors' }*/);
-        const blob = await response.blob();
-        return new Promise((onSuccess, onError) => {
-          try {
-            const reader = new FileReader() ;
-            reader.onload = function(){ onSuccess(this.result) } ;
-            reader.readAsDataURL(blob) ;
-          } catch(e) {
-            onError(e);
-          }
-        });
-      };
-
-      logInfo("ViewFungible", "refreshTokenMetadata()");
-      const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
-      console.log("url: " + url);
-      const data = await fetch(url).then(response => response.json());
-      // console.log("data: " + JSON.stringify(data, null, 2));
-      if (data.tokens.length > 0) {
-        const tokenData = data.tokens[0].token;
-        // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
-        // const base64 = await imageUrlToBase64(tokenData.image);
-        const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
-        attributes.sort((a, b) => {
-          return ('' + a.trait_type).localeCompare(b.trait_type);
-        });
-        const address = ethers.utils.getAddress(tokenData.contract);
-        let expiry = undefined;
-        if (address == ENS_ERC721_ADDRESS) {
-          const expiryRecord = attributes.filter(e => e.trait_type == "Expiration Date");
-          console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
-          expiry = expiryRecord.length == 1 && expiryRecord[0].value || null;
-        }
-        const metadata = {
-          chainId: tokenData.chainId,
-          contract: this.contract,
-          tokenId: tokenData.tokenId,
-          expiry,
-          name: tokenData.name,
-          description: tokenData.description,
-          image: tokenData.image,
-          attributes,
-          // image: base64,
-        };
-        console.log("metadata: " + JSON.stringify(metadata, null, 2));
-        store.dispatch('data/addTokenMetadata', metadata);
-        store.dispatch('data/saveData', ['tokenMetadata']);
-      }
-    },
+    // async refreshTokenMetadata() {
+    //   const imageUrlToBase64 = async url => {
+    //     const response = await fetch(url /*, { mode: 'cors' }*/);
+    //     const blob = await response.blob();
+    //     return new Promise((onSuccess, onError) => {
+    //       try {
+    //         const reader = new FileReader() ;
+    //         reader.onload = function(){ onSuccess(this.result) } ;
+    //         reader.readAsDataURL(blob) ;
+    //       } catch(e) {
+    //         onError(e);
+    //       }
+    //     });
+    //   };
+    //
+    //   logInfo("ViewFungible", "refreshTokenMetadata()");
+    //   const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
+    //   console.log("url: " + url);
+    //   const data = await fetch(url).then(response => response.json());
+    //   // console.log("data: " + JSON.stringify(data, null, 2));
+    //   if (data.tokens.length > 0) {
+    //     const tokenData = data.tokens[0].token;
+    //     // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
+    //     // const base64 = await imageUrlToBase64(tokenData.image);
+    //     const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
+    //     attributes.sort((a, b) => {
+    //       return ('' + a.trait_type).localeCompare(b.trait_type);
+    //     });
+    //     const address = ethers.utils.getAddress(tokenData.contract);
+    //     let expiry = undefined;
+    //     if (address == ENS_ERC721_ADDRESS) {
+    //       const expiryRecord = attributes.filter(e => e.trait_type == "Expiration Date");
+    //       console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
+    //       expiry = expiryRecord.length == 1 && expiryRecord[0].value || null;
+    //     }
+    //     const metadata = {
+    //       chainId: tokenData.chainId,
+    //       contract: this.contract,
+    //       tokenId: tokenData.tokenId,
+    //       expiry,
+    //       name: tokenData.name,
+    //       description: tokenData.description,
+    //       image: tokenData.image,
+    //       attributes,
+    //       // image: base64,
+    //     };
+    //     console.log("metadata: " + JSON.stringify(metadata, null, 2));
+    //     store.dispatch('data/addTokenMetadata', metadata);
+    //     store.dispatch('data/saveData', ['tokenMetadata']);
+    //   }
+    // },
 
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')

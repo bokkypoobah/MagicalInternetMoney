@@ -123,7 +123,7 @@ const Fungibles = {
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
+            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null || data.item.unsupported" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.active & !data.item.junk) ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
@@ -135,6 +135,13 @@ const Fungibles = {
             <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
+            <div v-if="data.item.unsupported">
+              <font size="-1">
+                <b-badge variant="warning" v-b-popover.hover="'Unsupported Non-Standard ERC-20'">
+                  Unsupported
+                </b-badge>
+              </font>
+            </div>
           </template>
           <template #cell(type)="data">
             <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
@@ -321,12 +328,13 @@ const Fungibles = {
               include = false;
             }
           }
+          const unsupported = contract in UNSUPPORTED_ERC20S;
           const balances = [];
           for (const [address, balance] of Object.entries(contractData.balances)) {
             balances.push({ address, balance });
           }
           if (include) {
-            results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances });
+            results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances, unsupported });
           }
         }
       }
