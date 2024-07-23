@@ -487,7 +487,6 @@ const dataModule = {
     addNonFungibleMetadata(state, info) {
       logInfo("dataModule", "mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
-      console.log(chainId + ":" + contract + ":" + tokenId);
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
       }
@@ -784,6 +783,65 @@ const dataModule = {
       // }
       await context.dispatch('saveData', ['tokens']);
     },
+
+    async requestReservoirMetadataRefresh(context, tokens) {
+      logInfo("dataModule", "actions.requestReservoirMetadataRefresh - token: " + JSON.stringify(tokens));
+      const chainId = store.getters['connection/chainId'];
+      const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
+      if (reservoirPrefix) {
+        const BATCHSIZE = 40; // 50 causes the Reservoir API to fail for some fetches
+        const DELAYINMILLIS = 2500;
+        for (let i = 0; i < tokens.length && !context.state.sync.halt; i += BATCHSIZE) {
+          const batch = tokens.slice(i, parseInt(i) + BATCHSIZE);
+          console.log("batch: " + JSON.stringify(batch));
+          const tokenList = batch.map(e => e.contract + ':' + e.tokenId);
+          console.log("tokenList: " + JSON.stringify(tokenList));
+          const options = {
+            method: 'POST',
+            // mode: 'no-cors', // cors, no-cors, *cors, same-origin
+            headers: { accept: '*/*', 'content-type': 'application/json', 'x-api-key': 'demo-api-key' },
+            body: JSON.stringify({
+              liquidityOnly: false,
+              overrideCoolDown: false,
+              tokens: tokenList,
+              // tokens: ['0xa1eB40c284C5B44419425c4202Fa8DabFF31006b:178'],
+            }),
+          };
+          console.log("options: " + JSON.stringify(options, null, 2));
+
+          const url = reservoirPrefix + "tokens/refresh/v2";
+          console.log(url);
+          fetch(reservoirPrefix + "tokens/refresh/v2", options)
+            .then(response => response.json())
+            .then(response => console.log(response))
+            .catch(err => console.error(err));
+          // TODO: Handle response
+
+      //     let continuation = null;
+      //     do {
+      //       if (!continuation) {
+      //         await delay(DELAYINMILLIS);
+      //       }
+      //       let url = reservoirPrefix + "tokens/v7?" + batch.map(e => 'tokens=' + e.contract + ':' + e.tokenId).join("&");
+      //       url = url + (continuation != null ? "&continuation=" + continuation : '');
+      //       url = url + "&limit=50&includeAttributes=true&includeTopBid=true&includeLastSale=true";
+      //       console.log(url);
+      //       const data = await fetch(url).then(response => response.json());
+      //       continuation = data.continuation;
+      //       if (data.tokens) {
+      //         for (let record of data.tokens) {
+      //           const token = parseReservoirTokenData(record);
+      //           // console.log("token: " + JSON.stringify(token, null, 2));
+      //           context.commit('addNonFungibleMetadata', token);
+      //         }
+      //       }
+      //     } while (continuation != null);
+        }
+      }
+      await context.dispatch('saveData', ['tokens']);
+    },
+
+
     async setSyncHalt(context, halt) {
       context.commit('setSyncHalt', halt);
     },

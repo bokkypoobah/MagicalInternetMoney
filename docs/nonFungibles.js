@@ -128,6 +128,7 @@ const NonFungibles = {
               <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()">Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
+              <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()">Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
             </b-dropdown>
           </template>
 
@@ -531,6 +532,18 @@ const NonFungibles = {
       }
       logInfo("NonFungibles", "methods.refreshSelectedNonFungibles - selectedTokens: " + JSON.stringify(selectedTokens));
       store.dispatch('data/refreshNonFungibleMetadata', selectedTokens);
+    },
+    requestSelectedReservoirMetadataRefresh() {
+      logInfo("NonFungibles", "methods.requestSelectedReservoirMetadataRefresh");
+      const selectedTokens = [];
+      for (const token of this.pagedFilteredSortedItems) {
+        console.log(JSON.stringify(token));
+        if (this.settings.selected[token.contract] && this.settings.selected[token.contract][token.tokenId]) {
+          selectedTokens.push(token);
+        }
+      }
+      logInfo("NonFungibles", "methods.requestSelectedReservoirMetadataRefresh - selectedTokens: " + JSON.stringify(selectedTokens));
+      store.dispatch('data/requestReservoirMetadataRefresh', selectedTokens);
     },
 
     copyToClipboard(str) {
