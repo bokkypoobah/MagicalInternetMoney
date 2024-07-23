@@ -54,20 +54,20 @@ const ViewFungible = {
 
         <b-form-group v-if="balances.length > 0" label="" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
-            <b-col cols="6" class="m-0 px-2">
+            <b-col cols="5" class="m-0 px-2">
               <font size="-1">Address</font>
             </b-col>
-            <b-col cols="6" class="m-0 px-2">
+            <b-col cols="7" class="m-0 px-2">
               <font size="-1">Balance</font>
             </b-col>
           </b-row>
           <b-row v-for="(b, i) in balances" v-bind:key="i" class="m-0 p-0">
-            <b-col cols="6" class="m-0 px-2">
+            <b-col cols="5" class="m-0 px-2">
               <b-link :href="explorer + 'address/' + b.address" target="_blank">
-                <font size="-1">{{ b.address.substring(0, 10) + '...' + b.address.slice(-8) }}</font>
+                <font size="-1">{{ b.address.substring(0, 8) + '...' + b.address.slice(-6) }}</font>
               </b-link>
             </b-col>
-            <b-col cols="6" class="m-0 px-2">
+            <b-col cols="7" class="m-0 px-2">
               <b-link :href="explorer + 'token/' + contract + '?a=' + b.address" target="_blank">
                 <font size="-1">{{ formatERC20(b.balance, decimals) }}</font>
               </b-link>

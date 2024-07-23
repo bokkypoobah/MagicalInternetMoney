@@ -156,19 +156,31 @@ const Fungibles = {
               </font>
             </div>
           </template>
-          <template #cell(balance)="data">
-            <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
-              <b-col cols="6" class="m-0 px-1">
-                <b-link :href="explorer + 'address/' + b.address" target="_blank">
-                  <font size="-1">{{ b.address.substring(0, 10) + '...' + b.address.slice(-8) }}</font>
-                </b-link>
+          <template #head(balances)="data">
+            <b-row class="m-0 p-0">
+              <b-col cols="5" class="m-0 px-2">
+                Address
               </b-col>
-              <b-col cols="6" class="m-0 px-1">
-                <b-link :href="explorer + 'token/' + data.item.contract + '?a=' + b.address" target="_blank">
-                  <font size="-1">{{ formatERC20(b.balance, data.item.decimals) }}</font>
-                </b-link>
+              <b-col cols="7" class="m-0 px-2 text-right">
+                Balance
               </b-col>
             </b-row>
+          </template>
+          <template #cell(balances)="data">
+            <font size="-1">
+              <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
+                <b-col cols="5" class="m-0 px-1">
+                  <b-link :href="explorer + 'address/' + b.address" target="_blank">
+                    {{ b.address.substring(0, 8) + '...' + b.address.slice(-6) }}
+                  </b-link>
+                </b-col>
+                <b-col cols="7" class="m-0 px-1 text-right">
+                  <b-link :href="explorer + 'token/' + data.item.contract + '?a=' + b.address" target="_blank">
+                    {{ formatERC20(b.balance, data.item.decimals) }}
+                  </b-link>
+                </b-col>
+              </b-row>
+            </font>
           </template>
           <template #cell(totalSupply)="data">
             <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
@@ -212,7 +224,7 @@ const Fungibles = {
         { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'symbolname', label: 'Symbol / Name', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'balances', label: 'Balances', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
         { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
