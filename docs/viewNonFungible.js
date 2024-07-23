@@ -2,7 +2,7 @@ const ViewNonFungible = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>ERC-721 Token</template>
+        <template #modal-title>{{ type == "erc721" ? 'ERC-721' : 'ERC-1155'}} Non-Fungible Token</template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -100,37 +100,37 @@ const ViewNonFungible = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    metadata() {
+    token() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
     },
+    type() {
+      return this.contract && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].type || null;
+    },
     name() {
-      return this.metadata && this.metadata.name || null;
+      return this.token && this.token.name || null;
     },
     description() {
-      return this.metadata && this.metadata.description || null;
+      return this.token && this.token.description || null;
     },
     image() {
       let result = null;
-      if (this.metadata.image) {
-        if (this.metadata.image.substring(0, 12) == "ipfs://ipfs/") {
-          result = "https://ipfs.io/" + this.metadata.image.substring(7)
-        } else if (this.metadata.image.substring(0, 7) == "ipfs://") {
-          result = "https://ipfs.io/ipfs/" + this.metadata.image.substring(7);
+      if (this.token.image) {
+        if (this.token.image.substring(0, 12) == "ipfs://ipfs/") {
+          result = "https://ipfs.io/" + this.token.image.substring(7)
+        } else if (this.token.image.substring(0, 7) == "ipfs://") {
+          result = "https://ipfs.io/ipfs/" + this.token.image.substring(7);
         } else {
-          result = this.metadata.image;
+          result = this.token.image;
         }
       }
       return result;
     },
     attributes() {
-      return this.metadata && this.metadata.attributes || [];
+      return this.token && this.token.attributes || [];
     },
 
     linkedTo() {
       return store.getters['viewNonFungible/linkedTo'];
-    },
-    type() {
-      return store.getters['viewNonFungible/type'];
     },
     mine: {
       get: function () {
