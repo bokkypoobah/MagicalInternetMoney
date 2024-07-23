@@ -129,7 +129,7 @@ const ViewFungible = {
       return store.getters['viewFungible/contract'];
     },
     unsupported() {
-      return this.contract in UNSUPPORTED_ERC20S;
+      return this.contract in UNSUPPORTED_FUNGIBLES;
     },
     contractDecimals() {
       return store.getters['viewFungible/contractDecimals'];
