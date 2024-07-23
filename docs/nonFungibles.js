@@ -127,8 +127,8 @@ const NonFungibles = {
               <!-- <b-dropdown-item href="#" @click="toggleSelected(filteredSortedAccounts)">Toggle selection for all tokens on all pages</b-dropdown-item> -->
               <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()">Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
-              <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()">Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
+              <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download> Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
+              <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()" v-b-popover.hover="'Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat selection above'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill> Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
             </b-dropdown>
           </template>
 
