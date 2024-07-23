@@ -217,7 +217,6 @@ const ViewNonFungible = {
     },
 
     refreshNonFungibleMetadata() {
-      const item = { blah: "Blah" };
       store.dispatch('data/refreshNonFungibleMetadata', [ { contract: this.contract, tokenId: this.tokenId } ]);
     },
 
