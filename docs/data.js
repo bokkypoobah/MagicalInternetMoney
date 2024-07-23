@@ -2045,7 +2045,7 @@ const dataModule = {
               // console.log("metadataFile: " + JSON.stringify(metadataFile, null, 2));
               if (contractType == "erc1155") {
                 // console.log("ERC-1155 metadataFile BEFORE: " + JSON.stringify(metadataFile, null, 2));
-                metadataFile = metadataFile.replace(/0x{id}/, tokenId);
+                metadataFile = metadataFile.replace(/0x{id}/, tokenId).replace(/{id}/, tokenId);
                 // console.log("ERC-1155 metadataFile AFTER: " + JSON.stringify(metadataFile, null, 2));
               }
               try {
