@@ -117,8 +117,22 @@ const NonFungibles = {
               </ul>
             </div>
           </template>
+
+          <template #head(number)="data">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+              <template #button-content>
+                <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+              </template>
+              <b-dropdown-item href="#" @click="toggleSelected(pagedFilteredSortedItems)">Toggle selection for all tokens on this page</b-dropdown-item>
+              <!-- <b-dropdown-item href="#" @click="toggleSelected(filteredSortedAccounts)">Toggle selection for all tokens on all pages</b-dropdown-item> -->
+              <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
+            </b-dropdown>
+          </template>
+
           <template #cell(number)="data">
-            {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
+            <b-form-checkbox size="sm" :checked="settings.selected[data.item.contract] && settings.selected[data.item.contract][data.item.tokenId]" @change="toggleSelected([data.item])">
+              {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
+            </b-form-checkbox>
           </template>
 
           <!-- <b-avatar button @click="toggleTrait(layer, trait.value)" rounded size="7rem" :src="getSVG(layer, trait.value)">
@@ -199,10 +213,11 @@ const NonFungibles = {
         filter: null,
         junkFilter: null,
         activeOnly: false,
+        selected: {},
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
-        version: 1,
+        version: 2,
       },
       transfer: {
         item: null,
@@ -462,13 +477,48 @@ const NonFungibles = {
     },
 
     toggleNonFungibleJunk(item) {
-      logInfo("NonFungibles", ".methods.toggleNonFungibleJunk - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibles", "methods.toggleNonFungibleJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleNonFungibleJunk', item);
     },
     toggleNonFungibleActive(item) {
-      logInfo("NonFungibles", ".methods.toggleNonFungibleActive - item: " + JSON.stringify(item, null, 2));
+      logInfo("NonFungibles", "methods.toggleNonFungibleActive - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleNonFungibleActive', item);
     },
+
+    toggleSelected(items) {
+      logInfo("NonFungibles", "methods.toggleSelected - items: " + JSON.stringify(items, null, 2));
+      let someFalse = false;
+      let someTrue = false;
+      for (const item of items) {
+        if (this.settings.selected[item.contract] && this.settings.selected[item.contract][item.tokenId]) {
+          someTrue = true;
+        } else {
+          someFalse = true;
+        }
+      }
+      for (const item of items) {
+        if (!(someTrue && !someFalse)) {
+          if (!(item.contract in this.settings.selected)) {
+            Vue.set(this.settings.selected, item.contract, {});
+          }
+          if (!(item.tokenId in this.settings.selected[item.contract])) {
+            Vue.set(this.settings.selected[item.contract], item.tokenId, true);
+          }
+        } else {
+          Vue.delete(this.settings.selected[item.contract], item.tokenId);
+          if (Object.keys(this.settings.selected[item.contract]) == 0) {
+            Vue.delete(this.settings.selected, item.contract);
+          }
+        }
+      }
+      logInfo("NonFungibles", "methods.toggleSelected - this.settings.selected: " + JSON.stringify(this.settings.selected, null, 2));
+      this.saveSettings();
+    },
+    clearSelected() {
+      this.settings.selected = {};
+      this.saveSettings();
+    },
+
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);
     },
@@ -534,50 +584,6 @@ const NonFungibles = {
       }
     },
 
-    async revealTransferSpendingPrivateKey() {
-      function computeStealthKey(ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey) {
-        const result = {};
-        result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
-        result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
-        const stealthPrivateKeyNumber = (BigInt(spendingPrivateKey) + BigInt(result.hashedSharedSecret)) % BigInt(SECP256K1_N);
-        const stealthPrivateKeyString = stealthPrivateKeyNumber.toString(16);
-        result.stealthPrivateKey = "0x" + stealthPrivateKeyString.padStart(64, '0');
-        result.stealthPublicKey = "0x" +  nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(stealthPrivateKeyNumber).toHex(false);
-        result.stealthAddress = ethers.utils.computeAddress(result.stealthPublicKey);
-        return result;
-      }
-
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - transfer: " + JSON.stringify(this.transfer, null, 2));
-      const stealthMetaAddressData = this.addresses[this.transfer.item.linkedTo.stealthMetaAddress];
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
-      const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [phraseInHex, this.coinbase],
-      });
-      const signature1 = signature.slice(2, 66);
-      const signature2 = signature.slice(66, 130);
-      // Hash "v" and "r" values using SHA-256
-      const hashedV = ethers.utils.sha256("0x" + signature1);
-      const hashedR = ethers.utils.sha256("0x" + signature2);
-      const n = ethers.BigNumber.from(SECP256K1_N);
-      // Calculate the private keys by taking the hash values modulo the curve order
-      const privateKey1 = ethers.BigNumber.from(hashedV).mod(n);
-      const privateKey2 = ethers.BigNumber.from(hashedR).mod(n);
-      const keyPair1 = new ethers.Wallet(privateKey1.toHexString());
-      const keyPair2 = new ethers.Wallet(privateKey2.toHexString());
-      const spendingPrivateKey = keyPair1.privateKey;
-      const viewingPrivateKey = keyPair2.privateKey;
-      const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
-      const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
-      // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
-      const computedStealthKey = computeStealthKey(this.transfer.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
-      const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
-      // Vue.set(this.transfer, 'stealthPrivateKey', stealthPrivateKey);
-      this.transfer.stealthPrivateKey = stealthPrivateKey;
-      console.log("this.transfer: " + JSON.stringify(this.transfer, null, 2));
-    },
 
     async timeoutCallback() {
       logDebug("NonFungibles", "timeoutCallback() count: " + this.count);

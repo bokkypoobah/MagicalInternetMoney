@@ -424,11 +424,11 @@ const Fungibles = {
     },
 
     toggleFungibleJunk(item) {
-      logInfo("Fungibles", ".methods.toggleFungibleJunk - item: " + JSON.stringify(item, null, 2));
+      logInfo("Fungibles", "methods.toggleFungibleJunk - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleFungibleJunk', item);
     },
     toggleFungibleActive(item) {
-      logInfo("Fungibles", ".methods.toggleFungibleActive - item: " + JSON.stringify(item, null, 2));
+      logInfo("Fungibles", "methods.toggleFungibleActive - item: " + JSON.stringify(item, null, 2));
       store.dispatch('data/toggleFungibleActive', item);
     },
     copyToClipboard(str) {
