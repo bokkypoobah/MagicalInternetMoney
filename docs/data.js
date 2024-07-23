@@ -728,11 +728,11 @@ const dataModule = {
       await context.dispatch('saveData', ['txsInfo']);
     },
     async refreshNonFungibleMetadata(context, tokens) {
-      logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens, null, 2));
+      logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens));
       const chainId = store.getters['connection/chainId'];
       const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
       if (reservoirPrefix) {
-        const BATCHSIZE = 2; // 40; // 50 causes the Reservoir API to fail for some fetches
+        const BATCHSIZE = 40; // 50 causes the Reservoir API to fail for some fetches
         const DELAYINMILLIS = 2500;
         for (let i = 0; i < tokens.length && !context.state.sync.halt; i += BATCHSIZE) {
           const batch = tokens.slice(i, parseInt(i) + BATCHSIZE);

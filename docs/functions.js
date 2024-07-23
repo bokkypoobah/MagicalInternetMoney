@@ -347,6 +347,12 @@ function parseReservoirTokenData(info) {
   result.name = token.name;
   result.description = token.description;
   result.image = token.image;
+  result.attributes = [];
+  if (token.attributes) {
+    for (const attribute of token.attributes) {
+      result.attributes.push({ trait_type: attribute.key, value: attribute.value });
+    }
+  }
   // const createdRecord = token.attributes.filter(e => e.key == "Created Date");
   // result.created = createdRecord.length == 1 && createdRecord[0].value && parseInt(createdRecord[0].value) || null;
   // if (result.contract == ENS_BASEREGISTRARIMPLEMENTATION_ADDRESS) {
