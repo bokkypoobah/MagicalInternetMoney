@@ -145,6 +145,11 @@ const NonFungibles = {
             <br />
             <font size="-1">{{ data.item.description }}</font>
             <br />
+            <font size="-1">
+              <b-badge variant="light">
+                {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
+              </b-badge>
+            </font>
             <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
