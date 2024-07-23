@@ -730,15 +730,38 @@ const dataModule = {
     async refreshNonFungibleMetadata(context, tokens) {
       logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens, null, 2));
       const chainId = store.getters['connection/chainId'];
-      console.log("chainId: " + chainId);
       const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
-      console.log("reservoirPrefix: " + JSON.stringify(reservoirPrefix, null, 2));
       if (reservoirPrefix) {
-        for (const token of tokens) {
-          console.log(JSON.stringify(token));
-          const url = reservoirPrefix + "tokens/v7?tokens=" + token.contract + ":" + token.tokenId;
-          console.log(url);
+        const BATCHSIZE = 2; // 40; // 50 causes the Reservoir API to fail for some fetches
+        const DELAYINMILLIS = 2500;
+        for (let i = 0; i < tokens.length && !context.state.sync.halt; i += BATCHSIZE) {
+          const batch = tokens.slice(i, parseInt(i) + BATCHSIZE);
+          let continuation = null;
+          do {
+            if (!continuation) {
+              await delay(DELAYINMILLIS);
+            }
+            let url = reservoirPrefix + "tokens/v7?" + batch.map(e => 'tokens=' + e.contract + ':' + e.tokenId).join("&");
+            url = url + (continuation != null ? "&continuation=" + continuation : '');
+            url = url + "&limit=50&includeAttributes=true&includeTopBid=true&includeLastSale=true";
+            console.log(url);
+            const data = await fetch(url).then(response => response.json());
+            continuation = data.continuation;
+            if (data.tokens) {
+              for (let record of data.tokens) {
+                // console.log("record: " + JSON.stringify(record, null, 2));
+                const data = parseReservoirTokenData(record);
+                console.log("data: " + JSON.stringify(data, null, 2));
+                // context.commit('addAccountToken', record.token);
+              }
+            }
+          } while (continuation != null);
         }
+        // for (const token of tokens) {
+        //   console.log(JSON.stringify(token));
+        //   const url = reservoirPrefix + "tokens/v7?tokens=" + token.contract + ":" + token.tokenId;
+        //   console.log(url);
+        // }
       }
       // const url = "https://api.reservoir.tools/tokens/v5?tokens=" + token.contract + ":" + token.tokenId;
       // console.log(url);
