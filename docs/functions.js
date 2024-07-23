@@ -344,9 +344,15 @@ function parseReservoirTokenData(info) {
     console.log("parseReservoirTokenData - ERROR: name: " + name + ", owner: " + token.owner + ", error: " + e.message + " info: " + JSON.stringify(info, null, 2));
     result.owner = ADDRESS0;
   }
+  result.collectionSymbol = token.collection && token.collection.symbol || null;
+  result.collectionName = token.collection && token.collection.name || null;
   result.name = token.name;
   result.description = token.description;
-  result.image = token.image;
+  // if (token.image == null && token.metadata && token.metadata.tokenURI) {
+  //   result.image = token.metadata.tokenURI;
+  // } else {
+    result.image = token.image;
+  // }
   result.attributes = [];
   if (token.attributes) {
     for (const attribute of token.attributes) {
@@ -408,5 +414,6 @@ function parseReservoirTokenData(info) {
     netAmount: topBidNetAmount,
     netAmountUSD: topBidNetAmountUSD,
   };
+  // console.log("result: " + JSON.stringify(result, null, 2));
   return result;
 }

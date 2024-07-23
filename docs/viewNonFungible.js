@@ -225,59 +225,6 @@ const ViewNonFungible = {
       store.dispatch('data/requestReservoirMetadataRefresh', [ { contract: this.contract, tokenId: this.tokenId } ]);
     },
 
-    // TODO: Delete
-    async refreshTokenMetadata() {
-      const imageUrlToBase64 = async url => {
-        const response = await fetch(url /*, { mode: 'cors' }*/);
-        const blob = await response.blob();
-        return new Promise((onSuccess, onError) => {
-          try {
-            const reader = new FileReader() ;
-            reader.onload = function(){ onSuccess(this.result) } ;
-            reader.readAsDataURL(blob) ;
-          } catch(e) {
-            onError(e);
-          }
-        });
-      };
-
-      logInfo("ViewNonFungible", "refreshTokenMetadata()");
-      const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
-      console.log("url: " + url);
-      const data = await fetch(url).then(response => response.json());
-      // console.log("data: " + JSON.stringify(data, null, 2));
-      if (data.tokens.length > 0) {
-        const tokenData = data.tokens[0].token;
-        // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
-        // const base64 = await imageUrlToBase64(tokenData.image);
-        const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
-        attributes.sort((a, b) => {
-          return ('' + a.trait_type).localeCompare(b.trait_type);
-        });
-        const address = ethers.utils.getAddress(tokenData.contract);
-        let expiry = undefined;
-        if (address == ENS_ERC721_ADDRESS) {
-          const expiryRecord = attributes.filter(e => e.trait_type == "Expiration Date");
-          console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
-          expiry = expiryRecord.length == 1 && expiryRecord[0].value || null;
-        }
-        const metadata = {
-          chainId: tokenData.chainId,
-          contract: this.contract,
-          tokenId: tokenData.tokenId,
-          expiry,
-          name: tokenData.name,
-          description: tokenData.description,
-          image: tokenData.image,
-          attributes,
-          // image: base64,
-        };
-        console.log("metadata: " + JSON.stringify(metadata, null, 2));
-        store.dispatch('data/addTokenMetadata', metadata);
-        store.dispatch('data/saveData', ['tokenMetadata']);
-      }
-    },
-
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
         .then(value => {

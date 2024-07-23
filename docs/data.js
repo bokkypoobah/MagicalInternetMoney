@@ -744,7 +744,7 @@ const dataModule = {
           const batch = tokens.slice(i, parseInt(i) + BATCHSIZE);
           let continuation = null;
           do {
-            if (!continuation) {
+            if (continuation) {
               await delay(DELAYINMILLIS);
             }
             let url = reservoirPrefix + "tokens/v7?" + batch.map(e => 'tokens=' + e.contract + ':' + e.tokenId).join("&");
@@ -925,6 +925,7 @@ const dataModule = {
         await context.dispatch('syncFungiblesMetadata', parameter);
       }
       if (options.nonFungiblesMetadata && !options.devThing) {
+        // await context.dispatch('syncNonFungiblesMetadataFromReservoir', parameter);
         await context.dispatch('syncNonFungiblesMetadata', parameter);
       }
       if (options.ens && chainId == 1 && !options.devThing) {
@@ -2253,6 +2254,271 @@ const dataModule = {
       }
       await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.syncNonFungiblesMetadata END");
+    },
+
+    async syncNonFungiblesMetadataFromReservoir(context, parameter) {
+      logInfo("dataModule", "actions.syncNonFungiblesMetadataFromReservoir: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      logInfo("dataModule", "actions.syncNonFungiblesMetadataFromReservoir BEGIN");
+      const FETCH_TIMEOUT_MILLIS = 15000;
+      const tokensToProcess = {};
+      let totalTokensToProcess = 0;
+      for (const [contract, balance] of Object.entries(context.state.balances[parameter.chainId] || {})) {
+        if (balance.type == "erc721" || balance.type == "erc1155") {
+          for (const [tokenId, tokenData] of Object.entries(balance.tokens)) {
+            if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId] || !context.state.tokens[parameter.chainId][contract].tokens[tokenId].name) {
+              if (!(contract in tokensToProcess)) {
+                tokensToProcess[contract] = {};
+              }
+              tokensToProcess[contract][tokenId] = tokenData;
+              totalTokensToProcess++;
+            }
+          }
+        }
+      }
+      console.log("tokensToProcess: " + JSON.stringify(tokensToProcess, null, 2));
+
+      let completed = 0;
+      context.commit('setSyncSection', { section: 'Non-Fungible Token Metadata', total: totalTokensToProcess });
+      context.commit('setSyncCompleted', 0);
+      // data:application/json;base64, 0x72A94e6c51CB06453B84c049Ce1E1312f7c05e2c Wiiides
+      // https:// -> ipfs://           0x31385d3520bCED94f77AaE104b406994D8F2168C BGANPUNKV2
+      // data:application/json;base64, 0x1C60841b70821dcA733c9B1a26dBe1a33338bD43 GLICPIXXXVER002
+      // IPFS data in another contract 0xC2C747E0F7004F9E8817Db2ca4997657a7746928 Hashmask
+      // No tokenURI                   0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85 ENS
+      // TODO ?                        0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401 ENS Name Wrapper
+      // IPFS retrieval failure        0xbe9371326F91345777b04394448c23E2BFEaa826 OSP Gemesis
+
+      const tokens = [];
+      for (const [contract, contractData] of Object.entries(tokensToProcess)) {
+        for (const [tokenId, tokenData] of Object.entries(contractData)) {
+          tokens.push({ contract, tokenId });
+        }
+      }
+
+      // console.log("tokens: " + JSON.stringify(tokens, null, 2));
+
+      const reservoirPrefix = NETWORKS[parameter.chainId] && NETWORKS[parameter.chainId].reservoir || null;
+      // console.log("reservoirPrefix: " + reservoirPrefix);
+
+      if (reservoirPrefix) {
+        const BATCHSIZE = 40; // 50 causes the Reservoir API to fail for some fetches
+        const DELAYINMILLIS = 2500;
+        for (let i = 0; i < tokens.length && !context.state.sync.halt; i += BATCHSIZE) {
+          const batch = tokens.slice(i, parseInt(i) + BATCHSIZE);
+          console.log("batch: " + JSON.stringify(batch));
+          let continuation = null;
+          do {
+            if (continuation) {
+              await delay(DELAYINMILLIS);
+            }
+            let url = reservoirPrefix + "tokens/v7?" + batch.map(e => 'tokens=' + e.contract + ':' + e.tokenId).join("&");
+            url = url + (continuation != null ? "&continuation=" + continuation : '');
+            url = url + "&limit=50&includeAttributes=true&includeTopBid=true&includeLastSale=true";
+            console.log(url);
+            const data = await fetch(url).then(response => response.json());
+            continuation = data.continuation;
+            if (data.tokens) {
+              for (let record of data.tokens) {
+                const token = parseReservoirTokenData(record);
+                // if (data.image) {
+                //   const imageBase64 = await imageUrlToBase64(data.image);
+                //   console.log("imageBase64: " + JSON.stringify(imageBase64, null, 2));
+                // }
+                context.commit('addNonFungibleMetadata', token);
+              }
+            }
+          } while (continuation != null);
+        }
+      }
+
+
+      return;
+
+
+      for (const [contract, contractData] of Object.entries(tokensToProcess)) {
+        const contractType = context.state.balances[parameter.chainId][contract].type;
+        console.log(contract + " => " + contractType);
+        for (const [tokenId, tokenData] of Object.entries(contractData)) {
+          context.commit('setSyncCompleted', completed);
+          try {
+            let tokenURIResult = null;
+            if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
+              tokenURIResult = "https://metadata.ens.domains/mainnet/" + contract + "/" + tokenId;
+            // } else if (contract == HASHMASK) {
+            //   // Cannot access to server CORS configuration tokenURIResult = "https://hashmap.azurewebsites.net/getMask/" + tokenId;
+            //   tokenURIResult = "https://api.reservoir.tools/tokens/v7?tokens=" + contract + "%3A" + tokenId + "&includeAttributes=true";
+            } else {
+              if (contractType == "erc721") {
+                const interface = new ethers.Contract(contract, ERC721ABI, provider);
+                tokenURIResult = await interface.tokenURI(tokenId);
+              } else if (contractType == "erc1155") {
+                const interface = new ethers.Contract(contract, ERC1155ABI, provider);
+                tokenURIResult = await interface.uri(tokenId);
+                // console.log("ERC-1155 tokenURIResult: " + tokenURIResult);
+              }
+            }
+            console.log("FIRST: " + contract + "/" + tokenId + " => " + JSON.stringify(tokenURIResult));
+            let name = null;
+            let description = null;
+            let attributes = null;
+            let imageSource = null;
+            let image = null;
+            let expiry = null;
+            let expired = false;
+            if (tokenURIResult && tokenURIResult.substring(0, 29) == "data:application/json;base64,") {
+              const decodedJSON = atob(tokenURIResult.substring(29));
+              const data = JSON.parse(decodedJSON);
+              name = data.name || undefined;
+              description = data.description || undefined;
+              attributes = data.attributes || {};
+              image = data.image || undefined;
+              context.commit('addNonFungibleMetadata', {
+                chainId: parameter.chainId,
+                contract,
+                tokenId,
+                name,
+                description,
+                image,
+                attributes,
+              });
+            } else if (tokenURIResult && (tokenURIResult.substring(0, 7) == "ipfs://" || tokenURIResult.substring(0, 8) == "https://")) {
+              let metadataFile = null;
+              if (tokenURIResult.substring(0, 12) == "ipfs://ipfs/") {
+                metadataFile = "https://ipfs.io/" + tokenURIResult.substring(7)
+              } else if (tokenURIResult.substring(0, 7) == "ipfs://") {
+                metadataFile = "https://ipfs.io/ipfs/" + tokenURIResult.substring(7);
+              } else {
+                metadataFile = tokenURIResult;
+              }
+              // let metadataFile = tokenURIResult.substring(0, 7) == "ipfs://" ? ("https://ipfs.io/ipfs/" + tokenURIResult.substring(7)) : tokenURIResult;
+              // console.log("tokenURIResult: " + tokenURIResult + ", metadataFile: " + metadataFile);
+
+              // console.log("metadataFile: " + JSON.stringify(metadataFile, null, 2));
+              if (contractType == "erc1155") {
+                // console.log("ERC-1155 metadataFile BEFORE: " + JSON.stringify(metadataFile, null, 2));
+                metadataFile = metadataFile.replace(/0x{id}/, tokenId).replace(/{id}/, tokenId);
+                // console.log("ERC-1155 metadataFile AFTER: " + JSON.stringify(metadataFile, null, 2));
+              }
+              try {
+                const metadataFileContent = await fetch(metadataFile, { mode: 'cors', signal: AbortSignal.timeout(FETCH_TIMEOUT_MILLIS) }).then(response => response.json());
+                // console.log("metadataFile: " + metadataFile + " => " + JSON.stringify(metadataFileContent, null, 2));
+
+                if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
+                  if (metadataFileContent && metadataFileContent.message) {
+                    // metadataFileContent: {
+                    //   "message": "'©god.eth' is already been expired at Fri, 29 Sep 2023 06:31:14 GMT."
+                    // }
+                    // console.log("EXPIRED: " + metadataFileContent.message);
+                    let inputString;
+                    [inputString, name, expiryString] = metadataFileContent.message.match(/'(.*)'.*at\s(.*)\./) || [null, null, null]
+                    expiry = moment.utc(expiryString).unix();
+                    console.log("EXPIRED - name: '" + name + "', expiryString: '" + expiryString + "', expiry: " + expiry);
+                    expired = true;
+                    context.commit('addNonFungibleMetadata', {
+                      chainId: parameter.chainId,
+                      contract,
+                      tokenId,
+                      created: null,
+                      registration: null,
+                      expiry,
+                      name: name,
+                      description: "Expired '" + name + "'",
+                      image: null,
+                      attributes: [],
+                    });
+                  } else { // if (metadataFileContent && metadataFileContent.attributes) {
+                    if (contract == ENS_ERC721_ADDRESS) {
+                      const createdRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Created Date");
+                      created = createdRecord.length == 1 && createdRecord[0].value / 1000 || null;
+                      const registrationRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Registration Date");
+                      registration = registrationRecord.length == 1 && registrationRecord[0].value / 1000 || null;
+                      const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Expiration Date");
+                      expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
+                      const attributes = metadataFileContent.attributes || [];
+                      attributes.sort((a, b) => {
+                        return ('' + a.trait_type).localeCompare(b.trait_type);
+                      });
+                      context.commit('addNonFungibleMetadata', {
+                        chainId: parameter.chainId,
+                        contract,
+                        tokenId,
+                        created,
+                        registration,
+                        expiry,
+                        name: metadataFileContent.name || null,
+                        description: metadataFileContent.name || null,
+                        image: metadataFileContent.image || null,
+                        attributes,
+                      });
+                    } else if (contract == ENS_ERC1155_ADDRESS) {
+                      const createdRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Created Date");
+                      created = createdRecord.length == 1 && createdRecord[0].value / 1000 || null;
+                      const expiryRecord = metadataFileContent.attributes.filter(e => e.trait_type == "Namewrapper Expiry Date");
+                      expiry = expiryRecord.length == 1 && expiryRecord[0].value / 1000 || null;
+                      const attributes = metadataFileContent.attributes || [];
+                      attributes.sort((a, b) => {
+                        return ('' + a.trait_type).localeCompare(b.trait_type);
+                      });
+                      context.commit('addNonFungibleMetadata', {
+                        chainId: parameter.chainId,
+                        contract,
+                        tokenId,
+                        created,
+                        expiry,
+                        name: metadataFileContent.name || null,
+                        description: metadataFileContent.name || null,
+                        image: metadataFileContent.image || null,
+                        attributes,
+                      });
+                    }
+                  }
+                } else {
+                  console.log("NON-ENS");
+                  const attributes = metadataFileContent.attributes || [];
+                  attributes.sort((a, b) => {
+                    return ('' + a.trait_type).localeCompare(b.trait_type);
+                  });
+                  const image = metadataFileContent.image || null;
+                  console.log(contract + "/" + tokenId + " => " + image);
+                  context.commit('addNonFungibleMetadata', {
+                    chainId: parameter.chainId,
+                    contract,
+                    tokenId,
+                    name: metadataFileContent.name || null,
+                    description: metadataFileContent.name || null,
+                    image: metadataFileContent.image || null,
+                    attributes,
+                  });
+                }
+              } catch (e1) {
+                if (e1.name === 'AbortError') {
+                  console.error("TIMEOUT: " + e1.message);
+                } else {
+                  console.error("ERROR: " + e1.message);
+                }
+              }
+            }
+          } catch (e) {
+            console.error(e.message);
+          }
+          completed++;
+          if ((completed % 10) == 0) {
+            await context.dispatch('saveData', ['tokens']);
+          }
+          if (context.state.sync.halt) {
+            break;
+          }
+        }
+        if (context.state.sync.halt) {
+          break;
+        }
+        // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
+      }
+      await context.dispatch('saveData', ['tokens']);
+      logInfo("dataModule", "actions.syncNonFungiblesMetadataFromReservoir END");
     },
 
     async syncENS(context, parameter) {
