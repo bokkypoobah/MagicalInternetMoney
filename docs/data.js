@@ -727,8 +727,19 @@ const dataModule = {
       await context.commit('removeTagFromTxs', info);
       await context.dispatch('saveData', ['txsInfo']);
     },
-    async refreshNonFungibleMetadata(context, token) {
-      logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(token, null, 2));
+    async refreshNonFungibleMetadata(context, tokens) {
+      logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens, null, 2));
+      const chainId = store.getters['connection/chainId'];
+      console.log("chainId: " + chainId);
+      const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
+      console.log("reservoirPrefix: " + JSON.stringify(reservoirPrefix, null, 2));
+      if (reservoirPrefix) {
+        for (const token of tokens) {
+          console.log(JSON.stringify(token));
+          const url = reservoirPrefix + "tokens/v7?tokens=" + token.contract + ":" + token.tokenId;
+          console.log(url);
+        }
+      }
       // const url = "https://api.reservoir.tools/tokens/v5?tokens=" + token.contract + ":" + token.tokenId;
       // console.log(url);
       // const data = await fetch(url).then(response => response.json());

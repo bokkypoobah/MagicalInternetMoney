@@ -215,9 +215,10 @@ const ViewNonFungible = {
 
     refreshNonFungibleMetadata() {
       const item = { blah: "Blah" };
-      store.dispatch('data/refreshNonFungibleMetadata', [item]);
+      store.dispatch('data/refreshNonFungibleMetadata', [{ contract: this.contract, tokenId: this.tokenId }]);
     },
 
+    // TODO: Delete
     async refreshTokenMetadata() {
       const imageUrlToBase64 = async url => {
         const response = await fetch(url /*, { mode: 'cors' }*/);
