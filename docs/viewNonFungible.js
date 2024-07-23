@@ -57,7 +57,7 @@ const ViewNonFungible = {
 
         <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" :disabled="sync.section != null" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download></b-button>
-          <b-button size="sm" :disabled="sync.section != null" @click="requestReservoirMetadataRefresh();" variant="link" v-b-popover.hover.top="'Request Reservoir API to refresh their metadata. Use this if the Reservoir does not have the correct metadata. Wait a few minutes then repeat refresh to the left'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill></b-button>
+          <b-button size="sm" :disabled="sync.section != null" @click="requestReservoirMetadataRefresh();" variant="link" v-b-popover.hover.top="'Request Reservoir API to refresh their metadata. Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat refresh to the left'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill></b-button>
         </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
