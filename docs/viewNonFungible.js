@@ -55,8 +55,8 @@ const ViewNonFungible = {
           </b-row>
         </b-form-group>
 
-        <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
+        <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button size="sm" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -211,6 +211,11 @@ const ViewNonFungible = {
     },
     setShow(show) {
       store.dispatch('viewNonFungible/setShow', show);
+    },
+
+    refreshNonFungibleMetadata() {
+      const item = { blah: "Blah" };
+      store.dispatch('data/refreshNonFungibleMetadata', [item]);
     },
 
     async refreshTokenMetadata() {

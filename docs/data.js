@@ -727,17 +727,18 @@ const dataModule = {
       await context.commit('removeTagFromTxs', info);
       await context.dispatch('saveData', ['txsInfo']);
     },
-    async refreshTokenMetadata(context, token) {
-      console.log("actions.refreshTokenMetadata - token: " + JSON.stringify(token));
-      const url = "https://api.reservoir.tools/tokens/v5?tokens=" + token.contract + ":" + token.tokenId;
-      console.log(url);
-      const data = await fetch(url).then(response => response.json());
-      if (data.tokens) {
-        for (let record of data.tokens) {
-          context.commit('updateAccountToken', record.token);
-        }
-      }
-      await context.dispatch('saveData', ['accounts']);
+    async refreshNonFungibleMetadata(context, token) {
+      logInfo("dataModule", "actions.refreshNonFungibleMetadata - token: " + JSON.stringify(token, null, 2));
+      // const url = "https://api.reservoir.tools/tokens/v5?tokens=" + token.contract + ":" + token.tokenId;
+      // console.log(url);
+      // const data = await fetch(url).then(response => response.json());
+      // if (data.tokens) {
+      //   for (let record of data.tokens) {
+      //     console.log(JSON.stringify(record));
+      //     // context.commit('updateAccountToken', record.token);
+      //   }
+      // }
+      // await context.dispatch('saveData', ['accounts']);
     },
     async setSyncHalt(context, halt) {
       context.commit('setSyncHalt', halt);
