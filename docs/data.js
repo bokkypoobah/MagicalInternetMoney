@@ -756,7 +756,6 @@ const dataModule = {
             if (data.tokens) {
               for (let record of data.tokens) {
                 const token = parseReservoirTokenData(record);
-                // console.log("token: " + JSON.stringify(token, null, 2));
                 // if (data.image) {
                 //   const imageBase64 = await imageUrlToBase64(data.image);
                 //   console.log("imageBase64: " + JSON.stringify(imageBase64, null, 2));
@@ -766,21 +765,7 @@ const dataModule = {
             }
           } while (continuation != null);
         }
-        // for (const token of tokens) {
-        //   console.log(JSON.stringify(token));
-        //   const url = reservoirPrefix + "tokens/v7?tokens=" + token.contract + ":" + token.tokenId;
-        //   console.log(url);
-        // }
       }
-      // const url = "https://api.reservoir.tools/tokens/v5?tokens=" + token.contract + ":" + token.tokenId;
-      // console.log(url);
-      // const data = await fetch(url).then(response => response.json());
-      // if (data.tokens) {
-      //   for (let record of data.tokens) {
-      //     console.log(JSON.stringify(record));
-      //     // context.commit('updateAccountToken', record.token);
-      //   }
-      // }
       await context.dispatch('saveData', ['tokens']);
     },
 
