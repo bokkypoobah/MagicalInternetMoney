@@ -56,7 +56,7 @@ const ViewNonFungible = {
         </b-form-group>
 
         <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
+          <b-button size="sm" :disabled="sync.section != null" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -87,6 +87,9 @@ const ViewNonFungible = {
     },
     nonFungibleViewer() {
       return store.getters['connection/nonFungibleViewer'];
+    },
+    sync() {
+      return store.getters['data/sync'];
     },
     addresses() {
       return store.getters['data/addresses'];
