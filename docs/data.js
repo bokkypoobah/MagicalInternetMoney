@@ -451,7 +451,7 @@ const dataModule = {
       Vue.delete(state.addresses, address);
     },
     addFungibleMetadata(state, info) {
-      // logInfo("dataModule", "mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      logInfo("dataModule", "mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
         Vue.set(state.tokens, info.chainId, {});
       }
@@ -1889,7 +1889,7 @@ const dataModule = {
           contract,
           symbol,
           name,
-          decimals: decimals && parseInt(decimals) || null,
+          decimals: decimals,
           totalSupply: totalSupply && totalSupply.toString() || null,
           image,
           ...contractData,
