@@ -487,6 +487,7 @@ const dataModule = {
     addNonFungibleMetadata(state, info) {
       logInfo("dataModule", "mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
+      console.log(chainId + ":" + contract + ":" + tokenId);
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
       }
@@ -514,7 +515,7 @@ const dataModule = {
             active: false,
           });
         } else {
-          // logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
+          logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
           Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
             name: info.name,
             description: info.description,
@@ -523,6 +524,12 @@ const dataModule = {
             active: false,
           });
         }
+      } else {
+        // logInfo("dataModule", "mutations.addNonFungibleMetadata existing: " + JSON.stringify(info, null, 2));
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'name', info.name);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'description', info.description);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'image', info.image);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'attributes', info.attributes);
       }
     },
     addStealthTransfer(state, info) {
