@@ -139,10 +139,9 @@ const Fungibles = {
           <template #cell(type)="data">
             <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
           </template>
-          <template #cell(symbol)="data">
+          <template #cell(symbolname)="data">
             <font size="-1">{{ data.item.symbol }}</font>
-          </template>
-          <template #cell(name)="data">
+            <br />
             <font size="-1">{{ data.item.name }}</font>
           </template>
           <template #cell(decimals)="data">
@@ -158,9 +157,18 @@ const Fungibles = {
             </div>
           </template>
           <template #cell(balance)="data">
-            <span v-if="data.item.balances[coinbase] && data.item.type == 'erc20'">
-              <b-button size="sm" :href="explorer + 'token/' + data.item.contract + '?a=' + coinbase" variant="link" class="m-0 ml-2 p-0" target="_blank">{{ formatDecimals(data.item.balances[coinbase], data.item.decimals || 0) }}</b-button>
-            </span>
+            <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
+              <b-col cols="6" class="m-0 px-1">
+                <b-link :href="explorer + 'address/' + b.address" target="_blank">
+                  <font size="-1">{{ b.address.substring(0, 10) + '...' + b.address.slice(-8) }}</font>
+                </b-link>
+              </b-col>
+              <b-col cols="6" class="m-0 px-1">
+                <b-link :href="explorer + 'token/' + data.item.contract + '?a=' + b.address" target="_blank">
+                  <font size="-1">{{ formatERC20(b.balance, data.item.decimals) }}</font>
+                </b-link>
+              </b-col>
+            </b-row>
           </template>
           <template #cell(totalSupply)="data">
             <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
@@ -198,15 +206,14 @@ const Fungibles = {
         { value: 'namedsc', text: '▼ Name, ▲ Contract' },
       ],
       fields: [
-        { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-        { key: 'active', label: '', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 4%;', tdClass: 'text-truncate' },
+        { key: 'active', label: '', sortable: false, thStyle: 'width: 4%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'symbolname', label: 'Symbol / Name', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 18%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -302,8 +309,12 @@ const Fungibles = {
               include = false;
             }
           }
+          const balances = [];
+          for (const [address, balance] of Object.entries(contractData.balances)) {
+            balances.push({ address, balance });
+          }
           if (include) {
-            results.push({ chainId: this.chainId, contract, ...contractData, ...metadata });
+            results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances });
           }
         }
       }
@@ -437,6 +448,13 @@ const Fungibles = {
         // TODO: ERC-20 & ERC-721
         return address.substring(0, 10) + '...' + address.slice(-8);
       }
+    },
+    formatERC20(e, decimals = 18) {
+      try {
+        return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
+      } catch (err) {
+      }
+      return e.toString();
     },
     formatTimestamp(ts) {
       if (ts != null) {
