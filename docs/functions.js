@@ -418,3 +418,33 @@ function parseReservoirTokenData(info) {
   // console.log("result: " + JSON.stringify(result, null, 2));
   return result;
 }
+
+// scientific.collections.eth
+//           1         2         3         4         5
+// 012345678901234567890123456789012345678901234567890123456789
+// 0x0a736369656e74696669630b636f6c6c656374696f6e730365746800
+//
+//   0a                                                                 10
+//     736369656e7469666963                                             scientific
+//                         0b                                           11
+//                           636f6c6c656374696f6e73                     collections
+//                                                 03                   3
+//                                                   657468             eth
+//                                                         00           0
+// const results = decodeNameWrapperBytes("0x0a736369656e74696669630b636f6c6c656374696f6e730365746800");
+// console.log("results: " + JSON.stringify(results)); // results: ["scientific","collections","eth"]
+function decodeNameWrapperBytes(b) {
+  let start = 4;
+  let len = ethers.BigNumber.from("0x" + b.substring(2, 4));
+  const parts = [];
+  while (len > 0) {
+    const str = b.substring(start, start + len * 2);
+    let strUtf8 = ethers.utils.toUtf8String("0x" + str);
+    parts.push(strUtf8);
+    const s = b.substring(start + len * 2, start + len * 2 + 2);
+    const newStart = start + len * 2 + 2;
+    len = ethers.BigNumber.from("0x" + b.substring(start + len * 2, start + len * 2 + 2));
+    start = newStart;
+  }
+  return parts;
+}

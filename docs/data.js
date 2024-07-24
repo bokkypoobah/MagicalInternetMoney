@@ -1935,6 +1935,79 @@ const dataModule = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const oldETHRegistarControllerInterface = new ethers.utils.Interface(ENS_OLDETHREGISTRARCONTROLLER_ABI);
       const ethRegistarControllerInterface = new ethers.utils.Interface(ENS_ETHREGISTRARCONTROLLER_ABI);
+      const nameWrapperInterface = new ethers.utils.Interface(ENS_NAMEWRAPPER_ABI);
+
+      let total = 0;
+      let t = this;
+      async function processLogs(logs) {
+        total = parseInt(total) + logs.length;
+        context.commit('setSyncCompleted', total);
+        logInfo("dataModule", "actions.syncENSExpiries.processLogs - logs.length: " + logs.length + ", total: " + total);
+        const records = [];
+        for (const log of logs) {
+          if (!log.removed) {
+            const contract = log.address;
+            let eventRecord = null;
+            if (log.topics[0] == "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f" && contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS) {
+              // ERC-721 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
+              const logData = oldETHRegistarControllerInterface.parseLog(log);
+              const [name, label, owner, cost, expires] = logData.args;
+              eventRecord = { type: "NameRegistered", name, label, owner, cost: cost.toString(), expires: parseInt(expires) };
+            } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae" && contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS) {
+              // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
+              const logData = oldETHRegistarControllerInterface.parseLog(log);
+              const [name, label, cost, expires] = logData.args;
+              eventRecord = { type: "NameRenewed", name, label, cost: cost.toString(), expires: parseInt(expires) };
+            } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae" && contract == ENS_ETHREGISTRARCONTROLLER_ADDRESS) {
+              // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
+              const logData = ethRegistarControllerInterface.parseLog(log);
+              const [name, label, cost, expires] = logData.args;
+              eventRecord = { type: "NameRenewed", name, label, cost: cost.toString(), expires: parseInt(expires) };
+            } else if (log.topics[0] == "0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340" && contract == ENS_NAMEWRAPPER_ADDRESS) {
+              // NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
+              const logData = nameWrapperInterface.parseLog(log);
+              const [node, name, owner, fuses, expiry] = logData.args;
+              let parts = decodeNameWrapperBytes(name);
+              let nameString = parts.join(".");
+              let label = null;
+              let labelhash = null;
+              let labelhashDecimals = null;
+              if (parts.length >= 2 && parts[parts.length - 1] == "eth") {
+                label = parts[parts.length - 2];
+                labelhash = ethers.utils.solidityKeccak256(["string"], [label]);
+                labelhashDecimals = ethers.BigNumber.from(labelhash).toString();
+              }
+              const namehashDecimals = ethers.BigNumber.from(node).toString();
+              const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
+              eventRecord = { type: "NameWrapped", namehash: node, name: nameString, label, labelhash, subdomain, owner, fuses, expiry: parseInt(expiry) };
+            } else {
+              console.log("NOT HANDLED: " + JSON.stringify(log));
+            }
+            if (eventRecord) {
+              console.log(JSON.stringify(eventRecord, null, 2));
+              // records.push( {
+              //   chainId: parameter.chainId,
+              //   blockNumber: parseInt(log.blockNumber),
+              //   logIndex: parseInt(log.logIndex),
+              //   txIndex: parseInt(log.transactionIndex),
+              //   txHash: log.transactionHash,
+              //   contract,
+              //   ...eventRecord,
+              //   confirmations: parameter.blockNumber - log.blockNumber,
+              // });
+            }
+          }
+        }
+        // logInfo("dataModule", "actions.syncENSEvents.bulkAdd - records: " + JSON.stringify(records));
+        // if (records.length) {
+        //   // logInfo("dataModule", "actions.syncENSEvents.bulkAdd - records: " + JSON.stringify(records));
+        //   await db.events.bulkAdd(records).then(function(lastKey) {
+        //     console.log("syncENSEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
+        //   }).catch(Dexie.BulkError, function(e) {
+        //     console.log("syncENSEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+        //   });
+        // }
+      }
 
       logInfo("dataModule", "actions.syncENSExpiries BEGIN");
       const ens721TokenIds = [];
@@ -1950,8 +2023,8 @@ const dataModule = {
           }
         }
       }
-      console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
-      console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
+      // console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
+      // console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
 
       const BATCHSIZE = 100;
       context.commit('setSyncSection', { section: 'ENS Expiries', total: null });
@@ -1961,45 +2034,47 @@ const dataModule = {
       //   [ '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', namehash, null ],
       // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires) 0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae
       //   [ '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', namehash, null ],
-      if (false) {
-      for (let i = 0; i < ens721TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
-        const tokenIds = ens721TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
-        try {
-          let topics = [[
-              '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f',
-              '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae',
-            ],
-            tokenIds,
-            null,
-          ];
-          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
-          console.log("logs: " + JSON.stringify(logs));
-          // await process721Logs(logs);
-        } catch (e) {
-          logInfo("dataModule", "actions.syncENSEvents - getLogs ERROR: " + e.message);
+      if (true) {
+        for (let i = 0; i < ens721TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+          const tokenIds = ens721TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+          try {
+            let topics = [[
+                '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f',
+                '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae',
+              ],
+              tokenIds,
+              null,
+            ];
+            const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+            // console.log("logs: " + JSON.stringify(logs));
+            await processLogs(logs);
+          } catch (e) {
+            logInfo("dataModule", "actions.syncENSEvents - getLogs ERROR: " + e.message);
+          }
         }
-      }
       }
 
       // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
       // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
       // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
       //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
-      for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
-        const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
-        try {
-          let topics = null;
-          topics = [[
-              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
-            ],
-            tokenIds,
-            null,
-          ];
-          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
-          console.log("logs: " + JSON.stringify(logs, null, 2));
-          // await process1155Logs(logs);
-        } catch (e) {
-          logInfo("dataModule", "actions.syncWrappedENSEvents - getLogs ERROR: " + e.message);
+      if (true) {
+        for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+          const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+          try {
+            let topics = null;
+            topics = [[
+                '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
+              ],
+              tokenIds,
+              null,
+            ];
+            const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+            // console.log("logs: " + JSON.stringify(logs, null, 2));
+            await processLogs(logs);
+          } catch (e) {
+            logInfo("dataModule", "actions.syncWrappedENSEvents - getLogs ERROR: " + e.message);
+          }
         }
       }
 
