@@ -2028,9 +2028,6 @@ const dataModule = {
           }
         }
       }
-      // console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
-      // console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
-
       const BATCHSIZE = 100;
       context.commit('setSyncSection', { section: 'ENS Expiries', total: null });
       context.commit('setSyncCompleted', 0);
@@ -2039,23 +2036,20 @@ const dataModule = {
       //   [ '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', namehash, null ],
       // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires) 0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae
       //   [ '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', namehash, null ],
-      if (true) {
-        for (let i = 0; i < ens721TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
-          const tokenIds = ens721TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
-          try {
-            let topics = [[
-                '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f',
-                '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae',
-              ],
-              tokenIds,
-              null,
-            ];
-            const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
-            // console.log("logs: " + JSON.stringify(logs));
-            await processLogs(logs);
-          } catch (e) {
-            logInfo("dataModule", "actions.syncENSEvents - getLogs ERROR: " + e.message);
-          }
+      for (let i = 0; i < ens721TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+        const tokenIds = ens721TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+        try {
+          let topics = [[
+              '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f',
+              '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae',
+            ],
+            tokenIds,
+            null,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+          await processLogs(logs);
+        } catch (e) {
+          logInfo("dataModule", "actions.syncENSExpiries - getLogs ERROR: " + e.message);
         }
       }
 
@@ -2063,26 +2057,22 @@ const dataModule = {
       // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
       // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
       //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
-      if (true) {
-        for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
-          const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
-          try {
-            let topics = null;
-            topics = [[
-                '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
-              ],
-              tokenIds,
-              null,
-            ];
-            const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
-            // console.log("logs: " + JSON.stringify(logs, null, 2));
-            await processLogs(logs);
-          } catch (e) {
-            logInfo("dataModule", "actions.syncWrappedENSEvents - getLogs ERROR: " + e.message);
-          }
+      for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+        const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+        try {
+          let topics = null;
+          topics = [[
+              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
+            ],
+            tokenIds,
+            null,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+          await processLogs(logs);
+        } catch (e) {
+          logInfo("dataModule", "actions.syncENSExpiries - getLogs ERROR: " + e.message);
         }
       }
-      console.log("context.state.expiries: " + JSON.stringify(context.state.expiries, null, 2));
       await context.dispatch('saveData', ['expiries']);
       logInfo("dataModule", "actions.syncENSExpiries END");
     },
