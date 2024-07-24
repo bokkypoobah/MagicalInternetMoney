@@ -337,6 +337,7 @@ function parseReservoirTokenData(info) {
   const market = info.market;
   result.chainId = token.chainId;
   result.contract = ethers.utils.getAddress(token.contract);
+  result.type = token.kind;
   result.tokenId = token.tokenId;
   try {
     result.owner = ethers.utils.getAddress(token.owner);
