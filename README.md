@@ -81,7 +81,7 @@ Deployed on Sepolia:
 
 ###### ERC-20 Fungible Tokens
 
-<kbd><img src="images/SampleScreen_Fungibles_20240723.png" /></kbd>
+<kbd><img src="images/SampleScreen_Fungibles_20240724.png" /></kbd>
 
 <kbd><img src="images/SampleScreen_Fungible_20240723.png" /></kbd>
 

@@ -177,8 +177,8 @@ const Fungibles = {
             <font size="-1">
               <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
                 <b-col cols="5" class="m-0 px-1">
-                  <b-link :href="explorer + 'address/' + b.address" target="_blank">
-                    {{ b.address.substring(0, 8) + '...' + b.address.slice(-6) }}
+                  <b-link :href="explorer + 'address/' + b.address" v-b-popover.hover="'View ' + b.address + ' in the explorer'" target="_blank">
+                  {{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}
                   </b-link>
                 </b-col>
                 <b-col cols="7" class="m-0 px-1 text-right">
@@ -237,12 +237,6 @@ const Fungibles = {
     }
   },
   computed: {
-    powerOn() {
-      return store.getters['connection/powerOn'];
-    },
-    coinbase() {
-      return store.getters['connection/coinbase'];
-    },
     chainId() {
       return store.getters['connection/chainId'];
     },
@@ -269,6 +263,9 @@ const Fungibles = {
     },
     tokens() {
       return store.getters['data/tokens'];
+    },
+    ens() {
+      return store.getters['data/ens'];
     },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
