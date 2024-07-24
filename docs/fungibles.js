@@ -178,7 +178,7 @@ const Fungibles = {
               <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
                 <b-col cols="5" class="m-0 px-1">
                   <b-link :href="explorer + 'address/' + b.address" v-b-popover.hover="'View ' + b.address + ' in the explorer'" target="_blank">
-                  {{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}
+                    {{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}
                   </b-link>
                 </b-col>
                 <b-col cols="7" class="m-0 px-1 text-right">
@@ -249,12 +249,6 @@ const Fungibles = {
     explorer() {
       return store.getters['connection/explorer'];
     },
-    sync() {
-      return store.getters['data/sync'];
-    },
-    pageSizes() {
-      return store.getters['config/pageSizes'];
-    },
     addresses() {
       return store.getters['data/addresses'];
     },
@@ -266,6 +260,12 @@ const Fungibles = {
     },
     ens() {
       return store.getters['data/ens'];
+    },
+    sync() {
+      return store.getters['data/sync'];
+    },
+    pageSizes() {
+      return store.getters['config/pageSizes'];
     },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];

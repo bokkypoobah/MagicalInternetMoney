@@ -107,7 +107,7 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_2_20240715.png" /></kbd>
 
-<kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_3_20240715.png" /></kbd>
+<kbd><img src="images/SampleScreen_Registry_20240724.png" /></kbd>
 
 <br />
 

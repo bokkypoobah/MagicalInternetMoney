@@ -57,7 +57,9 @@ const Registry = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(registrant)="data">
-            {{ data.item.registrant }}
+            <b-link :href="explorer + 'address/' + data.item.registrant" v-b-popover.hover="'View ' + data.item.registrant + ' in the explorer'" target="_blank">
+              {{ addresses[data.item.registrant] && addresses[data.item.registrant].name || ens[data.item.registrant] || (data.item.registrant.substring(0, 8) + '...' + data.item.registrant.slice(-6)) }}
+            </b-link>
           </template>
           <template #cell(transfer)="data">
             <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(data.item.stealthMetaAddress);" variant="link" v-b-popover.hover="'Transfer to ' + data.item.stealthMetaAddress" class="m-0 ml-2 p-0"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
@@ -103,6 +105,15 @@ const Registry = {
     },
     transferHelper() {
       return store.getters['connection/transferHelper'];
+    },
+    explorer() {
+      return store.getters['connection/explorer'];
+    },
+    addresses() {
+      return store.getters['data/addresses'];
+    },
+    ens() {
+      return store.getters['data/ens'];
     },
     sync() {
       return store.getters['data/sync'];
