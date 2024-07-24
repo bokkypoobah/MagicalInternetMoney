@@ -158,7 +158,7 @@
               <font v-if="networkSupported" size="-2">
                 <span v-if="coinbase">
                   <b-link :href="explorer + 'address/' + coinbase" v-b-popover.hover.bottom="'View attached account in explorer'" target="_blank">
-                    {{ coinbase.substring(0, 6) + '...' + coinbase.slice(-4) }}
+                    {{ addresses[coinbase] && addresses[coinbase].name || ens[coinbase] || (coinbase.substring(0, 8) + '...' + coinbase.slice(-6)) }}
                   </b-link>
                   @
                 </span>

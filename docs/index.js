@@ -143,6 +143,12 @@ const app = new Vue({
     timestamp() {
       return store.getters['connection/block'] == null ? 0 : store.getters['connection/block'].timestamp;
     },
+    addresses() {
+      return store.getters['data/addresses'];
+    },
+    ens() {
+      return store.getters['data/ens'];
+    },
     spinnerVariant1() {
       var sv = store.getters['connection/spinnerVariant'];
       logInfo("index.js - computed.spinnerVariant", sv);
