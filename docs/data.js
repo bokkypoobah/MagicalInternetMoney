@@ -918,6 +918,7 @@ const dataModule = {
       if (options.txData && !options.devThing) {
         await context.dispatch('syncTokenEventTxData', parameter);
       }
+      // TODO if ((options.tokens || options.ensExpiries || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
       if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
       }
@@ -1932,17 +1933,77 @@ const dataModule = {
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const oldETHRegistarControllerInterface = new ethers.utils.Interface(ENS_OLDETHREGISTRARCONTROLLER_ABI);
+      const ethRegistarControllerInterface = new ethers.utils.Interface(ENS_ETHREGISTRARCONTROLLER_ABI);
+
       logInfo("dataModule", "actions.syncENSExpiries BEGIN");
-      return;
-      const contractsToProcess = {};
+      const ens721TokenIds = [];
+      const ens1155TokenIds = [];
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
-        if (contractData.type == "erc20") {
-          if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
-            contractsToProcess[contract] = contractData;
+        if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
+          for (const [tokenId, tokenData] of Object.entries(contractData.tokens)) {
+            if (contract == ENS_ERC721_ADDRESS) {
+              ens721TokenIds.push(tokenId);
+            } else {
+              ens1155TokenIds.push(tokenId);
+            }
           }
         }
       }
-      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
+      console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
+      console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
+
+      const BATCHSIZE = 100;
+      context.commit('setSyncSection', { section: 'ENS Expiries', total: null });
+      context.commit('setSyncCompleted', 0);
+      // 925.eth ERC-721 0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:53835211818918528779359817553631021141919078878710948845228773628660104698081
+      // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires) 0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f
+      //   [ '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', namehash, null ],
+      // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires) 0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae
+      //   [ '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', namehash, null ],
+      if (false) {
+      for (let i = 0; i < ens721TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+        const tokenIds = ens721TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+        try {
+          let topics = [[
+              '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f',
+              '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae',
+            ],
+            tokenIds,
+            null,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+          console.log("logs: " + JSON.stringify(logs));
+          // await process721Logs(logs);
+        } catch (e) {
+          logInfo("dataModule", "actions.syncENSEvents - getLogs ERROR: " + e.message);
+        }
+      }
+      }
+
+      // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
+      // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
+      // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
+      //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
+      for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+        const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+        try {
+          let topics = null;
+          topics = [[
+              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
+            ],
+            tokenIds,
+            null,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+          console.log("logs: " + JSON.stringify(logs, null, 2));
+          // await process1155Logs(logs);
+        } catch (e) {
+          logInfo("dataModule", "actions.syncWrappedENSEvents - getLogs ERROR: " + e.message);
+        }
+      }
+
+      return;
       context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
       let completed = 0;
       for (const [contract, contractData] of Object.entries(contractsToProcess)) {
