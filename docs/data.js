@@ -921,6 +921,11 @@ const dataModule = {
       if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
       }
+
+      if (options.ensExpiries && !options.devThing) {
+        await context.dispatch('syncENSExpiries', parameter);
+      }
+
       if (options.fungiblesMetadata && !options.devThing) {
         await context.dispatch('syncFungiblesMetadata', parameter);
       }
@@ -1922,6 +1927,81 @@ const dataModule = {
       logInfo("dataModule", "actions.computeBalances END");
     },
 
+    async syncENSExpiries(context, parameter) {
+      logInfo("dataModule", "actions.syncENSExpiries: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      logInfo("dataModule", "actions.syncENSExpiries BEGIN");
+      return;
+      const contractsToProcess = {};
+      for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
+        if (contractData.type == "erc20") {
+          if (!context.state.tokens[parameter.chainId] || !context.state.tokens[parameter.chainId][contract]) {
+            contractsToProcess[contract] = contractData;
+          }
+        }
+      }
+      console.log("contractsToProcess: " + JSON.stringify(contractsToProcess));
+      context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
+      let completed = 0;
+      for (const [contract, contractData] of Object.entries(contractsToProcess)) {
+        // console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
+        context.commit('setSyncCompleted', completed);
+        const interface = new ethers.Contract(contract, ERC20ABI, provider);
+        let symbol = null;
+        let name = null;
+        let decimals = null;
+        let totalSupply = null;
+        try {
+          symbol = await interface.symbol();
+        } catch (e) {
+        }
+        try {
+          name = await interface.name();
+        } catch (e) {
+        }
+        try {
+          decimals = await interface.decimals();
+        } catch (e) {
+        }
+        try {
+          totalSupply = await interface.totalSupply();
+        } catch (e) {
+        }
+        await delay(500);
+
+        const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
+        let image = null;
+        for (let i = 0; i < erc20Logos.length && !image; i++) {
+          const url = erc20Logos[i].replace(/\${contract}/, contract);
+          image = await imageUrlToBase64(url);
+        }
+
+        logInfo("dataModule", "actions.syncENSExpiries: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        context.commit('addFungibleMetadata', {
+          chainId: parameter.chainId,
+          contract,
+          symbol,
+          name,
+          decimals: decimals,
+          totalSupply: totalSupply && totalSupply.toString() || null,
+          image,
+          ...contractData,
+        });
+        completed++;
+        if ((completed % 10) == 0) {
+          await context.dispatch('saveData', ['tokens']);
+        }
+        if (context.state.sync.halt) {
+          break;
+        }
+      }
+      // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
+      await context.dispatch('saveData', ['tokens']);
+      logInfo("dataModule", "actions.syncENSExpiries END");
+    },
+
     async syncFungiblesMetadata(context, parameter) {
       logInfo("dataModule", "actions.syncFungiblesMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
@@ -1995,7 +2075,6 @@ const dataModule = {
       await context.dispatch('saveData', ['tokens']);
       logInfo("dataModule", "actions.syncFungiblesMetadata END");
     },
-
 
     async syncNonFungiblesMetadata(context, parameter) {
       logInfo("dataModule", "actions.syncNonFungiblesMetadata: " + JSON.stringify(parameter));
