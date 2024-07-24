@@ -299,6 +299,9 @@ const NonFungibles = {
     tokens() {
       return store.getters['data/tokens'];
     },
+    expiries() {
+      return store.getters['data/expiries'];
+    },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
     },
@@ -400,6 +403,7 @@ const NonFungibles = {
                 }
               }
               if (owners.length > 0) {
+                const expiry = this.expiries[this.chainId] && this.expiries[this.chainId][contract] && this.expiries[this.chainId][contract][tokenId] || null;
                 results.push({
                   chainId: this.chainId,
                   contract,
@@ -411,7 +415,7 @@ const NonFungibles = {
                   owners,
                   name: metadata.name || null,
                   description: metadata.description || null,
-                  expiry: metadata.expiry || undefined,
+                  expiry,
                   attributes: metadata.attributes || null,
                   // imageSource: metadata.imageSource || null,
                   image,

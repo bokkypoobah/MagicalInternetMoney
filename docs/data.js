@@ -250,6 +250,7 @@ const dataModule = {
     addresses: state => state.addresses,
     balances: state => state.balances,
     tokens: state => state.tokens,
+    expiries: state => state.expiries,
 
     collection: state => state.collection,
     timestamps: state => state.timestamps,
