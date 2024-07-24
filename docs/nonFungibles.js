@@ -183,9 +183,9 @@ const NonFungibles = {
 
           <template #cell(owners)="data">
             <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-              <b-link v-if="networkSupported" :href="explorer + 'token/' + data.item.contract + '?a=' + info.owner" target="_blank">
+              <b-link v-if="networkSupported" :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
                 <font size="-1">
-                  {{ info.owner.substring(0, 10) + '...' + info.owner.slice(-8) }}
+                  {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                   <span v-if="data.item.type == 'erc1155'" class="small muted">
                     {{ 'x' + info.count }}
                   </span>
@@ -301,6 +301,9 @@ const NonFungibles = {
     },
     expiries() {
       return store.getters['data/expiries'];
+    },
+    ens() {
+      return store.getters['data/ens'];
     },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];

@@ -87,7 +87,7 @@ Deployed on Sepolia:
 
 ###### ERC-721 and ERC-1155 Non-Fungible Tokens
 
-<kbd><img src="images/SampleScreen_NonFungibleTokens_20240711.png" /></kbd>
+<kbd><img src="images/SampleScreen_NonFungibleTokens_20240724.png" /></kbd>
 
 ###### ENS ERC-721 and ERC-1155 Non-Fungible Tokens With Expiries
 
