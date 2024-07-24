@@ -403,7 +403,7 @@ const NonFungibles = {
                 }
               }
               if (owners.length > 0) {
-                const expiry = this.expiries[this.chainId] && this.expiries[this.chainId][contract] && this.expiries[this.chainId][contract][tokenId] || null;
+                const expiry = (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) && this.expiries[this.chainId] && this.expiries[this.chainId][contract] && this.expiries[this.chainId][contract][tokenId] || null;
                 results.push({
                   chainId: this.chainId,
                   contract,

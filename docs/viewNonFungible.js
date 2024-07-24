@@ -26,6 +26,10 @@ const ViewNonFungible = {
           </b-input-group>
         </b-form-group>
 
+        <b-form-group v-if="expiry" label="Expiry:" label-for="token-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-form-input size="sm" plaintext id="token-expiry" :value="formatTimestamp(expiry)" class="px-2 w-100"></b-form-input>
+        </b-form-group>
+
         <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
         </b-form-group>
@@ -104,11 +108,17 @@ const ViewNonFungible = {
     tokens() {
       return store.getters['data/tokens'];
     },
+    expiries() {
+      return store.getters['data/expiries'];
+    },
     token() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
     },
     type() {
       return this.contract && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].type || null;
+    },
+    expiry() {
+      return this.contract && this.expiries[this.chainId] && this.expiries[this.chainId][this.contract] && this.expiries[this.chainId][this.contract][this.tokenId] || null;
     },
     name() {
       return this.token && this.token.name || null;
