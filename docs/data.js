@@ -1722,7 +1722,7 @@ const dataModule = {
       context.commit('setSyncSection', { section: 'Token Events', total: null });
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
+        if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
@@ -1849,7 +1849,7 @@ const dataModule = {
       logInfo("dataModule", "actions.computeBalances BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
+        if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
           selectedAddressesMap[address] = true;
         }
       }
