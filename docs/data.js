@@ -216,6 +216,7 @@ const dataModule = {
     //   }
     // }
     tokens: {},
+    expiries: {},
 
     collection: {}, // chainId -> contract => { id, symbol, name, image, slug, creator, tokenCount }
     timestamps: {}, // chainId -> blockNumber => timestamp
@@ -469,6 +470,23 @@ const dataModule = {
         });
       }
     },
+    addExpiry(state, info) {
+      // logInfo("dataModule", "mutations.addExpiry info: " + JSON.stringify(info, null, 2));
+      const [ chainId, contract, tokenId, expiry ] = [ info.chainId, info.contract, info.tokenId, info.expiry ];
+      if (!(chainId in state.expiries)) {
+        Vue.set(state.expiries, chainId, {});
+      }
+      if (!(contract in state.expiries[chainId])) {
+        Vue.set(state.expiries[chainId], contract, {});
+      }
+      if (!(tokenId in state.expiries[chainId][contract])) {
+        Vue.set(state.expiries[chainId][contract], tokenId, expiry);
+      } else {
+        if (expiry > state.expiries[chainId][contract][tokenId]) {
+          Vue.set(state.expiries[chainId][contract], tokenId, expiry);
+        }
+      }
+    },
     addNonFungibleContractMetadata(state, info) {
       logInfo("dataModule", "mutations.addNonFungibleContractMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
@@ -642,7 +660,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['ens', 'addresses', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
+        for (let type of ['ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // logInfo("dataModule", "actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
@@ -1948,24 +1966,24 @@ const dataModule = {
           if (!log.removed) {
             const contract = log.address;
             let eventRecord = null;
-            if (log.topics[0] == "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f" && contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS) {
+            if (log.topics[0] == "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f" && ((contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER1_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER2_ADDRESS) || contract == ENS_OLDETHREGISTRARCONTROLLER1_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER2_ADDRESS)) {
               // ERC-721 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
               const logData = oldETHRegistarControllerInterface.parseLog(log);
               const [name, label, owner, cost, expires] = logData.args;
               const labelhashDecimals = ethers.BigNumber.from(label).toString();
-              eventRecord = { type: "NameRegistered", name, label, tokenId: labelhashDecimals, owner, cost: cost.toString(), expires: parseInt(expires) };
-            } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae" && contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS) {
+              eventRecord = { contract: ENS_ERC721_ADDRESS, type: "NameRegistered", name, label, tokenId: labelhashDecimals, owner, cost: cost.toString(), expiry: parseInt(expires) };
+            } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae" && (contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER1_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER2_ADDRESS)) {
               // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
               const logData = oldETHRegistarControllerInterface.parseLog(log);
               const [name, label, cost, expires] = logData.args;
               const labelhashDecimals = ethers.BigNumber.from(label).toString();
-              eventRecord = { type: "NameRenewed", name, label, tokenId: labelhashDecimals, cost: cost.toString(), expires: parseInt(expires) };
+              eventRecord = { contract: ENS_ERC721_ADDRESS, type: "NameRenewed", name, label, tokenId: labelhashDecimals, cost: cost.toString(), expiry: parseInt(expires) };
             } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae" && contract == ENS_ETHREGISTRARCONTROLLER_ADDRESS) {
               // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
               const logData = ethRegistarControllerInterface.parseLog(log);
               const [name, label, cost, expires] = logData.args;
               const labelhashDecimals = ethers.BigNumber.from(label).toString();
-              eventRecord = { type: "NameRenewed", name, label, tokenId: labelhashDecimals, cost: cost.toString(), expires: parseInt(expires) };
+              eventRecord = { contract: ENS_ERC721_ADDRESS, type: "NameRenewed", name, label, tokenId: labelhashDecimals, cost: cost.toString(), expiry: parseInt(expires) };
             } else if (log.topics[0] == "0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340" && contract == ENS_NAMEWRAPPER_ADDRESS) {
               // NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
               const logData = nameWrapperInterface.parseLog(log);
@@ -1982,34 +2000,18 @@ const dataModule = {
               }
               const namehashDecimals = ethers.BigNumber.from(node).toString();
               const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
-              eventRecord = { type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, subdomain, owner, fuses, expiry: parseInt(expiry) };
+              eventRecord = { contract, type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, subdomain, owner, fuses, expiry: parseInt(expiry), expirym90: moment.unix(parseInt(expiry)).subtract(90, 'days').unix() };
             } else {
               console.log("NOT HANDLED: " + JSON.stringify(log));
             }
             if (eventRecord) {
-              console.log(JSON.stringify(eventRecord, null, 2));
-              // records.push( {
-              //   chainId: parameter.chainId,
-              //   blockNumber: parseInt(log.blockNumber),
-              //   logIndex: parseInt(log.logIndex),
-              //   txIndex: parseInt(log.transactionIndex),
-              //   txHash: log.transactionHash,
-              //   contract,
-              //   ...eventRecord,
-              //   confirmations: parameter.blockNumber - log.blockNumber,
-              // });
+              context.commit('addExpiry', {
+                chainId: parameter.chainId,
+                 ...eventRecord,
+              });
             }
           }
         }
-        // logInfo("dataModule", "actions.syncENSEvents.bulkAdd - records: " + JSON.stringify(records));
-        // if (records.length) {
-        //   // logInfo("dataModule", "actions.syncENSEvents.bulkAdd - records: " + JSON.stringify(records));
-        //   await db.events.bulkAdd(records).then(function(lastKey) {
-        //     console.log("syncENSEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
-        //   }).catch(Dexie.BulkError, function(e) {
-        //     console.log("syncENSEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
-        //   });
-        // }
       }
 
       logInfo("dataModule", "actions.syncENSExpiries BEGIN");
@@ -2019,13 +2021,9 @@ const dataModule = {
         if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokens)) {
             if (contract == ENS_ERC721_ADDRESS) {
-              // if (ens721TokenIds.length == 0) {
-                ens721TokenIds.push(tokenId);
-              // }
+              ens721TokenIds.push(tokenId);
             } else {
-              // if (ens1155TokenIds.length == 0) {
-                ens1155TokenIds.push(tokenId);
-              // }
+              ens1155TokenIds.push(tokenId);
             }
           }
         }
@@ -2065,7 +2063,7 @@ const dataModule = {
       // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
       // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
       //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
-      if (false) {
+      if (true) {
         for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
           const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
           try {
@@ -2084,64 +2082,8 @@ const dataModule = {
           }
         }
       }
-
-      return;
-      context.commit('setSyncSection', { section: 'Fungibles Metadata', total: Object.keys(contractsToProcess).length });
-      let completed = 0;
-      for (const [contract, contractData] of Object.entries(contractsToProcess)) {
-        // console.log("Processing: " + contract + " => " + JSON.stringify(contractData));
-        context.commit('setSyncCompleted', completed);
-        const interface = new ethers.Contract(contract, ERC20ABI, provider);
-        let symbol = null;
-        let name = null;
-        let decimals = null;
-        let totalSupply = null;
-        try {
-          symbol = await interface.symbol();
-        } catch (e) {
-        }
-        try {
-          name = await interface.name();
-        } catch (e) {
-        }
-        try {
-          decimals = await interface.decimals();
-        } catch (e) {
-        }
-        try {
-          totalSupply = await interface.totalSupply();
-        } catch (e) {
-        }
-        await delay(500);
-
-        const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
-        let image = null;
-        for (let i = 0; i < erc20Logos.length && !image; i++) {
-          const url = erc20Logos[i].replace(/\${contract}/, contract);
-          image = await imageUrlToBase64(url);
-        }
-
-        logInfo("dataModule", "actions.syncENSExpiries: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
-        context.commit('addFungibleMetadata', {
-          chainId: parameter.chainId,
-          contract,
-          symbol,
-          name,
-          decimals: decimals,
-          totalSupply: totalSupply && totalSupply.toString() || null,
-          image,
-          ...contractData,
-        });
-        completed++;
-        if ((completed % 10) == 0) {
-          await context.dispatch('saveData', ['tokens']);
-        }
-        if (context.state.sync.halt) {
-          break;
-        }
-      }
-      // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
-      await context.dispatch('saveData', ['tokens']);
+      console.log("context.state.expiries: " + JSON.stringify(context.state.expiries, null, 2));
+      await context.dispatch('saveData', ['expiries']);
       logInfo("dataModule", "actions.syncENSExpiries END");
     },
 
