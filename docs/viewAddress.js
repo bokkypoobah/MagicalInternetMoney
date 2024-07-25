@@ -277,7 +277,7 @@ const ViewAddress = {
         return result;
       }
 
-      logInfo("ViewAddress", "methods.revealSpendingPrivateKey BEGIN");
+      console.log(moment().format("HH:mm:ss") + " INFO ViewAddress:methods.revealSpendingPrivateKey BEGIN");
       const stealthTransfer = this.stealthTransfers && this.stealthTransfers.length > 0 && this.stealthTransfers[0] || {};
       const linkedToStealthMetaAddress = this.linkedTo && this.linkedTo.stealthMetaAddress || null;
       const stealthMetaAddressData = linkedToStealthMetaAddress && this.addresses[linkedToStealthMetaAddress] || {};
@@ -337,15 +337,11 @@ const ViewAddress = {
       }
       return null;
     },
-    saveSettings() {
-      logInfo("ViewAddress", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.transfersSettings = JSON.stringify(this.settings);
-    },
     setShow(show) {
       store.dispatch('viewAddress/setShow', show);
     },
     async deleteAddress(address) {
-      logInfo("ViewAddress", "deleteAddress - address: " + JSON.stringify(address));
+      console.log(moment().format("HH:mm:ss") + " INFO ViewAddress:methods.deleteAddress - address: " + JSON.stringify(address));
       this.$bvModal.msgBoxConfirm("Delete " + address.substring(0, 10) + '...' + address.slice(-8) + "?")
         .then(value => {
           if (value) {
@@ -359,16 +355,16 @@ const ViewAddress = {
     },
   },
   beforeDestroy() {
-    logDebug("ViewAddress", "beforeDestroy()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewAddress:beforeDestroy");
   },
   mounted() {
-    logDebug("ViewAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
-    if ('transfersSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.transfersSettings);
-      if ('version' in tempSettings && tempSettings.version == 0) {
-        this.settings = tempSettings;
-      }
-    }
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewAddress:mounted - $route: " + JSON.stringify(this.$route.params));
+    // if ('transfersSettings' in localStorage) {
+    //   const tempSettings = JSON.parse(localStorage.transfersSettings);
+    //   if ('version' in tempSettings && tempSettings.version == 0) {
+    //     this.settings = tempSettings;
+    //   }
+    // }
   },
 };
 
@@ -408,7 +404,7 @@ const viewAddressModule = {
   },
   mutations: {
     viewAddress(state, address) {
-      logInfo("viewAddressModule", "mutations.viewAddress - address: " + address);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.viewAddress - address: " + address);
       const data = store.getters['data/addresses'][address] || {};
       state.address = address;
       state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
@@ -436,31 +432,31 @@ const viewAddressModule = {
       state.show = true;
     },
     setJunk(state, junk) {
-      logInfo("viewAddressModule", "mutations.setJunk - junk: " + junk);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setJunk - junk: " + junk);
       state.junk = junk;
     },
     setMine(state, mine) {
-      logInfo("viewAddressModule", "mutations.setMine - mine: " + mine);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setWatch(state, watch) {
-      logInfo("viewAddressModule", "mutations.setWatch - watch: " + watch);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setWatch - watch: " + watch);
       state.watch = watch;
     },
     setSendFrom(state, sendFrom) {
-      logInfo("viewAddressModule", "mutations.setSendFrom - sendFrom: " + sendFrom);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setSendFrom - sendFrom: " + sendFrom);
       state.sendFrom = sendFrom;
     },
     setSendTo(state, sendTo) {
-      logInfo("viewAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setSendTo - sendTo: " + sendTo);
       state.sendTo = sendTo;
     },
     setName(state, name) {
-      logInfo("viewAddressModule", "mutations.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      logInfo("viewAddressModule", "mutations.setNotes - notes: " + notes);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setShow(state, show) {
@@ -469,39 +465,39 @@ const viewAddressModule = {
   },
   actions: {
     async viewAddress(context, address) {
-      logInfo("viewAddressModule", "actions.viewAddress - address: " + address);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.viewAddress - address: " + address);
       await context.commit('viewAddress', address);
     },
     async setJunk(context, junk) {
-      logInfo("viewAddressModule", "actions.setJunk - junk: " + junk);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setJunk - junk: " + junk);
       await context.commit('setJunk', junk);
     },
     async setMine(context, mine) {
-      logInfo("viewAddressModule", "actions.setMine - mine: " + mine);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setWatch(context, favourite) {
-      logInfo("viewAddressModule", "actions.setWatch - favourite: " + favourite);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setWatch - favourite: " + favourite);
       await context.commit('setWatch', favourite);
     },
     async setSendFrom(context, check) {
-      logInfo("viewAddressModule", "actions.setSendFrom - check: " + check);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setSendFrom - check: " + check);
       await context.commit('setSendFrom', check);
     },
     async setSendTo(context, sendTo) {
-      logInfo("viewAddressModule", "actions.setSendTo - sendTo: " + sendTo);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setSendTo - sendTo: " + sendTo);
       await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
-      logInfo("viewAddressModule", "actions.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      logInfo("viewAddressModule", "actions.setNotes - notes: " + notes);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setSource(context, source) {
-      logInfo("viewAddressModule", "actions.setSource - source: " + source);
+      console.log(moment().format("HH:mm:ss") + " INFO viewAddressModule:actions.setSource - source: " + source);
       await context.commit('setSource', source);
     },
     async setShow(context, show) {
