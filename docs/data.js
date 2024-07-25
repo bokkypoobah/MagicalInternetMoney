@@ -1961,9 +1961,15 @@ const dataModule = {
         for (const item of data) {
           if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
             console.log(JSON.stringify(item));
-            const contract = item.contract;
-            if (!(item.owner in collator)) {
-              collator[item.owner] = {};
+            const [ contract, owner, spender ] = [ item.contract, item.owner, item.spender ];
+            if (!(owner in collator)) {
+              collator[owner] = {};
+            }
+            if (!(contract in collator[owner])) {
+              collator[owner][contract] = {};
+            }
+            if (!(spender in collator[owner][contract])) {
+              collator[owner][contract][spender] = {};
             }
             // if (!(contract in collator)) {
             //   if (item.eventType == "erc20") {
