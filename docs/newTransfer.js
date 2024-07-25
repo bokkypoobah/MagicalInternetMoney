@@ -287,11 +287,11 @@ const NewTransfer = {
 
 
     filteredERC721Tokens() {
-      logInfo("NewTransfer", "methods.filteredERC721Tokens BEGIN");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.filteredERC721Tokens BEGIN");
       const results = [];
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       const balances = this.balances[this.chainId] && this.balances[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
-      logInfo("NewTransfer", "methods.filteredERC721Tokens - tokenContract: " + JSON.stringify(tokenContract, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.filteredERC721Tokens - tokenContract: " + JSON.stringify(tokenContract, null, 2));
       if (tokenContract.type == "erc721") {
         for (const [tokenId, tokenData] of Object.entries(tokenContract.tokens)) {
           // console.log(this.modalAddTokensToNewTransfer.token + "/" + tokenId + " => " + JSON.stringify(tokenData));
@@ -302,7 +302,7 @@ const NewTransfer = {
           }
         }
       }
-      logInfo("NewTransfer", "methods.filteredERC721Tokens - results: " + JSON.stringify(results, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.filteredERC721Tokens - results: " + JSON.stringify(results, null, 2));
       return results;
     },
     filteredSortedERC721Tokens() {
@@ -351,14 +351,14 @@ const NewTransfer = {
       return results;
     },
     pagedFilteredSortedERC721Tokens() {
-      logInfo("NewTransfer", "methods.pagedFilteredSortedERC721Tokens - results[0..9]: " + JSON.stringify(this.filteredSortedERC721Tokens.slice(0, 10), null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.pagedFilteredSortedERC721Tokens - results[0..9]: " + JSON.stringify(this.filteredSortedERC721Tokens.slice(0, 10), null, 2));
       return this.filteredSortedERC721Tokens.slice((this.settings.erc721TokensTable.currentPage - 1) * this.settings.erc721TokensTable.pageSize, this.settings.erc721TokensTable.currentPage * this.settings.erc721TokensTable.pageSize);
     },
 
   },
   methods: {
     saveSettings() {
-      logInfo("NewTransfer", "methods.saveSettings - newTransferSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.saveSettings - newTransferSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.newTransferSettings = JSON.stringify(this.settings);
     },
     formatDecimals(e, decimals = 18) {
@@ -368,12 +368,12 @@ const NewTransfer = {
       store.dispatch('newTransfer/setShow', show);
     },
     addTokensForTransfer() {
-      logInfo("NewTransfer", "methods.addTokensForTransfer");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.addTokensForTransfer");
       this.$bvModal.show('modal-addtokensfortransfer');
     },
     async additionalTokenSelected() {
-      logInfo("NewTransfer", "methods.additionalTokenSelected");
-      logInfo("NewTransfer", "methods.additionalTokenSelected - this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.additionalTokenSelected");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.additionalTokenSelected - this.modalAddTokensToNewTransfer: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       if (this.modalAddTokensToNewTransfer.token) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         console.log("this.tokens: " + JSON.stringify(this.tokens, null, 2));
@@ -399,7 +399,7 @@ const NewTransfer = {
     },
 
     async updateApproval() {
-      logInfo("NewTransfer", "methods.updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.updateApproval BEGIN: " + JSON.stringify(this.modalAddTokensToNewTransfer, null, 2));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       if (this.modalAddTokensToNewTransfer.type == "erc20") {
         const contract = new ethers.Contract(this.modalAddTokensToNewTransfer.token, ERC20ABI, provider);
@@ -421,21 +421,21 @@ const NewTransfer = {
           console.log("updateApproval - ERC721.setApprovalForAll(...) error: " + JSON.stringify(e));
         }
       }
-      logInfo("NewTransfer", "methods.updateApproval END");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.updateApproval END");
     },
 
     erc721TokenIdToggle(tokenId) {
-      logInfo("NewTransfer", "methods.erc721TokenIdToggle - tokenId: " + tokenId);
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.erc721TokenIdToggle - tokenId: " + tokenId);
       if (tokenId in this.modalAddTokensToNewTransfer.selectedERC721TokenIds) {
         Vue.delete(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId);
       } else {
         Vue.set(this.modalAddTokensToNewTransfer.selectedERC721TokenIds, tokenId, true);
       }
-      logInfo("NewTransfer", "methods.erc721TokenIdToggle - this.modalAddTokensToNewTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToNewTransfer.selectedERC721TokenIds));
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.erc721TokenIdToggle - this.modalAddTokensToNewTransfer.selectedERC721TokenIds: " + JSON.stringify(this.modalAddTokensToNewTransfer.selectedERC721TokenIds));
     },
 
     addERC20TokenToTransfer() {
-      logInfo("NewTransfer", "methods.addERC20TokenToTransfer");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.addERC20TokenToTransfer");
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       const decimals = tokenContract.decimals && parseInt(tokenContract.decimals) || null;
       const symbol = tokenContract.symbol || null;
@@ -452,7 +452,7 @@ const NewTransfer = {
     },
 
     addERC721TokenToTransfer() {
-      logInfo("NewTransfer", "methods.addERC721TokenToTransfer");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.addERC721TokenToTransfer");
       const tokenContract = this.tokens[this.chainId] && this.tokens[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       const balances = this.balances[this.chainId] && this.balances[this.chainId][this.modalAddTokensToNewTransfer.token] || {};
       // console.log("tokenContract: " + JSON.stringify(tokenContract, null, 2));
@@ -506,7 +506,7 @@ const NewTransfer = {
           result.stealthAddress = ethers.utils.computeAddress("0x" + result.stealthPublicKey.toHex(false));
           return result;
       }
-      logInfo("NewTransfer", "methods.executeNewTransfer BEGIN");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.executeNewTransfer BEGIN");
       const result = generateStealthAddress(this.stealthMetaAddress);
       for (const [k, v] of Object.entries(result)) {
         console.log("    ", k, "=>", v);
@@ -533,7 +533,7 @@ const NewTransfer = {
       } catch (e) {
         console.log("executeNewTransfer MagicalInternetMoney.transferEthAndAnnounce(...) error: " + JSON.stringify(e));
       }
-      logInfo("NewTransfer", "methods.executeNewTransfer END");
+      console.log(moment().format("HH:mm:ss") + " INFO NewTransfer:methods.executeNewTransfer END");
     },
     async syncIt(info) {
       store.dispatch('data/syncIt', info);
@@ -574,7 +574,7 @@ const newTransferModule = {
   },
   mutations: {
     newTransfer(state, stealthMetaAddress) {
-      logInfo("newTransferModule", "mutations.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:mutations.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
       state.show = true;
       state.stealthMetaAddressSpecified = !!stealthMetaAddress;
       state.stealthMetaAddress = stealthMetaAddress;
@@ -584,44 +584,44 @@ const newTransferModule = {
       state.show = show;
     },
     setStealthMetaAddress(state, stealthMetaAddress) {
-      logInfo("newTransferModule", "mutations.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:mutations.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       state.stealthMetaAddress = stealthMetaAddress;
     },
     setAmount(state, amount) {
-      logInfo("newTransferModule", "mutations.setAmount - amount: " + amount);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:mutations.setAmount - amount: " + amount);
       state.amount = amount;
     },
     addItem(state, item) {
-      logInfo("newTransferModule", "mutations.addItem - item: " + JSON.stringify(item));
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:mutations.addItem - item: " + JSON.stringify(item));
       state.items.push(item);
     },
     removeItem(state, index) {
-      logInfo("newTransferModule", "mutations.removeItem - index: " + JSON.stringify(index));
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:mutations.removeItem - index: " + JSON.stringify(index));
       state.items.splice(index, 1);
     },
   },
   actions: {
     async newTransfer(context, stealthMetaAddress) {
-      logInfo("newTransferModule", "actions.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:actions.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
       await context.commit('newTransfer', stealthMetaAddress);
     },
     async setShow(context, show) {
       await context.commit('setShow', show);
     },
     async setStealthMetaAddress(context, stealthMetaAddress) {
-      logInfo("newTransferModule", "actions.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:actions.setStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       await context.commit('setStealthMetaAddress', stealthMetaAddress);
     },
     async setAmount(context, amount) {
-      logInfo("newTransferModule", "actions.setAmount - amount: " + amount);
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:actions.setAmount - amount: " + amount);
       await context.commit('setAmount', amount);
     },
     async addItem(context, item) {
-      logInfo("newTransferModule", "actions.addItem - item: " + JSON.stringify(item));
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:actions.addItem - item: " + JSON.stringify(item));
       await context.commit('addItem', item);
     },
     async removeItem(context, index) {
-      logInfo("newTransferModule", "actions.removeItem - index: " + JSON.stringify(index));
+      console.log(moment().format("HH:mm:ss") + " INFO newTransferModule:actions.removeItem - index: " + JSON.stringify(index));
       await context.commit('removeItem', index);
     },
   },
