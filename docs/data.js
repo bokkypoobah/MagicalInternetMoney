@@ -932,7 +932,7 @@ const dataModule = {
         await context.dispatch('computeBalances', parameter);
       }
 
-      if (options.ensExpiries && !options.devThing) {
+      if (options.ensExpiries && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENSExpiries', parameter);
       }
 
