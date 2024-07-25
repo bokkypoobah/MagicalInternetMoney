@@ -273,7 +273,7 @@ const NewAddress = {
   },
   methods: {
     saveSettings() {
-      logInfo("NewAddress", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewAddress:methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.transfersSettings = JSON.stringify(this.settings);
     },
     setShow(show) {
@@ -281,10 +281,10 @@ const NewAddress = {
     },
 
     async generateNewStealthMetaAddress() {
-      logInfo("NewAddress", "methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.phrase, null, 2));
-      logInfo("NewAddress", "methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
+      console.log(moment().format("HH:mm:ss") + " INFO NewAddress:methods.generateNewStealthMetaAddress BEGIN: " + JSON.stringify(this.phrase, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO NewAddress:methods.generateNewStealthMetaAddress - coinbase: " + this.coinbase);
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.phrase));
-      logInfo("NewAddress", "methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
+      console.log(moment().format("HH:mm:ss") + " INFO NewAddress:methods.generateNewStealthMetaAddress - phraseInHex: " + phraseInHex);
       const linkedToAddress = this.coinbase;
       const signature = await ethereum.request({
         method: 'personal_sign',
@@ -308,7 +308,7 @@ const NewAddress = {
       store.dispatch('newAddress/setKeys', { viewingPrivateKey, spendingPublicKey, viewingPublicKey, stealthMetaAddress, linkedToAddress });
     },
     async addNewAddress() {
-      logInfo("NewAddress", "methods.addNewAddress BEGIN");
+      console.log(moment().format("HH:mm:ss") + " INFO NewAddress:methods.addNewAddress BEGIN");
       store.dispatch('data/addNewAddress', {
         action: this.action,
         address: this.address,
@@ -330,10 +330,10 @@ const NewAddress = {
 
   },
   beforeDestroy() {
-    logDebug("NewAddress", "beforeDestroy()");
+    // console.log(moment().format("HH:mm:ss") + " INFO NewAddress:beforeDestroy");
   },
   mounted() {
-    logDebug("NewAddress", "mounted() $route: " + JSON.stringify(this.$route.params));
+    // console.log(moment().format("HH:mm:ss") + " INFO NewAddress:mounted - $route: " + JSON.stringify(this.$route.params));
     if ('transfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.transfersSettings);
       if ('version' in tempSettings && tempSettings.version == 0) {
@@ -381,7 +381,7 @@ const newAddressModule = {
   },
   mutations: {
     newAddress(state) {
-      logInfo("newAddressModule", "mutations.newAddress");
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.newAddress");
       state.action = 'addCoinbase';
       state.address = null;
       state.linkedToAddress = null;
@@ -396,23 +396,23 @@ const newAddressModule = {
       state.show = true;
     },
     setAction(state, action) {
-      logInfo("newAddressModule", "mutations.setAction - action: " + action);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setAction - action: " + action);
       state.action = action;
     },
     setAddress(state, address) {
-      logInfo("newAddressModule", "mutations.setAddress - address: " + address);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setAddress - address: " + address);
       state.address = address;
     },
     setPhrase(state, phrase) {
-      logInfo("newAddressModule", "mutations.setPhrase - phrase: " + phrase);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setPhrase - phrase: " + phrase);
       state.phrase = phrase;
     },
     setLinkedToAddress(state, linkedToAddress) {
-      logInfo("newAddressModule", "mutations.setLinkedToAddress - linkedToAddress: " + linkedToAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setLinkedToAddress - linkedToAddress: " + linkedToAddress);
       state.linkedToAddress = linkedToAddress;
     },
     setKeys(state, keys) {
-      logInfo("newAddressModule", "mutations.setKeys - keys: " + JSON.stringify(keys, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setKeys - keys: " + JSON.stringify(keys, null, 2));
       state.address = keys.stealthMetaAddress;
       state.viewingPrivateKey = keys.viewingPrivateKey;
       state.spendingPublicKey = keys.spendingPublicKey;
@@ -421,27 +421,27 @@ const newAddressModule = {
     },
 
     setMine(state, mine) {
-      logInfo("newAddressModule", "mutations.setMine - mine: " + mine);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setWatch(state, watch) {
-      logInfo("newAddressModule", "mutations.setWatch - watch: " + watch);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setWatch - watch: " + watch);
       state.watch = watch;
     },
     setSendFrom(state, sendFrom) {
-      logInfo("newAddressModule", "mutations.setSendFrom - sendFrom: " + sendFrom);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setSendFrom - sendFrom: " + sendFrom);
       state.sendFrom = sendFrom;
     },
     setSendTo(state, sendTo) {
-      logInfo("newAddressModule", "mutations.setSendTo - sendTo: " + sendTo);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setSendTo - sendTo: " + sendTo);
       state.sendTo = sendTo;
     },
     setName(state, name) {
-      logInfo("newAddressModule", "mutations.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      logInfo("newAddressModule", "mutations.setNotes - notes: " + notes);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setShow(state, show) {
@@ -450,51 +450,51 @@ const newAddressModule = {
   },
   actions: {
     async newAddress(context) {
-      logInfo("newAddressModule", "actions.newAddress");
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.newAddress");
       await context.commit('newAddress');
     },
     async setAction(context, action) {
-      logInfo("newAddressModule", "actions.setAction - action: " + action);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setAction - action: " + action);
       await context.commit('setAction', action);
     },
     async setAddress(context, address) {
-      logInfo("newAddressModule", "actions.setAddress - address: " + address);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setAddress - address: " + address);
       await context.commit('setAddress', address);
     },
     async setPhrase(context, phrase) {
-      logInfo("newAddressModule", "actions.setPhrase - phrase: " + phrase);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setPhrase - phrase: " + phrase);
       await context.commit('setPhrase', phrase);
     },
     async setLinkedToAddress(context, linkedToAddress) {
-      logInfo("newAddressModule", "actions.setLinkedToAddress - linkedToAddress: " + linkedToAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setLinkedToAddress - linkedToAddress: " + linkedToAddress);
       await context.commit('setLinkedToAddress', linkedToAddress);
     },
     async setKeys(context, keys) {
-      logInfo("newAddressModule", "actions.setKeys - keys: " + JSON.stringify(keys, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setKeys - keys: " + JSON.stringify(keys, null, 2));
       await context.commit('setKeys', keys);
     },
     async setMine(context, mine) {
-      logInfo("newAddressModule", "actions.setMine - mine: " + mine);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setWatch(context, watch) {
-      logInfo("newAddressModule", "actions.setWatch - watch: " + watch);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setWatch - watch: " + watch);
       await context.commit('setWatch', watch);
     },
     async setSendFrom(context, sendFrom) {
-      logInfo("newAddressModule", "actions.setSendFrom - sendFrom: " + sendFrom);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setSendFrom - sendFrom: " + sendFrom);
       await context.commit('setSendFrom', sendFrom);
     },
     async setSendTo(context, sendTo) {
-      logInfo("newAddressModule", "actions.setSendTo - sendTo: " + sendTo);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setSendTo - sendTo: " + sendTo);
       await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
-      logInfo("newAddressModule", "actions.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      logInfo("newAddressModule", "actions.setNotes - notes: " + notes);
+      console.log(moment().format("HH:mm:ss") + " INFO newAddressModule:actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setShow(context, show) {
