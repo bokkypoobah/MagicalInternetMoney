@@ -1509,12 +1509,14 @@ const dataModule = {
       // CatRescued (index_topic_1 address to, index_topic_2 bytes5 catId)
       // 0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd
 
-      // // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
-      // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-      // // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
-      // // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
-      // // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
-      // // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+      // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+      // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+      // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
+      // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
+      // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+      // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
+      // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
+      // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
       let total = 0;
       let t = this;
       async function processLogs(fromBlock, toBlock, section, logs) {
