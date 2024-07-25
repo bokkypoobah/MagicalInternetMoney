@@ -157,7 +157,7 @@ const Registry = {
       return results;
     },
     pagedFilteredSortedRegistryEntries() {
-      console.log(moment().format("HH:mm:ss") + " INFO Registry:computed.pagedFilteredSortedRegistryEntries - results[0..1]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 2), null, 2));
+      // console.log(moment().format("HH:mm:ss") + " INFO Registry:computed.pagedFilteredSortedRegistryEntries - results[0..1]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 2), null, 2));
       return this.filteredSortedRegistryEntries.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 

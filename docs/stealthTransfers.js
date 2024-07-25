@@ -343,7 +343,7 @@ const StealthTransfers = {
       return results;
     },
     pagedFilteredSortedTransfers() {
-      logInfo("Addresses", "pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
+      // console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:computed.pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
       return this.filteredSortedTransfers.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -364,7 +364,7 @@ const StealthTransfers = {
       return e.toFixed(precision);
     },
     saveSettings() {
-      logInfo("StealthTransfers", "methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.stealthTransfersSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -404,7 +404,7 @@ const StealthTransfers = {
       return null;
     },
     rowSelected(item) {
-      logInfo("StealthTransfers", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         this.transfer.item = item[0];
         this.transfer.stealthPrivateKey = null;
@@ -459,8 +459,7 @@ const StealthTransfers = {
     },
 
     async timeoutCallback() {
-      logDebug("StealthTransfers", "timeoutCallback() count: " + this.count);
-
+      // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -471,10 +470,10 @@ const StealthTransfers = {
     },
   },
   beforeDestroy() {
-    logDebug("StealthTransfers", "beforeDestroy()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:beforeDestroy");
   },
   mounted() {
-    logDebug("StealthTransfers", "mounted() $route: " + JSON.stringify(this.$route.params));
+    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('stealthTransfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.stealthTransfersSettings);
@@ -484,7 +483,7 @@ const StealthTransfers = {
       }
     }
     this.reschedule = true;
-    logDebug("StealthTransfers", "Calling timeoutCallback()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -495,27 +494,10 @@ const StealthTransfers = {
 const stealthTransfersModule = {
   namespaced: true,
   state: {
-    params: null,
-    executing: false,
-    executionQueue: [],
   },
   getters: {
-    params: state => state.params,
-    executionQueue: state => state.executionQueue,
   },
   mutations: {
-    deQueue(state) {
-      logDebug("stealthTransfersModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
-      state.executionQueue.shift();
-    },
-    updateParams(state, params) {
-      state.params = params;
-      logDebug("stealthTransfersModule", "updateParams('" + params + "')")
-    },
-    updateExecuting(state, executing) {
-      state.executing = executing;
-      logDebug("stealthTransfersModule", "updateExecuting(" + executing + ")")
-    },
   },
   actions: {
   },
