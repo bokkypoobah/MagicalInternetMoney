@@ -502,7 +502,7 @@ const Fungibles = {
     },
 
     async timeoutCallback() {
-      logDebug("Fungibles", "timeoutCallback() count: " + this.count);
+      // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -513,10 +513,10 @@ const Fungibles = {
     },
   },
   beforeDestroy() {
-    logDebug("Fungibles", "beforeDestroy()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:beforeDestroy");
   },
   mounted() {
-    logDebug("Fungibles", "mounted() $route: " + JSON.stringify(this.$route.params));
+    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('fungiblesSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.fungiblesSettings);
@@ -526,7 +526,7 @@ const Fungibles = {
       }
     }
     this.reschedule = true;
-    logDebug("Fungibles", "Calling timeoutCallback()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {
@@ -537,27 +537,10 @@ const Fungibles = {
 const fungiblesModule = {
   namespaced: true,
   state: {
-    params: null,
-    executing: false,
-    executionQueue: [],
   },
   getters: {
-    params: state => state.params,
-    executionQueue: state => state.executionQueue,
   },
   mutations: {
-    deQueue(state) {
-      logDebug("fungiblesModule", "deQueue(" + JSON.stringify(state.executionQueue) + ")");
-      state.executionQueue.shift();
-    },
-    updateParams(state, params) {
-      state.params = params;
-      logDebug("fungiblesModule", "updateParams('" + params + "')")
-    },
-    updateExecuting(state, executing) {
-      state.executing = executing;
-      logDebug("fungiblesModule", "updateExecuting(" + executing + ")")
-    },
   },
   actions: {
   },
