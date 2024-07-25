@@ -220,7 +220,7 @@ const ViewFungible = {
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'image', value: image });
         store.dispatch('viewFungible/setImage', image);
       } catch (e) {
-        logInfo("ViewFungible", "methods.handleImage - error: " + e.message);
+        console.log(moment().format("HH:mm:ss") + " ERROR ViewFungible:methods.handleImage: " + e.message);
       }
     },
     copyToClipboard(str) {
@@ -257,65 +257,9 @@ const ViewFungible = {
       }
       return null;
     },
-    saveSettings() {
-      logInfo("ViewFungible", "methods.saveSettings - transfersSettings: " + JSON.stringify(this.settings, null, 2));
-      localStorage.transfersSettings = JSON.stringify(this.settings);
-    },
     setShow(show) {
       store.dispatch('viewFungibleModule/setShow', show);
     },
-
-    // async refreshTokenMetadata() {
-    //   const imageUrlToBase64 = async url => {
-    //     const response = await fetch(url /*, { mode: 'cors' }*/);
-    //     const blob = await response.blob();
-    //     return new Promise((onSuccess, onError) => {
-    //       try {
-    //         const reader = new FileReader() ;
-    //         reader.onload = function(){ onSuccess(this.result) } ;
-    //         reader.readAsDataURL(blob) ;
-    //       } catch(e) {
-    //         onError(e);
-    //       }
-    //     });
-    //   };
-    //
-    //   logInfo("ViewFungible", "refreshTokenMetadata()");
-    //   const url = "https://api.reservoir.tools/tokens/v7?tokens=" + this.contract + "%3A" + this.tokenId + "&includeAttributes=true";
-    //   console.log("url: " + url);
-    //   const data = await fetch(url).then(response => response.json());
-    //   // console.log("data: " + JSON.stringify(data, null, 2));
-    //   if (data.tokens.length > 0) {
-    //     const tokenData = data.tokens[0].token;
-    //     // console.log("tokenData: " + JSON.stringify(tokenData, null, 2));
-    //     // const base64 = await imageUrlToBase64(tokenData.image);
-    //     const attributes = tokenData.attributes.map(e => ({ trait_type: e.key, value: e.value }));
-    //     attributes.sort((a, b) => {
-    //       return ('' + a.trait_type).localeCompare(b.trait_type);
-    //     });
-    //     const address = ethers.utils.getAddress(tokenData.contract);
-    //     let expiry = undefined;
-    //     if (address == ENS_ERC721_ADDRESS) {
-    //       const expiryRecord = attributes.filter(e => e.trait_type == "Expiration Date");
-    //       console.log("expiryRecord: " + JSON.stringify(expiryRecord, null, 2));
-    //       expiry = expiryRecord.length == 1 && expiryRecord[0].value || null;
-    //     }
-    //     const metadata = {
-    //       chainId: tokenData.chainId,
-    //       contract: this.contract,
-    //       tokenId: tokenData.tokenId,
-    //       expiry,
-    //       name: tokenData.name,
-    //       description: tokenData.description,
-    //       image: tokenData.image,
-    //       attributes,
-    //       // image: base64,
-    //     };
-    //     console.log("metadata: " + JSON.stringify(metadata, null, 2));
-    //     store.dispatch('data/addTokenMetadata', metadata);
-    //     store.dispatch('data/saveData', ['tokenMetadata']);
-    //   }
-    // },
 
     async deleteAddress(account) {
       this.$bvModal.msgBoxConfirm('Are you sure?')
@@ -331,16 +275,16 @@ const ViewFungible = {
     },
   },
   beforeDestroy() {
-    logDebug("ViewFungible", "beforeDestroy()");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewFungible:beforeDestroy");
   },
   mounted() {
-    logDebug("ViewFungible", "mounted() $route: " + JSON.stringify(this.$route.params));
-    if ('transfersSettings' in localStorage) {
-      const tempSettings = JSON.parse(localStorage.transfersSettings);
-      if ('version' in tempSettings && tempSettings.version == 0) {
-        this.settings = tempSettings;
-      }
-    }
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewFungible:mounted - $route: " + JSON.stringify(this.$route.params));
+    // if ('transfersSettings' in localStorage) {
+    //   const tempSettings = JSON.parse(localStorage.transfersSettings);
+    //   if ('version' in tempSettings && tempSettings.version == 0) {
+    //     this.settings = tempSettings;
+    //   }
+    // }
   },
 };
 
@@ -376,7 +320,7 @@ const viewFungibleModule = {
   },
   mutations: {
     viewFungible(state, info) {
-      // logInfo("viewFungibleModule", "mutations.viewFungible - info: " + JSON.stringify(info));
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.viewFungible - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.symbol = info.symbol;
       state.name = info.name;
@@ -391,37 +335,37 @@ const viewFungibleModule = {
       state.show = true;
     },
     setSymbol(state, symbol) {
-      // logInfo("viewFungibleModule", "mutations.setSymbol - symbol: " + symbol);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setSymbol - symbol: " + symbol);
       state.symbol = symbol;
     },
     setName(state, name) {
-      // logInfo("viewFungibleModule", "mutations.setName - name: " + name);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setDecimals(state, decimals) {
-      // logInfo("viewFungibleModule", "mutations.setDecimals - decimals: " + decimals);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setDecimals - decimals: " + decimals);
       state.decimals = decimals;
     },
     setImage(state, image) {
-      // logInfo("viewFungibleModule", "mutations.setImage - image: " + image);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setImage - image: " + image);
       state.image = image;
     },
     toggleFungibleJunk(state) {
-      // logInfo("viewFungibleModule", "mutations.toggleFungibleJunk");
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.toggleFungibleJunk");
       state.junk = !state.junk;
     },
     toggleFungibleActive(state) {
-      // logInfo("viewFungibleModule", "mutations.toggleFungibleActive");
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.toggleFungibleActive");
       state.active = !state.active;
     },
     setContractValues(state, info) {
-      // logInfo("viewFungibleModule", "mutations.setContractValues - info: " + JSON.stringify(info));
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setContractValues - info: " + JSON.stringify(info));
       state.contractSymbol = info.contractSymbol;
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
     },
     setBalances(state, balances) {
-      // logInfo("viewFungibleModule", "mutations.setBalances - balances: " + JSON.stringify(balances));
+      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setBalances - balances: " + JSON.stringify(balances));
       state.balances = balances;
     },
     setShow(state, show) {
@@ -430,7 +374,7 @@ const viewFungibleModule = {
   },
   actions: {
     async viewFungible(context, info) {
-      logInfo("viewFungibleModule", "actions.viewFungible - info: " + JSON.stringify(info));
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.viewFungible - info: " + JSON.stringify(info));
       const chainId = store.getters['connection/chainId'] || null;
       const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
       await context.commit('viewFungible', {
@@ -480,27 +424,27 @@ const viewFungibleModule = {
       await context.commit('setBalances', balancesResults);
     },
     async setSymbol(context, symbol) {
-      logInfo("viewFungibleModule", "actions.setSymbol - symbol: " + symbol);
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setSymbol - symbol: " + symbol);
       await context.commit('setSymbol', symbol);
     },
     async setName(context, name) {
-      logInfo("viewFungibleModule", "actions.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setDecimals(context, decimals) {
-      logInfo("viewFungibleModule", "actions.setDecimals - decimals: " + decimals);
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setDecimals - decimals: " + decimals);
       await context.commit('setDecimals', decimals);
     },
     async setImage(context, image) {
-      logInfo("viewFungibleModule", "actions.setImage - image: " + image);
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setImage - image: " + image);
       await context.commit('setImage', image);
     },
     async toggleFungibleJunk(context) {
-      logInfo("viewFungibleModule", "actions.toggleFungibleJunk");
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.toggleFungibleJunk");
       await context.commit('toggleFungibleJunk');
     },
     async toggleFungibleActive(context) {
-      logInfo("viewFungibleModule", "actions.toggleFungibleActive");
+      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.toggleFungibleActive");
       await context.commit('toggleFungibleActive');
     },
     async setShow(context, show) {
