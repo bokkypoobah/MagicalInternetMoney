@@ -459,18 +459,18 @@ const Addresses = {
       return results;
     },
     pagedFilteredSortedAddresses() {
-      // logInfo("Addresses", "filteredSortedAddresses - results[0..1]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 2), null, 2));
+      // console.log(moment().format("HH:mm:ss") + " INFO Addresses:computed.filteredSortedAddresses - results[0..1]: " + JSON.stringify(this.filteredSortedAddresses.slice(0, 2), null, 2));
       return this.filteredSortedAddresses.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
   },
   methods: {
     saveSettings() {
-      logInfo("Addresses", "methods.saveSettings - addressesSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.saveSettings - addressesSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.addressesSettings = JSON.stringify(this.settings);
     },
 
     newTransfer(stealthMetaAddress = null) {
-      logInfo("Addresses", "methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
       store.dispatch('newTransfer/newTransfer', stealthMetaAddress);
     },
 
@@ -489,12 +489,12 @@ const Addresses = {
     },
 
     viewModalAddAccount() {
-      logInfo("Addresses", "methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.viewModalAddAccount BEGIN: " + JSON.stringify(this.settings.newAccount, null, 2));
       store.dispatch('newAddress/newAddress');
     },
 
     rowSelected(item) {
-      logInfo("Addresses", "methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         const account = item[0].account;
         if (account.substring(0, 3) == "st:") {
@@ -507,12 +507,12 @@ const Addresses = {
     },
 
     addNewAddress() {
-      logInfo("Addresses", "methods.addNewAddress: " + JSON.stringify(this.newAccount, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.addNewAddress: " + JSON.stringify(this.newAccount, null, 2));
       this.$refs['modalnewaddress'].hide();
       store.dispatch('data/addNewAddress', this.newAccount);
     },
     addCoinbase() {
-      logInfo("Addresses", "methods.addCoinbase - coinbase: " + store.getters['connection/coinbase']);
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.addCoinbase - coinbase: " + store.getters['connection/coinbase']);
       store.dispatch('data/addNewAddress', store.getters['connection/coinbase']);
     },
     toggleSelectedAccounts(items) {
@@ -539,11 +539,11 @@ const Addresses = {
       this.saveSettings();
     },
     async toggleAddressField(address, field) {
-      logInfo("Addresses", "methods.toggleAddressField - address: " + address + ", field: " + field);
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.toggleAddressField - address: " + address + ", field: " + field);
       store.dispatch('data/toggleAddressField', { address, field });
     },
     async setAddressField(address, field, value) {
-      logInfo("Addresses", "methods.setAddressField - address: " + address + ", field: " + field + ", value: " + value);
+      console.log(moment().format("HH:mm:ss") + " INFO Addresses:methods.setAddressField - address: " + address + ", field: " + field + ", value: " + value);
       store.dispatch('data/setAddressField', { address, field, value });
     },
     async deleteAddress(account, modalRef) {
