@@ -162,6 +162,7 @@ const dataModule = {
     //   }
     // }
     balances: {},
+    approvals: {},
 
     // {
     //   "11155111": {
@@ -249,6 +250,7 @@ const dataModule = {
   getters: {
     addresses: state => state.addresses,
     balances: state => state.balances,
+    approvals: state => state.approvals,
     tokens: state => state.tokens,
     expiries: state => state.expiries,
 
@@ -272,6 +274,10 @@ const dataModule = {
     updateBalances(state, info) {
       // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
       Vue.set(state.balances, info.chainId, info.balances);
+    },
+    updateApprovals(state, info) {
+      console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateApprovals - info: " + JSON.stringify(info, null, 2));
+      Vue.set(state.approvals, info.chainId, info.approvals);
     },
     toggleAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
@@ -651,7 +657,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'registry', 'stealthTransfers']) {
+        for (let type of ['ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'approvals', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
@@ -1953,9 +1959,12 @@ const dataModule = {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (item.type == "Approval" || item.type == "ApprovalForAll") {
+          if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
             console.log(JSON.stringify(item));
             const contract = item.contract;
+            if (!(item.owner in collator)) {
+              collator[item.owner] = {};
+            }
             // if (!(contract in collator)) {
             //   if (item.eventType == "erc20") {
             //     collator[contract] = {
@@ -2036,9 +2045,9 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      // console.log("collator: " + JSON.stringify(collator, null, 2));
-      context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
-      await context.dispatch('saveData', ['balances']);
+      console.log("collator: " + JSON.stringify(collator, null, 2));
+      context.commit('updateApprovals', { chainId: parameter.chainId, approvals: collator });
+      await context.dispatch('saveData', ['approvals']);
       console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals END");
     },
 
