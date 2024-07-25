@@ -931,6 +931,9 @@ const dataModule = {
       if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
       }
+      if (options.devThing) {
+        await context.dispatch('computeApprovals', parameter);
+      }
 
       if (options.ensExpiries && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENSExpiries', parameter);
@@ -1928,6 +1931,115 @@ const dataModule = {
       context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
       await context.dispatch('saveData', ['balances']);
       console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances END");
+    },
+
+    async computeApprovals(context, parameter) {
+      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals: " + JSON.stringify(parameter));
+      const db = new Dexie(context.state.db.name);
+      db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals BEGIN");
+      const selectedAddressesMap = {};
+      for (const [address, addressData] of Object.entries(context.state.addresses)) {
+        if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
+          selectedAddressesMap[address] = true;
+        }
+      }
+      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      let rows = 0;
+      let done = false;
+      const collator = {};
+      do {
+        let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
+        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        for (const item of data) {
+          if (item.type == "Approval" || item.type == "ApprovalForAll") {
+            console.log(JSON.stringify(item));
+            const contract = item.contract;
+            // if (!(contract in collator)) {
+            //   if (item.eventType == "erc20") {
+            //     collator[contract] = {
+            //       type: item.eventType,
+            //       balances: {},
+            //     };
+            //   } else {
+            //     collator[contract] = {
+            //       type: item.eventType,
+            //       tokens: {},
+            //     };
+            //   }
+            // }
+            // if (item.eventType == "erc20" && item.type == "Transfer") {
+            //   if (item.from in selectedAddressesMap) {
+            //     if (!(item.from in collator[contract].balances)) {
+            //       collator[contract].balances[item.from] = "0";
+            //     }
+            //     collator[contract].balances[item.from] = ethers.BigNumber.from(collator[contract].balances[item.from]).sub(item.tokens).toString();
+            //   }
+            //   if (item.to in selectedAddressesMap) {
+            //     if (!(item.to in collator[contract].balances)) {
+            //       collator[contract].balances[item.to] = "0";
+            //     }
+            //     collator[contract].balances[item.to] = ethers.BigNumber.from(collator[contract].balances[item.to]).add(item.tokens).toString();
+            //   }
+            // } else if (item.eventType == "erc721" && item.type == "Transfer") {
+            //   if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
+            //     collator[contract].tokens[item.tokenId] = item.to;
+            //   }
+            // } else if (item.eventType == "erc1155" && item.type == "TransferSingle") {
+            //   if (item.from in selectedAddressesMap) {
+            //     if (!(item.tokenId in collator[contract].tokens)) {
+            //       collator[contract].tokens[item.tokenId] = {};
+            //     }
+            //     if (item.from in collator[contract].tokens[item.tokenId]) {
+            //       collator[contract].tokens[item.tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.from]).sub(item.value).toString();
+            //       if (collator[contract].tokens[item.tokenId][item.from] == "0") {
+            //         delete collator[contract].tokens[item.tokenId][item.from];
+            //       }
+            //     }
+            //   }
+            //   if (item.to in selectedAddressesMap) {
+            //     if (!(item.tokenId in collator[contract].tokens)) {
+            //       collator[contract].tokens[item.tokenId] = {};
+            //     }
+            //     if (!(item.to in collator[contract].tokens[item.tokenId])) {
+            //       collator[contract].tokens[item.tokenId][item.to] = "0";
+            //     }
+            //     collator[contract].tokens[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.to]).add(item.value).toString();
+            //   }
+            // } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
+            //   for (const [index, tokenId] of item.tokenIds.entries()) {
+            //     if (item.from in selectedAddressesMap) {
+            //       if (!(tokenId in collator[contract].tokens)) {
+            //         collator[contract].tokens[tokenId] = {};
+            //       }
+            //       if (item.from in collator[contract].tokens[tokenId]) {
+            //         collator[contract].tokens[tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.from]).sub(item.values[index]).toString();
+            //         if (collator[contract].tokens[tokenId][item.from] == "0") {
+            //           delete collator[contract].tokens[tokenId][item.from];
+            //         }
+            //       }
+            //     }
+            //     if (item.to in selectedAddressesMap) {
+            //       if (!(tokenId in collator[contract].tokens)) {
+            //         collator[contract].tokens[tokenId] = {};
+            //       }
+            //       if (!(item.to in collator[contract].tokens[tokenId])) {
+            //         collator[contract].tokens[tokenId][item.to] = "0";
+            //       }
+            //       collator[contract].tokens[tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.to]).add(item.values[index]).toString();
+            //     }
+            //   }
+            // }
+          }
+        }
+        rows = parseInt(rows) + data.length;
+        done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
+      } while (!done);
+      // console.log("collator: " + JSON.stringify(collator, null, 2));
+      context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
+      await context.dispatch('saveData', ['balances']);
+      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals END");
     },
 
     async syncENSExpiries(context, parameter) {
