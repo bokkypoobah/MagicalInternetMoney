@@ -95,7 +95,7 @@ const SyncOptions = {
   },
   methods: {
     saveSettings() {
-      // logInfo("SyncOptions", "methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(moment().format("HH:mm:ss") + " INFO SyncOptions:methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.syncOptionsSettings = JSON.stringify(this.settings);
     },
     syncNow() {
@@ -118,7 +118,7 @@ const SyncOptions = {
     },
   },
   mounted() {
-    logDebug("SyncOptions", "mounted() $route: " + JSON.stringify(this.$route.params));
+    // console.log(moment().format("HH:mm:ss") + " DEBUG SyncOptions:mounted - $route: " + JSON.stringify(this.$route.params));
     if ('syncOptionsSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.syncOptionsSettings);
       if ('version' in tempSettings && tempSettings.version == this.settings.version) {
@@ -138,7 +138,7 @@ const syncOptionsModule = {
   },
   mutations: {
     viewSyncOptions(state) {
-      logInfo("syncOptionsModule", "mutations.viewSyncOptions");
+      console.log(moment().format("HH:mm:ss") + " INFO syncOptionsModule:mutations.viewSyncOptions");
       state.show = true;
     },
     setShow(state, show) {
@@ -147,7 +147,7 @@ const syncOptionsModule = {
   },
   actions: {
     async viewSyncOptions(context, blah) {
-      logInfo("syncOptionsModule", "actions.viewSyncOptions");
+      console.log(moment().format("HH:mm:ss") + " INFO syncOptionsModule:actions.viewSyncOptions");
       await context.commit('viewSyncOptions');
     },
     async setShow(context, show) {
