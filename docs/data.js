@@ -1960,16 +1960,33 @@ const dataModule = {
         console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
-            console.log(JSON.stringify(item));
-            const [ contract, owner, spender ] = [ item.contract, item.owner, item.spender ];
+            const [ eventType, type, contract, owner, spender ] = [ item.eventType, item.type, item.contract, item.owner, item.spender ];
             if (!(owner in collator)) {
               collator[owner] = {};
             }
             if (!(contract in collator[owner])) {
-              collator[owner][contract] = {};
+              if (eventType == "erc20") {
+                collator[owner][contract] = {};
+              } else {
+                collator[owner][contract] = {
+                  tokenIds: {},
+                  approvalForAll: {},
+                };
+              }
             }
-            if (!(spender in collator[owner][contract])) {
-              collator[owner][contract][spender] = {};
+            if (eventType == "erc20") {
+              // console.log(JSON.stringify(item));
+              collator[owner][contract][spender] = item.tokens;
+            } else if (eventType == "erc721") {
+              if (type == "Approval") {
+                // console.log("ERC-721 Approval: " + JSON.stringify(item));
+                collator[owner][contract].tokenIds[item.tokenId] = item.approved;
+              } else if (type == "ApprovalForAll") {
+                // console.log("ERC-721 ApprovalForAll: " + JSON.stringify(item));
+                collator[owner][contract].approvalForAll[item.operator] = item.approved;
+              }
+            } else if (eventType == "erc1155") {
+              // console.log("ERC-1155");
             }
             // if (!(contract in collator)) {
             //   if (item.eventType == "erc20") {
