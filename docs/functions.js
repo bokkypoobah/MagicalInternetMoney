@@ -385,36 +385,48 @@ function parseReservoirTokenData(info) {
   const lastSaleCurrency = token.lastSale && token.lastSale.price && token.lastSale.price.currency && token.lastSale.price.currency.symbol || null;
   const lastSaleAmount = token.lastSale && token.lastSale.price && token.lastSale.price.amount && token.lastSale.price.amount.native || null;
   const lastSaleAmountUSD = token.lastSale && token.lastSale.price && token.lastSale.price.amount && token.lastSale.price.amount.usd || null;
-  result.lastSale = {
-    timestamp: lastSaleTimestamp,
-    currency: lastSaleCurrency,
-    amount: lastSaleAmount,
-    amountUSD: lastSaleAmountUSD,
-  };
+  if (lastSaleAmount) {
+    result.lastSale = {
+      timestamp: lastSaleTimestamp,
+      currency: lastSaleCurrency,
+      amount: lastSaleAmount,
+      amountUSD: lastSaleAmountUSD,
+    };
+  } else {
+    result.lastSale = null;
+  }
   const priceExpiry = market.floorAsk && market.floorAsk.validUntil && parseInt(market.floorAsk.validUntil) || null;
   const priceSource = market.floorAsk && market.floorAsk.source && market.floorAsk.source.domain || null;
   const priceCurrency = market.floorAsk && market.floorAsk.price && market.floorAsk.price.currency && market.floorAsk.price.currency.symbol || null;
   const priceAmount = market.floorAsk && market.floorAsk.price && market.floorAsk.price.amount && market.floorAsk.price.amount.native || null;
   const priceAmountUSD = market.floorAsk && market.floorAsk.price && market.floorAsk.price.amount && market.floorAsk.price.amount.usd || null;
-  result.price = {
-    source: priceSource,
-    expiry: priceExpiry,
-    currency: priceCurrency,
-    amount: priceAmount,
-    amountUSD: priceAmountUSD,
-  };
+  if (priceAmount) {
+    result.price = {
+      source: priceSource,
+      expiry: priceExpiry,
+      currency: priceCurrency,
+      amount: priceAmount,
+      amountUSD: priceAmountUSD,
+    };
+  } else {
+    result.price = null;
+  }
   const topBidCurrency = market.topBid && market.topBid.price && market.topBid.price.currency && market.topBid.price.currency.symbol || null;
   const topBidAmount = market.topBid && market.topBid.price && market.topBid.price.amount && market.topBid.price.amount.native || null;
   const topBidAmountUSD = market.topBid && market.topBid.price && market.topBid.price.amount && market.topBid.price.amount.usd || null;
   const topBidNetAmount = market.topBid && market.topBid.price && market.topBid.price.netAmount && market.topBid.price.netAmount.native || null;
   const topBidNetAmountUSD = market.topBid && market.topBid.price && market.topBid.price.netAmount && market.topBid.price.netAmount.usd || null;
-  result.topBid = {
-    currency: topBidCurrency,
-    amount: topBidAmount,
-    amountUSD: topBidAmountUSD,
-    netAmount: topBidNetAmount,
-    netAmountUSD: topBidNetAmountUSD,
-  };
+  if (topBidNetAmount) {
+    result.topBid = {
+      currency: topBidCurrency,
+      amount: topBidAmount,
+      amountUSD: topBidAmountUSD,
+      netAmount: topBidNetAmount,
+      netAmountUSD: topBidNetAmountUSD,
+    };
+  } else {
+    result.topBid = null;
+  }
   // console.log("result: " + JSON.stringify(result, null, 2));
   return result;
 }

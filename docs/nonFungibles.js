@@ -424,6 +424,9 @@ const NonFungibles = {
                   image,
                   // blockNumber: tokenData.blockNumber,
                   // logIndex: tokenData.logIndex,
+                  lastSale: metadata.lastSale,
+                  price: metadata.price,
+                  topBid: metadata.topBid,
                 });
               }
             }

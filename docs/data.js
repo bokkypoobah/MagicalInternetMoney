@@ -512,42 +512,33 @@ const dataModule = {
       if (!(contract in state.tokens[chainId])) {
         Vue.set(state.tokens[chainId], contract, {
           type: info.type,
-          symbol: null,
-          name: null,
+          symbol: info.collectionSymbol || null,
+          name: info.collectionName || null,
           junk: false,
           tokens: {},
         });
       }
       if (!(tokenId in state.tokens[chainId][contract].tokens)) {
-        if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
-          // TODO
-          logInfo("dataModule", "mutations.addNonFungibleMetadata ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
-            created: info.created || null,
-            registration: info.registration || null,
-            expiry: info.expiry,
-            name: info.name,
-            description: info.description,
-            image: info.image,
-            attributes: info.attributes,
-            active: false,
-          });
-        } else {
-          logInfo("dataModule", "mutations.addNonFungibleMetadata Non-ENS info: " + JSON.stringify(info, null, 2));
-          Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
-            name: info.name,
-            description: info.description,
-            image: info.image,
-            attributes: info.attributes,
-            active: false,
-          });
-        }
+        // logInfo("dataModule", "mutations.addNonFungibleMetadata new info: " + JSON.stringify(info, null, 2));
+        Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
+          name: info.name,
+          description: info.description,
+          image: info.image,
+          attributes: info.attributes,
+          active: false,
+          lastSale: info.lastSale || null,
+          price: info.price || null,
+          topBid: info.topBid || null,
+        });
       } else {
         // logInfo("dataModule", "mutations.addNonFungibleMetadata existing: " + JSON.stringify(info, null, 2));
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'name', info.name);
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'description', info.description);
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'image', info.image);
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'attributes', info.attributes);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'lastSale', info.lastSale || null);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'price', info.price || null);
+        Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'topBid', info.topBid || null);
       }
     },
     addStealthTransfer(state, info) {
@@ -2464,6 +2455,9 @@ const dataModule = {
                 const token = parseReservoirTokenData(record);
                 context.commit('addNonFungibleMetadata', token);
                 completed++;
+                if ((completed % 250) == 0) {
+                  await context.dispatch('saveData', ['tokens']);
+                }
               }
             }
           } while (continuation != null);
