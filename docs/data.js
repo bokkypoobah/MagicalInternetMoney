@@ -1982,7 +1982,13 @@ const dataModule = {
             if (eventType == "erc20") {
               collator[owner][contract][spender] = item.tokens;
             } else if (eventType == "erc721" && type == "Approval") {
-              collator[owner][contract].tokenIds[item.tokenId] = item.approved;
+              if (item.approved == ADDRESS0) {
+                if (item.tokenId in collator[owner][contract].tokenIds) {
+                  delete collator[owner][contract].tokenIds[item.tokenId];
+                }
+              } else {
+                collator[owner][contract].tokenIds[item.tokenId] = item.approved;
+              }
             } else if (type == "ApprovalForAll") {
               collator[owner][contract].approvalForAll[item.operator] = item.approved;
             }
