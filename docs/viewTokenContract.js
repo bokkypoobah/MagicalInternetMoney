@@ -395,6 +395,13 @@ const viewTokenContractModule = {
         active: token.active,
       });
 
+      const balances = chainId && store.getters['data/balances'] && store.getters['data/balances'][chainId] && store.getters['data/balances'][chainId][info.contract] && store.getters['data/balances'][chainId][info.contract].balances || {};
+      const balancesResults = [];
+      for (const [address, balance] of Object.entries(balances)) {
+        balancesResults.push({ address, balance });
+      }
+      await context.commit('setBalances', balancesResults);
+
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
       let symbol = null;
@@ -423,12 +430,6 @@ const viewTokenContractModule = {
           selectedAddressesMap[address] = true;
         }
       }
-      const balances = chainId && store.getters['data/balances'] && store.getters['data/balances'][chainId] && store.getters['data/balances'][chainId][info.contract] && store.getters['data/balances'][chainId][info.contract].balances || {};
-      const balancesResults = [];
-      for (const [address, balance] of Object.entries(balances)) {
-        balancesResults.push({ address, balance });
-      }
-      await context.commit('setBalances', balancesResults);
     },
     async setSymbol(context, symbol) {
       console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setSymbol - symbol: " + symbol);
