@@ -142,7 +142,7 @@ const Approvals = {
           <template #cell(spender)="data">
             <font size="-1">
               <b-link :href="explorer + 'address/' + data.item.spender + '#code'" target="_blank">
-                {{ addresses[data.item.spender] && addresses[data.item.spender].name || ens[data.item.spender] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
+                {{ addresses[data.item.spender] && addresses[data.item.spender].name || ens[data.item.spender] || customNames[data.item.spender] && customNames[data.item.spender][1] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
               </b-link>
             </font>
           </template>
@@ -233,6 +233,9 @@ const Approvals = {
     },
     ens() {
       return store.getters['data/ens'];
+    },
+    customNames() {
+      return CUSTOMNAMES;
     },
     sync() {
       return store.getters['data/sync'];
