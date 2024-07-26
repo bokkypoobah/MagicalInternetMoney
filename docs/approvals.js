@@ -296,17 +296,20 @@ const Approvals = {
       }
       for (const [owner, ownerData] of Object.entries(this.approvals[this.chainId] || {})) {
         for (const [contract, contractData] of Object.entries(ownerData)) {
-          const type = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].type || null;
+          const token = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || null;
+          const type = token && token.type || null;
+          const symbol = token && token.symbol || null;
+          const name = token && token.name || null;
           if (type == "erc20") {
             for (const [spender, value] of Object.entries(contractData)) {
-              results.push({ chainId: this.chainId, contract, type, eventType: "Approval", owner, spender, value });
+              results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "Approval", owner, spender, value });
             }
           } else {
             for (const [tokenId, spender] of Object.entries(contractData.tokens)) {
-              results.push({ chainId: this.chainId, contract, type, eventType: "Approval", owner, spender, value: tokenId });
+              results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "Approval", owner, spender, value: tokenId });
             }
             for (const [spender, approved] of Object.entries(contractData.approvalForAll)) {
-              results.push({ chainId: this.chainId, contract, type, eventType: "SetApprovalForAll", owner, spender, value: approved });
+              results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "SetApprovalForAll", owner, spender, value: approved });
             }
           }
         }
