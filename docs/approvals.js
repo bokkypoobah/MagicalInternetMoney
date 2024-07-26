@@ -3,13 +3,6 @@ const Approvals = {
     <div class="m-0 p-0">
       <b-card no-body no-header class="border-0">
 
-        <!-- :MODALFAUCETS -->
-        <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
-          <template #modal-title>ERC-20 Faucets</template>
-          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover="'Select faucet'"></b-form-select>
-          <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
-        </b-modal>
-
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 pr-1" style="width: 200px;">
             <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
@@ -61,9 +54,6 @@ const Approvals = {
             <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
-          </div>
-          <div class="mt-0 pr-1">
-            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
@@ -255,6 +245,9 @@ const Approvals = {
     balances() {
       return store.getters['data/balances'];
     },
+    approvals() {
+      return store.getters['data/approvals'];
+    },
     tokens() {
       return store.getters['data/tokens'];
     },
@@ -266,24 +259,6 @@ const Approvals = {
     },
     pageSizes() {
       return store.getters['config/pageSizes'];
-    },
-    faucets() {
-      return FAUCETS && FAUCETS[this.chainId];
-    },
-    faucetsOptions() {
-      const results = [];
-      if (FAUCETS && FAUCETS[this.chainId]) {
-        results.push({ value: null, text: '(select a faucet)' });
-        for (const item of FAUCETS[this.chainId]) {
-          if (item.type == "erc20") {
-            results.push({
-              value: item.address,
-              text: item.drip + " x " + (item.type == "erc20" ? "ERC-20 " : "ERC-721 ") + item.symbol + ' ' + item.name + (item.type == "erc20" ? " (" + item.decimals + " dp)" : "") + ' @ ' + item.address.substring(0, this.ADDRESS_SEGMENT_LENGTH + 2) + '...' + item.address.slice(-this.ADDRESS_SEGMENT_LENGTH),
-            });
-          }
-        }
-      }
-      return results;
     },
 
     totalERC20Contracts() {
@@ -389,37 +364,6 @@ const Approvals = {
 
   },
   methods: {
-    viewFaucets() {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.viewFaucets");
-      this.$bvModal.show('modal-faucets');
-    },
-    async drip() {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const faucetInfo = FAUCETS[this.chainId] && FAUCETS[this.chainId].filter(e => e.address == this.modalFaucet.selectedFaucet)[0] || null;
-      if (faucetInfo) {
-        console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.drip - faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
-        if (faucetInfo.type == "erc20") {
-          try {
-            const tx = await signer.sendTransaction({ to: faucetInfo.address, value: "0" });
-            console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.drip ERC-20 - tx: " + JSON.stringify(tx));
-          } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR Approvals:methods.drip ERC-20: " + JSON.stringify(e));
-          }
-        } else {
-          const testToadzContract = new ethers.Contract(faucetInfo.address, TESTTOADZABI, provider);
-          const testToadzContractWithSigner = testToadzContract.connect(provider.getSigner());
-          try {
-            const tx = await testToadzContractWithSigner.mint(3);
-            console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.drip ERC-721 - tx: " + JSON.stringify(tx));
-          } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR Approvals:methods.drip ERC-721: " + JSON.stringify(e));
-          }
-        }
-      }
-    },
-
     toggleFungibleJunk(item) {
       console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.toggleFungibleJunk - item: " + JSON.stringify(item));
       store.dispatch('data/toggleFungibleJunk', item);
