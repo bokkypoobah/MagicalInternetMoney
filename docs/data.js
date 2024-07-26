@@ -1598,8 +1598,8 @@ const dataModule = {
             } else if (log.topics[0] == "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31") {
               const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
               const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-              approved = ethers.BigNumber.from(log.data).toString();
-              // NOTE: Both erc1155 and erc721 fall in this category
+              approved = ethers.BigNumber.from(log.data) > 0;
+              // NOTE: Both erc1155 and erc721 fall in this category, but assigning all to erc721
               eventRecord = { type: "ApprovalForAll", owner, operator, approved, eventType: "erc721" };
             } else if (log.topics[0] == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62") {
               // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
@@ -1990,6 +1990,7 @@ const dataModule = {
                 collator[owner][contract].tokenIds[item.tokenId] = item.approved;
               }
             } else if (type == "ApprovalForAll") {
+              // TODO: Can remove !! after new db change
               collator[owner][contract].approvalForAll[item.operator] = !!item.approved;
             }
           }
