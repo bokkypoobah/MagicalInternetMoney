@@ -101,6 +101,10 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_ViewNonFungibleTokens_20240711.png" /></kbd>
 
+###### ERC-20, ERC-721 and ERC-1155 Approvals
+
+<kbd><img src="images/SampleScreen_Approvals_20240726.png" /></kbd>
+
 ###### Add Stealth Meta-Address To Registry
 
 <kbd><img src="images/SampleScreen_AddStealthMetaAddressToRegistry_1_20240715.png" /></kbd>

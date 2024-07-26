@@ -81,7 +81,7 @@ const Approvals = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover="'# token contracts'">{{ filteredSortedItems.length + '/' + totalERC20Contracts }}</font>
+            <font size="-2" v-b-popover.hover="'# token contracts'">{{ filteredSortedItems.length + '/' + totalApprovals }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -91,7 +91,8 @@ const Approvals = {
           </div>
         </div>
 
-        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+        <!-- <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1"> -->
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -261,11 +262,23 @@ const Approvals = {
       return store.getters['config/pageSizes'];
     },
 
-    totalERC20Contracts() {
+    totalApprovals() {
       let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.balances[this.chainId] || {})) {
-        if (data.type == "erc20") {
-          result++;
+      for (const [owner, ownerData] of Object.entries(this.approvals[this.chainId] || {})) {
+        for (const [contract, contractData] of Object.entries(ownerData)) {
+          const type = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].type || null;
+          if (type == "erc20") {
+            for (const [spender, value] of Object.entries(contractData)) {
+              result++
+            }
+          } else {
+            for (const [tokenId, spender] of Object.entries(contractData.tokens)) {
+              result++
+            }
+            for (const [spender, approved] of Object.entries(contractData.approvalForAll)) {
+              result++
+            }
+          }
         }
       }
       return result;
@@ -281,94 +294,101 @@ const Approvals = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
-      for (const [contract, contractData] of Object.entries(this.approvals[this.chainId] || {})) {
-        console.log(contract + " => " + JSON.stringify(contractData));
-        for (const [owner, approvals] of Object.entries(contractData)) {
-          console.log("  " + owner + " => " + JSON.stringify(approvals));
-          // for (const [tokenIds, owner] of Object.entries(approvals.tokens)) {
-          //   console.log("  " + owner + " => " + JSON.stringify(approvals));
-          // }
-        }
-      }
-
-      for (const [contract, contractData] of Object.entries(this.balances[this.chainId] || {})) {
-        if (contractData.type == "erc20") {
-          const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
-          let include = true;
-          if (this.settings.junkFilter) {
-            if (this.settings.junkFilter == 'junk' && !metadata.junk) {
-              include = false;
-            } else if (this.settings.junkFilter == 'excludejunk' && metadata.junk) {
-              include = false;
+      for (const [owner, ownerData] of Object.entries(this.approvals[this.chainId] || {})) {
+        for (const [contract, contractData] of Object.entries(ownerData)) {
+          const type = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].type || null;
+          if (type == "erc20") {
+            for (const [spender, value] of Object.entries(contractData)) {
+              results.push({ chainId: this.chainId, contract, type, eventType: "Approval", owner, spender, value });
             }
-          }
-          if (include && this.settings.activeOnly && (!metadata.active || metadata.junk)) {
-            include = false;
-          }
-          if (include && regex) {
-            if (!(regex.test(metadata.symbol) || regex.test(metadata.name) || regex.test(contract))) {
-              include = false;
+          } else {
+            for (const [tokenId, spender] of Object.entries(contractData.tokens)) {
+              results.push({ chainId: this.chainId, contract, type, eventType: "Approval", owner, spender, value: tokenId });
             }
-          }
-          const unsupported = contract in UNSUPPORTED_FUNGIBLES;
-          const balances = [];
-          for (const [address, balance] of Object.entries(contractData.balances)) {
-            balances.push({ address, balance });
-          }
-          if (include) {
-            // results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances, unsupported });
+            for (const [spender, approved] of Object.entries(contractData.approvalForAll)) {
+              results.push({ chainId: this.chainId, contract, type, eventType: "SetApprovalForAll", owner, spender, value: approved });
+            }
           }
         }
       }
+      // for (const [contract, contractData] of Object.entries(this.balances[this.chainId] || {})) {
+      //   if (contractData.type == "erc20") {
+      //     const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
+      //     let include = true;
+      //     if (this.settings.junkFilter) {
+      //       if (this.settings.junkFilter == 'junk' && !metadata.junk) {
+      //         include = false;
+      //       } else if (this.settings.junkFilter == 'excludejunk' && metadata.junk) {
+      //         include = false;
+      //       }
+      //     }
+      //     if (include && this.settings.activeOnly && (!metadata.active || metadata.junk)) {
+      //       include = false;
+      //     }
+      //     if (include && regex) {
+      //       if (!(regex.test(metadata.symbol) || regex.test(metadata.name) || regex.test(contract))) {
+      //         include = false;
+      //       }
+      //     }
+      //     const unsupported = contract in UNSUPPORTED_FUNGIBLES;
+      //     const balances = [];
+      //     for (const [address, balance] of Object.entries(contractData.balances)) {
+      //       balances.push({ address, balance });
+      //     }
+      //     if (include) {
+      //       // results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances, unsupported });
+      //     }
+      //   }
+      // }
       return results;
     },
     filteredSortedItems() {
       const results = this.filteredItems;
-      if (this.settings.sortOption == 'contractasc') {
-        results.sort((a, b) => {
-          return ('' + a.contract).localeCompare(b.contract);
-        });
-      } else if (this.settings.sortOption == 'contractdsc') {
-        results.sort((a, b) => {
-          return ('' + b.contract).localeCompare(a.contract);
-        });
-      } else if (this.settings.sortOption == 'symbolasc') {
-        results.sort((a, b) => {
-          if (('' + a.symbol).localeCompare(b.symbol) == 0) {
-            return ('' + a.contract).localeCompare(b.contract);
-          } else {
-            return ('' + a.symbol).localeCompare(b.symbol);
-          }
-        });
-      } else if (this.settings.sortOption == 'symboldsc') {
-        results.sort((a, b) => {
-          if (('' + a.symbol).localeCompare(b.symbol) == 0) {
-            return ('' + a.contract).localeCompare(b.contract);
-          } else {
-            return ('' + b.symbol).localeCompare(a.symbol);
-          }
-        });
-      } else if (this.settings.sortOption == 'nameasc') {
-        results.sort((a, b) => {
-          if (('' + a.name).localeCompare(b.name) == 0) {
-            return ('' + a.contract).localeCompare(b.contract);
-          } else {
-            return ('' + a.name).localeCompare(b.name);
-          }
-        });
-      } else if (this.settings.sortOption == 'namedsc') {
-        results.sort((a, b) => {
-          if (('' + a.name).localeCompare(b.name) == 0) {
-            return ('' + a.contract).localeCompare(b.contract);
-          } else {
-            return ('' + b.name).localeCompare(a.name);
-          }
-        });
-      }
+      // if (this.settings.sortOption == 'contractasc') {
+      //   results.sort((a, b) => {
+      //     return ('' + a.contract).localeCompare(b.contract);
+      //   });
+      // } else if (this.settings.sortOption == 'contractdsc') {
+      //   results.sort((a, b) => {
+      //     return ('' + b.contract).localeCompare(a.contract);
+      //   });
+      // } else if (this.settings.sortOption == 'symbolasc') {
+      //   results.sort((a, b) => {
+      //     if (('' + a.symbol).localeCompare(b.symbol) == 0) {
+      //       return ('' + a.contract).localeCompare(b.contract);
+      //     } else {
+      //       return ('' + a.symbol).localeCompare(b.symbol);
+      //     }
+      //   });
+      // } else if (this.settings.sortOption == 'symboldsc') {
+      //   results.sort((a, b) => {
+      //     if (('' + a.symbol).localeCompare(b.symbol) == 0) {
+      //       return ('' + a.contract).localeCompare(b.contract);
+      //     } else {
+      //       return ('' + b.symbol).localeCompare(a.symbol);
+      //     }
+      //   });
+      // } else if (this.settings.sortOption == 'nameasc') {
+      //   results.sort((a, b) => {
+      //     if (('' + a.name).localeCompare(b.name) == 0) {
+      //       return ('' + a.contract).localeCompare(b.contract);
+      //     } else {
+      //       return ('' + a.name).localeCompare(b.name);
+      //     }
+      //   });
+      // } else if (this.settings.sortOption == 'namedsc') {
+      //   results.sort((a, b) => {
+      //     if (('' + a.name).localeCompare(b.name) == 0) {
+      //       return ('' + a.contract).localeCompare(b.contract);
+      //     } else {
+      //       return ('' + b.name).localeCompare(a.name);
+      //     }
+      //   });
+      // }
       return results;
     },
     pagedFilteredSortedItems() {
-      // console.log(moment().format("HH:mm:ss") + " INFO Approvals:computed.pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // console.log(moment().format("HH:mm:ss") + " INFO Approvals:computed.pagedFilteredSortedItems - results[0..9]: " + JSON.stringify(this.filteredSortedItems.slice(0, 10), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 

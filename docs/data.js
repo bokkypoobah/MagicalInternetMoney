@@ -1982,7 +1982,9 @@ const dataModule = {
             if (eventType == "erc20") {
               collator[owner][contract][spender] = item.tokens;
             } else if (eventType == "erc721" && type == "Approval") {
-              if (item.approved == ADDRESS0) {
+              // TODO
+              const testing = false;
+              if (item.approved == ADDRESS0 && !testing) {
                 if (item.tokenId in collator[owner][contract].tokens) {
                   delete collator[owner][contract].tokens[item.tokenId];
                 }
