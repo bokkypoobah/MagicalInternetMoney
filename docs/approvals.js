@@ -472,7 +472,7 @@ const Approvals = {
     rowSelected(item) {
       console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
-        store.dispatch('viewFungible/viewFungible', { contract: item[0].contract });
+        store.dispatch('viewTokenContract/viewTokenContract', { contract: item[0].contract });
         store.dispatch('data/updateFungibleTotalSupply', { chainId: this.chainId, contract: item[0].contract });
         this.$refs.tokenContractsTable.clearSelected();
       }

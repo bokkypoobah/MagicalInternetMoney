@@ -1,4 +1,4 @@
-const ViewFungible = {
+const ViewTokenContract = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
@@ -123,92 +123,92 @@ const ViewFungible = {
       return store.getters['connection/explorer'];
     },
     address() {
-      return store.getters['viewFungible/address'];
+      return store.getters['viewTokenContract/address'];
     },
     contract() {
-      return store.getters['viewFungible/contract'];
+      return store.getters['viewTokenContract/contract'];
     },
     unsupported() {
       return this.contract in UNSUPPORTED_FUNGIBLES;
     },
     contractDecimals() {
-      return store.getters['viewFungible/contractDecimals'];
+      return store.getters['viewTokenContract/contractDecimals'];
     },
     tokenId() {
-      return store.getters['viewFungible/tokenId'];
+      return store.getters['viewTokenContract/tokenId'];
     },
     tokens() {
       return store.getters['data/tokens'];
     },
     symbol: {
       get: function () {
-        return store.getters['viewFungible/symbol'];
+        return store.getters['viewTokenContract/symbol'];
       },
       set: function (symbol) {
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'symbol', value: symbol });
-        store.dispatch('viewFungible/setSymbol', symbol);
+        store.dispatch('viewTokenContract/setSymbol', symbol);
       },
     },
     name: {
       get: function () {
-        return store.getters['viewFungible/name'];
+        return store.getters['viewTokenContract/name'];
       },
       set: function (name) {
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'name', value: name });
-        store.dispatch('viewFungible/setName', name);
+        store.dispatch('viewTokenContract/setName', name);
       },
     },
     decimals: {
       get: function () {
-        return store.getters['viewFungible/decimals'];
+        return store.getters['viewTokenContract/decimals'];
       },
       set: function (decimals) {
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'decimals', value: decimals });
-        store.dispatch('viewFungible/setDecimals', decimals);
+        store.dispatch('viewTokenContract/setDecimals', decimals);
       },
     },
     totalSupply() {
       return this.chainId && this.contract && store.getters['data/tokens'] && store.getters['data/tokens'][this.chainId] && store.getters['data/tokens'][this.chainId][this.contract] && store.getters['data/tokens'][this.chainId][this.contract].totalSupply;
     },
     balances() {
-      return store.getters['viewFungible/balances'];
+      return store.getters['viewTokenContract/balances'];
     },
     image() {
-      return store.getters['viewFungible/image'];
+      return store.getters['viewTokenContract/image'];
     },
     contractSymbol() {
-      return store.getters['viewFungible/contractSymbol'];
+      return store.getters['viewTokenContract/contractSymbol'];
     },
     contractName() {
-      return store.getters['viewFungible/contractName'];
+      return store.getters['viewTokenContract/contractName'];
     },
     contractDecimals() {
-      return store.getters['viewFungible/contractDecimals'];
+      return store.getters['viewTokenContract/contractDecimals'];
     },
     junk: {
       get: function () {
-        return store.getters['viewFungible/junk'];
+        return store.getters['viewTokenContract/junk'];
       },
       set: function (junk) {
         store.dispatch('data/toggleFungibleJunk', { chainId: this.chainId, contract: this.contract });
-        store.dispatch('viewFungible/toggleFungibleJunk');
+        store.dispatch('viewTokenContract/toggleFungibleJunk');
       },
     },
     active: {
       get: function () {
-        return store.getters['viewFungible/active'];
+        return store.getters['viewTokenContract/active'];
       },
       set: function (active) {
         store.dispatch('data/toggleFungibleActive', { chainId: this.chainId, contract: this.contract });
-        store.dispatch('viewFungible/toggleFungibleActive');
+        store.dispatch('viewTokenContract/toggleFungibleActive');
       },
     },
     show: {
       get: function () {
-        return store.getters['viewFungible/show'];
+        return store.getters['viewTokenContract/show'];
       },
       set: function (show) {
-        store.dispatch('viewFungible/setShow', show);
+        store.dispatch('viewTokenContract/setShow', show);
       },
     },
   },
@@ -218,9 +218,9 @@ const ViewFungible = {
       try {
         const image = await toBase64(selectedImage);
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'image', value: image });
-        store.dispatch('viewFungible/setImage', image);
+        store.dispatch('viewTokenContract/setImage', image);
       } catch (e) {
-        console.log(moment().format("HH:mm:ss") + " ERROR ViewFungible:methods.handleImage: " + e.message);
+        console.log(moment().format("HH:mm:ss") + " ERROR ViewTokenContract:methods.handleImage: " + e.message);
       }
     },
     copyToClipboard(str) {
@@ -258,7 +258,7 @@ const ViewFungible = {
       return null;
     },
     setShow(show) {
-      store.dispatch('viewFungibleModule/setShow', show);
+      store.dispatch('viewTokenContract/setShow', show);
     },
 
     async deleteAddress(account) {
@@ -275,10 +275,10 @@ const ViewFungible = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewFungible:beforeDestroy");
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewTokenContract:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewFungible:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewTokenContract:mounted - $route: " + JSON.stringify(this.$route.params));
     // if ('transfersSettings' in localStorage) {
     //   const tempSettings = JSON.parse(localStorage.transfersSettings);
     //   if ('version' in tempSettings && tempSettings.version == 0) {
@@ -288,7 +288,7 @@ const ViewFungible = {
   },
 };
 
-const viewFungibleModule = {
+const viewTokenContractModule = {
   namespaced: true,
   state: {
     contract: null,
@@ -319,8 +319,8 @@ const viewFungibleModule = {
     show: state => state.show,
   },
   mutations: {
-    viewFungible(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.viewFungible - info: " + JSON.stringify(info));
+    viewTokenContract(state, info) {
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.viewTokenContract - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.symbol = info.symbol;
       state.name = info.name;
@@ -335,37 +335,37 @@ const viewFungibleModule = {
       state.show = true;
     },
     setSymbol(state, symbol) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setSymbol - symbol: " + symbol);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setSymbol - symbol: " + symbol);
       state.symbol = symbol;
     },
     setName(state, name) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setName - name: " + name);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setDecimals(state, decimals) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setDecimals - decimals: " + decimals);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setDecimals - decimals: " + decimals);
       state.decimals = decimals;
     },
     setImage(state, image) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setImage - image: " + image);
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setImage - image: " + image);
       state.image = image;
     },
     toggleFungibleJunk(state) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.toggleFungibleJunk");
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.toggleFungibleJunk");
       state.junk = !state.junk;
     },
     toggleFungibleActive(state) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.toggleFungibleActive");
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.toggleFungibleActive");
       state.active = !state.active;
     },
     setContractValues(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setContractValues - info: " + JSON.stringify(info));
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setContractValues - info: " + JSON.stringify(info));
       state.contractSymbol = info.contractSymbol;
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
     },
     setBalances(state, balances) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:mutations.setBalances - balances: " + JSON.stringify(balances));
+      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setBalances - balances: " + JSON.stringify(balances));
       state.balances = balances;
     },
     setShow(state, show) {
@@ -373,11 +373,11 @@ const viewFungibleModule = {
     },
   },
   actions: {
-    async viewFungible(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.viewFungible - info: " + JSON.stringify(info));
+    async viewTokenContract(context, info) {
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.viewTokenContract - info: " + JSON.stringify(info));
       const chainId = store.getters['connection/chainId'] || null;
       const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
-      await context.commit('viewFungible', {
+      await context.commit('viewTokenContract', {
         chainId,
         contract: info.contract,
         symbol: token.symbol,
@@ -424,27 +424,27 @@ const viewFungibleModule = {
       await context.commit('setBalances', balancesResults);
     },
     async setSymbol(context, symbol) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setSymbol - symbol: " + symbol);
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setSymbol - symbol: " + symbol);
       await context.commit('setSymbol', symbol);
     },
     async setName(context, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setName - name: " + name);
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setDecimals(context, decimals) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setDecimals - decimals: " + decimals);
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setDecimals - decimals: " + decimals);
       await context.commit('setDecimals', decimals);
     },
     async setImage(context, image) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.setImage - image: " + image);
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setImage - image: " + image);
       await context.commit('setImage', image);
     },
     async toggleFungibleJunk(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.toggleFungibleJunk");
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.toggleFungibleJunk");
       await context.commit('toggleFungibleJunk');
     },
     async toggleFungibleActive(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewFungibleModule:actions.toggleFungibleActive");
+      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.toggleFungibleActive");
       await context.commit('toggleFungibleActive');
     },
     async setShow(context, show) {
