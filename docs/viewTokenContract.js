@@ -64,7 +64,7 @@ const ViewTokenContract = {
           <b-row v-for="(b, i) in balances" v-bind:key="i" class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <b-link :href="explorer + 'address/' + b.address" target="_blank">
-                <font size="-1">{{ b.address.substring(0, 8) + '...' + b.address.slice(-6) }}</font>
+                <font size="-1">{{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}</font>
               </b-link>
             </b-col>
             <b-col cols="7" class="m-0 px-2">
@@ -140,8 +140,14 @@ const ViewTokenContract = {
     tokenId() {
       return store.getters['viewTokenContract/tokenId'];
     },
+    addresses() {
+      return store.getters['data/addresses'];
+    },
     tokens() {
       return store.getters['data/tokens'];
+    },
+    ens() {
+      return store.getters['data/ens'];
     },
     symbol: {
       get: function () {
@@ -401,6 +407,15 @@ const viewTokenContractModule = {
         balancesResults.push({ address, balance });
       }
       await context.commit('setBalances', balancesResults);
+
+      console.log("Here");
+      for (const [owner, ownerData] of Object.entries(store.getters['data/approvals'][chainId] || {})) {
+        // console.log(owner + " => " + JSON.stringify(ownerData));
+        const contractData = ownerData[info.contract] || [];
+        if (token.type == "erc20") {
+          console.log("  ERC-20: " + owner + " => " + JSON.stringify(contractData));
+        }
+      }
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
