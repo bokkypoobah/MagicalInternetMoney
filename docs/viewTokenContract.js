@@ -34,7 +34,7 @@ const ViewTokenContract = {
           <b-form-input size="sm" id="token-name" v-model.trim="name" debounce="600" class="px-2 w-100"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="type == 'erc-20'" label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc20'" label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
           <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
         </b-form-group>
 
@@ -48,11 +48,11 @@ const ViewTokenContract = {
           </b-form-file>
         </b-form-group>
 
-        <b-form-group v-if="type == 'erc-20'" label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc20'" label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="type == 'erc-20' && balances.length > 0" label="Balances" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc20' && balances.length > 0" label="Balances" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <font size="-1">Address</font>
