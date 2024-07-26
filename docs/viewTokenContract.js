@@ -1,8 +1,8 @@
 const ViewTokenContract = {
   template: `
     <div>
-      <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>{{ type == 'erc20' ? 'ERC-20 Fungible Token' : (type == 'erc721' ? 'ERC-721 Non-Fungible Token' : 'ERC-1155 Non-Fungible Token') }}</template>
+      <b-modal ref="viewtokencontract" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+        <template #modal-title>{{ (type == 'erc20' ? 'ERC-20 ' : (type == 'erc721' ? 'ERC-721 Non-' : 'ERC-1155 Non-')) + 'Fungible Token Contract' }}</template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="unsupported ? 'Unsupported Non-Standard ERC-20' : ''" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -269,7 +269,7 @@ const ViewTokenContract = {
         .then(value => {
           if (value) {
             store.dispatch('data/deleteAddress', account);
-            this.$refs['viewtoken'].hide();
+            this.$refs['viewtokencontract'].hide();
           }
         })
         .catch(err => {

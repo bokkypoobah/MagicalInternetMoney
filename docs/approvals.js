@@ -91,8 +91,7 @@ const Approvals = {
           </div>
         </div>
 
-        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
-        <!-- <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1"> -->
+        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
           <template #empty="scope">
             <h6>{{ scope.emptyText }}</h6>
             <div>
@@ -109,19 +108,6 @@ const Approvals = {
           <template #cell(number)="data">
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
-          <template #cell(active)="data">
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
-              </b-icon>
-            </b-button>
-            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null || data.item.unsupported" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
-              <b-icon :icon="(data.item.active & !data.item.junk) ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
-              </b-icon>
-            </b-button>
-          </template>
-          <template #cell(logo)="data">
-            <b-img v-if="data.item.image" button rounded width="75px;" :src="data.item.image" />
-          </template>
           <template #cell(contract)="data">
             <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
@@ -135,53 +121,45 @@ const Approvals = {
             </div>
           </template>
           <template #cell(type)="data">
-            <font size="-1">{{ data.item.type == "erc20" ? "ERC-20" : "ERC-721" }}</font>
+            <font size="-1">{{ data.item.type.replace(/erc/, 'ERC-') }}</font>
           </template>
-          <template #cell(symbolname)="data">
+          <template #cell(symbol)="data">
             <font size="-1">{{ data.item.symbol }}</font>
-            <br />
+          </template>
+          <template #cell(name)="data">
             <font size="-1">{{ data.item.name }}</font>
           </template>
-          <template #cell(decimals)="data">
-            <div v-if="data.item.decimals !== null">
-              <font size="-1">{{ data.item.decimals || '0' }}</font>
-            </div>
-            <div v-else>
-              <font size="-1">
-                <b-badge variant="warning" v-b-popover.hover="'Please set decimals as the fungible contract has not provided this information'">
-                  To Configure
-                </b-badge>
-              </font>
-            </div>
+          <template #cell(eventType)="data">
+            <font size="-1">{{ data.item.eventType }}</font>
           </template>
-          <template #head(balances)="data">
-            <b-row class="m-0 p-0">
-              <b-col cols="5" class="m-0 px-2">
-                Address
-              </b-col>
-              <b-col cols="7" class="m-0 px-2 text-right">
-                Balance
-              </b-col>
-            </b-row>
-          </template>
-          <template #cell(balances)="data">
+          <template #cell(owner)="data">
             <font size="-1">
-              <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
-                <b-col cols="5" class="m-0 px-1">
-                  <b-link :href="explorer + 'address/' + b.address" v-b-popover.hover="'View ' + b.address + ' in the explorer'" target="_blank">
-                    {{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}
-                  </b-link>
-                </b-col>
-                <b-col cols="7" class="m-0 px-1 text-right">
-                  <b-link :href="explorer + 'token/' + data.item.contract + '?a=' + b.address" target="_blank">
-                    {{ formatERC20(b.balance, data.item.decimals) }}
-                  </b-link>
-                </b-col>
-              </b-row>
+              <b-link :href="explorer + 'address/' + data.item.owner + '#code'" target="_blank">
+                {{ addresses[data.item.owner] && addresses[data.item.owner].name || ens[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
+              </b-link>
             </font>
           </template>
-          <template #cell(totalSupply)="data">
-            <font size="-1">{{ data.item.type == "erc20" ? formatDecimals(data.item.totalSupply, data.item.decimals || 0) : data.item.totalSupply }}</font>
+          <template #cell(spender)="data">
+            <font size="-1">
+              <b-link :href="explorer + 'address/' + data.item.spender + '#code'" target="_blank">
+                {{ addresses[data.item.spender] && addresses[data.item.spender].name || ens[data.item.spender] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
+              </b-link>
+            </font>
+          </template>
+          <template #cell(value)="data">
+            <font size="-1">
+              <div v-if="data.item.type == 'erc20'">
+                <span v-if="data.item.value.toString().length > 30">
+                  <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
+                </span>
+                <span v-else>
+                  {{ formatDecimals(data.item.value, data.item.decimals || 0) }}
+                </span>
+              </div>
+              <div v-else>
+                {{ data.item.value }}
+              </div>
+            </font>
           </template>
         </b-table>
       </b-card>
@@ -216,14 +194,15 @@ const Approvals = {
         { value: 'namedsc', text: '▼ Name, ▲ Contract' },
       ],
       fields: [
-        { key: 'number', label: '#', sortable: false, thStyle: 'width: 4%;', tdClass: 'text-truncate' },
-        { key: 'active', label: '', sortable: false, thStyle: 'width: 4%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'logo', label: 'Logo', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'symbolname', label: 'Symbol / Name', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'balances', label: 'Balances', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-left' },
-        { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'eventType', label: 'Event Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+        { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+        { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+        { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -301,8 +280,9 @@ const Approvals = {
           const symbol = token && token.symbol || null;
           const name = token && token.name || null;
           if (type == "erc20") {
+            const decimals = token && token.decimals || null;
             for (const [spender, value] of Object.entries(contractData)) {
-              results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "Approval", owner, spender, value });
+              results.push({ chainId: this.chainId, contract, type, symbol, name, decimals, eventType: "Approval", owner, spender, value });
             }
           } else if (type == "erc721" || type == "erc1155") {
             for (const [tokenId, spender] of Object.entries(contractData.tokens || {})) {
