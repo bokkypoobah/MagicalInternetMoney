@@ -374,18 +374,18 @@ const Approvals = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // console.log(moment().format("HH:mm:ss") + " INFO Approvals:computed.pagedFilteredSortedItems - results[0..9]: " + JSON.stringify(this.filteredSortedItems.slice(0, 10), null, 2));
+      // console.log(now() + " INFO Approvals:computed.pagedFilteredSortedItems - results[0..9]: " + JSON.stringify(this.filteredSortedItems.slice(0, 10), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
   },
   methods: {
     toggleFungibleJunk(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.toggleFungibleJunk - item: " + JSON.stringify(item));
+      console.log(now() + " INFO Approvals:methods.toggleFungibleJunk - item: " + JSON.stringify(item));
       store.dispatch('data/toggleFungibleJunk', item);
     },
     toggleFungibleActive(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.toggleFungibleActive - item: " + JSON.stringify(item));
+      console.log(now() + " INFO Approvals:methods.toggleFungibleActive - item: " + JSON.stringify(item));
       store.dispatch('data/toggleFungibleActive', item);
     },
     copyToClipboard(str) {
@@ -406,7 +406,7 @@ const Approvals = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.saveSettings - approvalsSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(now() + " INFO Approvals:methods.saveSettings - approvalsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.approvalsSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -453,7 +453,7 @@ const Approvals = {
       return null;
     },
     rowSelected(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Approvals:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      console.log(now() + " INFO Approvals:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewTokenContract/viewTokenContract', { contract: item[0].contract });
         store.dispatch('data/updateFungibleTotalSupply', { chainId: this.chainId, contract: item[0].contract });
@@ -462,7 +462,7 @@ const Approvals = {
     },
 
     async timeoutCallback() {
-      // console.log(moment().format("HH:mm:ss") + " DEBUG Approvals:methods.timeoutCallback - count: " + this.count);
+      // console.log(now() + " DEBUG Approvals:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -473,10 +473,10 @@ const Approvals = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Approvals:beforeDestroy");
+    // console.log(now() + " DEBUG Approvals:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Approvals:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG Approvals:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('approvalsSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.approvalsSettings);
@@ -486,7 +486,7 @@ const Approvals = {
       }
     }
     this.reschedule = true;
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Approvals:mounted - calling timeoutCallback()");
+    // console.log(now() + " DEBUG Approvals:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {

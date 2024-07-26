@@ -157,14 +157,14 @@ const Registry = {
       return results;
     },
     pagedFilteredSortedRegistryEntries() {
-      // console.log(moment().format("HH:mm:ss") + " INFO Registry:computed.pagedFilteredSortedRegistryEntries - results[0..1]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 2), null, 2));
+      // console.log(now() + " INFO Registry:computed.pagedFilteredSortedRegistryEntries - results[0..1]: " + JSON.stringify(this.filteredSortedRegistryEntries.slice(0, 2), null, 2));
       return this.filteredSortedRegistryEntries.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
   },
   methods: {
     saveSettings() {
-      console.log(moment().format("HH:mm:ss") + " INFO Registry:methods.saveSettings - registrySettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(now() + " INFO Registry:methods.saveSettings - registrySettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.registrySettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -174,11 +174,11 @@ const Registry = {
       store.dispatch('data/setSyncHalt', true);
     },
     newTransfer(stealthMetaAddress = null) {
-      console.log(moment().format("HH:mm:ss") + " INFO Registry:methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(now() + " INFO Registry:methods.newTransfer - stealthMetaAddress: " + stealthMetaAddress);
       store.dispatch('newTransfer/newTransfer', stealthMetaAddress);
     },
     async timeoutCallback() {
-      // console.log(moment().format("HH:mm:ss") + " DEBUG Registry:methods.timeoutCallback - count: " + this.count);
+      // console.log(now() + " DEBUG Registry:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -189,10 +189,10 @@ const Registry = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Registry:beforeDestroy");
+    // console.log(now() + " DEBUG Registry:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Registry:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG Registry:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('registrySettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.registrySettings);
@@ -202,7 +202,7 @@ const Registry = {
       }
     }
     this.reschedule = true;
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Registry:mounted - calling timeoutCallback()");
+    // console.log(now() + " DEBUG Registry:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {

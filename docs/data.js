@@ -268,51 +268,51 @@ const dataModule = {
   },
   mutations: {
     setState(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setState - info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.setState - info: " + JSON.stringify(info, null, 2));
       Vue.set(state, info.name, info.data);
     },
     updateBalances(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.updateBalances - info: " + JSON.stringify(info, null, 2));
       Vue.set(state.balances, info.chainId, info.balances);
     },
     updateApprovals(state, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateApprovals - info: " + JSON.stringify(info, null, 2));
+      console.log(now() + " INFO dataModule:mutations.updateApprovals - info: " + JSON.stringify(info, null, 2));
       Vue.set(state.approvals, info.chainId, info.approvals);
     },
     toggleAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, !state.addresses[info.address][info.field]);
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.toggleAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
+      // console.log(now() + " INFO dataModule:mutations.toggleAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
     setAddressField(state, info) {
       Vue.set(state.addresses[info.address], info.field, info.value);
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
+      // console.log(now() + " INFO dataModule:mutations.setAddressField - addresses[" + info.address + "]." + info.field + " = " + state.addresses[info.address][info.field]);
     },
     toggleFungibleJunk(state, item) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:mutations.toggleFungibleJunk - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'junk', !state.tokens[item.chainId][item.contract].junk);
       }
     },
     toggleFungibleActive(state, item) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.toggleFungibleActive - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:mutations.toggleFungibleActive - item: " + JSON.stringify(item));
       if (state.tokens[item.chainId] && state.tokens[item.chainId][item.contract]) {
         Vue.set(state.tokens[item.chainId][item.contract], 'active', !state.tokens[item.chainId][item.contract].active);
       }
     },
     setFungibleField(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setFungibleField: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.setFungibleField: " + JSON.stringify(info, null, 2));
       if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
         Vue.set(state.tokens[info.chainId][info.contract], info.field, info.value);
       }
     },
     updateFungibleTotalSupply(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateFungibleTotalSupply: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.updateFungibleTotalSupply: " + JSON.stringify(info, null, 2));
       if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract]) {
         Vue.set(state.tokens[info.chainId][info.contract], 'totalSupply', info.totalSupply);
       }
     },
     toggleNonFungibleJunk(state, item) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:mutations.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
@@ -326,7 +326,7 @@ const dataModule = {
       Vue.set(state.tokens[chainId][contract], 'junk', !state.tokens[chainId][contract].junk);
     },
     toggleNonFungibleActive(state, item) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:mutations.toggleNonFungibleActive - item: " + JSON.stringify(item));
       const [ chainId, contract, tokenId ] = [ item.chainId, item.contract, item.tokenId ];
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
@@ -350,7 +350,7 @@ const dataModule = {
     },
 
     addNewAddress(state, newAccount) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
+      // console.log(now() + " INFO dataModule:mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
       let address = null;
       let linkedToAddress = null;
       let type = null;
@@ -428,10 +428,10 @@ const dataModule = {
           });
         }
       }
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNewAddress AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addNewAddress AFTER - state.accounts: " + JSON.stringify(state.accounts, null, 2));
     },
     addNewStealthAddress(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNewStealthAddress: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addNewStealthAddress: " + JSON.stringify(info, null, 2));
       Vue.set(state.addresses, info.stealthAddress, {
         type: info.type,
         linkedTo: info.linkedTo,
@@ -446,7 +446,7 @@ const dataModule = {
       });
     },
     updateToStealthAddress(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.updateToStealthAddress: " + JSON.stringify(info, null, 2));
       Vue.set(state.addresses[info.stealthAddress], 'type', info.type);
       Vue.set(state.addresses[info.stealthAddress], 'linkedTo', info.linkedTo);
       Vue.set(state.addresses[info.stealthAddress], 'junk', info.junk);
@@ -458,7 +458,7 @@ const dataModule = {
       Vue.delete(state.addresses, address);
     },
     addFungibleMetadata(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addFungibleMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
         Vue.set(state.tokens, info.chainId, {});
       }
@@ -477,7 +477,7 @@ const dataModule = {
       }
     },
     addExpiry(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addExpiry info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addExpiry info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId, expiry ] = [ info.chainId, info.contract, info.tokenId, info.expiry ];
       if (!(chainId in state.expiries)) {
         Vue.set(state.expiries, chainId, {});
@@ -494,7 +494,7 @@ const dataModule = {
       }
     },
     addNonFungibleContractMetadata(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNonFungibleContractMetadata info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addNonFungibleContractMetadata info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.tokens)) {
         Vue.set(state.tokens, info.chainId, {});
       }
@@ -510,7 +510,7 @@ const dataModule = {
       }
     },
     addNonFungibleMetadata(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});
@@ -526,7 +526,7 @@ const dataModule = {
         });
       }
       if (!(tokenId in state.tokens[chainId][contract].tokens)) {
-        // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNonFungibleMetadata new info: " + JSON.stringify(info, null, 2));
+        // console.log(now() + " INFO dataModule:mutations.addNonFungibleMetadata new info: " + JSON.stringify(info, null, 2));
         Vue.set(state.tokens[chainId][contract].tokens, tokenId, {
           name: info.name,
           description: info.description,
@@ -538,7 +538,7 @@ const dataModule = {
           topBid: info.topBid || null,
         });
       } else {
-        // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addNonFungibleMetadata existing: " + JSON.stringify(info, null, 2));
+        // console.log(now() + " INFO dataModule:mutations.addNonFungibleMetadata existing: " + JSON.stringify(info, null, 2));
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'name', info.name);
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'description', info.description);
         Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'image', info.image);
@@ -549,7 +549,7 @@ const dataModule = {
       }
     },
     addStealthTransfer(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addStealthTransfer: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.stealthTransfers)) {
         Vue.set(state.stealthTransfers, info.chainId, {});
       }
@@ -561,7 +561,7 @@ const dataModule = {
       }
     },
     setENS(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setENS info: " + JSON.stringify(info));
+      // console.log(now() + " INFO dataModule:mutations.setENS info: " + JSON.stringify(info));
       if (info.name) {
         Vue.set(state.ens, info.address, info.name);
       } else {
@@ -571,7 +571,7 @@ const dataModule = {
       }
     },
     addTimestamp(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.timestamps)) {
         Vue.set(state.timestamps, info.chainId, {});
       }
@@ -580,7 +580,7 @@ const dataModule = {
       }
     },
     addTx(state, tx) {
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.addTx tx: " + JSON.stringify(tx, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addTx tx: " + JSON.stringify(tx, null, 2));
       if (!(tx.chainId in state.txs)) {
         Vue.set(state.txs, tx.chainId, {});
       }
@@ -599,7 +599,7 @@ const dataModule = {
     },
     forceRefresh(state) {
       Vue.set(state, 'forceRefresh', parseInt(state.forceRefresh) + 1);
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.forceRefresh: " + state.forceRefresh);
+      // console.log(now() + " INFO dataModule:mutations.forceRefresh: " + state.forceRefresh);
     },
     saveTxTags(state, info) {
       if (!(info.txHash in state.txsInfo)) {
@@ -641,12 +641,12 @@ const dataModule = {
       }
     },
     setSyncSection(state, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setSyncSection info: " + JSON.stringify(info));
+      console.log(now() + " INFO dataModule:mutations.setSyncSection info: " + JSON.stringify(info));
       state.sync.section = info.section;
       state.sync.total = info.total;
     },
     setSyncCompleted(state, completed) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:mutations.setSyncCompleted completed: " + completed + (state.sync.total ? ("/" + state.sync.total) : "") + " " + state.sync.section);
+      console.log(now() + " INFO dataModule:mutations.setSyncCompleted completed: " + completed + (state.sync.total ? ("/" + state.sync.total) : "") + " " + state.sync.section);
       state.sync.completed = completed;
     },
     setSyncHalt(state, halt) {
@@ -655,21 +655,21 @@ const dataModule = {
   },
   actions: {
     async restoreState(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.restoreState");
+      console.log(now() + " INFO dataModule:actions.restoreState");
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
         for (let type of ['ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'approvals', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
-            // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
+            // console.log(now() + " INFO dataModule:actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
             context.commit('setState', { name: type, data: data[0].object });
           }
         }
       }
     },
     async saveData(context, types) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.saveData - types: " + JSON.stringify(types));
+      console.log(now() + " INFO dataModule:actions.saveData - types: " + JSON.stringify(types));
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       for (let type of types) {
@@ -682,17 +682,17 @@ const dataModule = {
     },
 
     async toggleAddressField(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.toggleAddressField - info: " + JSON.stringify(info));
+      console.log(now() + " INFO dataModule:actions.toggleAddressField - info: " + JSON.stringify(info));
       await context.commit('toggleAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
     async setAddressField(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.setAddressField - info: " + JSON.stringify(info));
+      console.log(now() + " INFO dataModule:actions.setAddressField - info: " + JSON.stringify(info));
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
     async updateFungibleTotalSupply(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.updateFungibleTotalSupply - info: " + JSON.stringify(info));
+      console.log(now() + " INFO dataModule:actions.updateFungibleTotalSupply - info: " + JSON.stringify(info));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
       try {
@@ -703,38 +703,38 @@ const dataModule = {
       // await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleJunk(context, item) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.toggleFungibleJunk - item: " + JSON.stringify(item));
+      console.log(now() + " INFO dataModule:actions.toggleFungibleJunk - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleActive(context, item) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.toggleFungibleActive - item: " + JSON.stringify(item));
+      console.log(now() + " INFO dataModule:actions.toggleFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async setFungibleField(context, item) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.setFungibleField - item: " + JSON.stringify(item));
+      console.log(now() + " INFO dataModule:actions.setFungibleField - item: " + JSON.stringify(item));
       await context.commit('setFungibleField', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleJunk(context, item) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      console.log(now() + " INFO dataModule:actions.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       await context.commit('toggleNonFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleActive(context, item) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      console.log(now() + " INFO dataModule:actions.toggleNonFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleNonFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async addNonFungibleMetadata(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.addNonFungibleMetadata - info: " + JSON.stringify(info, null, 2));
+      console.log(now() + " INFO dataModule:actions.addNonFungibleMetadata - info: " + JSON.stringify(info, null, 2));
       context.commit('addNonFungibleMetadata', info);
       await context.dispatch('saveData', ['tokens']);
     },
 
     async deleteAddress(context, address) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.deleteAddress - address: " + JSON.stringify(address, null, 2));
+      console.log(now() + " INFO dataModule:actions.deleteAddress - address: " + JSON.stringify(address, null, 2));
       await context.commit('deleteAddress', address);
       await context.dispatch('saveData', ['addresses']);
     },
@@ -751,7 +751,7 @@ const dataModule = {
       await context.dispatch('saveData', ['txsInfo']);
     },
     async refreshNonFungibleMetadata(context, tokens) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens));
+      console.log(now() + " INFO dataModule:actions.refreshNonFungibleMetadata - token: " + JSON.stringify(tokens));
       const chainId = store.getters['connection/chainId'];
       const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
       if (reservoirPrefix) {
@@ -787,7 +787,7 @@ const dataModule = {
     },
 
     async requestReservoirMetadataRefresh(context, tokens) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.requestReservoirMetadataRefresh - token: " + JSON.stringify(tokens));
+      console.log(now() + " INFO dataModule:actions.requestReservoirMetadataRefresh - token: " + JSON.stringify(tokens));
       const chainId = store.getters['connection/chainId'];
       const reservoirPrefix = NETWORKS[chainId] && NETWORKS[chainId].reservoir || null;
       if (reservoirPrefix) {
@@ -852,7 +852,7 @@ const dataModule = {
       await context.dispatch('saveData', ['accounts']);
     },
     async resetData(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.resetData");
+      console.log(now() + " INFO dataModule:actions.resetData");
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       await db.announcements.clear();
@@ -862,12 +862,12 @@ const dataModule = {
       db.close();
     },
     async addNewAddress(context, newAddress) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.addNewAddress - newAddress: " + JSON.stringify(newAddress, null, 2) + ")");
+      console.log(now() + " INFO dataModule:actions.addNewAddress - newAddress: " + JSON.stringify(newAddress, null, 2) + ")");
       context.commit('addNewAddress', newAddress);
       await context.dispatch('saveData', ['addresses']);
     },
     // async restoreAccount(context, addressData) {
-    // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.restoreAccount - addressData: " + JSON.stringify(addressData));
+    // console.log(now() + " INFO dataModule:actions.restoreAccount - addressData: " + JSON.stringify(addressData));
     //   const provider = new ethers.providers.Web3Provider(window.ethereum);
     //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
     //   const accountInfo = await getAccountInfo(addressData.account, provider)
@@ -888,7 +888,7 @@ const dataModule = {
     //   }
     // },
     async syncIt(context, options) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncIt - options: " + JSON.stringify(options));
+      console.log(now() + " INFO dataModule:actions.syncIt - options: " + JSON.stringify(options));
       // const db = new Dexie(context.state.db.name);
       // db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -969,7 +969,7 @@ const dataModule = {
     },
 
     async syncStealthTransfers(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers BEGIN: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfers BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -982,7 +982,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, selectedContracts, selectedCallers, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        console.log(now() + " INFO dataModule:actions.syncStealthTransfers.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1035,14 +1035,14 @@ const dataModule = {
         // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
           await db.announcements.bulkAdd(records).then (function(lastKey) {
-            console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers.bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log(now() + " INFO dataModule:actions.syncStealthTransfers.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+            // console.log(now() + " INFO dataModule:actions.syncStealthTransfers.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
       async function getLogs(fromBlock, toBlock, selectedContracts, selectedCallers, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers.getLogs: " + fromBlock + " - " + toBlock);
+        console.log(now() + " INFO dataModule:actions.syncStealthTransfers.getLogs: " + fromBlock + " - " + toBlock);
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
         if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
@@ -1072,7 +1072,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, selectedContracts, selectedCallers, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfers BEGIN");
       context.commit('setSyncSection', { section: 'Stealth Transfers', total: null });
       const selectedContracts = [];
       const selectedCallers = [];
@@ -1093,11 +1093,11 @@ const dataModule = {
         const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         await getLogs(startBlock, parameter.blockNumber, selectedContracts, selectedCallers, processLogs);
       // }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfers END");
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfers END");
     },
 
     async syncStealthTransfersData(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfersData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1105,16 +1105,16 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData - total: " + total);
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfersData - total: " + total);
       context.commit('setSyncSection', { section: 'Stealth Transfer Data', total });
       let rows = 0;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncStealthTransfersData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
           if (item.timestamp == null) {
@@ -1151,20 +1151,20 @@ const dataModule = {
         if (records.length > 0) {
           await db.announcements.bulkPut(records).then (function() {
           }).catch(function(error) {
-            console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData.bulkPut error: " + error);
+            console.log(now() + " INFO dataModule:actions.syncStealthTransfersData.bulkPut error: " + error);
           });
         }
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
 
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData END");
+      console.log(now() + " INFO dataModule:actions.syncStealthTransfersData END");
     },
 
     async identifyMyStealthTransfers(context, parameter) {
 
       function checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey) {
         const result = {};
-        // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncStealthTransfersData.checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
+        // console.log(now() + " INFO dataModule:actions.syncStealthTransfersData.checkStealthAddress - stealthAddress: " + stealthAddress + ", ephemeralPublicKey: " + ephemeralPublicKey + ", viewingPrivateKey: " + viewingPrivateKey + ", spendingPublicKey: " + spendingPublicKey);
         result.sharedSecret = nobleCurves.secp256k1.getSharedSecret(viewingPrivateKey.substring(2), ephemeralPublicKey.substring(2), false);
         result.hashedSharedSecret = ethers.utils.keccak256(result.sharedSecret.slice(1));
         result.hashedSharedSecretPoint = nobleCurves.secp256k1.ProjectivePoint.fromPrivateKey(result.hashedSharedSecret.substring(2));
@@ -1174,27 +1174,27 @@ const dataModule = {
         return result;
       }
 
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
 
       // const accounts = store.getters['data/accounts'];
       const addresses = context.state.addresses;
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers addresses BEFORE: " + JSON.stringify(addresses, null, 2));
+      // console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers addresses BEFORE: " + JSON.stringify(addresses, null, 2));
       const checkAddresses = [];
       for (const [address, addressData] of Object.entries(addresses)) {
         if (addressData.type == "stealthMetaAddress" && addressData.mine && addressData.viewingPrivateKey) {
           checkAddresses.push({ address, ...addressData });
         }
       }
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
+      // console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers - checkAddresses: " + JSON.stringify(checkAddresses.map(e => e.address)));
 
       let rows = 0;
       let done = false;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
           if (item.schemeId == 1) {
@@ -1214,7 +1214,7 @@ const dataModule = {
               try {
                 const status = checkStealthAddress(stealthAddress, ephemeralPublicKey, viewingPrivateKey, spendingPublicKey);
                 if (status && status.match) {
-                  console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers - found stealthAddress: " + stealthAddress);
+                  console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers - found stealthAddress: " + stealthAddress);
                   item.linkedTo = { stealthMetaAddress: account.address, address: account.linkedToAddress };
                   item.iReceived = true;
                   if (stealthAddress in addresses) {
@@ -1264,20 +1264,20 @@ const dataModule = {
         if (writeRecords.length > 0) {
           await db.announcements.bulkPut(writeRecords).then (function() {
           }).catch(function(error) {
-            console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers bulkPut error: " + error);
+            console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers bulkPut error: " + error);
           });
         }
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
+      // console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers addresses END: " + JSON.stringify(addresses, null, 2));
       context.commit('setState', { name: 'addresses', data: addresses });
       await context.dispatch('saveData', ['addresses']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.identifyMyStealthTransfers END");
+      console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers END");
     },
 
     async collateStealthTransfers(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateStealthTransfers: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.collateStealthTransfers: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1286,7 +1286,7 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.collateStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.schemeId == 1) {
             context.commit('addStealthTransfer', item);
@@ -1296,11 +1296,11 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       await context.dispatch('saveData', ['stealthTransfers']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateStealthTransfers END");
+      console.log(now() + " INFO dataModule:actions.collateStealthTransfers END");
     },
 
     async syncRegistrations(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations BEGIN: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncRegistrations BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1313,7 +1313,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
+        console.log(now() + " INFO dataModule:actions.syncRegistrations.processLogs: " + fromBlock + " - " + toBlock + " " + logs.length + " " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1340,20 +1340,20 @@ const dataModule = {
                 });
               }
             } catch (e) {
-              console.log(moment().format("HH:mm:ss") + " ERROR dataModule:actions.syncRegistrations.processLogs: " + e.message);
+              console.log(now() + " ERROR dataModule:actions.syncRegistrations.processLogs: " + e.message);
             }
           }
         }
         if (records.length) {
           await db.registrations.bulkAdd(records).then (function(lastKey) {
-            console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log(now() + " INFO dataModule:actions.syncRegistrations bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations bulkAdd error: " + JSON.stringify(e.failures, null, 2));
+            // console.log(now() + " INFO dataModule:actions.syncRegistrations bulkAdd error: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
       async function getLogs(fromBlock, toBlock, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
+        console.log(now() + " INFO dataModule:actions.syncRegistrations.getLogs: " + fromBlock + " - " + toBlock);
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
         if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
@@ -1382,18 +1382,18 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncRegistrations BEGIN");
       context.commit('setSyncSection', { section: 'Stealth Meta-Address Registry', total: null });
       const deleteCall = await db.registrations.where("confirmations").below(parameter.confirmations).delete();
       const latest = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
       // TODO: Handle incrementalSync?
       const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
       await getLogs(startBlock, parameter.blockNumber, processLogs);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrations END");
+      console.log(now() + " INFO dataModule:actions.syncRegistrations END");
     },
 
     async syncRegistrationsData(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrationsData: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncRegistrationsData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1401,16 +1401,16 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(total).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         total = parseInt(total) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrationsData - total: " + total);
+      console.log(now() + " INFO dataModule:actions.syncRegistrationsData - total: " + total);
       context.commit('setSyncSection', { section: 'Stealth Meta-Address Registry Data', total });
       let rows = 0;
       do {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncRegistrationsData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const records = [];
         for (const item of data) {
           if (item.timestamp == null) {
@@ -1445,18 +1445,18 @@ const dataModule = {
         if (records.length > 0) {
           await db.registrations.bulkPut(records).then (function() {
           }).catch(function(error) {
-            // console.log(moment().format("HH:mm:ss") + " ERROR dataModule:actions.syncRegistrationsData.bulkPut: " + error);
+            // console.log(now() + " ERROR dataModule:actions.syncRegistrationsData.bulkPut: " + error);
           });
         }
         rows = parseInt(rows) + data.length;
         context.commit('setSyncCompleted', rows);
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncRegistrationsData END");
+      console.log(now() + " INFO dataModule:actions.syncRegistrationsData END");
     },
 
     async collateRegistrations(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateRegistrations: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.collateRegistrations: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1470,10 +1470,10 @@ const dataModule = {
       let done = false;
       do {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (item.schemeId == 1) {
-            // console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
+            // console.log(now() + " INFO dataModule:actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
             const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
             registry[parameter.chainId][item.registrant] = stealthMetaAddress;
           }
@@ -1483,11 +1483,11 @@ const dataModule = {
       } while (!done);
       context.commit('setState', { name: 'registry', data: registry });
       await context.dispatch('saveData', ['registry']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.collateRegistrations END");
+      console.log(now() + " INFO dataModule:actions.collateRegistrations END");
     },
 
     async syncTokenEvents(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEvents: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncTokenEvents: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1535,7 +1535,7 @@ const dataModule = {
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEvents.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
+        console.log(now() + " INFO dataModule:actions.syncTokenEvents.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1650,7 +1650,7 @@ const dataModule = {
         }
       }
       async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEvents.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
+        console.log(now() + " INFO dataModule:actions.syncTokenEvents.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
         if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
@@ -1715,7 +1715,7 @@ const dataModule = {
           await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEvents BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncTokenEvents BEGIN");
       context.commit('setSyncSection', { section: 'Token Events', total: null });
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
@@ -1733,11 +1733,11 @@ const dataModule = {
           await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEvents END");
+      console.log(now() + " INFO dataModule:actions.syncTokenEvents END");
     },
 
     async syncTokenEventTimestamps(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTimestamps: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTimestamps: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1747,7 +1747,7 @@ const dataModule = {
       const newBlocks = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTimestamps - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncTokenEventTimestamps - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (!(item.blockNumber in existingTimestamps) && !(item.blockNumber in newBlocks)) {
             newBlocks[item.blockNumber] = true;
@@ -1757,7 +1757,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       const total = Object.keys(newBlocks).length;
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTimestamps - total: " + total);
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTimestamps - total: " + total);
       context.commit('setSyncSection', { section: 'Token Event Timestamps', total });
       let completed = 0;
       for (let blockNumber of Object.keys(newBlocks)) {
@@ -1775,11 +1775,11 @@ const dataModule = {
       }
       // console.log("context.state.timestamps: " + JSON.stringify(context.state.timestamps, null, 2));
       await context.dispatch('saveData', ['timestamps']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTimestamps END");
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTimestamps END");
     },
 
     async syncTokenEventTxData(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTxData: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTxData: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1789,7 +1789,7 @@ const dataModule = {
       const newTxs = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTxData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.syncTokenEventTxData - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if (!(item.txHash in existingTxs) && !(item.txHash in newTxs)) {
             newTxs[item.txHash] = true;
@@ -1799,7 +1799,7 @@ const dataModule = {
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
       const total = Object.keys(newTxs).length;
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTxData - total: " + total);
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTxData - total: " + total);
       context.commit('setSyncSection', { section: 'Token Event Transaction Data', total });
       let completed = 0;
       for (let txHash of Object.keys(newTxs)) {
@@ -1835,15 +1835,15 @@ const dataModule = {
       }
       // console.log("context.state.txs: " + JSON.stringify(context.state.txs, null, 2));
       await context.dispatch('saveData', ['txs']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncTokenEventTxData END");
+      console.log(now() + " INFO dataModule:actions.syncTokenEventTxData END");
     },
 
     async computeBalances(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.computeBalances: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances BEGIN");
+      console.log(now() + " INFO dataModule:actions.computeBalances BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
@@ -1856,7 +1856,7 @@ const dataModule = {
       const collator = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.computeBalances - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           const contract = item.contract;
           if (item.type == "Transfer" || item.type == "TransferSingle" || item.type == "TransferBatch") {
@@ -1943,15 +1943,15 @@ const dataModule = {
       // console.log("collator: " + JSON.stringify(collator, null, 2));
       context.commit('updateBalances', { chainId: parameter.chainId, balances: collator });
       await context.dispatch('saveData', ['balances']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances END");
+      console.log(now() + " INFO dataModule:actions.computeBalances END");
     },
 
     async computeApprovals(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.computeApprovals: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals BEGIN");
+      console.log(now() + " INFO dataModule:actions.computeApprovals BEGIN");
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
@@ -1963,7 +1963,7 @@ const dataModule = {
       const collator = {};
       do {
         let data = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
+        console.log(now() + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
             const [ eventType, type, contract, owner, spender ] = [ item.eventType, item.type, item.contract, item.owner, item.spender ];
@@ -2005,11 +2005,11 @@ const dataModule = {
       console.log("collator: " + JSON.stringify(collator, null, 2));
       context.commit('updateApprovals', { chainId: parameter.chainId, approvals: collator });
       await context.dispatch('saveData', ['approvals']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals END");
+      console.log(now() + " INFO dataModule:actions.computeApprovals END");
     },
 
     async syncENSExpiries(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncENSExpiries: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -2022,7 +2022,7 @@ const dataModule = {
       async function processLogs(logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries.processLogs - logs.length: " + logs.length + ", total: " + total);
+        console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -2076,7 +2076,7 @@ const dataModule = {
         }
       }
 
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncENSExpiries BEGIN");
       const ens721TokenIds = [];
       const ens1155TokenIds = [];
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
@@ -2111,7 +2111,7 @@ const dataModule = {
           const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
           await processLogs(logs);
         } catch (e) {
-          console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
+          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
         }
       }
 
@@ -2132,19 +2132,19 @@ const dataModule = {
           const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
           await processLogs(logs);
         } catch (e) {
-          console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
+          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
         }
       }
       await context.dispatch('saveData', ['expiries']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENSExpiries END");
+      console.log(now() + " INFO dataModule:actions.syncENSExpiries END");
     },
 
     async syncFungiblesMetadata(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncFungiblesMetadata: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncFungiblesMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncFungiblesMetadata BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncFungiblesMetadata BEGIN");
       const contractsToProcess = {};
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contractData.type == "erc20") {
@@ -2185,7 +2185,7 @@ const dataModule = {
           const url = erc20Logos[i].replace(/\${contract}/, contract);
           image = await imageUrlToBase64(url);
         }
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
+        console.log(now() + " INFO dataModule:actions.syncFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name + " " + decimals + " " + totalSupply);
         context.commit('addFungibleMetadata', {
           chainId: parameter.chainId,
           contract,
@@ -2205,15 +2205,15 @@ const dataModule = {
         }
       }
       await context.dispatch('saveData', ['tokens']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncFungiblesMetadata END");
+      console.log(now() + " INFO dataModule:actions.syncFungiblesMetadata END");
     },
 
     async syncNonFungiblesMetadata(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadata: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadata: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadata BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadata BEGIN");
       const FETCH_TIMEOUT_MILLIS = 15000;
       const contractsToProcess = {};
       const tokensToProcess = {};
@@ -2252,7 +2252,7 @@ const dataModule = {
           } catch (e) {
           }
         }
-        console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name);
+        console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadata: " + contract + " " + contractData.type + " " + symbol + " " + name);
         context.commit('addNonFungibleContractMetadata', {
           chainId: parameter.chainId,
           contract,
@@ -2461,11 +2461,11 @@ const dataModule = {
         // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens, null, 2));
       }
       await context.dispatch('saveData', ['tokens']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadata END");
+      console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadata END");
     },
 
     async syncNonFungiblesMetadataFromReservoir(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadataFromReservoir: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadataFromReservoir: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -2526,11 +2526,11 @@ const dataModule = {
         }
       }
       await context.dispatch('saveData', ['tokens']);
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncNonFungiblesMetadataFromReservoir END");
+      console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadataFromReservoir END");
     },
 
     async syncENS(context, parameter) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENS BEGIN: " + JSON.stringify(parameter));
+      console.log(now() + " INFO dataModule:actions.syncENS BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -2540,7 +2540,7 @@ const dataModule = {
           owners[address] = true;
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncENS - owners: " + JSON.stringify(owners));
+      console.log(now() + " INFO dataModule:actions.syncENS - owners: " + JSON.stringify(owners));
       context.commit('setSyncSection', { section: "ENS", total: Object.keys(owners).length });
       let completed = 0;
       const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
@@ -2579,7 +2579,7 @@ const dataModule = {
 
     async syncImportExchangeRates(context, parameter) {
       const reportingCurrency = store.getters['config/settings'].reportingCurrency;
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.syncImportExchangeRates - reportingCurrency: " + reportingCurrency);
+      console.log(now() + " INFO dataModule:actions.syncImportExchangeRates - reportingCurrency: " + reportingCurrency);
       const MAXDAYS = 2000;
       const MINDATE = moment("2015-07-30");
       let toTs = moment();
@@ -2627,7 +2627,7 @@ const dataModule = {
     // },
     // Called by Connection.execWeb3()
     async execWeb3({ state, commit, rootState }, { count, listenersInstalled }) {
-      console.log(moment().format("HH:mm:ss") + " INFO dataModule:execWeb3() start[" + count + ", " + listenersInstalled + ", " + JSON.stringify(rootState.route.params) + "]");
+      console.log(now() + " INFO dataModule:execWeb3() start[" + count + ", " + listenersInstalled + ", " + JSON.stringify(rootState.route.params) + "]");
     },
   },
 };

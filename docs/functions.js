@@ -245,6 +245,8 @@ function handleErrors(response) {
   return response;
 }
 
+const now = () => moment().format("HH:mm:ss");
+
 function sleep(milliseconds) {
   const date = Date.now();
   let currentDate = null;

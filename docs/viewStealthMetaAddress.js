@@ -190,7 +190,7 @@ const ViewStealthMetaAddress = {
   },
   methods: {
     async revealModalAddressSpendingPrivateKey() {
-      console.log(moment().format("HH:mm:ss") + " INFO ViewStealthMetaAddress:methods.revealModalAddressSpendingPrivateKey - phrase: " + this.phrase);
+      console.log(now() + " INFO ViewStealthMetaAddress:methods.revealModalAddressSpendingPrivateKey - phrase: " + this.phrase);
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(this.phrase));
       const signature = await ethereum.request({
         method: 'personal_sign',
@@ -214,7 +214,7 @@ const ViewStealthMetaAddress = {
       store.dispatch('viewStealthMetaAddress/setShow', show);
     },
     async deleteAddress(address) {
-      console.log(moment().format("HH:mm:ss") + " INFO ViewStealthMetaAddress:methods.deleteAddress - address: " + JSON.stringify(address));
+      console.log(now() + " INFO ViewStealthMetaAddress:methods.deleteAddress - address: " + JSON.stringify(address));
       this.$bvModal.msgBoxConfirm("Delete " + address.substring(0, 17) + '...' + address.slice(-8) + "?")
         .then(value => {
           if (value) {
@@ -227,7 +227,7 @@ const ViewStealthMetaAddress = {
         })
     },
     async addAddressToRegistry(address) {
-      console.log(moment().format("HH:mm:ss") + " INFO ViewStealthMetaAddress:methods.addAddressToRegistry - address: " + JSON.stringify(address));
+      console.log(now() + " INFO ViewStealthMetaAddress:methods.addAddressToRegistry - address: " + JSON.stringify(address));
       this.$bvModal.msgBoxConfirm("Add " + address.substring(0, 17) + '...' + address.slice(-8) + " to the ERC-6538 Registry?")
         .then(async value => {
           if (value) {
@@ -236,9 +236,9 @@ const ViewStealthMetaAddress = {
             const contractWithSigner = contract.connect(provider.getSigner());
             try {
               const tx = await contractWithSigner.registerKeys(ONLY_SUPPORTED_SCHEME_ID, ethers.utils.toUtf8Bytes(address));
-              console.log(moment().format("HH:mm:ss") + " INFO ViewStealthMetaAddress:methods.addAddressToRegistry - tx: " + JSON.stringify(tx));
+              console.log(now() + " INFO ViewStealthMetaAddress:methods.addAddressToRegistry - tx: " + JSON.stringify(tx));
             } catch (e) {
-              console.log(moment().format("HH:mm:ss") + " ERROR ViewStealthMetaAddress:methods.addAddressToRegistry registry.registerKeys(...): " + e.message);
+              console.log(now() + " ERROR ViewStealthMetaAddress:methods.addAddressToRegistry registry.registerKeys(...): " + e.message);
             }
             // store.dispatch('data/addAddressToRegistry', address);
             // this.$refs['viewstealthmetaaddress'].hide();
@@ -250,10 +250,10 @@ const ViewStealthMetaAddress = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewStealthMetaAddress:beforeDestroy");
+    // console.log(now() + " DEBUG ViewStealthMetaAddress:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewStealthMetaAddress:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG ViewStealthMetaAddress:mounted - $route: " + JSON.stringify(this.$route.params));
     // if ('transfersSettings' in localStorage) {
     //   const tempSettings = JSON.parse(localStorage.transfersSettings);
     //   if ('version' in tempSettings && tempSettings.version == 0) {
@@ -303,7 +303,7 @@ const viewStealthMetaAddressModule = {
   },
   mutations: {
     viewStealthMetaAddress(state, stealthMetaAddress) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.viewStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.viewStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       const data = store.getters['data/addresses'][stealthMetaAddress] || {};
       state.address = stealthMetaAddress;
       state.type = data.type;
@@ -323,31 +323,31 @@ const viewStealthMetaAddressModule = {
       state.show = true;
     },
     setJunk(state, junk) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setJunk - junk: " + junk);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setJunk - junk: " + junk);
       state.junk = junk;
     },
     setMine(state, mine) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setMine - mine: " + mine);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setWatch(state, watch) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setWatch - watch: " + watch);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setWatch - watch: " + watch);
       state.watch = watch;
     },
     setSendTo(state, sendTo) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setSendTo - sendTo: " + sendTo);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setSendTo - sendTo: " + sendTo);
       state.sendTo = sendTo;
     },
     setName(state, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setName - name: " + name);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setNotes - notes: " + notes);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setSpendingPrivateKey(state, spendingPrivateKey) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:mutations.setSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+      console.log(now() + " INFO viewStealthMetaAddressModule:mutations.setSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
       state.spendingPrivateKey = spendingPrivateKey;
     },
     setShow(state, show) {
@@ -356,39 +356,39 @@ const viewStealthMetaAddressModule = {
   },
   actions: {
     async viewStealthMetaAddress(context, stealthMetaAddress) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.viewStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.viewStealthMetaAddress - stealthMetaAddress: " + stealthMetaAddress);
       await context.commit('viewStealthMetaAddress', stealthMetaAddress);
     },
     async setJunk(context, junk) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setJunk - junk: " + junk);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setJunk - junk: " + junk);
       await context.commit('setJunk', junk);
     },
     async setMine(context, mine) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setMine - mine: " + mine);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setWatch(context, watch) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setWatch - watch: " + watch);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setWatch - watch: " + watch);
       await context.commit('setWatch', watch);
     },
     async setSendTo(context, sendTo) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setSendTo - sendTo: " + sendTo);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setSendTo - sendTo: " + sendTo);
       await context.commit('setSendTo', sendTo);
     },
     async setName(context, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setName - name: " + name);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setNotes - notes: " + notes);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setSpendingPrivateKey(context, spendingPrivateKey) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
       await context.commit('setSpendingPrivateKey', spendingPrivateKey);
     },
     async setSource(context, source) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewStealthMetaAddressModule:actions.setSource - source: " + source);
+      console.log(now() + " INFO viewStealthMetaAddressModule:actions.setSource - source: " + source);
       await context.commit('setSource', source);
     },
     async setShow(context, show) {

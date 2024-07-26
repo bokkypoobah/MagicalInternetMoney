@@ -383,49 +383,49 @@ const Fungibles = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // console.log(moment().format("HH:mm:ss") + " INFO Fungibles:computed.pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // console.log(now() + " INFO Fungibles:computed.pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
   },
   methods: {
     viewFaucets() {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.viewFaucets");
+      console.log(now() + " INFO Fungibles:methods.viewFaucets");
       this.$bvModal.show('modal-faucets');
     },
     async drip() {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
+      console.log(now() + " INFO Fungibles:methods.drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const faucetInfo = FAUCETS[this.chainId] && FAUCETS[this.chainId].filter(e => e.address == this.modalFaucet.selectedFaucet)[0] || null;
       if (faucetInfo) {
-        console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.drip - faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
+        console.log(now() + " INFO Fungibles:methods.drip - faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
         if (faucetInfo.type == "erc20") {
           try {
             const tx = await signer.sendTransaction({ to: faucetInfo.address, value: "0" });
-            console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.drip ERC-20 - tx: " + JSON.stringify(tx));
+            console.log(now() + " INFO Fungibles:methods.drip ERC-20 - tx: " + JSON.stringify(tx));
           } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR Fungibles:methods.drip ERC-20: " + JSON.stringify(e));
+            console.log(now() + " ERROR Fungibles:methods.drip ERC-20: " + JSON.stringify(e));
           }
         } else {
           const testToadzContract = new ethers.Contract(faucetInfo.address, TESTTOADZABI, provider);
           const testToadzContractWithSigner = testToadzContract.connect(provider.getSigner());
           try {
             const tx = await testToadzContractWithSigner.mint(3);
-            console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.drip ERC-721 - tx: " + JSON.stringify(tx));
+            console.log(now() + " INFO Fungibles:methods.drip ERC-721 - tx: " + JSON.stringify(tx));
           } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR Fungibles:methods.drip ERC-721: " + JSON.stringify(e));
+            console.log(now() + " ERROR Fungibles:methods.drip ERC-721: " + JSON.stringify(e));
           }
         }
       }
     },
 
     toggleFungibleJunk(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.toggleFungibleJunk - item: " + JSON.stringify(item));
+      console.log(now() + " INFO Fungibles:methods.toggleFungibleJunk - item: " + JSON.stringify(item));
       store.dispatch('data/toggleFungibleJunk', item);
     },
     toggleFungibleActive(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.toggleFungibleActive - item: " + JSON.stringify(item));
+      console.log(now() + " INFO Fungibles:methods.toggleFungibleActive - item: " + JSON.stringify(item));
       store.dispatch('data/toggleFungibleActive', item);
     },
     copyToClipboard(str) {
@@ -446,7 +446,7 @@ const Fungibles = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.saveSettings - fungiblesSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(now() + " INFO Fungibles:methods.saveSettings - fungiblesSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.fungiblesSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -493,7 +493,7 @@ const Fungibles = {
       return null;
     },
     rowSelected(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO Fungibles:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      console.log(now() + " INFO Fungibles:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewTokenContract/viewTokenContract', { contract: item[0].contract });
         store.dispatch('data/updateFungibleTotalSupply', { chainId: this.chainId, contract: item[0].contract });
@@ -502,7 +502,7 @@ const Fungibles = {
     },
 
     async timeoutCallback() {
-      // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:methods.timeoutCallback - count: " + this.count);
+      // console.log(now() + " DEBUG Fungibles:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -513,10 +513,10 @@ const Fungibles = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:beforeDestroy");
+    // console.log(now() + " DEBUG Fungibles:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG Fungibles:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('fungiblesSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.fungiblesSettings);
@@ -526,7 +526,7 @@ const Fungibles = {
       }
     }
     this.reschedule = true;
-    // console.log(moment().format("HH:mm:ss") + " DEBUG Fungibles:mounted - calling timeoutCallback()");
+    // console.log(now() + " DEBUG Fungibles:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {

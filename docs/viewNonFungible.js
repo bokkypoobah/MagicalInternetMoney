@@ -245,10 +245,10 @@ const ViewNonFungible = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewNonFungible:beforeDestroy");
+    // console.log(now() + " DEBUG ViewNonFungible:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewNonFungible:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG ViewNonFungible:mounted - $route: " + JSON.stringify(this.$route.params));
     // if ('transfersSettings' in localStorage) {
     //   const tempSettings = JSON.parse(localStorage.transfersSettings);
     //   if ('version' in tempSettings && tempSettings.version == 0) {
@@ -290,7 +290,7 @@ const viewNonFungibleModule = {
   },
   mutations: {
     viewNonFungible(state, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
+      console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
 
       // const data = store.getters['data/addresses'][address] || {};
       state.contract = info.contract;
@@ -317,19 +317,19 @@ const viewNonFungibleModule = {
       state.show = true;
     },
     setMine(state, mine) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:mutations.setMine - mine: " + mine);
+      console.log(now() + " INFO viewNonFungibleModule:mutations.setMine - mine: " + mine);
       state.mine = mine;
     },
     setFavourite(state, favourite) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:mutations.setFavourite - favourite: " + favourite);
+      console.log(now() + " INFO viewNonFungibleModule:mutations.setFavourite - favourite: " + favourite);
       state.favourite = favourite;
     },
     setName(state, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:mutations.setName - name: " + name);
+      console.log(now() + " INFO viewNonFungibleModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setNotes(state, notes) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:mutations.setNotes - notes: " + notes);
+      console.log(now() + " INFO viewNonFungibleModule:mutations.setNotes - notes: " + notes);
       state.notes = notes;
     },
     setShow(state, show) {
@@ -338,27 +338,27 @@ const viewNonFungibleModule = {
   },
   actions: {
     async viewNonFungible(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
       await context.commit('viewNonFungible', info);
     },
     async setMine(context, mine) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.setMine - mine: " + mine);
+      console.log(now() + " INFO viewNonFungibleModule:actions.setMine - mine: " + mine);
       await context.commit('setMine', mine);
     },
     async setFavourite(context, favourite) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.setFavourite - favourite: " + favourite);
+      console.log(now() + " INFO viewNonFungibleModule:actions.setFavourite - favourite: " + favourite);
       await context.commit('setFavourite', favourite);
     },
     async setName(context, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.setName - name: " + name);
+      console.log(now() + " INFO viewNonFungibleModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setNotes(context, notes) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.setNotes - notes: " + notes);
+      console.log(now() + " INFO viewNonFungibleModule:actions.setNotes - notes: " + notes);
       await context.commit('setNotes', notes);
     },
     async setSource(context, source) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewNonFungibleModule:actions.setSource - source: " + source);
+      console.log(now() + " INFO viewNonFungibleModule:actions.setSource - source: " + source);
       await context.commit('setSource', source);
     },
     async setShow(context, show) {

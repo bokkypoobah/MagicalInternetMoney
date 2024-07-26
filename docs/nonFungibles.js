@@ -451,7 +451,7 @@ const NonFungibles = {
       return results;
     },
     pagedFilteredSortedItems() {
-      // console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:computed.pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
+      // console.log(now() + " INFO NonFungibles:computed.pagedFilteredSortedItems - results[0..1]: " + JSON.stringify(this.filteredSortedItems.slice(0, 2), null, 2));
       return this.filteredSortedItems.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -461,47 +461,47 @@ const NonFungibles = {
       return this.nonFungibleViewer.replace(/\${contract}/, contract).replace(/\${tokenId}/, tokenId);
     },
     viewFaucets() {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.viewFaucets");
+      console.log(now() + " INFO NonFungibles:methods.viewFaucets");
       this.$bvModal.show('modal-faucets');
     },
     async drip() {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
+      console.log(now() + " INFO NonFungibles:methods.drip BEGIN: " + JSON.stringify(this.modalFaucet, null, 2));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const faucetInfo = FAUCETS[this.chainId] && FAUCETS[this.chainId].filter(e => e.address == this.modalFaucet.selectedFaucet)[0] || null;
       if (faucetInfo) {
-        console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.drip - faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
+        console.log(now() + " INFO NonFungibles:methods.drip - faucetInfo: " + JSON.stringify(faucetInfo, null, 2));
         if (faucetInfo.type == "erc20") {
           try {
             const tx = await signer.sendTransaction({ to: faucetInfo.address, value: "0" });
-            console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.drip ERC-20 - tx: " + JSON.stringify(tx));
+            console.log(now() + " INFO NonFungibles:methods.drip ERC-20 - tx: " + JSON.stringify(tx));
           } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR NonFungibles:methods.drip ERC-20: " + JSON.stringify(e));
+            console.log(now() + " ERROR NonFungibles:methods.drip ERC-20: " + JSON.stringify(e));
           }
         } else {
           const testToadzContract = new ethers.Contract(faucetInfo.address, TESTTOADZABI, provider);
           const testToadzContractWithSigner = testToadzContract.connect(provider.getSigner());
           try {
             const tx = await testToadzContractWithSigner.mint(3);
-            console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.drip ERC-721 - tx: " + JSON.stringify(tx));
+            console.log(now() + " INFO NonFungibles:methods.drip ERC-721 - tx: " + JSON.stringify(tx));
           } catch (e) {
-            console.log(moment().format("HH:mm:ss") + " ERROR NonFungibles:methods.drip ERC-721: " + JSON.stringify(e));
+            console.log(now() + " ERROR NonFungibles:methods.drip ERC-721: " + JSON.stringify(e));
           }
         }
       }
     },
 
     toggleNonFungibleJunk(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       store.dispatch('data/toggleNonFungibleJunk', item);
     },
     toggleNonFungibleActive(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleActive - item: " + JSON.stringify(item));
       store.dispatch('data/toggleNonFungibleActive', item);
     },
 
     toggleSelected(items) {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.toggleSelected - items: " + JSON.stringify(items));
+      console.log(now() + " INFO NonFungibles:methods.toggleSelected - items: " + JSON.stringify(items));
       let someFalse = false;
       let someTrue = false;
       for (const item of items) {
@@ -526,7 +526,7 @@ const NonFungibles = {
           }
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.toggleSelected - this.settings.selected: " + JSON.stringify(this.settings.selected));
+      console.log(now() + " INFO NonFungibles:methods.toggleSelected - this.settings.selected: " + JSON.stringify(this.settings.selected));
       this.saveSettings();
     },
     clearSelected() {
@@ -534,7 +534,7 @@ const NonFungibles = {
       this.saveSettings();
     },
     refreshSelectedNonFungibles() {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.refreshSelectedNonFungibles");
+      console.log(now() + " INFO NonFungibles:methods.refreshSelectedNonFungibles");
       const selectedTokens = [];
       for (const token of this.pagedFilteredSortedItems) {
         console.log(JSON.stringify(token));
@@ -542,11 +542,11 @@ const NonFungibles = {
           selectedTokens.push(token);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.refreshSelectedNonFungibles - selectedTokens: " + JSON.stringify(selectedTokens));
+      console.log(now() + " INFO NonFungibles:methods.refreshSelectedNonFungibles - selectedTokens: " + JSON.stringify(selectedTokens));
       store.dispatch('data/refreshNonFungibleMetadata', selectedTokens);
     },
     requestSelectedReservoirMetadataRefresh() {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.requestSelectedReservoirMetadataRefresh");
+      console.log(now() + " INFO NonFungibles:methods.requestSelectedReservoirMetadataRefresh");
       const selectedTokens = [];
       for (const token of this.pagedFilteredSortedItems) {
         console.log(JSON.stringify(token));
@@ -554,7 +554,7 @@ const NonFungibles = {
           selectedTokens.push(token);
         }
       }
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.requestSelectedReservoirMetadataRefresh - selectedTokens: " + JSON.stringify(selectedTokens));
+      console.log(now() + " INFO NonFungibles:methods.requestSelectedReservoirMetadataRefresh - selectedTokens: " + JSON.stringify(selectedTokens));
       store.dispatch('data/requestReservoirMetadataRefresh', selectedTokens);
     },
 
@@ -576,7 +576,7 @@ const NonFungibles = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.saveSettings - nonFungiblesSettings: " + JSON.stringify(this.settings));
+      console.log(now() + " INFO NonFungibles:methods.saveSettings - nonFungiblesSettings: " + JSON.stringify(this.settings));
       localStorage.nonFungiblesSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -616,20 +616,20 @@ const NonFungibles = {
       return null;
     },
     rowSelected(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.rowSelected - item: " + JSON.stringify(item, null, 2));
+      console.log(now() + " INFO NonFungibles:methods.rowSelected - item: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewNonFungible/viewNonFungible', { contract: item[0].contract, tokenId: item[0].tokenId });
         this.$refs.tokenContractsTable.clearSelected();
       }
     },
     viewTokenContract(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO NonFungibles:methods.viewTokenContract - item: " + JSON.stringify(item, null, 2));
+      console.log(now() + " INFO NonFungibles:methods.viewTokenContract - item: " + JSON.stringify(item, null, 2));
       store.dispatch('viewTokenContract/viewTokenContract', { contract: item.contract, tokenId: item.tokenId });
     },
 
 
     async timeoutCallback() {
-      // console.log(moment().format("HH:mm:ss") + " DEBUG NonFungibles:methods.timeoutCallback - count: " + this.count);
+      // console.log(now() + " DEBUG NonFungibles:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -640,10 +640,10 @@ const NonFungibles = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG NonFungibles:beforeDestroy");
+    // console.log(now() + " DEBUG NonFungibles:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG NonFungibles:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG NonFungibles:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('nonFungiblesSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.nonFungiblesSettings);
@@ -653,7 +653,7 @@ const NonFungibles = {
       }
     }
     this.reschedule = true;
-    // console.log(moment().format("HH:mm:ss") + " DEBUG NonFungibles:mounted - calling timeoutCallback()");
+    // console.log(now() + " DEBUG NonFungibles:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {

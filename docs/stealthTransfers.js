@@ -343,7 +343,7 @@ const StealthTransfers = {
       return results;
     },
     pagedFilteredSortedTransfers() {
-      // console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:computed.pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
+      // console.log(now() + " INFO StealthTransfers:computed.pagedFilteredSortedTransfers - results[0..1]: " + JSON.stringify(this.filteredSortedTransfers.slice(0, 2), null, 2));
       return this.filteredSortedTransfers.slice((this.settings.currentPage - 1) * this.settings.pageSize, this.settings.currentPage * this.settings.pageSize);
     },
 
@@ -364,7 +364,7 @@ const StealthTransfers = {
       return e.toFixed(precision);
     },
     saveSettings() {
-      console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
+      console.log(now() + " INFO StealthTransfers:methods.saveSettings - stealthTransfersSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.stealthTransfersSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
@@ -404,7 +404,7 @@ const StealthTransfers = {
       return null;
     },
     rowSelected(item) {
-      console.log(moment().format("HH:mm:ss") + " INFO StealthTransfers:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
+      console.log(now() + " INFO StealthTransfers:methods.rowSelected BEGIN: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         this.transfer.item = item[0];
         this.transfer.stealthPrivateKey = null;
@@ -426,9 +426,9 @@ const StealthTransfers = {
         return result;
       }
 
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - transfer: " + JSON.stringify(this.transfer, null, 2));
+      console.log(now() + " revealTransferSpendingPrivateKey - transfer: " + JSON.stringify(this.transfer, null, 2));
       const stealthMetaAddressData = this.addresses[this.transfer.item.linkedTo.stealthMetaAddress];
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
+      console.log(now() + " revealTransferSpendingPrivateKey - stealthMetaAddressData: " + JSON.stringify(stealthMetaAddressData, null, 2));
       const phraseInHex = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(stealthMetaAddressData.phrase));
       const signature = await ethereum.request({
         method: 'personal_sign',
@@ -450,7 +450,7 @@ const StealthTransfers = {
       const spendingPublicKey = ethers.utils.computePublicKey(keyPair1.privateKey, true);
       const viewingPublicKey = ethers.utils.computePublicKey(keyPair2.privateKey, true);
       // const stealthMetaAddress = "st:eth:" + spendingPublicKey + viewingPublicKey.substring(2);
-      console.log(moment().format("HH:mm:ss") + " revealTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
+      console.log(now() + " revealTransferSpendingPrivateKey - spendingPrivateKey: " + spendingPrivateKey);
       const computedStealthKey = computeStealthKey(this.transfer.item.ephemeralPublicKey, viewingPrivateKey, spendingPrivateKey);
       const stealthPrivateKey = computedStealthKey.stealthPrivateKey;
       // Vue.set(this.transfer, 'stealthPrivateKey', stealthPrivateKey);
@@ -459,7 +459,7 @@ const StealthTransfers = {
     },
 
     async timeoutCallback() {
-      // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:methods.timeoutCallback - count: " + this.count);
+      // console.log(now() + " DEBUG StealthTransfers:methods.timeoutCallback - count: " + this.count);
       this.count++;
       var t = this;
       if (this.reschedule) {
@@ -470,10 +470,10 @@ const StealthTransfers = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:beforeDestroy");
+    // console.log(now() + " DEBUG StealthTransfers:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG StealthTransfers:mounted - $route: " + JSON.stringify(this.$route.params));
     store.dispatch('data/restoreState');
     if ('stealthTransfersSettings' in localStorage) {
       const tempSettings = JSON.parse(localStorage.stealthTransfersSettings);
@@ -483,7 +483,7 @@ const StealthTransfers = {
       }
     }
     this.reschedule = true;
-    // console.log(moment().format("HH:mm:ss") + " DEBUG StealthTransfers:mounted - calling timeoutCallback()");
+    // console.log(now() + " DEBUG StealthTransfers:mounted - calling timeoutCallback()");
     this.timeoutCallback();
   },
   destroyed() {

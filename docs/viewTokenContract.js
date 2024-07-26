@@ -52,7 +52,7 @@ const ViewTokenContract = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="type == 'erc20' && balances.length > 0" label="Balances" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc20' && balances.length > 0" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <font size="-1">Address</font>
@@ -229,7 +229,7 @@ const ViewTokenContract = {
         store.dispatch('data/setFungibleField', { chainId: this.chainId, contract: this.contract, field: 'image', value: image });
         store.dispatch('viewTokenContract/setImage', image);
       } catch (e) {
-        console.log(moment().format("HH:mm:ss") + " ERROR ViewTokenContract:methods.handleImage: " + e.message);
+        console.log(now() + " ERROR ViewTokenContract:methods.handleImage: " + e.message);
       }
     },
     copyToClipboard(str) {
@@ -284,10 +284,10 @@ const ViewTokenContract = {
     },
   },
   beforeDestroy() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewTokenContract:beforeDestroy");
+    // console.log(now() + " DEBUG ViewTokenContract:beforeDestroy");
   },
   mounted() {
-    // console.log(moment().format("HH:mm:ss") + " DEBUG ViewTokenContract:mounted - $route: " + JSON.stringify(this.$route.params));
+    // console.log(now() + " DEBUG ViewTokenContract:mounted - $route: " + JSON.stringify(this.$route.params));
     // if ('transfersSettings' in localStorage) {
     //   const tempSettings = JSON.parse(localStorage.transfersSettings);
     //   if ('version' in tempSettings && tempSettings.version == 0) {
@@ -331,7 +331,7 @@ const viewTokenContractModule = {
   },
   mutations: {
     viewTokenContract(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.viewTokenContract - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO viewTokenContractModule:mutations.viewTokenContract - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.type = info.type;
       state.symbol = info.symbol;
@@ -347,38 +347,42 @@ const viewTokenContractModule = {
       state.show = true;
     },
     setSymbol(state, symbol) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setSymbol - symbol: " + symbol);
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setSymbol - symbol: " + symbol);
       state.symbol = symbol;
     },
     setName(state, name) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setName - name: " + name);
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setName - name: " + name);
       state.name = name;
     },
     setDecimals(state, decimals) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setDecimals - decimals: " + decimals);
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setDecimals - decimals: " + decimals);
       state.decimals = decimals;
     },
     setImage(state, image) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setImage - image: " + image);
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setImage - image: " + image);
       state.image = image;
     },
     toggleFungibleJunk(state) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.toggleFungibleJunk");
+      // console.log(now() + " INFO viewTokenContractModule:mutations.toggleFungibleJunk");
       state.junk = !state.junk;
     },
     toggleFungibleActive(state) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.toggleFungibleActive");
+      // console.log(now() + " INFO viewTokenContractModule:mutations.toggleFungibleActive");
       state.active = !state.active;
     },
     setContractValues(state, info) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setContractValues - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setContractValues - info: " + JSON.stringify(info));
       state.contractSymbol = info.contractSymbol;
       state.contractName = info.contractName;
       state.contractDecimals = info.contractDecimals;
     },
     setBalances(state, balances) {
-      // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.setBalances - balances: " + JSON.stringify(balances));
+      // console.log(now() + " INFO viewTokenContractModule:mutations.setBalances - balances: " + JSON.stringify(balances));
       state.balances = balances;
+    },
+    setApprovals(state, approvals) {
+      console.log(now() + " INFO viewTokenContractModule:mutations.setApprovals - approvals: " + JSON.stringify(approvals));
+      state.approvals = approvals;
     },
     setShow(state, show) {
       state.show = show;
@@ -386,7 +390,7 @@ const viewTokenContractModule = {
   },
   actions: {
     async viewTokenContract(context, info) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.viewTokenContract - info: " + JSON.stringify(info));
+      console.log(now() + " INFO viewTokenContractModule:actions.viewTokenContract - info: " + JSON.stringify(info));
       const chainId = store.getters['connection/chainId'] || null;
       const token = chainId && store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
       await context.commit('viewTokenContract', {
@@ -408,14 +412,28 @@ const viewTokenContractModule = {
       }
       await context.commit('setBalances', balancesResults);
 
-      console.log("Here");
+      const approvalsResults = [];
       for (const [owner, ownerData] of Object.entries(store.getters['data/approvals'][chainId] || {})) {
         // console.log(owner + " => " + JSON.stringify(ownerData));
         const contractData = ownerData[info.contract] || [];
         if (token.type == "erc20") {
-          console.log("  ERC-20: " + owner + " => " + JSON.stringify(contractData));
+          // console.log("  ERC-20: " + owner + " => " + JSON.stringify(contractData));
+          for (const [spender, value] of Object.entries(contractData)) {
+            // console.log("  ERC-20 Approval: " + owner + " " + spender + " " + value);
+            approvalsResults.push({ type: token.type, eventType: "Approval", owner, spender, value });
+          }
+        } else if (token.type == "erc721" || token.type == "erc1155") {
+          for (const [tokenId, spender] of Object.entries(contractData.tokens || {})) {
+            // console.log("  ERC-721 Approval: " + owner + " " + spender + " " + tokenId);
+            approvalsResults.push({ type: token.type, eventType: "Approval", owner, spender, value });
+          }
+          for (const [spender, approved] of Object.entries(contractData.approvalForAll || {})) {
+            // console.log("  ERC-721/ERC-1155 SetApprovalForAll: " + owner + " " + spender + " " + approved);
+            approvalsResults.push({ type: token.type, eventType: "SetApprovalForAll", owner, spender, approved });
+          }
         }
       }
+      await context.commit('setApprovals', approvalsResults);
 
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
@@ -447,27 +465,27 @@ const viewTokenContractModule = {
       }
     },
     async setSymbol(context, symbol) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setSymbol - symbol: " + symbol);
+      console.log(now() + " INFO viewTokenContractModule:actions.setSymbol - symbol: " + symbol);
       await context.commit('setSymbol', symbol);
     },
     async setName(context, name) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setName - name: " + name);
+      console.log(now() + " INFO viewTokenContractModule:actions.setName - name: " + name);
       await context.commit('setName', name);
     },
     async setDecimals(context, decimals) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setDecimals - decimals: " + decimals);
+      console.log(now() + " INFO viewTokenContractModule:actions.setDecimals - decimals: " + decimals);
       await context.commit('setDecimals', decimals);
     },
     async setImage(context, image) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.setImage - image: " + image);
+      console.log(now() + " INFO viewTokenContractModule:actions.setImage - image: " + image);
       await context.commit('setImage', image);
     },
     async toggleFungibleJunk(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.toggleFungibleJunk");
+      console.log(now() + " INFO viewTokenContractModule:actions.toggleFungibleJunk");
       await context.commit('toggleFungibleJunk');
     },
     async toggleFungibleActive(context) {
-      console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:actions.toggleFungibleActive");
+      console.log(now() + " INFO viewTokenContractModule:actions.toggleFungibleActive");
       await context.commit('toggleFungibleActive');
     },
     async setShow(context, show) {

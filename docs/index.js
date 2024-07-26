@@ -161,7 +161,7 @@ const app = new Vue({
     },
   },
   mounted() {
-    logInfo("app", "mounted() Called");
+    console.log(now() + " INFO app:mounted");
     // this.loadNFTData("config.json");
     // logInfo("app", "mounted() $route: " + JSON.stringify(this.$route.params));
     if (this.$route.params["id"] != null) {
