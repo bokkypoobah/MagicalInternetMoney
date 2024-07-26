@@ -936,8 +936,6 @@ const dataModule = {
       // TODO if ((options.tokens || options.ensExpiries || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
       if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
-      }
-      if (options.devThing) {
         await context.dispatch('computeApprovals', parameter);
       }
 
@@ -1954,8 +1952,6 @@ const dataModule = {
           selectedAddressesMap[address] = true;
         }
       }
-      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
-      // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens));
       let rows = 0;
       let done = false;
       const collator = {};
@@ -1964,7 +1960,6 @@ const dataModule = {
         console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeApprovals - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
-            console.log(JSON.stringify(item));
             const [ eventType, type, contract, owner, spender ] = [ item.eventType, item.type, item.contract, item.owner, item.spender ];
             const tokenType = context.state.tokens[parameter.chainId] && context.state.tokens[parameter.chainId][contract] && context.state.tokens[parameter.chainId][contract].type || null;
             if (!(owner in collator)) {
@@ -1981,90 +1976,12 @@ const dataModule = {
               }
             }
             if (eventType == "erc20") {
-              // console.log(JSON.stringify(item));
-              // collator[owner][contract][spender] = item.tokens;
+              collator[owner][contract][spender] = item.tokens;
             } else if (eventType == "erc721" && type == "Approval") {
-                // console.log("ERC-721 Approval: " + JSON.stringify(item));
-                // collator[owner][contract].tokenIds[item.tokenId] = item.approved;
+              collator[owner][contract].tokenIds[item.tokenId] = item.approved;
             } else if (type == "ApprovalForAll") {
-                console.log("ERC-721 or ERC-1155 ApprovalForAll: " + JSON.stringify(item));
-                collator[owner][contract].approvalForAll[item.operator] = item.approved;
+              collator[owner][contract].approvalForAll[item.operator] = item.approved;
             }
-            // if (!(contract in collator)) {
-            //   if (item.eventType == "erc20") {
-            //     collator[contract] = {
-            //       type: item.eventType,
-            //       balances: {},
-            //     };
-            //   } else {
-            //     collator[contract] = {
-            //       type: item.eventType,
-            //       tokens: {},
-            //     };
-            //   }
-            // }
-            // if (item.eventType == "erc20" && item.type == "Transfer") {
-            //   if (item.from in selectedAddressesMap) {
-            //     if (!(item.from in collator[contract].balances)) {
-            //       collator[contract].balances[item.from] = "0";
-            //     }
-            //     collator[contract].balances[item.from] = ethers.BigNumber.from(collator[contract].balances[item.from]).sub(item.tokens).toString();
-            //   }
-            //   if (item.to in selectedAddressesMap) {
-            //     if (!(item.to in collator[contract].balances)) {
-            //       collator[contract].balances[item.to] = "0";
-            //     }
-            //     collator[contract].balances[item.to] = ethers.BigNumber.from(collator[contract].balances[item.to]).add(item.tokens).toString();
-            //   }
-            // } else if (item.eventType == "erc721" && item.type == "Transfer") {
-            //   if (item.from in selectedAddressesMap || item.to in selectedAddressesMap) {
-            //     collator[contract].tokens[item.tokenId] = item.to;
-            //   }
-            // } else if (item.eventType == "erc1155" && item.type == "TransferSingle") {
-            //   if (item.from in selectedAddressesMap) {
-            //     if (!(item.tokenId in collator[contract].tokens)) {
-            //       collator[contract].tokens[item.tokenId] = {};
-            //     }
-            //     if (item.from in collator[contract].tokens[item.tokenId]) {
-            //       collator[contract].tokens[item.tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.from]).sub(item.value).toString();
-            //       if (collator[contract].tokens[item.tokenId][item.from] == "0") {
-            //         delete collator[contract].tokens[item.tokenId][item.from];
-            //       }
-            //     }
-            //   }
-            //   if (item.to in selectedAddressesMap) {
-            //     if (!(item.tokenId in collator[contract].tokens)) {
-            //       collator[contract].tokens[item.tokenId] = {};
-            //     }
-            //     if (!(item.to in collator[contract].tokens[item.tokenId])) {
-            //       collator[contract].tokens[item.tokenId][item.to] = "0";
-            //     }
-            //     collator[contract].tokens[item.tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[item.tokenId][item.to]).add(item.value).toString();
-            //   }
-            // } else if (item.eventType == "erc1155" && item.type == "TransferBatch") {
-            //   for (const [index, tokenId] of item.tokenIds.entries()) {
-            //     if (item.from in selectedAddressesMap) {
-            //       if (!(tokenId in collator[contract].tokens)) {
-            //         collator[contract].tokens[tokenId] = {};
-            //       }
-            //       if (item.from in collator[contract].tokens[tokenId]) {
-            //         collator[contract].tokens[tokenId][item.from] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.from]).sub(item.values[index]).toString();
-            //         if (collator[contract].tokens[tokenId][item.from] == "0") {
-            //           delete collator[contract].tokens[tokenId][item.from];
-            //         }
-            //       }
-            //     }
-            //     if (item.to in selectedAddressesMap) {
-            //       if (!(tokenId in collator[contract].tokens)) {
-            //         collator[contract].tokens[tokenId] = {};
-            //       }
-            //       if (!(item.to in collator[contract].tokens[tokenId])) {
-            //         collator[contract].tokens[tokenId][item.to] = "0";
-            //       }
-            //       collator[contract].tokens[tokenId][item.to] = ethers.BigNumber.from(collator[contract].tokens[tokenId][item.to]).add(item.values[index]).toString();
-            //     }
-            //   }
-            // }
           }
         }
         rows = parseInt(rows) + data.length;
