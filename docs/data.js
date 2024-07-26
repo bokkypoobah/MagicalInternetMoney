@@ -939,6 +939,10 @@ const dataModule = {
         await context.dispatch('computeApprovals', parameter);
       }
 
+      if (options.devThing) {
+        await context.dispatch('computeApprovals', parameter);
+      }
+
       if (options.ensExpiries && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENSExpiries', parameter);
       }
