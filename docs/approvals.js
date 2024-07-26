@@ -281,6 +281,16 @@ const Approvals = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
+      for (const [contract, contractData] of Object.entries(this.approvals[this.chainId] || {})) {
+        console.log(contract + " => " + JSON.stringify(contractData));
+        for (const [owner, approvals] of Object.entries(contractData)) {
+          console.log("  " + owner + " => " + JSON.stringify(approvals));
+          // for (const [tokenIds, owner] of Object.entries(approvals.tokens)) {
+          //   console.log("  " + owner + " => " + JSON.stringify(approvals));
+          // }
+        }
+      }
+
       for (const [contract, contractData] of Object.entries(this.balances[this.chainId] || {})) {
         if (contractData.type == "erc20") {
           const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
@@ -306,7 +316,7 @@ const Approvals = {
             balances.push({ address, balance });
           }
           if (include) {
-            results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances, unsupported });
+            // results.push({ chainId: this.chainId, contract, ...contractData, ...metadata, balances, unsupported });
           }
         }
       }

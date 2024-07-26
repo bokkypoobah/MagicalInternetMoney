@@ -1974,7 +1974,7 @@ const dataModule = {
                 collator[owner][contract] = {};
               } else {
                 collator[owner][contract] = {
-                  tokenIds: {},
+                  tokens: {},
                   approvalForAll: {},
                 };
               }
@@ -1983,11 +1983,11 @@ const dataModule = {
               collator[owner][contract][spender] = item.tokens;
             } else if (eventType == "erc721" && type == "Approval") {
               if (item.approved == ADDRESS0) {
-                if (item.tokenId in collator[owner][contract].tokenIds) {
-                  delete collator[owner][contract].tokenIds[item.tokenId];
+                if (item.tokenId in collator[owner][contract].tokens) {
+                  delete collator[owner][contract].tokens[item.tokenId];
                 }
               } else {
-                collator[owner][contract].tokenIds[item.tokenId] = item.approved;
+                collator[owner][contract].tokens[item.tokenId] = item.approved;
               }
             } else if (type == "ApprovalForAll") {
               // TODO: Can remove !! after new db change
