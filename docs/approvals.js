@@ -271,7 +271,7 @@ const Approvals = {
             for (const [spender, value] of Object.entries(contractData)) {
               result++
             }
-          } else {
+          } else if (type == "erc721" || type == "erc1155") {
             for (const [tokenId, spender] of Object.entries(contractData.tokens)) {
               result++
             }
@@ -304,11 +304,11 @@ const Approvals = {
             for (const [spender, value] of Object.entries(contractData)) {
               results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "Approval", owner, spender, value });
             }
-          } else {
-            for (const [tokenId, spender] of Object.entries(contractData.tokens)) {
+          } else if (type == "erc721" || type == "erc1155") {
+            for (const [tokenId, spender] of Object.entries(contractData.tokens || {})) {
               results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "Approval", owner, spender, value: tokenId });
             }
-            for (const [spender, approved] of Object.entries(contractData.approvalForAll)) {
+            for (const [spender, approved] of Object.entries(contractData.approvalForAll || {})) {
               results.push({ chainId: this.chainId, contract, type, symbol, name, eventType: "SetApprovalForAll", owner, spender, value: approved });
             }
           }
