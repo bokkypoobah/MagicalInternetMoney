@@ -1990,7 +1990,7 @@ const dataModule = {
                 collator[owner][contract].tokenIds[item.tokenId] = item.approved;
               }
             } else if (type == "ApprovalForAll") {
-              collator[owner][contract].approvalForAll[item.operator] = item.approved;
+              collator[owner][contract].approvalForAll[item.operator] = !!item.approved;
             }
           }
         }
