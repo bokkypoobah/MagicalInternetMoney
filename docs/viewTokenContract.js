@@ -2,7 +2,7 @@ const ViewTokenContract = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>ERC-20 Fungible Token</template>
+        <template #modal-title>{{ type == 'erc20' ? 'ERC-20 Fungible Token' : (type == 'erc721' ? 'ERC-721 Non-Fungible Token' : 'ERC-1155 Non-Fungible Token') }}</template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="unsupported ? 'Unsupported Non-Standard ERC-20' : ''" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">
@@ -34,7 +34,7 @@ const ViewTokenContract = {
           <b-form-input size="sm" id="token-name" v-model.trim="name" debounce="600" class="px-2 w-100"></b-form-input>
         </b-form-group>
 
-        <b-form-group label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc-20'" label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
           <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
         </b-form-group>
 
@@ -48,11 +48,11 @@ const ViewTokenContract = {
           </b-form-file>
         </b-form-group>
 
-        <b-form-group label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc-20'" label="Total Supply:" label-for="token-totalsupply" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="balances.length > 0" label="" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc-20' && balances.length > 0" label="Balances" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <font size="-1">Address</font>
@@ -127,6 +127,9 @@ const ViewTokenContract = {
     },
     contract() {
       return store.getters['viewTokenContract/contract'];
+    },
+    type() {
+      return store.getters['viewTokenContract/type'];
     },
     unsupported() {
       return this.contract in UNSUPPORTED_FUNGIBLES;
@@ -292,6 +295,7 @@ const viewTokenContractModule = {
   namespaced: true,
   state: {
     contract: null,
+    type: null,
     symbol: null,
     name: null,
     decimals: null,
@@ -306,6 +310,7 @@ const viewTokenContractModule = {
   },
   getters: {
     contract: state => state.contract,
+    type: state => state.type,
     symbol: state => state.symbol,
     name: state => state.name,
     decimals: state => state.decimals,
@@ -322,6 +327,7 @@ const viewTokenContractModule = {
     viewTokenContract(state, info) {
       // console.log(moment().format("HH:mm:ss") + " INFO viewTokenContractModule:mutations.viewTokenContract - info: " + JSON.stringify(info));
       state.contract = info.contract;
+      state.type = info.type;
       state.symbol = info.symbol;
       state.name = info.name;
       state.decimals = info.decimals;
@@ -380,6 +386,7 @@ const viewTokenContractModule = {
       await context.commit('viewTokenContract', {
         chainId,
         contract: info.contract,
+        type: token.type,
         symbol: token.symbol,
         name: token.name,
         decimals: token.decimals,

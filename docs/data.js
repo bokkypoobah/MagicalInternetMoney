@@ -503,6 +503,7 @@ const dataModule = {
           type: info.type,
           symbol: info.symbol,
           name: info.name,
+          image: null,
           junk: false,
           tokens: {},
         });
@@ -519,6 +520,7 @@ const dataModule = {
           type: info.type,
           symbol: info.collectionSymbol || null,
           name: info.collectionName || null,
+          image: null,
           junk: false,
           tokens: {},
         });
