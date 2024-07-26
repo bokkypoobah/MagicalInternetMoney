@@ -1597,6 +1597,7 @@ const dataModule = {
               const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
               const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
               approved = ethers.BigNumber.from(log.data).toString();
+              // NOTE: Both erc1155 and erc721 fall in this category
               eventRecord = { type: "ApprovalForAll", owner, operator, approved, eventType: "erc721" };
             } else if (log.topics[0] == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62") {
               // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
@@ -1854,8 +1855,8 @@ const dataModule = {
         console.log(moment().format("HH:mm:ss") + " INFO dataModule:actions.computeBalances - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
           const contract = item.contract;
-          if (!(contract in collator)) {
-            if (item.type == "Transfer" || item.type == "TransferSingle" || item.type == "TransferBatch") {
+          if (item.type == "Transfer" || item.type == "TransferSingle" || item.type == "TransferBatch") {
+            if (!(contract in collator)) {
               if (item.eventType == "erc20") {
                 collator[contract] = {
                   type: item.eventType,
@@ -1953,7 +1954,8 @@ const dataModule = {
           selectedAddressesMap[address] = true;
         }
       }
-      console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
+      // console.log("context.state.tokens: " + JSON.stringify(context.state.tokens));
       let rows = 0;
       let done = false;
       const collator = {};
@@ -1964,6 +1966,7 @@ const dataModule = {
           if ((item.type == "Approval" || item.type == "ApprovalForAll") && item.owner in selectedAddressesMap) {
             console.log(JSON.stringify(item));
             const [ eventType, type, contract, owner, spender ] = [ item.eventType, item.type, item.contract, item.owner, item.spender ];
+            const tokenType = context.state.tokens[parameter.chainId] && context.state.tokens[parameter.chainId][contract] && context.state.tokens[parameter.chainId][contract].type || null;
             if (!(owner in collator)) {
               collator[owner] = {};
             }
@@ -1980,16 +1983,12 @@ const dataModule = {
             if (eventType == "erc20") {
               // console.log(JSON.stringify(item));
               // collator[owner][contract][spender] = item.tokens;
-            } else if (eventType == "erc721") {
-              if (type == "Approval") {
+            } else if (eventType == "erc721" && type == "Approval") {
                 // console.log("ERC-721 Approval: " + JSON.stringify(item));
                 // collator[owner][contract].tokenIds[item.tokenId] = item.approved;
-              } else if (type == "ApprovalForAll") {
-                // console.log("ERC-721 ApprovalForAll: " + JSON.stringify(item));
-                // collator[owner][contract].approvalForAll[item.operator] = item.approved;
-              }
-            } else if (eventType == "erc1155") {
-              console.log("ERC-1155: " + JSON.stringify(item));
+            } else if (type == "ApprovalForAll") {
+                console.log("ERC-721 or ERC-1155 ApprovalForAll: " + JSON.stringify(item));
+                collator[owner][contract].approvalForAll[item.operator] = item.approved;
             }
             // if (!(contract in collator)) {
             //   if (item.eventType == "erc20") {
