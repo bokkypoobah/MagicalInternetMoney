@@ -445,6 +445,8 @@ const NonFungibles = {
           regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
         }
       }
+      const selectedOwners = Object.keys(this.settings.selectedOwners[this.chainId] || {}).length > 0 ? this.settings.selectedOwners[this.chainId] : null;
+      console.log("selectedOwners: " + JSON.stringify(selectedOwners, null, 2));
       const selectedAddressesMap = {};
       for (const [address, addressData] of Object.entries(this.addresses)) {
         if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
@@ -468,6 +470,18 @@ const NonFungibles = {
             include = false;
           }
         }
+        if (include && selectedOwners) {
+          let found = false;
+          for (const o of item.owners) {
+            if (o.owner in selectedOwners) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            include = false;
+          }
+        }
         if (include) {
           results.push(item);
         }
@@ -476,7 +490,7 @@ const NonFungibles = {
     },
     ownersWithCounts() {
       const collator = {};
-      for (const item of this.filteredItems) {
+      for (const item of this.items) {
         for (const o of item.owners) {
           const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
           if (owner in collator) {
