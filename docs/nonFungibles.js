@@ -93,7 +93,7 @@ const NonFungibles = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + totalItems }}</font>
+            <font size="-2" v-b-popover.hover="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + items.length }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -326,20 +326,22 @@ const NonFungibles = {
       return results;
     },
 
-    items() {
-      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
-      const selectedAddressesMap = {};
+    owners() {
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? {} : {};
       for (const [address, addressData] of Object.entries(this.addresses)) {
         if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
-          selectedAddressesMap[address] = true;
+          results[address] = true;
         }
       }
+      return results;
+    },
+    items() {
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc721" || data.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
             const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
-            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
             let image = null;
             if (metadata.image) {
               if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
@@ -352,12 +354,12 @@ const NonFungibles = {
             }
             const owners = [];
             if (data.type == "erc721") {
-              if (tokenData in selectedAddressesMap) {
+              if (tokenData in this.owners) {
                 owners.push({ owner: tokenData });
               }
             } else {
               for (const [owner, count] of Object.entries(tokenData)) {
-                if (owner in selectedAddressesMap) {
+                if (owner in this.owners) {
                   owners.push({ owner, count });
                 }
               }
@@ -390,9 +392,6 @@ const NonFungibles = {
         }
       }
       return results;
-    },
-    totalItems() {
-      return this.items.length;
     },
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
