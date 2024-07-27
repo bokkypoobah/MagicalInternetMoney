@@ -13,6 +13,9 @@ const NonFungibles = {
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
+          <div class="mt-0 pr-1">
+            <b-button size="sm" :pressed.sync="settings.sidebar" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show sidebar'"><b-icon :icon="settings.sidebar ? 'layout-sidebar-inset' : 'layout-sidebar'" font-scale="1.1" variant="primary"></b-icon></b-button>
+          </div>
           <div class="mt-0 pr-1" style="width: 200px;">
             <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover="'Regex filter by name, description or tokenId'" placeholder="🔍 name/desc/id regex"></b-form-input>
           </div>
@@ -103,110 +106,116 @@ const NonFungibles = {
           </div>
         </div>
 
-        <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
-          <template #empty="scope">
-            <h6>{{ scope.emptyText }}</h6>
-            <div>
-              <ul>
-                <li>
-                  Check you are connected to one of the <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">supported networks</b-link> (TODO: Only Sepolia currently)
-                </li>
-                <li>
-                  Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button> above to sync this app to the blockchain
-                </li>
-              </ul>
-            </div>
-          </template>
-
-          <template #head(number)="data">
-            <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
-              <template #button-content>
-                <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+        <b-row>
+          <b-col v-if="settings.sidebar" cols="2">
+          </b-col>
+          <b-col>
+            <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+              <template #empty="scope">
+                <h6>{{ scope.emptyText }}</h6>
+                <div>
+                  <ul>
+                    <li>
+                      Check you are connected to one of the <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">supported networks</b-link> (TODO: Only Sepolia currently)
+                    </li>
+                    <li>
+                      Click <b-button size="sm" variant="link" class="m-0 p-0"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button> above to sync this app to the blockchain
+                    </li>
+                  </ul>
+                </div>
               </template>
-              <b-dropdown-item href="#" @click="toggleSelected(pagedFilteredSortedItems)">Toggle selection for all tokens on this page</b-dropdown-item>
-              <!-- <b-dropdown-item href="#" @click="toggleSelected(filteredSortedAccounts)">Toggle selection for all tokens on all pages</b-dropdown-item> -->
-              <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download> Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
-              <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()" v-b-popover.hover="'Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat selection above'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill> Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
-            </b-dropdown>
-          </template>
 
-          <template #cell(number)="data">
-            <b-form-checkbox size="sm" :checked="settings.selected[data.item.contract] && settings.selected[data.item.contract][data.item.tokenId]" @change="toggleSelected([data.item])">
-              {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
-            </b-form-checkbox>
-          </template>
+              <template #head(number)="data">
+                <b-dropdown size="sm" variant="link" v-b-popover.hover="'Toggle selection'">
+                  <template #button-content>
+                    <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
+                  </template>
+                  <b-dropdown-item href="#" @click="toggleSelected(pagedFilteredSortedItems)">Toggle selection for all tokens on this page</b-dropdown-item>
+                  <!-- <b-dropdown-item href="#" @click="toggleSelected(filteredSortedAccounts)">Toggle selection for all tokens on all pages</b-dropdown-item> -->
+                  <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
+                  <b-dropdown-divider></b-dropdown-divider>
+                  <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download> Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()" v-b-popover.hover="'Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat selection above'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill> Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
+                </b-dropdown>
+              </template>
 
-          <!-- <b-avatar button @click="toggleTrait(layer, trait.value)" rounded size="7rem" :src="getSVG(layer, trait.value)">
-            <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template>
-          </b-avatar> -->
+              <template #cell(number)="data">
+                <b-form-checkbox size="sm" :checked="settings.selected[data.item.contract] && settings.selected[data.item.contract][data.item.tokenId]" @change="toggleSelected([data.item])">
+                  {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
+                </b-form-checkbox>
+              </template>
 
-          <template #cell(image)="data">
-            <!-- <b-avatar v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image"> -->
-              <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-            <!-- </b-avatar> -->
-            <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
-            </b-img>
-          </template>
+              <!-- <b-avatar button @click="toggleTrait(layer, trait.value)" rounded size="7rem" :src="getSVG(layer, trait.value)">
+                <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template>
+              </b-avatar> -->
 
-          <template #cell(info)="data">
-            <b-link v-if="networkSupported" :href="nonFungibleViewerURL(data.item.contract, data.item.tokenId)" target="_blank">
-              <span v-if="data.item.name">
-                <font size="-1">{{ data.item.name }}</font>
-              </span>
-              <span v-else>
-                <font size="-1">{{ '#' + (data.item.tokenId.length > 20 ? (data.item.tokenId.substring(0, 10) + '...' + data.item.tokenId.slice(-8)) : data.item.tokenId) }}</font>
-              </span>
-            </b-link>
-            <br />
-            <font size="-1">{{ data.item.description }}</font>
-            <br />
-            <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover="'View Token Contract'" class="m-0 ml-1 p-0">
-              <font size="-1">
-                <b-badge variant="light">
-                  {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
-                </b-badge>
-              </font>
-            </b-button>
-            <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
-              </b-icon>
-            </b-button>
-            <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Token active' : 'Token inactive'" class="m-0 ml-1 p-0">
-              <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
-              </b-icon>
-            </b-button>
-          </template>
+              <template #cell(image)="data">
+                <!-- <b-avatar v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image"> -->
+                  <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+                <!-- </b-avatar> -->
+                <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
+                </b-img>
+              </template>
 
-          <template #cell(expiry)="data">
-            <font size="-1">{{ formatTimestamp(data.item.expiry) }}</font>
-          </template>
-
-          <template #cell(owners)="data">
-            <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-              <b-link v-if="networkSupported" :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
-                <font size="-1">
-                  {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
-                  <span v-if="data.item.type == 'erc1155'" class="small muted">
-                    {{ 'x' + info.count }}
+              <template #cell(info)="data">
+                <b-link v-if="networkSupported" :href="nonFungibleViewerURL(data.item.contract, data.item.tokenId)" target="_blank">
+                  <span v-if="data.item.name">
+                    <font size="-1">{{ data.item.name }}</font>
                   </span>
-                </font>
-              </b-link>
-            </div>
-          </template>
+                  <span v-else>
+                    <font size="-1">{{ '#' + (data.item.tokenId.length > 20 ? (data.item.tokenId.substring(0, 10) + '...' + data.item.tokenId.slice(-8)) : data.item.tokenId) }}</font>
+                  </span>
+                </b-link>
+                <br />
+                <font size="-1">{{ data.item.description }}</font>
+                <br />
+                <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover="'View Token Contract'" class="m-0 ml-1 p-0">
+                  <font size="-1">
+                    <b-badge variant="light">
+                      {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
+                    </b-badge>
+                  </font>
+                </b-button>
+                <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
+                  <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
+                  </b-icon>
+                </b-button>
+                <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover="data.item.active ? 'Token active' : 'Token inactive'" class="m-0 ml-1 p-0">
+                  <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
+                  </b-icon>
+                </b-button>
+              </template>
 
-          <template #cell(attributes)="data">
-            <b-row v-for="(attribute, i) in data.item.attributes" v-bind:key="i" class="m-0 p-0">
-              <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
-              <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
-            </b-row>
-          </template>
+              <template #cell(expiry)="data">
+                <font size="-1">{{ formatTimestamp(data.item.expiry) }}</font>
+              </template>
 
-          <!-- <template #cell(favourite)="data"> -->
-            <!-- <b-button size="sm" @click="toggleNonFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button> -->
-          <!-- </template> -->
-        </b-table>
+              <template #cell(owners)="data">
+                <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
+                  <b-link v-if="networkSupported" :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
+                    <font size="-1">
+                      {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
+                      <span v-if="data.item.type == 'erc1155'" class="small muted">
+                        {{ 'x' + info.count }}
+                      </span>
+                    </font>
+                  </b-link>
+                </div>
+              </template>
+
+              <template #cell(attributes)="data">
+                <b-row v-for="(attribute, i) in data.item.attributes" v-bind:key="i" class="m-0 p-0">
+                  <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
+                  <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
+                </b-row>
+              </template>
+
+              <!-- <template #cell(favourite)="data"> -->
+                <!-- <b-button size="sm" @click="toggleNonFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button> -->
+              <!-- </template> -->
+            </b-table>
+          </b-col>
+        </b-row>
       </b-card>
     </div>
   `,
@@ -215,6 +224,7 @@ const NonFungibles = {
       count: 0,
       reschedule: true,
       settings: {
+        sidebar: false,
         filter: null,
         junkFilter: null,
         activeOnly: false,
@@ -222,7 +232,7 @@ const NonFungibles = {
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
-        version: 2,
+        version: 3,
       },
       transfer: {
         item: null,
