@@ -106,10 +106,21 @@ const NonFungibles = {
           </div>
         </div>
 
-        <b-row>
+        <b-row class="m-0 p-0">
           <b-col v-if="settings.sidebar" cols="2" class="m-0 p-0 border-0">
             <b-card no-header no-body class="m-0 p-0 border-0">
-              <b-card-body class="m-0 mt-1 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
+              <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
+                <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                  <template #header>
+                    <span variant="secondary" class="small truncate">
+                      <!-- {{ slugToTitle(attributeKey) }} -->
+                      Owners
+                    </span>
+                  </template>
+                  <font size="-2">
+                    {{ ownersWithCounts }}
+                  </font>
+                </b-card>
               </b-card-body>
             </b-card>
           </b-col>
@@ -232,11 +243,12 @@ const NonFungibles = {
         filter: null,
         junkFilter: null,
         activeOnly: false,
+        selectedOwners: {},
         selected: {},
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
-        version: 3,
+        version: 4,
       },
       transfer: {
         item: null,
@@ -444,6 +456,20 @@ const NonFungibles = {
         }
         if (include) {
           results.push(item);
+        }
+      }
+      return results;
+    },
+    ownersWithCounts() {
+      const results = {};
+      for (const item of this.filteredItems) {
+        for (const o of item.owners) {
+          const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
+          if (owner in results) {
+            results[owner] = [ parseInt(results[owner][0]) + 1, parseInt(results[owner][1]) + parseInt(count) ];
+          } else {
+            results[owner] = [1, count];
+          }
         }
       }
       return results;
