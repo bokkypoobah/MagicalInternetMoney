@@ -1534,7 +1534,7 @@ const dataModule = {
       let t = this;
       async function processLogs(fromBlock, toBlock, section, logs) {
         total = parseInt(total) + logs.length;
-        context.commit('setSyncCompleted', total);
+        context.commit('setSyncCompleted', toBlock);
         console.log(now() + " INFO dataModule:actions.syncTokenEvents.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
@@ -1643,9 +1643,9 @@ const dataModule = {
         }
         if (records.length) {
           await db.tokenEvents.bulkAdd(records).then (function(lastKey) {
-            console.log("syncTokenEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
+            console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
-            // console.log("syncTokenEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
+            // console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
           });
         }
       }
@@ -1716,7 +1716,6 @@ const dataModule = {
         }
       }
       console.log(now() + " INFO dataModule:actions.syncTokenEvents BEGIN");
-      context.commit('setSyncSection', { section: 'Token Events', total: null });
       const selectedAddresses = [];
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
@@ -1730,6 +1729,8 @@ const dataModule = {
         // const startBlock = (parameter.incrementalSync && latest) ? parseInt(latest.blockNumber) + 1: 0;
         const startBlock = 0;
         for (let section = 0; section < 4; section++) {
+          context.commit('setSyncSection', { section: 'Token Events #' + (section + 1), total: parameter.blockNumber });
+          context.commit('setSyncCompleted', startBlock);
           await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
         }
       }
