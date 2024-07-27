@@ -510,7 +510,7 @@ const dataModule = {
       }
     },
     addNonFungibleMetadata(state, info) {
-      // console.log(now() + " INFO dataModule:mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
+      console.log(now() + " INFO dataModule:mutations.addNonFungibleMetadata info: " + JSON.stringify(info, null, 2));
       const [ chainId, contract, tokenId ] = [ info.chainId, info.contract, info.tokenId ];
       if (!(chainId in state.tokens)) {
         Vue.set(state.tokens, chainId, {});

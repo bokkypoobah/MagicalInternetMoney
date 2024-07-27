@@ -381,7 +381,8 @@ const NonFungibles = {
         if (data.type == "erc721" || data.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
-            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
+            const tokenMetadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
+            const metadata = tokenMetadata && tokenMetadata.tokens[tokenId] || {};
             let image = null;
             if (metadata.image) {
               if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
@@ -410,6 +411,8 @@ const NonFungibles = {
                 chainId: this.chainId,
                 contract,
                 type: data.type,
+                symbol: tokenMetadata.symbol,
+                collection: tokenMetadata.name,
                 junk,
                 active: metadata.active,
                 totalSupply: data.totalSupply,
@@ -446,13 +449,6 @@ const NonFungibles = {
         }
       }
       const selectedOwners = Object.keys(this.settings.selectedOwners[this.chainId] || {}).length > 0 ? this.settings.selectedOwners[this.chainId] : null;
-      console.log("selectedOwners: " + JSON.stringify(selectedOwners, null, 2));
-      const selectedAddressesMap = {};
-      for (const [address, addressData] of Object.entries(this.addresses)) {
-        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
-          selectedAddressesMap[address] = true;
-        }
-      }
       for (const item of this.items) {
         let include = true;
         if (this.settings.junkFilter) {
