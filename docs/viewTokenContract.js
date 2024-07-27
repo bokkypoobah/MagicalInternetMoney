@@ -52,6 +52,10 @@ const ViewTokenContract = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
+        <b-form-group label="" label-for="token-refresh" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-button @click="syncTokenContract();" variant="link" v-b-popover.hover="'Refresh balances and approvals'" ><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
+        </b-form-group>
+
         <b-form-group v-if="type == 'erc20'" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
@@ -281,6 +285,12 @@ const ViewTokenContract = {
       } catch (e) {
         console.log(now() + " ERROR ViewTokenContract:methods.handleImage: " + e.message);
       }
+    },
+    async syncTokenContract() {
+      console.log(now() + " INFO ViewTokenContract:methods.syncTokenContract");
+      store.dispatch('data/syncIt', {
+        selectedContract: this.contract,
+      });
     },
     copyToClipboard(str) {
       navigator.clipboard.writeText(str);

@@ -393,6 +393,7 @@ const NonFungibles = {
       }
       return results;
     },
+
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       let regex = null;

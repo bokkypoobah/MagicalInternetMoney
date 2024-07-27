@@ -129,7 +129,7 @@ const Data = {
 const dataModule = {
   namespaced: true,
   state: {
-    DB_PROCESSING_BATCH_SIZE: 1234,
+    DB_PROCESSING_BATCH_SIZE: 12345,
 
     // address => info
     addresses: {},
@@ -926,7 +926,7 @@ const dataModule = {
         await context.dispatch('collateRegistrations', parameter);
       }
 
-      if (options.tokens && !options.devThing) {
+      if ((options.tokens || options.selectedContract) && !options.devThing) {
         await context.dispatch('syncTokenEvents', parameter);
       }
       if (options.timestamps && !options.devThing) {
@@ -935,8 +935,7 @@ const dataModule = {
       if (options.txData && !options.devThing) {
         await context.dispatch('syncTokenEventTxData', parameter);
       }
-      // TODO if ((options.tokens || options.ensExpiries || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
-      if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata) && !options.devThing) {
+      if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata || options.selectedContract) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
         await context.dispatch('computeApprovals', parameter);
       }
@@ -1654,7 +1653,7 @@ const dataModule = {
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
         if (!maxLogScrapingSize || (toBlock - fromBlock) <= maxLogScrapingSize) {
-          const address = null;
+          const address = parameter.selectedContract;
           try {
             let topics = null;
             if (section == 0) {
