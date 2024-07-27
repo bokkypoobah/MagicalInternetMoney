@@ -93,7 +93,7 @@ const NonFungibles = {
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + totalERC721Tokens }}</font>
+            <font size="-2" v-b-popover.hover="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + totalItems }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
@@ -326,14 +326,73 @@ const NonFungibles = {
       return results;
     },
 
-    totalERC721Tokens() {
-      let result = (store.getters['data/forceRefresh'] % 2) == 0 ? 0 : 0;
-      for (const [address, data] of Object.entries(this.balances[this.chainId] || {})) {
-        if (data.type == "erc721" || data.type == "erc1155") {
-          result += Object.keys(data.tokens).length;
+    items() {
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
+      const selectedAddressesMap = {};
+      for (const [address, addressData] of Object.entries(this.addresses)) {
+        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
+          selectedAddressesMap[address] = true;
         }
       }
-      return result;
+      for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
+        if (data.type == "erc721" || data.type == "erc1155") {
+          for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
+            const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
+            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
+            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
+            let image = null;
+            if (metadata.image) {
+              if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
+                image = "https://ipfs.io/" + metadata.image.substring(7)
+              } else if (metadata.image.substring(0, 7) == "ipfs://") {
+                image = "https://ipfs.io/ipfs/" + metadata.image.substring(7);
+              } else {
+                image = metadata.image;
+              }
+            }
+            const owners = [];
+            if (data.type == "erc721") {
+              if (tokenData in selectedAddressesMap) {
+                owners.push({ owner: tokenData });
+              }
+            } else {
+              for (const [owner, count] of Object.entries(tokenData)) {
+                if (owner in selectedAddressesMap) {
+                  owners.push({ owner, count });
+                }
+              }
+            }
+            if (owners.length > 0) {
+              const expiry = (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) && this.expiries[this.chainId] && this.expiries[this.chainId][contract] && this.expiries[this.chainId][contract][tokenId] || null;
+              results.push({
+                chainId: this.chainId,
+                contract,
+                type: data.type,
+                junk,
+                active: metadata.active,
+                totalSupply: data.totalSupply,
+                tokenId,
+                owners,
+                name: metadata.name || null,
+                description: metadata.description || null,
+                expiry,
+                attributes: metadata.attributes || null,
+                // imageSource: metadata.imageSource || null,
+                image,
+                // blockNumber: tokenData.blockNumber,
+                // logIndex: tokenData.logIndex,
+                lastSale: metadata.lastSale,
+                price: metadata.price,
+                topBid: metadata.topBid,
+              });
+            }
+          }
+        }
+      }
+      return results;
+    },
+    totalItems() {
+      return this.items.length;
     },
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
@@ -352,87 +411,25 @@ const NonFungibles = {
           selectedAddressesMap[address] = true;
         }
       }
-      // console.log("selectedAddressesMap: " + Object.keys(selectedAddressesMap));
-
-      for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
-        // console.log(contract + " => " + JSON.stringify(data));
-        // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
-        if (data.type == "erc721" || data.type == "erc1155") {
-          // console.log(contract + " => " + JSON.stringify(data, null, 2));
-          for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
-            // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData, null, 2));
-            const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
-            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
-            // console.log("  metadata: " + JSON.stringify(metadata, null, 2));
-
-            let include = true;
-            if (this.settings.junkFilter) {
-              if (this.settings.junkFilter == 'junk' && !junk) {
-                include = false;
-              } else if (this.settings.junkFilter == 'excludejunk' && junk) {
-                include = false;
-              }
-            }
-            if (include && this.settings.activeOnly && (!metadata.active || junk)) {
-              include = false;
-            }
-            if (include && regex) {
-              const name = metadata.name || null;
-              const description = metadata.description || null;
-              if (!(regex.test(tokenId) || regex.test(name) || regex.test(description))) {
-                include = false;
-              }
-            }
-            if (include) {
-              // console.log(contract + "/" + tokenId + " => " + JSON.stringify(tokenData));
-              let image = null;
-              if (metadata.image) {
-                if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
-                  image = "https://ipfs.io/" + metadata.image.substring(7)
-                } else if (metadata.image.substring(0, 7) == "ipfs://") {
-                  image = "https://ipfs.io/ipfs/" + metadata.image.substring(7);
-                } else {
-                  image = metadata.image;
-                }
-              }
-              const owners = [];
-              if (data.type == "erc721") {
-                if (tokenData in selectedAddressesMap) {
-                  owners.push({ owner: tokenData });
-                }
-              } else {
-                for (const [owner, count] of Object.entries(tokenData)) {
-                  if (owner in selectedAddressesMap) {
-                    owners.push({ owner, count });
-                  }
-                }
-              }
-              if (owners.length > 0) {
-                const expiry = (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) && this.expiries[this.chainId] && this.expiries[this.chainId][contract] && this.expiries[this.chainId][contract][tokenId] || null;
-                results.push({
-                  chainId: this.chainId,
-                  contract,
-                  type: data.type,
-                  junk,
-                  active: metadata.active,
-                  totalSupply: data.totalSupply,
-                  tokenId,
-                  owners,
-                  name: metadata.name || null,
-                  description: metadata.description || null,
-                  expiry,
-                  attributes: metadata.attributes || null,
-                  // imageSource: metadata.imageSource || null,
-                  image,
-                  // blockNumber: tokenData.blockNumber,
-                  // logIndex: tokenData.logIndex,
-                  lastSale: metadata.lastSale,
-                  price: metadata.price,
-                  topBid: metadata.topBid,
-                });
-              }
-            }
+      for (const item of this.items) {
+        let include = true;
+        if (this.settings.junkFilter) {
+          if (this.settings.junkFilter == 'junk' && !item.junk) {
+            include = false;
+          } else if (this.settings.junkFilter == 'excludejunk' && item.junk) {
+            include = false;
           }
+        }
+        if (include && this.settings.activeOnly && (!item.active || item.junk)) {
+          include = false;
+        }
+        if (include && regex) {
+          if (!(regex.test(item.tokenId) || regex.test(item.name) || regex.test(item.description))) {
+            include = false;
+          }
+        }
+        if (include) {
+          results.push(item);
         }
       }
       return results;
