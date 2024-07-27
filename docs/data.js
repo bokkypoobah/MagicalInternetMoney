@@ -2003,7 +2003,7 @@ const dataModule = {
         rows = parseInt(rows) + data.length;
         done = data.length < context.state.DB_PROCESSING_BATCH_SIZE;
       } while (!done);
-      console.log("collator: " + JSON.stringify(collator, null, 2));
+      // console.log("collator: " + JSON.stringify(collator, null, 2));
       context.commit('updateApprovals', { chainId: parameter.chainId, approvals: collator });
       await context.dispatch('saveData', ['approvals']);
       console.log(now() + " INFO dataModule:actions.computeApprovals END");
