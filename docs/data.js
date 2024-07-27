@@ -520,6 +520,7 @@ const dataModule = {
           type: info.type,
           symbol: info.collectionSymbol || null,
           name: info.collectionName || null,
+          slug: info.slug || null,
           image: null,
           junk: false,
           tokens: {},

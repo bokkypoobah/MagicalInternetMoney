@@ -130,6 +130,31 @@ const NonFungibles = {
                     </b-table>
                   </font>
                 </b-card>
+                <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                  <template #header>
+                    <span variant="secondary" class="small truncate">
+                      Collections
+                    </span>
+                  </template>
+                  <font size="-2">
+                    <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light">
+                      <template #cell(select)="data">
+                        <b-form-checkbox size="sm" :checked="settings.selectedCollections[chainId] && settings.selectedCollections[chainId][data.item.contract]" @change="collectionsFilterChange(data.item.contract)"></b-form-checkbox>
+                      </template>
+                      <template #cell(collection)="data">
+                        <b-link v-if="data.item.collection" :href="'https://opensea.io/collection/' + data.item.slug" target="_blank">
+                          {{ data.item.collection }}
+                        </b-link>
+                        <b-link v-else :href="explorer + 'token/' + data.item.contract" target="_blank">
+                          {{ data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6) }}
+                        </b-link>
+                      </template>
+                      <template #cell(items)="data">
+                        <span v-b-popover.hover="data.item.counts + ' including copies'">{{ data.item.items }}</span>
+                      </template>
+                    </b-table>
+                  </font>
+                </b-card>
               </b-card-body>
             </b-card>
           </b-col>
@@ -216,7 +241,7 @@ const NonFungibles = {
 
               <template #cell(owners)="data">
                 <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-                  <b-link v-if="networkSupported" :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
+                  <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
                     <font size="-1">
                       {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                       <span v-if="data.item.type == 'erc1155'" class="small muted">
@@ -229,8 +254,8 @@ const NonFungibles = {
 
               <template #cell(attributes)="data">
                 <b-row v-for="(attribute, i) in data.item.attributes" v-bind:key="i" class="m-0 p-0">
-                  <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
-                  <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
+                  <b-col cols="6" class="m-0 p-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
+                  <b-col cols="6" class="m-0 p-0 px-2 truncate"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
                 </b-row>
               </template>
 
@@ -253,11 +278,12 @@ const NonFungibles = {
         junkFilter: null,
         activeOnly: false,
         selectedOwners: {},
+        selectedCollections: {},
         selected: {},
         currentPage: 1,
         pageSize: 10,
         sortOption: 'registrantasc',
-        version: 4,
+        version: 5,
       },
       transfer: {
         item: null,
@@ -299,8 +325,13 @@ const NonFungibles = {
       ],
       ownersFields: [
         { key: 'select', label: '', thStyle: 'width: 10%;' },
-        { key: 'owner', label: 'Owner' /*, sortable: true*/ },
-        { key: 'items', label: 'Items', /*sortable: true,*/ thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'owner', label: 'Owner', sortable: true },
+        { key: 'items', label: 'Items', sortable: true, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
+      ],
+      collectionsFields: [
+        { key: 'select', label: '', thStyle: 'width: 10%;' },
+        { key: 'collection', label: 'Collection', sortable: true },
+        { key: 'items', label: 'Items', sortable: true, thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -382,7 +413,7 @@ const NonFungibles = {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
             const tokenMetadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
-            const metadata = tokenMetadata && tokenMetadata.tokens[tokenId] || {};
+            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
             let image = null;
             if (metadata.image) {
               if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
@@ -413,6 +444,7 @@ const NonFungibles = {
                 type: data.type,
                 symbol: tokenMetadata.symbol,
                 collection: tokenMetadata.name,
+                slug: tokenMetadata.slug,
                 junk,
                 active: metadata.active,
                 totalSupply: data.totalSupply,
@@ -436,7 +468,43 @@ const NonFungibles = {
       }
       return results;
     },
-
+    ownersWithCounts() {
+      const collator = {};
+      for (const item of this.items) {
+        for (const o of item.owners) {
+          const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
+          if (owner in collator) {
+            collator[owner] = [ parseInt(collator[owner][0]) + 1, parseInt(collator[owner][1]) + parseInt(count) ];
+          } else {
+            collator[owner] = [1, count];
+          }
+        }
+      }
+      const results = [];
+      for (const [owner, info] of Object.entries(collator)) {
+        results.push({ owner, items: info[0], counts: info[1] });
+      }
+      return results;
+    },
+    collectionsWithCounts() {
+      const collator = {};
+      for (const item of this.items) {
+        for (const o of item.owners) {
+          const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
+          if (item.contract in collator) {
+            collator[item.contract][0] = parseInt(collator[item.contract][0]) + 1;
+            collator[item.contract][1] = parseInt(collator[item.contract][1]) + parseInt(count);
+          } else {
+            collator[item.contract] = [1, count, item.symbol, item.collection, item.slug ];
+          }
+        }
+      }
+      const results = [];
+      for (const [contract, info] of Object.entries(collator)) {
+        results.push({ contract, symbol: info[2], collection: info[3], slug: info[4], items: info[0], counts: info[1] });
+      }
+      return results;
+    },
     filteredItems() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       let regex = null;
@@ -449,6 +517,7 @@ const NonFungibles = {
         }
       }
       const selectedOwners = Object.keys(this.settings.selectedOwners[this.chainId] || {}).length > 0 ? this.settings.selectedOwners[this.chainId] : null;
+      const selectedCollections = Object.keys(this.settings.selectedCollections[this.chainId] || {}).length > 0 ? this.settings.selectedCollections[this.chainId] : null;
       for (const item of this.items) {
         let include = true;
         if (this.settings.junkFilter) {
@@ -478,27 +547,14 @@ const NonFungibles = {
             include = false;
           }
         }
+        if (include && selectedCollections) {
+          if (!(item.contract in selectedCollections)) {
+            include = false;
+          }
+        }
         if (include) {
           results.push(item);
         }
-      }
-      return results;
-    },
-    ownersWithCounts() {
-      const collator = {};
-      for (const item of this.items) {
-        for (const o of item.owners) {
-          const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
-          if (owner in collator) {
-            collator[owner] = [ parseInt(collator[owner][0]) + 1, parseInt(collator[owner][1]) + parseInt(count) ];
-          } else {
-            collator[owner] = [1, count];
-          }
-        }
-      }
-      const results = [];
-      for (const [owner, info] of Object.entries(collator)) {
-        results.push({ owner, items: info[0], counts: info[1] });
       }
       return results;
     },
@@ -609,6 +665,18 @@ const NonFungibles = {
         Vue.set(this.settings.selectedOwners[this.chainId], owner, true);
       }
       console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedOwners));
+      this.saveSettings();
+    },
+    collectionsFilterChange(contract) {
+      if (!(this.chainId in this.settings.selectedCollections)) {
+        Vue.set(this.settings.selectedCollections, this.chainId, {});
+      }
+      if (this.settings.selectedCollections[this.chainId][contract]) {
+        Vue.delete(this.settings.selectedCollections[this.chainId], contract);
+      } else {
+        Vue.set(this.settings.selectedCollections[this.chainId], contract, true);
+      }
+      console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedCollections));
       this.saveSettings();
     },
 

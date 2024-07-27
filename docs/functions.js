@@ -347,6 +347,7 @@ function parseReservoirTokenData(info) {
     console.log("parseReservoirTokenData - ERROR: name: " + name + ", owner: " + token.owner + ", error: " + e.message + " info: " + JSON.stringify(info, null, 2));
     result.owner = ADDRESS0;
   }
+  result.slug = token.collection && token.collection.slug || null;
   result.collectionSymbol = token.collection && token.collection.symbol || null;
   result.collectionName = token.collection && token.collection.name || null;
   result.name = token.name;

@@ -117,6 +117,10 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_NonFungibles_FilterByOwners_20240727.png" /></kbd>
 
+###### ERC-721 and ERC-1155 Non-Fungibles Filter By Collections
+
+<kbd><img src="images/SampleScreen_NonFungibles_FilterByCollections_20240727.png" /></kbd>
+
 ###### ERC-20, ERC-721 and ERC-1155 Approvals
 
 <kbd><img src="images/SampleScreen_Approvals_20240726.png" /></kbd>
