@@ -104,6 +104,34 @@ const NonFungibles = {
           <div class="mt-0 pl-1">
             <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover="'Page size'"></b-form-select>
           </div>
+          <div class="mt-0 pl-1">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover="'View'" right>
+              <template #button-content>
+                <span v-if="settings.viewOption == 'list'">
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+                <span v-else>
+                  <b-iconstack font-scale="1">
+                    <b-icon stacked icon="grid3x3-gap" variant="primary" scale="0.75"></b-icon>
+                  </b-iconstack>
+                </span>
+              </template>
+              <b-dropdown-item href="#" @click="settings.viewOption = 'list'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                </b-iconstack>
+                List
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.viewOption = 'icons'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="grid3x3-gap" variant="primary" scale="0.75"></b-icon>
+                </b-iconstack>
+                Icons
+              </b-dropdown-item>
+            </b-dropdown>
+          </div>
         </div>
 
         <b-row class="m-0 p-0">
@@ -159,7 +187,7 @@ const NonFungibles = {
             </b-card>
           </b-col>
           <b-col class="m-0 p-0">
-            <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+            <b-table v-if="settings.viewOption == 'list'" ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
               <template #empty="scope">
                 <h6>{{ scope.emptyText }}</h6>
                 <div>
@@ -263,6 +291,35 @@ const NonFungibles = {
                 <!-- <b-button size="sm" @click="toggleNonFungibleActive(data.item);" variant="transparent"><b-icon :icon="data.item.favourite ? 'heart-fill' : 'heart'" font-scale="0.9" variant="danger"></b-icon></b-button> -->
               <!-- </template> -->
             </b-table>
+
+            <b-card-group v-if="settings.viewOption == 'icons'" deck class="m-1 p-1">
+              <div v-for="record in pagedFilteredSortedItems">
+                <b-card body-class="p-1" header-class="p-1" footer-class="p-1" img-top class="m-1 p-0 border-0">
+
+                  <b-link :href="nonFungibleViewerURL(record.contract, record.tokenId)" target="_blank">
+                    <b-img-lazy v-if="record.image" width="200%" :src="record.image">
+                    </b-img-lazy>
+                  </b-link>
+                  <b-card-text>
+                    <div class="d-flex justify-content-between m-0 p-0">
+                      <div class="mt-0 pr-1">
+                        <div v-for="(info, i) in record.owners"  v-bind:key="i" class="m-0 p-0">
+                          <b-link :href="explorer + 'address/' + info.owner" target="_blank">
+                            <font size="-1">
+                              {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
+                              <span v-if="record.type == 'erc1155'" class="small muted">
+                                {{ 'x' + info.count }}
+                              </span>
+                            </font>
+                          </b-link>
+                        </div>
+                      </div>
+                    </div>
+                  </b-card-text>
+                </b-card>
+              </div>
+            </b-card-group>
+
           </b-col>
         </b-row>
       </b-card>
@@ -274,6 +331,7 @@ const NonFungibles = {
       reschedule: true,
       settings: {
         sidebar: false,
+        viewOption: 'list',
         filter: null,
         junkFilter: null,
         activeOnly: false,
@@ -282,8 +340,8 @@ const NonFungibles = {
         selected: {},
         currentPage: 1,
         pageSize: 10,
-        sortOption: 'registrantasc',
-        version: 5,
+        sortOption: 'collectionasc',
+        version: 6,
       },
       transfer: {
         item: null,
@@ -295,16 +353,11 @@ const NonFungibles = {
       sortOptions: [
         // { value: 'nameregistrantasc', text: '▲ Name, ▲ Registrant' },
         // { value: 'nameregistrantdsc', text: '▼ Name, ▲ Registrant' },
-        { value: 'registrantasc', text: '▲ Registrant' },
-        { value: 'registrantdsc', text: '▼ Registrant' },
+        { value: 'collectionasc', text: '▲ Collection' },
+        { value: 'collectiondsc', text: '▼ Collection' },
+        { value: 'nameasc', text: '▲ Name' },
+        { value: 'namedsc', text: '▼ Name' },
       ],
-      // fields: [
-      //   { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-      //   { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-      //   { key: 'sender', label: 'Sender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      //   { key: 'receiver', label: 'Receiver', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      //   { key: 'tokens', label: 'Tokens', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-      // ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
@@ -312,16 +365,6 @@ const NonFungibles = {
         { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'owners', label: 'Owner(s)', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'favourite', label: '', sortable: false, thStyle: 'width: 3%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 16%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 7%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        // { key: 'firstEventBlockNumber', label: 'First Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'lastEventBlockNumber', label: 'Last Ev#', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'decimals', label: 'Decs', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
-        // { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
       ownersFields: [
         { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -503,6 +546,9 @@ const NonFungibles = {
       for (const [contract, info] of Object.entries(collator)) {
         results.push({ contract, symbol: info[2], collection: info[3], slug: info[4], items: info[0], counts: info[1] });
       }
+      results.sort((a, b) => {
+        return ('' + a.collection).localeCompare(b.collection);
+      });
       return results;
     },
     filteredItems() {
@@ -560,15 +606,23 @@ const NonFungibles = {
     },
     filteredSortedItems() {
       const results = this.filteredItems;
-      // if (this.settings.sortOption == 'registrantasc') {
-      //   results.sort((a, b) => {
-      //     return ('' + a.registrant).localeCompare(b.registrant);
-      //   });
-      // } else if (this.settings.sortOption == 'registrantdsc') {
-      //   results.sort((a, b) => {
-      //     return ('' + b.registrant).localeCompare(a.registrant);
-      //   });
-      // }
+      if (this.settings.sortOption == 'collectionasc') {
+        results.sort((a, b) => {
+          return ('' + a.collection).localeCompare(b.collection);
+        });
+      } else if (this.settings.sortOption == 'collectiondsc') {
+        results.sort((a, b) => {
+          return ('' + b.collection).localeCompare(a.collection);
+        });
+      } else if (this.settings.sortOption == 'nameasc') {
+        results.sort((a, b) => {
+          return ('' + a.name).localeCompare(b.name);
+        });
+      } else if (this.settings.sortOption == 'namedsc') {
+        results.sort((a, b) => {
+          return ('' + b.name).localeCompare(a.name);
+        });
+      }
       return results;
     },
     pagedFilteredSortedItems() {
