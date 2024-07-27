@@ -107,9 +107,13 @@ const NonFungibles = {
         </div>
 
         <b-row>
-          <b-col v-if="settings.sidebar" cols="2">
+          <b-col v-if="settings.sidebar" cols="2" class="m-0 p-0 border-0">
+            <b-card no-header no-body class="m-0 p-0 border-0">
+              <b-card-body class="m-0 mt-1 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
+              </b-card-body>
+            </b-card>
           </b-col>
-          <b-col>
+          <b-col class="m-0 p-0">
             <b-table ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
               <template #empty="scope">
                 <h6>{{ scope.emptyText }}</h6>
