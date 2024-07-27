@@ -119,7 +119,7 @@ const NonFungibles = {
                   <font size="-2">
                     <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
                       <template #cell(select)="data">
-                        <b-form-checkbox size="sm" :checked="settings.selectedOwners[data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
+                        <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
                       </template>
                       <template #cell(owner)="data">
                         {{ addresses[data.item.owner] && addresses[data.item.owner].name || ens[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
@@ -590,10 +590,13 @@ const NonFungibles = {
     },
 
     ownersFilterChange(owner) {
-      if (this.settings.selectedOwners[owner]) {
-        Vue.delete(this.settings.selectedOwners, owner);
+      if (!(this.chainId in this.settings.selectedOwners)) {
+        Vue.set(this.settings.selectedOwners, this.chainId, {});
+      }
+      if (this.settings.selectedOwners[this.chainId][owner]) {
+        Vue.delete(this.settings.selectedOwners[this.chainId], owner);
       } else {
-        Vue.set(this.settings.selectedOwners, owner, true);
+        Vue.set(this.settings.selectedOwners[this.chainId], owner, true);
       }
       console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedOwners));
       this.saveSettings();
