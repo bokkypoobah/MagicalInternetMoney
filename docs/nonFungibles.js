@@ -113,12 +113,21 @@ const NonFungibles = {
                 <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
                     <span variant="secondary" class="small truncate">
-                      <!-- {{ slugToTitle(attributeKey) }} -->
                       Owners
                     </span>
                   </template>
                   <font size="-2">
-                    {{ ownersWithCounts }}
+                    <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
+                      <template #cell(select)="data">
+                        <b-form-checkbox size="sm" :checked="settings.selectedOwners[data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
+                      </template>
+                      <template #cell(owner)="data">
+                        {{ addresses[data.item.owner] && addresses[data.item.owner].name || ens[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
+                      </template>
+                      <template #cell(items)="data">
+                        <span v-b-popover.hover="data.item.counts + ' including copies'">{{ data.item.items }}</span>
+                      </template>
+                    </b-table>
                   </font>
                 </b-card>
               </b-card-body>
@@ -287,6 +296,11 @@ const NonFungibles = {
         // { key: 'decimals', label: 'Decs', sortable: false, thStyle: 'width: 5%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'balance', label: 'Balance', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
         // { key: 'totalSupply', label: 'Total Supply', sortable: false, thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+      ],
+      ownersFields: [
+        { key: 'select', label: '', thStyle: 'width: 10%;' },
+        { key: 'owner', label: 'Owner' /*, sortable: true*/ },
+        { key: 'items', label: 'Items', /*sortable: true,*/ thStyle: 'width: 25%;', thClass: 'text-right', tdClass: 'text-right' },
       ],
     }
   },
@@ -461,16 +475,20 @@ const NonFungibles = {
       return results;
     },
     ownersWithCounts() {
-      const results = {};
+      const collator = {};
       for (const item of this.filteredItems) {
         for (const o of item.owners) {
           const [ owner, count ] = [ o.owner, item.type == "erc721" ? 1 : o.count ];
-          if (owner in results) {
-            results[owner] = [ parseInt(results[owner][0]) + 1, parseInt(results[owner][1]) + parseInt(count) ];
+          if (owner in collator) {
+            collator[owner] = [ parseInt(collator[owner][0]) + 1, parseInt(collator[owner][1]) + parseInt(count) ];
           } else {
-            results[owner] = [1, count];
+            collator[owner] = [1, count];
           }
         }
+      }
+      const results = [];
+      for (const [owner, info] of Object.entries(collator)) {
+        results.push({ owner, items: info[0], counts: info[1] });
       }
       return results;
     },
@@ -570,6 +588,17 @@ const NonFungibles = {
       this.settings.selected = {};
       this.saveSettings();
     },
+
+    ownersFilterChange(owner) {
+      if (this.settings.selectedOwners[owner]) {
+        Vue.delete(this.settings.selectedOwners, owner);
+      } else {
+        Vue.set(this.settings.selectedOwners, owner, true);
+      }
+      console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedOwners));
+      this.saveSettings();
+    },
+
     refreshSelectedNonFungibles() {
       console.log(now() + " INFO NonFungibles:methods.refreshSelectedNonFungibles");
       const selectedTokens = [];
