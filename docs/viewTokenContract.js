@@ -53,7 +53,7 @@ const ViewTokenContract = {
         </b-form-group>
 
         <b-form-group label="" label-for="token-refresh" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button @click="syncTokenContract();" variant="link" v-b-popover.hover="'Refresh balances and approvals'" ><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
+          <b-button size="sm" :disabled="!networkSupported || sync.section != null"  @click="syncTokenContract();" variant="link" v-b-popover.hover="'Refresh balances and approvals'" ><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
         </b-form-group>
 
         <b-form-group v-if="type == 'erc20'" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -199,6 +199,9 @@ const ViewTokenContract = {
     },
     customNames() {
       return CUSTOMNAMES;
+    },
+    sync() {
+      return store.getters['data/sync'];
     },
     symbol: {
       get: function () {
