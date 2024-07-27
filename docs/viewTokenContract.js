@@ -52,7 +52,7 @@ const ViewTokenContract = {
           <b-form-input size="sm" plaintext id="token-totalsupply" :value="formatERC20(totalSupply, decimals)" class="px-2 w-50"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="type == 'erc20' && balances.length > 0" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+        <b-form-group v-if="type == 'erc20'" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-row class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <font size="-1">Address</font>
@@ -71,6 +71,50 @@ const ViewTokenContract = {
               <b-link :href="explorer + 'token/' + contract + '?a=' + b.address" target="_blank">
                 <font size="-1">{{ formatERC20(b.balance, decimals) }}</font>
               </b-link>
+            </b-col>
+          </b-row>
+        </b-form-group>
+
+        <b-form-group label="Approvals:" label-for="token-approvals" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+          <b-row class="m-0 p-0">
+            <b-col cols="4" class="m-0 px-2">
+              <font size="-1">Owner</font>
+            </b-col>
+            <b-col cols="4" class="m-0 px-2">
+              <font size="-1">Spender</font>
+            </b-col>
+            <b-col cols="4" class="m-0 px-2">
+              <font size="-1">Value</font>
+            </b-col>
+          </b-row>
+          <b-row v-for="(a, i) in approvals" v-bind:key="i" class="m-0 p-0">
+            <b-col cols="4" class="m-0 px-2">
+              <b-link :href="explorer + 'address/' + a.owner" target="_blank">
+                <font size="-1">{{ addresses[a.owner] && addresses[a.owner].name || ens[a.owner] || (a.owner.substring(0, 8) + '...' + a.owner.slice(-6)) }}</font>
+              </b-link>
+            </b-col>
+            <b-col cols="4" class="m-0 px-2">
+              <b-link :href="explorer + 'address/' + a.spender" target="_blank">
+                <font size="-1">{{ addresses[a.spender] && addresses[a.spender].name || ens[a.spender] || customNames[a.spender] && customNames[a.spender][1] || (a.spender.substring(0, 8) + '...' + a.spender.slice(-6)) }}</font>
+              </b-link>
+            </b-col>
+            <b-col cols="4" class="m-0 px-2">
+              <font size="-1">
+                <div v-if="type == 'erc20'">
+                  <span v-if="a.value.toString().length > 30">
+                    <b-badge pill variant="transparent" v-b-popover.hover="formatERC20(a.value, decimals)" class="px-0">&infin;</b-badge>
+                  </span>
+                  <span v-else>
+                    {{ formatERC20(a.value, decimals || 0) }}
+                  </span>
+                </div>
+                <div v-else-if="type == 'erc721' && a.eventType == 'Approval'">
+                  {{ a.tokenId }}
+                </div>
+                <div v-else>
+                  {{ a.approved }}
+                </div>
+              </font>
             </b-col>
           </b-row>
         </b-form-group>
@@ -149,6 +193,9 @@ const ViewTokenContract = {
     ens() {
       return store.getters['data/ens'];
     },
+    customNames() {
+      return CUSTOMNAMES;
+    },
     symbol: {
       get: function () {
         return store.getters['viewTokenContract/symbol'];
@@ -181,6 +228,9 @@ const ViewTokenContract = {
     },
     balances() {
       return store.getters['viewTokenContract/balances'];
+    },
+    approvals() {
+      return store.getters['viewTokenContract/approvals'];
     },
     image() {
       return store.getters['viewTokenContract/image'];
@@ -306,6 +356,7 @@ const viewTokenContractModule = {
     name: null,
     decimals: null,
     balances: [],
+    approvals: [],
     image: null,
     junk: null,
     active: null,
@@ -321,6 +372,7 @@ const viewTokenContractModule = {
     name: state => state.name,
     decimals: state => state.decimals,
     balances: state => state.balances,
+    approvals: state => state.approvals,
     image: state => state.image,
     junk: state => state.junk,
     active: state => state.active,
@@ -414,21 +466,16 @@ const viewTokenContractModule = {
 
       const approvalsResults = [];
       for (const [owner, ownerData] of Object.entries(store.getters['data/approvals'][chainId] || {})) {
-        // console.log(owner + " => " + JSON.stringify(ownerData));
         const contractData = ownerData[info.contract] || [];
         if (token.type == "erc20") {
-          // console.log("  ERC-20: " + owner + " => " + JSON.stringify(contractData));
           for (const [spender, value] of Object.entries(contractData)) {
-            // console.log("  ERC-20 Approval: " + owner + " " + spender + " " + value);
             approvalsResults.push({ type: token.type, eventType: "Approval", owner, spender, value });
           }
         } else if (token.type == "erc721" || token.type == "erc1155") {
           for (const [tokenId, spender] of Object.entries(contractData.tokens || {})) {
-            // console.log("  ERC-721 Approval: " + owner + " " + spender + " " + tokenId);
-            approvalsResults.push({ type: token.type, eventType: "Approval", owner, spender, value });
+            approvalsResults.push({ type: token.type, eventType: "Approval", owner, spender, tokenId });
           }
           for (const [spender, approved] of Object.entries(contractData.approvalForAll || {})) {
-            // console.log("  ERC-721/ERC-1155 SetApprovalForAll: " + owner + " " + spender + " " + approved);
             approvalsResults.push({ type: token.type, eventType: "SetApprovalForAll", owner, spender, approved });
           }
         }

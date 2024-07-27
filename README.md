@@ -85,6 +85,10 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_Fungible_20240723.png" /></kbd>
 
+###### ERC-20 Fungible Tokens Contract With Approvals
+
+<kbd><img src="images/SampleScreen_FungibleTokenContractApprovals_20240727.png" /></kbd>
+
 ###### ERC-721 and ERC-1155 Non-Fungible Tokens
 
 <kbd><img src="images/SampleScreen_NonFungibleTokens_20240724.png" /></kbd>
@@ -100,6 +104,14 @@ Deployed on Sepolia:
 ###### View ERC-721 and ERC-1155 Non-Fungible Tokens
 
 <kbd><img src="images/SampleScreen_ViewNonFungibleTokens_20240711.png" /></kbd>
+
+###### Select ERC-721 and ERC-1155 Non-Fungible Token Contract
+
+<kbd><img src="images/SampleScreen_NonFungiblesWithTokenContractSelected_20240727.png" /></kbd>
+
+###### ERC-721 Non-Fungible Token Contract With Approvals
+
+<kbd><img src="images/SampleScreen_NonFungibleTokenContractApprovals_20240727.png" /></kbd>
 
 ###### ERC-20, ERC-721 and ERC-1155 Approvals
 
