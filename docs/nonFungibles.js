@@ -140,7 +140,7 @@ const NonFungibles = {
               <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
                 <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-2"></b-form-input>
+                    <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-0 px-2"></b-form-input>
                   </template>
                   <font size="-2">
                     <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
@@ -158,7 +158,7 @@ const NonFungibles = {
                 </b-card>
                 <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-2"></b-form-input>
+                    <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-0 px-2"></b-form-input>
                   </template>
                   <font size="-2">
                     <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light">
