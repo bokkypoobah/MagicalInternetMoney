@@ -138,11 +138,9 @@ const NonFungibles = {
           <b-col v-if="settings.sidebar" cols="2" class="m-0 p-0 border-0">
             <b-card no-header no-body class="m-0 p-0 border-0">
               <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
-                <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <span variant="secondary" class="small truncate">
-                      Owners
-                    </span>
+                    <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-2"></b-form-input>
                   </template>
                   <font size="-2">
                     <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
@@ -158,11 +156,9 @@ const NonFungibles = {
                     </b-table>
                   </font>
                 </b-card>
-                <b-card header-class="m-0 px-2 pt-2 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <span variant="secondary" class="small truncate">
-                      Collections
-                    </span>
+                    <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-2"></b-form-input>
                   </template>
                   <font size="-2">
                     <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light">
@@ -333,6 +329,8 @@ const NonFungibles = {
         sidebar: false,
         viewOption: 'list',
         filter: null,
+        ownerFilter: null,
+        collectionFilter: null,
         junkFilter: null,
         activeOnly: false,
         selectedOwners: {},
@@ -341,7 +339,7 @@ const NonFungibles = {
         currentPage: 1,
         pageSize: 10,
         sortOption: 'collectionasc',
-        version: 6,
+        version: 7,
       },
       transfer: {
         item: null,
@@ -512,6 +510,15 @@ const NonFungibles = {
       return results;
     },
     ownersWithCounts() {
+      let regex = null;
+      if (this.settings.ownerFilter != null && this.settings.ownerFilter.length > 0) {
+        try {
+          regex = new RegExp(this.settings.ownerFilter, 'i');
+        } catch (e) {
+          console.log("ownersWithCounts - regex error: " + e.message);
+          regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+        }
+      }
       const collator = {};
       for (const item of this.items) {
         for (const o of item.owners) {
@@ -525,11 +532,22 @@ const NonFungibles = {
       }
       const results = [];
       for (const [owner, info] of Object.entries(collator)) {
-        results.push({ owner, items: info[0], counts: info[1] });
+        if (!regex || regex.test(owner) || (this.ens[owner] && regex.test(this.ens[owner]))) {
+          results.push({ owner, items: info[0], counts: info[1] });
+        }
       }
       return results;
     },
     collectionsWithCounts() {
+      let regex = null;
+      if (this.settings.collectionFilter != null && this.settings.collectionFilter.length > 0) {
+        try {
+          regex = new RegExp(this.settings.collectionFilter, 'i');
+        } catch (e) {
+          console.log("collectionsWithCounts - regex error: " + e.message);
+          regex = new RegExp(/thequickbrowndogjumpsoverthelazyfox/, 'i');
+        }
+      }
       const collator = {};
       for (const item of this.items) {
         for (const o of item.owners) {
@@ -544,7 +562,9 @@ const NonFungibles = {
       }
       const results = [];
       for (const [contract, info] of Object.entries(collator)) {
-        results.push({ contract, symbol: info[2], collection: info[3], slug: info[4], items: info[0], counts: info[1] });
+        if (!regex || regex.test(contract) || regex.test(info[2]) || regex.test(info[3])) {
+          results.push({ contract, symbol: info[2], collection: info[3], slug: info[4], items: info[0], counts: info[1] });
+        }
       }
       results.sort((a, b) => {
         return ('' + a.collection).localeCompare(b.collection);
