@@ -2,7 +2,17 @@ const ViewNonFungible = {
   template: `
     <div>
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
-        <template #modal-title>{{ type == "erc721" ? 'ERC-721' : 'ERC-1155'}} Non-Fungible Token</template>
+        <template #modal-title>
+          <div v-if="contract == '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'">
+            ENS Name
+          </div>
+          <div v-else-if="contract == '0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401'">
+            Wrapped ENS Name
+          </div>
+          <div v-else>
+            {{ type == "erc721" ? 'ERC-721' : 'ERC-1155'}} Non-Fungible Token
+          </div>
+        </template>
 
         <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-input-group size="sm" class="w-100">

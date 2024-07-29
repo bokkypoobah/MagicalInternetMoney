@@ -548,12 +548,18 @@ function processENSEventLogs(logs) {
           let parts = decodeNameWrapperBytes(name);
           let nameString = parts.join(".");
           let label = null;
+          let labelhash = null;
+          let labelhashDecimals = null;
           if (parts.length >= 2 && parts[parts.length - 1] == "eth" && ethers.utils.isValidName(nameString)) {
-            label = parts.join(".").replace(/\.eth$/, '');
+            label = parts[parts.length - 2];
+            labelhash = ethers.utils.solidityKeccak256(["string"], [label]);
+            labelhashDecimals = ethers.BigNumber.from(labelhash).toString();
           }
-          // const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
+          const namehashDecimals = ethers.BigNumber.from(node).toString();
+          const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
           if (ethers.utils.isValidName(label)) {
-            eventRecord = { type: "NameWrapped", label, owner, fuses, expiry: parseInt(expiry) };
+            eventRecord = { type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, labelhashDecimals, subdomain, owner, fuses, expiry: parseInt(expiry), expirym90: moment.unix(parseInt(expiry)).subtract(90, 'days').unix() };
+            // eventRecord = { type: "NameWrapped", label, owner, fuses, expiry: parseInt(expiry) };
             // if (subdomain) {
             //   console.log("With subdomain: " + nameString + " & " + JSON.stringify(eventRecord, null, 2));
             // }
