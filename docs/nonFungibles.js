@@ -410,6 +410,8 @@ const NonFungibles = {
         { value: 'collectiondsc', text: '▼ Collection' },
         { value: 'nameasc', text: '▲ Name' },
         { value: 'namedsc', text: '▼ Name' },
+        { value: 'expiryasc', text: '▲ Expiry' },
+        { value: 'expirydsc', text: '▼ Expiry' },
       ],
       ensDateOptions: [
         { value: null, text: 'Unfiltered' },
@@ -750,6 +752,18 @@ const NonFungibles = {
       } else if (this.settings.sortOption == 'namedsc') {
         results.sort((a, b) => {
           return ('' + b.name).localeCompare(a.name);
+        });
+      } else if (this.settings.sortOption == 'expiryasc') {
+        results.sort((a, b) => {
+          const expiryA = a.expiry && a.expiry > 0 ? a.expiry : 1234567890123456789;
+          const expiryB = b.expiry && b.expiry > 0 ? b.expiry : 1234567890123456789;
+          return expiryA - expiryB;
+        });
+      } else if (this.settings.sortOption == 'expirydsc') {
+        results.sort((a, b) => {
+          const expiryA = a.expiry && a.expiry > 0 ? a.expiry : -1234567890123456789;
+          const expiryB = b.expiry && b.expiry > 0 ? b.expiry : -1234567890123456789;
+          return expiryB - expiryA;
         });
       }
       return results;
