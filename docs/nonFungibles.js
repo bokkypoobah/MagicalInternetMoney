@@ -171,7 +171,7 @@ const NonFungibles = {
                     </b-table>
                   </font>
                 </b-card>
-                <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                <b-card header-class="m-0 mt-1 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
                     <b-input-group v-if="settings.showcollectionFilter">
                       <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-0 px-2"></b-form-input>
@@ -186,7 +186,7 @@ const NonFungibles = {
                       <div class="mt-0 flex-grow-1">
                       </div>
                       <div class="mt-0 pl-1">
-                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show owner filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show collection filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </div>
                     </div>
                   </template>
@@ -208,6 +208,23 @@ const NonFungibles = {
                       </template>
                     </b-table>
                   </font>
+                </b-card>
+                <b-card header-class="m-0 mt-1 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
+                  <template #header>
+                    <div class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 pr-1">
+                        ENS
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" :pressed.sync="settings.showENSFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show ENS filter'"><b-icon :icon="settings.showENSFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                      </div>
+                    </div>
+                  </template>
+                  <div v-if="settings.showENSFilter">
+                    Blah
+                  <div>
                 </b-card>
               </b-card-body>
             </b-card>
@@ -363,6 +380,7 @@ const NonFungibles = {
         ownerFilter: null,
         showcollectionFilter: false,
         collectionFilter: null,
+        showENSFilter: false,
         junkFilter: null,
         activeOnly: false,
         selectedOwners: {},
@@ -371,7 +389,7 @@ const NonFungibles = {
         currentPage: 1,
         pageSize: 10,
         sortOption: 'collectionasc',
-        version: 8,
+        version: 9,
       },
       transfer: {
         item: null,
