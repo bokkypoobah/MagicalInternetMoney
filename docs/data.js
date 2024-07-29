@@ -2088,12 +2088,11 @@ const dataModule = {
                    contract: ENS_ERC1155_ADDRESS,
                    tokenId: remapToERC1155,
                 });
-              } else {
-                context.commit('addExpiry', {
-                  chainId: parameter.chainId,
-                   ...eventRecord,
-                });
               }
+              context.commit('addExpiry', {
+                chainId: parameter.chainId,
+                 ...eventRecord,
+              });
             }
           }
         }
