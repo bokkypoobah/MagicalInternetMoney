@@ -315,7 +315,7 @@ const NonFungibles = {
                   <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
                     <font size="-1">
                       {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
-                      <span v-if="data.item.type == 'erc1155'" class="small muted">
+                      <span v-if="data.item.type == 'erc1155' && info.count > 1" class="small muted">
                         {{ 'x' + info.count }}
                       </span>
                     </font>
@@ -350,7 +350,7 @@ const NonFungibles = {
                           <b-link :href="explorer + 'address/' + info.owner" target="_blank">
                             <font size="-1">
                               {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
-                              <span v-if="record.type == 'erc1155'" class="small muted">
+                              <span v-if="record.type == 'erc1155' && info.count > 1" class="small muted">
                                 {{ 'x' + info.count }}
                               </span>
                             </font>
@@ -409,6 +409,7 @@ const NonFungibles = {
       ],
       ensDateOptions: [
         { value: null, text: 'Unfiltered' },
+        { value: 'all', text: 'All' },
         { value: 'active', text: 'Active' },
         { value: 'grace', text: 'Grace Period' },
         { value: 'expired', text: 'Expired' },
@@ -514,16 +515,16 @@ const NonFungibles = {
         if (data.type == "erc721" || data.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
             const junk = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].junk || false;
-            const tokenMetadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
-            const metadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
+            const tokenContractMetadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] || {};
+            const tokenMetadata = this.tokens[this.chainId] && this.tokens[this.chainId][contract] && this.tokens[this.chainId][contract].tokens[tokenId] || {};
             let image = null;
-            if (metadata.image) {
-              if (metadata.image.substring(0, 12) == "ipfs://ipfs/") {
-                image = "https://ipfs.io/" + metadata.image.substring(7)
-              } else if (metadata.image.substring(0, 7) == "ipfs://") {
-                image = "https://ipfs.io/ipfs/" + metadata.image.substring(7);
+            if (tokenMetadata.image) {
+              if (tokenMetadata.image.substring(0, 12) == "ipfs://ipfs/") {
+                image = "https://ipfs.io/" + tokenMetadata.image.substring(7)
+              } else if (tokenMetadata.image.substring(0, 7) == "ipfs://") {
+                image = "https://ipfs.io/ipfs/" + tokenMetadata.image.substring(7);
               } else {
-                image = metadata.image;
+                image = tokenMetadata.image;
               }
             }
             const owners = [];
@@ -544,25 +545,25 @@ const NonFungibles = {
                 chainId: this.chainId,
                 contract,
                 type: data.type,
-                symbol: tokenMetadata.symbol,
-                collection: tokenMetadata.name,
-                slug: tokenMetadata.slug,
+                symbol: tokenContractMetadata.symbol,
+                collection: tokenContractMetadata.name,
+                slug: tokenContractMetadata.slug,
                 junk,
-                active: metadata.active,
+                active: tokenMetadata.active,
                 totalSupply: data.totalSupply,
                 tokenId,
                 owners,
-                name: metadata.name || null,
-                description: metadata.description || null,
+                name: tokenMetadata.name || null,
+                description: tokenMetadata.description || null,
                 expiry,
-                attributes: metadata.attributes || null,
-                // imageSource: metadata.imageSource || null,
+                attributes: tokenMetadata.attributes || null,
+                // imageSource: tokenMetadata.imageSource || null,
                 image,
                 // blockNumber: tokenData.blockNumber,
                 // logIndex: tokenData.logIndex,
-                lastSale: metadata.lastSale,
-                price: metadata.price,
-                topBid: metadata.topBid,
+                lastSale: tokenMetadata.lastSale,
+                price: tokenMetadata.price,
+                topBid: tokenMetadata.topBid,
               });
             }
           }
@@ -645,6 +646,34 @@ const NonFungibles = {
       }
       const selectedOwners = Object.keys(this.settings.selectedOwners[this.chainId] || {}).length > 0 ? this.settings.selectedOwners[this.chainId] : null;
       const selectedCollections = Object.keys(this.settings.selectedCollections[this.chainId] || {}).length > 0 ? this.settings.selectedCollections[this.chainId] : null;
+      const ensOnly = this.settings.ensDateOption != null;
+      const graceFrom = moment().subtract(90, 'days').unix();
+      const expiry1m = moment().add(1, 'months').unix();
+      const expiry3m = moment().add(3, 'months').unix();
+      const expiry1y = moment().add(1, 'years').unix();
+      let dateFrom = null;
+      let dateTo = null;
+      if (this.settings.ensDateOption) {
+        if (this.settings.ensDateOption == "active") {
+          dateFrom = graceFrom;
+        } else if (this.settings.ensDateOption == "grace") {
+          dateFrom = graceFrom;
+          dateTo = moment().unix();
+        } else if (this.settings.ensDateOption == "expired") {
+          dateTo = moment().unix();
+        } else if (this.settings.ensDateOption == "expiry1m") {
+          dateFrom = graceFrom;
+          dateTo = expiry1m;
+        } else if (this.settings.ensDateOption == "expiry3m") {
+          dateFrom = graceFrom;
+          dateTo = expiry3m;
+        } else if (this.settings.ensDateOption == "expiry1y") {
+          dateFrom = graceFrom;
+          dateTo = expiry1y;
+        } else if (this.settings.ensDateOption == "expiry1yp") {
+          dateFrom = expiry1y;
+        }
+      }
       for (const item of this.items) {
         let include = true;
         if (this.settings.junkFilter) {
@@ -652,6 +681,21 @@ const NonFungibles = {
             include = false;
           } else if (this.settings.junkFilter == 'excludejunk' && item.junk) {
             include = false;
+          }
+        }
+        if (include && ensOnly) {
+          if (item.contract != ENS_ERC721_ADDRESS && item.contract != ENS_ERC1155_ADDRESS) {
+            include = false;
+          }
+          if (include && dateFrom) {
+            if (item.expiry < dateFrom) {
+              include = false;
+            }
+          }
+          if (include && dateTo) {
+            if (item.expiry > dateTo) {
+              include = false;
+            }
           }
         }
         if (include && this.settings.activeOnly && (!item.active || item.junk)) {
