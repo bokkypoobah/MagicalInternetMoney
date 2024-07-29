@@ -263,57 +263,36 @@ const viewNonFungibleModule = {
   state: {
     contract: null,
     tokenId: null,
-    linkedTo: {
-      address: null,
-      stealthMetaAddress: null,
-    },
-    type: null,
-    mine: null,
-    favourite: null,
-    name: null,
-    notes: null,
-    source: null,
+    // linkedTo: {
+    //   address: null,
+    //   stealthMetaAddress: null,
+    // },
+    // type: null,
+    // mine: null,
+    // favourite: null,
+    // name: null,
+    // notes: null,
+    // source: null,
     show: false,
   },
   getters: {
     contract: state => state.contract,
     tokenId: state => state.tokenId,
-    linkedTo: state => state.linkedTo,
-    type: state => state.type,
-    mine: state => state.mine,
-    favourite: state => state.favourite,
-    name: state => state.name,
-    notes: state => state.notes,
-    source: state => state.source,
-    stealthTransfers: state => state.stealthTransfers,
+    // linkedTo: state => state.linkedTo,
+    // type: state => state.type,
+    // mine: state => state.mine,
+    // favourite: state => state.favourite,
+    // name: state => state.name,
+    // notes: state => state.notes,
+    // source: state => state.source,
+    // stealthTransfers: state => state.stealthTransfers,
     show: state => state.show,
   },
   mutations: {
     viewNonFungible(state, info) {
       console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
-
-      // const data = store.getters['data/addresses'][address] || {};
       state.contract = info.contract;
       state.tokenId = info.tokenId;
-      // state.linkedTo = data.linkedTo || { address: null, stealthMetaAddress: null };
-      // state.type = data.type;
-      // state.mine = data.mine;
-      // state.favourite = data.favourite;
-      // state.name = data.name;
-      // state.notes = data.notes;
-      // state.source = data.source;
-      // const stealthTransfers = [];
-      // if (data.type == "stealthAddress") {
-      //   const transfers = store.getters['data/transfers'][store.getters['connection/chainId']] || {};
-      //   for (const [blockNumber, logIndexes] of Object.entries(transfers)) {
-      //     for (const [logIndex, item] of Object.entries(logIndexes)) {
-      //       if (item.schemeId == 0 && item.stealthAddress == address) {
-      //         stealthTransfers.push(item);
-      //       }
-      //     }
-      //   }
-      // }
-      // Vue.set(state, 'stealthTransfers', stealthTransfers);
       state.show = true;
     },
     setMine(state, mine) {
@@ -340,6 +319,332 @@ const viewNonFungibleModule = {
     async viewNonFungible(context, info) {
       console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
       await context.commit('viewNonFungible', info);
+      const chainId = store.getters['connection/chainId'] || null;
+      if (chainId == 1 && (info.contract == ENS_ERC721_ADDRESS || info.contract == ENS_ERC1155_ADDRESS)) {
+        await context.dispatch('loadENSEvents', name);
+        // await context.dispatch('loadTimestamps', name);
+      }
+    },
+    async loadENSEvents(context, name) {
+      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - name: " + name);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const block = await provider.getBlock();
+      const blockNumber = block && block.number || null;
+      const fromBlock = 0;
+      const toBlock = blockNumber;
+      const [ chainId, contract, tokenId ] = [ store.getters['connection/chainId'], context.state.contract, context.state.tokenId ];
+      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - contract: " + contract);
+      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - tokenId: " + tokenId);
+      // const tokens = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] && store.getters['data/tokens'][chainId][info.contract].tokens[info.tokenId] || {};
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokens: " + JSON.stringify(tokens));
+
+      if (contract == ENS_ERC1155_ADDRESS) {
+        // ENS Events
+        try {
+          const topics = [[
+              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', // NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
+            ],
+            [ ethers.BigNumber.from(tokenId).toHexString() ],
+            null
+          ];
+          const logs = await provider.getLogs({ address: ENS_ERC1155_ADDRESS, fromBlock, toBlock, topics });
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - logs: " + JSON.stringify(logs, null, 2));
+          const events = processENSEventLogs(logs);
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          // await context.commit('addEvents', events);
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+
+      }
+
+      return;
+
+      // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
+      // ENS: Old ETH Registrar Controller 2 @ 0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16 deployed Nov-04-2019 12:43:55 AM +UTC
+      // ENS: Old ETH Registrar Controller @ 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 deployed Jan-30-2020 12:56:38 AM +UTC
+      // ENS: ETH Registrar Controller @ 0x253553366Da8546fC250F225fe3d25d0C782303b deployed Mar-28-2023 11:44:59 AM +UTC
+
+      // ENS: Base Registrar Implementation 0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85
+      // NameRegistered (index_topic_1 uint256 id, index_topic_2 address owner, uint256 expires) 0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9
+
+      // 925.eth ERC-721 0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:53835211818918528779359817553631021141919078878710948845228773628660104698081
+      // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires) 0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f
+      //   [ '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', namehash, null ],
+      // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires) 0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae
+      //   [ '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', namehash, null ],
+
+      // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
+      // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
+      // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
+      //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
+      // NameUnwrapped (index_topic_1 bytes32 node, address owner) 0xee2ba1195c65bcf218a83d874335c6bf9d9067b4c672f3c3bf16cf40de7586c4
+
+      // ENS_REGISTRYWITHFALLBACK 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e
+      // NewResolver (index_topic_1 bytes32 node, address resolver) 0x335721b01866dc23fbee8b6b2c7b1e14d6f05c28cd35a2c934239f94095602a0
+      // NewOwner (index_topic_1 bytes32 node, index_topic_2 bytes32 label, address owner) 0xce0457fe73731f824cc272376169235128c118b49d344817417c6d108d155e82
+
+      const label = name && name.replace(/\.eth/, '') || null;
+      if (label) {
+        const erc721TokenId = ethers.utils.solidityKeccak256([ "string" ], [ label ]);
+        const erc1155TokenId = ethers.utils.namehash(label + ".eth");
+        const fromBlock = 0;
+        const toBlock = blockNumber;
+
+        // ENS Events
+        try {
+          const topics = [[
+              '0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9', // NameRegistered (index_topic_1 uint256 id, index_topic_2 address owner, uint256 expires)
+              '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', // NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
+              '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
+              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', // NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
+              '0xee2ba1195c65bcf218a83d874335c6bf9d9067b4c672f3c3bf16cf40de7586c4', // NameUnwrapped (index_topic_1 bytes32 node, address owner)
+
+              // Implementation
+              '0x335721b01866dc23fbee8b6b2c7b1e14d6f05c28cd35a2c934239f94095602a0', // NewResolver (index_topic_1 bytes32 node, address resolver)
+              '0xce0457fe73731f824cc272376169235128c118b49d344817417c6d108d155e82', // NewOwner (index_topic_1 bytes32 node, index_topic_2 bytes32 label, address owner)
+
+              // Public Resolver, Public Resolver 1, Public Resolver 2
+              '0xb7d29e911041e8d9b843369e890bcb72c9388692ba48b65ac54e7214c4c348f7', // NameChanged (index_topic_1 bytes32 node, string name)
+              '0x52d7d861f09ab3d26239d492e8968629f95e9e318cf0b73bfddc441522a15fd2', // AddrChanged (index_topic_1 bytes32 node, address a)
+              '0x65412581168e88a1e60c6459d7f44ae83ad0832e670826c05a4e2476b57af752', // AddressChanged (index_topic_1 bytes32 node, uint256 coinType, bytes newAddress)
+              '0xd8c9334b1a9c2f9da342a0a2b32629c1a229b6445dad78947f674b44444a7550', // TextChanged (index_topic_1 bytes32 node, index_topic_2 string indexedKey, string key)
+              '0x448bc014f1536726cf8d54ff3d6481ed3cbc683c2591ca204274009afa09b1a1', // TextChanged (index_topic_1 bytes32 node, index_topic_2 string indexedKey, string key, string value)
+              '0xe379c1624ed7e714cc0937528a32359d69d5281337765313dba4e081b72d7578', // ContenthashChanged (index_topic_1 bytes32 node, bytes hash)
+            ],
+            [ erc721TokenId, erc1155TokenId ],
+            null
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+          const events = processENSEventLogs(logs);
+          await context.commit('addEvents', events);
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+
+        // ERC-721 Transfers
+        try {
+          const topics = [[
+              '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef', // Transfer (index_topic_1 address from, index_topic_2 address to, index_topic_3 uint256 id)
+            ],
+            null,
+            null,
+            erc721TokenId,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+          const events = processENSEventLogs(logs);
+          await context.commit('addEvents', events);
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+
+        // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
+        // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
+        // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
+
+        // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+        // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, accountAs32Bytes, null ],
+        // [ '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', null, null, accountAs32Bytes ],
+
+        const selectedAddresses = [];
+        for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
+          if (address.substring(0, 2) == "0x" && addressData.process) {
+            selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
+          }
+        }
+        // console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
+
+        const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
+        const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
+
+        // ERC-1155 Transfers To My Account
+        try {
+          const topics = [[
+              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', // TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
+              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', // TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+            ],
+            null,
+            null,
+            selectedAddresses,
+          ];
+          const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
+          const events = processENSEventLogs(logs);
+
+          const selectedEvents = [];
+          for (const event of events) {
+            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenIdDecimals) {
+              // console.log("event: " + JSON.stringify(event, null, 2));
+              selectedEvents.push(event);
+            } else if (event.type == "TransferBatch") {
+              // TODO: Handle this
+            }
+          }
+
+          await context.commit('addEvents', selectedEvents);
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+
+        // ERC-1155 Transfers From My Account
+        try {
+          const topics = [[
+              '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', // TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
+              '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb', // TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
+            ],
+            null,
+            selectedAddresses,
+          ];
+          const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
+          const events = processENSEventLogs(logs);
+
+          const selectedEvents = [];
+          for (const event of events) {
+            // console.log("event.tokenId: " + event.tokenId + " vs " + erc1155TokenIdDecimals);
+            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenIdDecimals) {
+              // console.log("event: " + JSON.stringify(event, null, 2));
+              selectedEvents.push(event);
+            } else if (event.type == "TransferBatch") {
+              // TODO: Handle this
+            }
+          }
+
+          await context.commit('addEvents', selectedEvents);
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+
+        const eventList = [];
+        for (const [blockNumber, blockData] of Object.entries(context.state.events)) {
+          // console.log(blockNumber + " => " + JSON.stringify(blockData));
+          for (const [txIndex, txData] of Object.entries(blockData)) {
+            for (const [logIndex, event] of Object.entries(txData)) {
+              eventList.push({
+                ...event,
+                blockNumber,
+                txIndex,
+                logIndex,
+              });
+            }
+          }
+        }
+        eventList.sort((a, b) => {
+          if (a.blockNumber == b.blockNumber) {
+            return b.logIndex - a.logIndex;
+          } else {
+            return b.blockNumber - a.blockNumber;
+          }
+        });
+        const erc721Transfers = eventList.filter(e => e.type == "Transfer");
+        const erc721Owner = erc721Transfers.length > 0 ? erc721Transfers[0].to : null;
+        const wrapped = erc721Owner == ENS_NAMEWRAPPER_ADDRESS;
+        const erc1155Transfers = wrapped ? eventList.filter(e => e.type == "TransferSingle" || e.type == "TransferBatch") : [];
+        // TODO: Handle TransferBatch
+        const erc1155Owner = erc1155Transfers.length > 0 ? erc1155Transfers[0].to : null;
+        const image = "https://metadata.ens.domains/mainnet/" + (wrapped ? ENS_NAMEWRAPPER_ADDRESS + "/" + erc1155TokenIdDecimals : ENS_BASEREGISTRARIMPLEMENTATION_ADDRESS + "/" + erc721TokenIdDecimals) + "/image";
+        await context.commit('setInfo', {
+          wrapped,
+          owner: wrapped ? erc1155Owner : erc721Owner,
+          erc721Owner,
+          erc1155Owner,
+          erc721TokenId: erc721TokenIdDecimals,
+          erc1155TokenId: erc1155TokenIdDecimals,
+          image,
+        });
+
+        const publicResolver2Interface = new ethers.utils.Interface(ENS_PUBLICRESOLVER2_ABI);
+        for (const event of eventList) {
+          if (event.contract == ENS_PUBLICRESOLVER2_ADDRESS && event.type == "TextChanged") {
+            const tx = await provider.getTransaction(event.txHash);
+            const decodedData = publicResolver2Interface.parseTransaction({ data: tx.data, value: tx.value });
+            if (decodedData.functionFragment.name == "setText") {
+              const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
+              await context.commit('setTextValue', {
+                chainId: store.getters['connection/chainId'],
+                blockNumber: event.blockNumber,
+                txIndex: event.txIndex,
+                txHash: event.txHash,
+                labelhash: decodedFunctionArgs[0],
+                key: decodedFunctionArgs[1],
+                value: decodedFunctionArgs[2],
+              });
+
+            } else if (decodedData.functionFragment.name == "multicall") {
+              const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("multicall", tx.data);
+              for (const data1 of decodedFunctionArgs) {
+                for (const data2 of data1) {
+                  const decodedArrayData = publicResolver2Interface.parseTransaction({ data: data2, value: tx.value });
+                  if (decodedArrayData.functionFragment.name == "setText") {
+                    const decodedFunctionArgs1 = publicResolver2Interface.decodeFunctionData("setText", data2);
+                    await context.commit('setTextValue', {
+                      chainId: store.getters['connection/chainId'],
+                      blockNumber: event.blockNumber,
+                      txIndex: event.txIndex,
+                      txHash: event.txHash,
+                      labelhash: decodedFunctionArgs1[0],
+                      key: decodedFunctionArgs1[1],
+                      value: decodedFunctionArgs1[2],
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // // 2nd parameter with tokenId
+        //
+        // const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
+        // console.log("erc721TokenIdDecimals: " + erc721TokenIdDecimals + " " + erc721TokenId);
+        // const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
+        // console.log("erc1155TokenIdDecimals: " + erc1155TokenIdDecimals + " " + erc1155TokenId);
+        //
+        // try {
+        //   const topics = [
+        //     '0x6ada868dd3058cf77a48a74489fd7963688e5464b2b0fa957ace976243270e92', // ReverseClaimed (index_topic_1 address addr, index_topic_2 bytes32 node)
+        //     "0x000000000000000000000000A2113f1E9A66c3B0A75BB466bbBfeEeC987ac92e",
+        //     // [ erc721TokenId, erc1155TokenId ],
+        //     // erc1155TokenId,
+        //   ];
+        //   console.log("topics: " + JSON.stringify(topics, null, 2));
+        //   const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+        //   console.log("logs: " + JSON.stringify(logs, null, 2));
+        //   // await processLogs(fromBlock, toBlock, logs);
+        //   const results = processENSEventLogs(logs);
+        // } catch (e) {
+        //   console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        // }
+        //
+        // // 0x13c293ab26f380f6555b301eecbae5dc67ce5ce322670655f3396abf2983a145
+        // const reverseAddress = "a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse";
+        // const namehash = ethers.utils.namehash(reverseAddress);
+        // console.log("reverseAddress: " + reverseAddress + ", namehash: " + namehash);
+        // // reverseAddress: a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse, namehash: 0x7d75f26ebf4147fc33aef5d5d6ae97e7a8e0f8985a40d73bb2ddacdd1e5e3ce0
+
+      }
+      context.commit('forceRefresh');
+
+      // await context.commit('updateTransfers', info);
+    },
+    async loadTimestamps(context, info) {
+      console.log(now() + " INFO viewNonFungibleModule:actions.loadTimestamps - info: " + JSON.stringify(info));
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const timestamps = store.getters['data/timestamps'][store.getters['connection/chainId']] || {};
+      const blockNumbers = Object.keys(context.state.events);
+      let modified = false;
+      for (const blockNumber of blockNumbers) {
+        if (!(blockNumber in timestamps)) {
+          const block = await provider.getBlock(parseInt(blockNumber));
+          store.dispatch('data/addTimestamp', {
+            chainId: store.getters['connection/chainId'],
+            blockNumber,
+            timestamp: block.timestamp,
+          });
+          modified = true;
+        }
+      }
+      if (modified) {
+        store.dispatch('data/saveTimestamps');
+      }
     },
     async setMine(context, mine) {
       console.log(now() + " INFO viewNonFungibleModule:actions.setMine - mine: " + mine);

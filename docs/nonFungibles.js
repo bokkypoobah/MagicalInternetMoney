@@ -261,7 +261,7 @@ const NonFungibles = {
 
               <template #cell(number)="data">
                 <b-form-checkbox size="sm" :checked="settings.selected[data.item.contract] && settings.selected[data.item.contract][data.item.tokenId]" @change="toggleSelected([data.item])">
-                  {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
+                  <font size="-1">{{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}</font>
                 </b-form-checkbox>
               </template>
 
@@ -425,12 +425,12 @@ const NonFungibles = {
         { value: 'expiry1yp', text: 'Expiry > 1y' },
       ],
       fields: [
-        { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
-        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'owners', label: 'Owner(s)', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'owners', label: 'Owner(s)', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 33%;', thClass: 'text-left', tdClass: 'text-truncate' },
       ],
       ownersFields: [
         { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -755,11 +755,19 @@ const NonFungibles = {
         });
       } else if (this.settings.sortOption == 'nameasc') {
         results.sort((a, b) => {
-          return ('' + a.name).localeCompare(b.name);
+          let compare = ('' + a.name).localeCompare(b.name);
+          if (compare == 0) {
+            compare = ('' + a.collection).localeCompare(b.collection);
+          }
+          return compare;
         });
       } else if (this.settings.sortOption == 'namedsc') {
         results.sort((a, b) => {
-          return ('' + b.name).localeCompare(a.name);
+          let compare = ('' + b.name).localeCompare(a.name);
+          if (compare == 0) {
+            compare = ('' + b.collection).localeCompare(a.collection);
+          }
+          return compare;
         });
       } else if (this.settings.sortOption == 'expiryasc') {
         results.sort((a, b) => {
