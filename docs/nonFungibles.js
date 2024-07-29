@@ -428,9 +428,9 @@ const NonFungibles = {
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
         { key: 'owners', label: 'Owner(s)', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 33%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
       ],
       ownersFields: [
         { key: 'select', label: '', thStyle: 'width: 10%;' },
@@ -509,6 +509,7 @@ const NonFungibles = {
     owners() {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? {} : {};
       for (const [address, addressData] of Object.entries(this.addresses)) {
+        // TODO: Remove "address" check
         if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
           results[address] = true;
         }

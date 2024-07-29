@@ -4,10 +4,10 @@ const ViewNonFungible = {
       <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
         <template #modal-title>
           <div v-if="contract == '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'">
-            ENS Name
+            ERC-721 ENS Name
           </div>
           <div v-else-if="contract == '0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401'">
-            Wrapped ENS Name
+            ERC-1155 Wrapped ENS Name
           </div>
           <div v-else>
             {{ type == "erc721" ? 'ERC-721' : 'ERC-1155'}} Non-Fungible Token
@@ -114,6 +114,9 @@ const ViewNonFungible = {
     },
     tokenId() {
       return store.getters['viewNonFungible/tokenId'];
+    },
+    events() {
+      return store.getters['viewNonFungible/events'];
     },
     tokens() {
       return store.getters['data/tokens'];
@@ -273,29 +276,13 @@ const viewNonFungibleModule = {
   state: {
     contract: null,
     tokenId: null,
-    // linkedTo: {
-    //   address: null,
-    //   stealthMetaAddress: null,
-    // },
-    // type: null,
-    // mine: null,
-    // favourite: null,
-    // name: null,
-    // notes: null,
-    // source: null,
+    events: {},
     show: false,
   },
   getters: {
     contract: state => state.contract,
     tokenId: state => state.tokenId,
-    // linkedTo: state => state.linkedTo,
-    // type: state => state.type,
-    // mine: state => state.mine,
-    // favourite: state => state.favourite,
-    // name: state => state.name,
-    // notes: state => state.notes,
-    // source: state => state.source,
-    // stealthTransfers: state => state.stealthTransfers,
+    events: state => state.events,
     show: state => state.show,
   },
   mutations: {
@@ -305,21 +292,23 @@ const viewNonFungibleModule = {
       state.tokenId = info.tokenId;
       state.show = true;
     },
-    setMine(state, mine) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.setMine - mine: " + mine);
-      state.mine = mine;
-    },
-    setFavourite(state, favourite) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.setFavourite - favourite: " + favourite);
-      state.favourite = favourite;
-    },
-    setName(state, name) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.setName - name: " + name);
-      state.name = name;
-    },
-    setNotes(state, notes) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.setNotes - notes: " + notes);
-      state.notes = notes;
+    addEvents(state, events) {
+      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
+      for (const event of events) {
+        if (!(event.blockNumber in state.events)) {
+          Vue.set(state.events, event.blockNumber, {});
+        }
+        if (!(event.txIndex in state.events[event.blockNumber])) {
+          Vue.set(state.events[event.blockNumber], event.txIndex, {});
+        }
+        Vue.set(state.events[event.blockNumber][event.txIndex], event.logIndex, {
+          ...event,
+          blockNumber: undefined,
+          txIndex: undefined,
+          logIndex: undefined,
+        });
+      }
+      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - state.events: " + JSON.stringify(state.events, null, 2));
     },
     setShow(state, show) {
       state.show = show;
@@ -339,16 +328,18 @@ const viewNonFungibleModule = {
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - name: " + name);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const block = await provider.getBlock();
-      const blockNumber = block && block.number || null;
+      const toBlock = block && block.number || null;
       const fromBlock = 0;
-      const toBlock = blockNumber;
       const [ chainId, contract, tokenId ] = [ store.getters['connection/chainId'], context.state.contract, context.state.tokenId ];
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - contract: " + contract);
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - tokenId: " + tokenId);
       // const tokens = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] && store.getters['data/tokens'][chainId][info.contract].tokens[info.tokenId] || {};
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokens: " + JSON.stringify(tokens));
 
+      const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
+      let erc1155TokenId = null;
       if (contract == ENS_ERC1155_ADDRESS) {
+        erc1155TokenId = tokenId;
         // ENS Events
         try {
           const topics = [[
@@ -358,17 +349,17 @@ const viewNonFungibleModule = {
             null
           ];
           const logs = await provider.getLogs({ address: ENS_ERC1155_ADDRESS, fromBlock, toBlock, topics });
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - logs: " + JSON.stringify(logs, null, 2));
           const events = processENSEventLogs(logs);
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          if (events.length > 0 && events[0].subdomain == null) {
+            tokenIds.push(events[0].labelhash);
+          }
           // await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
-
       }
-
-      return;
+      console.log("tokenIds: " + JSON.stringify(tokenIds));
 
       // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
       // ENS: Old ETH Registrar Controller 2 @ 0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16 deployed Nov-04-2019 12:43:55 AM +UTC
@@ -394,13 +385,7 @@ const viewNonFungibleModule = {
       // NewResolver (index_topic_1 bytes32 node, address resolver) 0x335721b01866dc23fbee8b6b2c7b1e14d6f05c28cd35a2c934239f94095602a0
       // NewOwner (index_topic_1 bytes32 node, index_topic_2 bytes32 label, address owner) 0xce0457fe73731f824cc272376169235128c118b49d344817417c6d108d155e82
 
-      const label = name && name.replace(/\.eth/, '') || null;
-      if (label) {
-        const erc721TokenId = ethers.utils.solidityKeccak256([ "string" ], [ label ]);
-        const erc1155TokenId = ethers.utils.namehash(label + ".eth");
-        const fromBlock = 0;
-        const toBlock = blockNumber;
-
+      if (true) {
         // ENS Events
         try {
           const topics = [[
@@ -422,12 +407,13 @@ const viewNonFungibleModule = {
               '0x448bc014f1536726cf8d54ff3d6481ed3cbc683c2591ca204274009afa09b1a1', // TextChanged (index_topic_1 bytes32 node, index_topic_2 string indexedKey, string key, string value)
               '0xe379c1624ed7e714cc0937528a32359d69d5281337765313dba4e081b72d7578', // ContenthashChanged (index_topic_1 bytes32 node, bytes hash)
             ],
-            [ erc721TokenId, erc1155TokenId ],
+            tokenIds,
             null
           ];
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-          await context.commit('addEvents', events);
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          // await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
@@ -439,15 +425,18 @@ const viewNonFungibleModule = {
             ],
             null,
             null,
-            erc721TokenId,
+            tokenIds,
           ];
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-          await context.commit('addEvents', events);
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
+          // await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
+      }
 
+      if (erc1155TokenId) {
         // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
         // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, accountAs32Bytes, null ],
         // [ '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62', null, null, accountAs32Bytes ],
@@ -458,13 +447,13 @@ const viewNonFungibleModule = {
 
         const selectedAddresses = [];
         for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
-          if (address.substring(0, 2) == "0x" && addressData.process) {
+          if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
             selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
           }
         }
-        // console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
+        console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
 
-        const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
+        // const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
         const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
 
         // ERC-1155 Transfers To My Account
@@ -479,7 +468,6 @@ const viewNonFungibleModule = {
           ];
           const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-
           const selectedEvents = [];
           for (const event of events) {
             if (event.type == "TransferSingle" && event.tokenId == erc1155TokenIdDecimals) {
@@ -489,8 +477,8 @@ const viewNonFungibleModule = {
               // TODO: Handle this
             }
           }
-
-          await context.commit('addEvents', selectedEvents);
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer to events: " + JSON.stringify(selectedEvents, null, 2));
+          // await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
@@ -506,7 +494,6 @@ const viewNonFungibleModule = {
           ];
           const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-
           const selectedEvents = [];
           for (const event of events) {
             // console.log("event.tokenId: " + event.tokenId + " vs " + erc1155TokenIdDecimals);
@@ -517,12 +504,16 @@ const viewNonFungibleModule = {
               // TODO: Handle this
             }
           }
-
-          await context.commit('addEvents', selectedEvents);
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer from events: " + JSON.stringify(selectedEvents, null, 2));
+          // await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
+        }
 
+        return;
+
+        if (false) {
         const eventList = [];
         for (const [blockNumber, blockData] of Object.entries(context.state.events)) {
           // console.log(blockNumber + " => " + JSON.stringify(blockData));
@@ -655,26 +646,6 @@ const viewNonFungibleModule = {
       if (modified) {
         store.dispatch('data/saveTimestamps');
       }
-    },
-    async setMine(context, mine) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.setMine - mine: " + mine);
-      await context.commit('setMine', mine);
-    },
-    async setFavourite(context, favourite) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.setFavourite - favourite: " + favourite);
-      await context.commit('setFavourite', favourite);
-    },
-    async setName(context, name) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.setName - name: " + name);
-      await context.commit('setName', name);
-    },
-    async setNotes(context, notes) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.setNotes - notes: " + notes);
-      await context.commit('setNotes', notes);
-    },
-    async setSource(context, source) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.setSource - source: " + source);
-      await context.commit('setSource', source);
     },
     async setShow(context, show) {
       await context.commit('setShow', show);
