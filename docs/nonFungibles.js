@@ -337,13 +337,17 @@ const NonFungibles = {
 
             <b-card-group v-if="settings.viewOption == 'icons'" deck class="m-1 p-1">
               <div v-for="record in pagedFilteredSortedItems">
-                <b-card body-class="p-1" header-class="p-1" footer-class="p-1" img-top class="m-1 p-0 border-0">
-
+                <b-card body-class="p-1" header-class="p-1" footer-class="p-1" img-top class="m-1 p-0 border-0" >
                   <b-link :href="nonFungibleViewerURL(record.contract, record.tokenId)" target="_blank">
                     <b-img-lazy v-if="record.image" width="200%" :src="record.image">
                     </b-img-lazy>
                   </b-link>
                   <b-card-text>
+                    <div class="d-flex justify-content-between m-0 p-0" style="max-width: 13rem;">
+                      <div class="mt-0 pr-1 truncate">
+                        <font size="-1">{{ record.name }}</font>
+                      </div>
+                    </div>
                     <div class="d-flex justify-content-between m-0 p-0">
                       <div class="mt-0 pr-1">
                         <div v-for="(info, i) in record.owners"  v-bind:key="i" class="m-0 p-0">
