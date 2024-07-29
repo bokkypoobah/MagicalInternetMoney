@@ -413,7 +413,7 @@ const viewNonFungibleModule = {
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
-          // await context.commit('addEvents', events);
+          await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
@@ -430,7 +430,7 @@ const viewNonFungibleModule = {
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
-          // await context.commit('addEvents', events);
+          await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
@@ -478,7 +478,7 @@ const viewNonFungibleModule = {
             }
           }
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer to events: " + JSON.stringify(selectedEvents, null, 2));
-          // await context.commit('addEvents', selectedEvents);
+          await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
@@ -505,11 +505,13 @@ const viewNonFungibleModule = {
             }
           }
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer from events: " + JSON.stringify(selectedEvents, null, 2));
-          // await context.commit('addEvents', selectedEvents);
+          await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
         }
+
+        console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
 
         return;
 
