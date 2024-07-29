@@ -77,6 +77,12 @@ const ViewNonFungible = {
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
+
+        <font size="-2">
+          <pre>
+{{ events }}
+          </pre>
+        </font>
       </b-modal>
     </div>
   `,
@@ -290,6 +296,7 @@ const viewNonFungibleModule = {
       console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.tokenId = info.tokenId;
+      state.events = {};
       state.show = true;
     },
     addEvents(state, events) {
@@ -308,7 +315,7 @@ const viewNonFungibleModule = {
           logIndex: undefined,
         });
       }
-      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - state.events: " + JSON.stringify(state.events, null, 2));
+      // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - state.events: " + JSON.stringify(state.events, null, 2));
     },
     setShow(state, show) {
       state.show = show;
@@ -318,14 +325,10 @@ const viewNonFungibleModule = {
     async viewNonFungible(context, info) {
       console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
       await context.commit('viewNonFungible', info);
-      const chainId = store.getters['connection/chainId'] || null;
-      if (chainId == 1 && (info.contract == ENS_ERC721_ADDRESS || info.contract == ENS_ERC1155_ADDRESS)) {
-        await context.dispatch('loadENSEvents', name);
-        // await context.dispatch('loadTimestamps', name);
-      }
+      await context.dispatch('loadENSEvents', info);
     },
-    async loadENSEvents(context, name) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - name: " + name);
+    async loadENSEvents(context, info) {
+      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - info: " + JSON.stringify(info));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const block = await provider.getBlock();
       const toBlock = block && block.number || null;
@@ -333,13 +336,21 @@ const viewNonFungibleModule = {
       const [ chainId, contract, tokenId ] = [ store.getters['connection/chainId'], context.state.contract, context.state.tokenId ];
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - contract: " + contract);
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - tokenId: " + tokenId);
-      // const tokens = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] && store.getters['data/tokens'][chainId][info.contract].tokens[info.tokenId] || {};
-      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokens: " + JSON.stringify(tokens));
+      const tokenContract = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenContract: " + JSON.stringify(tokenContract));
+      const token = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] && store.getters['data/tokens'][chainId][info.contract].tokens[info.tokenId] || {};
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - token: " + JSON.stringify(token));
+      const type = tokenContract.type || null;
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - type: " + type);
 
+      // const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
       const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
-      let erc1155TokenId = null;
+      let erc721TokenId = type == "erc721" ? tokenId : null;
+      let erc1155TokenId = type == "erc1155" ? tokenId : null;
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+
       if (contract == ENS_ERC1155_ADDRESS) {
-        erc1155TokenId = tokenId;
         // ENS Events
         try {
           const topics = [[
@@ -353,13 +364,15 @@ const viewNonFungibleModule = {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           if (events.length > 0 && events[0].subdomain == null) {
             tokenIds.push(events[0].labelhash);
+            erc721TokenId = events[0].labelhashDecimals;
           }
-          // await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
       }
-      console.log("tokenIds: " + JSON.stringify(tokenIds));
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenIds: " + JSON.stringify(tokenIds));
 
       // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
       // ENS: Old ETH Registrar Controller 2 @ 0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16 deployed Nov-04-2019 12:43:55 AM +UTC
@@ -385,7 +398,7 @@ const viewNonFungibleModule = {
       // NewResolver (index_topic_1 bytes32 node, address resolver) 0x335721b01866dc23fbee8b6b2c7b1e14d6f05c28cd35a2c934239f94095602a0
       // NewOwner (index_topic_1 bytes32 node, index_topic_2 bytes32 label, address owner) 0xce0457fe73731f824cc272376169235128c118b49d344817417c6d108d155e82
 
-      if (true) {
+      if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
         // ENS Events
         try {
           const topics = [[
@@ -417,7 +430,10 @@ const viewNonFungibleModule = {
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
+      }
 
+      if (erc721TokenId) {
+        console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
         // ERC-721 Transfers
         try {
           const topics = [[
@@ -425,9 +441,10 @@ const viewNonFungibleModule = {
             ],
             null,
             null,
-            tokenIds,
+            "0x" + ethers.BigNumber.from(erc721TokenId).toHexString().substring(2).padStart(64, '0'),
           ];
-          const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+          // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - topics: " + JSON.stringify(topics));
+          const logs = await provider.getLogs({ address: info.contract == ENS_ERC1155_ADDRESS ? ENS_ERC721_ADDRESS : info.contract, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
@@ -466,11 +483,12 @@ const viewNonFungibleModule = {
             null,
             selectedAddresses,
           ];
-          const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
+          const logs = await provider.getLogs({ address: info.contract, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
           const selectedEvents = [];
           for (const event of events) {
-            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenIdDecimals) {
+            console.log("event: " + JSON.stringify(event, null, 2));
+            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenId) {
               // console.log("event: " + JSON.stringify(event, null, 2));
               selectedEvents.push(event);
             } else if (event.type == "TransferBatch") {
@@ -492,12 +510,12 @@ const viewNonFungibleModule = {
             null,
             selectedAddresses,
           ];
-          const logs = await provider.getLogs({ address: ENS_NAMEWRAPPER_ADDRESS, fromBlock, toBlock, topics });
+          const logs = await provider.getLogs({ address: info.contract, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
           const selectedEvents = [];
           for (const event of events) {
             // console.log("event.tokenId: " + event.tokenId + " vs " + erc1155TokenIdDecimals);
-            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenIdDecimals) {
+            if (event.type == "TransferSingle" && event.tokenId == erc1155TokenId) {
               // console.log("event: " + JSON.stringify(event, null, 2));
               selectedEvents.push(event);
             } else if (event.type == "TransferBatch") {
@@ -513,7 +531,7 @@ const viewNonFungibleModule = {
 
         console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
 
-        return;
+        // return;
 
         if (false) {
         const eventList = [];
@@ -624,8 +642,7 @@ const viewNonFungibleModule = {
         // // reverseAddress: a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse, namehash: 0x7d75f26ebf4147fc33aef5d5d6ae97e7a8e0f8985a40d73bb2ddacdd1e5e3ce0
 
       }
-      context.commit('forceRefresh');
-
+      // context.commit('forceRefresh');
       // await context.commit('updateTransfers', info);
     },
     async loadTimestamps(context, info) {
