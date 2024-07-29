@@ -140,9 +140,24 @@ const NonFungibles = {
               <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
                 <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-0 px-2"></b-form-input>
+                    <b-input-group v-if="settings.showOwnerFilter">
+                      <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-0 px-2"></b-form-input>
+                      <b-input-group-append>
+                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                    <div v-if="!settings.showOwnerFilter" class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 pr-1">
+                        Owners
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                      </div>
+                    </div>
                   </template>
-                  <font size="-2">
+                  <font v-if="settings.showOwnerFilter" size="-2">
                     <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
                       <template #cell(select)="data">
                         <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
@@ -158,9 +173,24 @@ const NonFungibles = {
                 </b-card>
                 <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
                   <template #header>
-                    <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-0 px-2"></b-form-input>
+                    <b-input-group v-if="settings.showcollectionFilter">
+                      <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-0 px-2"></b-form-input>
+                      <b-input-group-append>
+                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show owner filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                      </b-input-group-append>
+                    </b-input-group>
+                    <div v-if="!settings.showcollectionFilter" class="d-flex flex-wrap m-0 p-0">
+                      <div class="mt-0 pr-1">
+                        Collections
+                      </div>
+                      <div class="mt-0 flex-grow-1">
+                      </div>
+                      <div class="mt-0 pl-1">
+                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover="'Show owner filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                      </div>
+                    </div>
                   </template>
-                  <font size="-2">
+                  <font v-if="settings.showcollectionFilter" size="-2">
                     <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light">
                       <template #cell(select)="data">
                         <b-form-checkbox size="sm" :checked="settings.selectedCollections[chainId] && settings.selectedCollections[chainId][data.item.contract]" @change="collectionsFilterChange(data.item.contract)"></b-form-checkbox>
@@ -329,7 +359,9 @@ const NonFungibles = {
         sidebar: false,
         viewOption: 'list',
         filter: null,
+        showOwnerFilter: false,
         ownerFilter: null,
+        showcollectionFilter: false,
         collectionFilter: null,
         junkFilter: null,
         activeOnly: false,
@@ -339,7 +371,7 @@ const NonFungibles = {
         currentPage: 1,
         pageSize: 10,
         sortOption: 'collectionasc',
-        version: 7,
+        version: 8,
       },
       transfer: {
         item: null,
