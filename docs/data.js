@@ -2018,6 +2018,7 @@ const dataModule = {
       const ethRegistarControllerInterface = new ethers.utils.Interface(ENS_ETHREGISTRARCONTROLLER_ABI);
       const nameWrapperInterface = new ethers.utils.Interface(ENS_NAMEWRAPPER_ABI);
 
+      const mapERC721ToERC1155 = {};
       let total = 0;
       let t = this;
       async function processLogs(logs) {
@@ -2027,6 +2028,7 @@ const dataModule = {
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
+            // TODO console.log(JSON.stringify(log));
             const contract = log.address;
             let eventRecord = null;
             if (log.topics[0] == "0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f" && ((contract == ENS_OLDETHREGISTRARCONTROLLER_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER1_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER2_ADDRESS) || contract == ENS_OLDETHREGISTRARCONTROLLER1_ADDRESS || contract == ENS_OLDETHREGISTRARCONTROLLER2_ADDRESS)) {
@@ -2064,14 +2066,34 @@ const dataModule = {
               const namehashDecimals = ethers.BigNumber.from(node).toString();
               const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
               eventRecord = { contract, type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, subdomain, owner, fuses, expiry: parseInt(expiry), expirym90: moment.unix(parseInt(expiry)).subtract(90, 'days').unix() };
+              if (!subdomain) {
+                ens721TokenIds.push(labelhashDecimals);
+                mapERC721ToERC1155[labelhashDecimals] = namehashDecimals;
+              }
             } else {
-              console.log("NOT HANDLED: " + JSON.stringify(log));
+              console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - NOT HANDLED: " + JSON.stringify(log));
             }
             if (eventRecord) {
-              context.commit('addExpiry', {
-                chainId: parameter.chainId,
-                 ...eventRecord,
-              });
+              let remapToERC1155 = null;
+              if (eventRecord.type == "NameRegistered" || eventRecord.type == "NameRenewed") {
+                if (eventRecord.tokenId in mapERC721ToERC1155) {
+                  remapToERC1155 = mapERC721ToERC1155[eventRecord.tokenId];
+                  console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - Remapping ERC-721 to ERC-1155: " + eventRecord.tokenId + " to " + remapToERC1155);
+                }
+              }
+              if (remapToERC1155) {
+                context.commit('addExpiry', {
+                  chainId: parameter.chainId,
+                   ...eventRecord,
+                   contract: ENS_ERC1155_ADDRESS,
+                   tokenId: remapToERC1155,
+                });
+              } else {
+                context.commit('addExpiry', {
+                  chainId: parameter.chainId,
+                   ...eventRecord,
+                });
+              }
             }
           }
         }
@@ -2083,17 +2105,48 @@ const dataModule = {
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
         if (contract == ENS_ERC721_ADDRESS || contract == ENS_ERC1155_ADDRESS) {
           for (const [tokenId, tokenData] of Object.entries(contractData.tokens)) {
-            if (contract == ENS_ERC721_ADDRESS) {
-              ens721TokenIds.push(tokenId);
-            } else {
-              ens1155TokenIds.push(tokenId);
-            }
+            // if (tokenId == "27727362303445643037535452095569739813950020376856883309402147522300287323280") {
+            //   console.log(tokenId + " => " + JSON.stringify(tokenData));
+            //   const tokenMetadata = context.state.tokens[parameter.chainId] && context.state.tokens[parameter.chainId][contract] && context.state.tokens[parameter.chainId][contract].tokens[tokenId] || {};
+            //   console.log("  tokenMetadata: " + JSON.stringify(tokenMetadata, null, 2));
+              if (contract == ENS_ERC721_ADDRESS) {
+                ens721TokenIds.push(tokenId);
+              } else {
+                ens1155TokenIds.push(tokenId);
+              }
+            // }
           }
         }
       }
+      // TODO console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
+      // console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
+      // return;
       const BATCHSIZE = 100;
       context.commit('setSyncSection', { section: 'ENS Expiries', total: null });
       context.commit('setSyncCompleted', 0);
+
+      // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
+      // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
+      // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
+      //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
+      for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
+        const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
+        try {
+          let topics = null;
+          topics = [[
+              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
+            ],
+            tokenIds,
+            null,
+          ];
+          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
+          await processLogs(logs);
+        } catch (e) {
+          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
+        }
+      }
+
+      // console.log("ens721TokenIds: " + JSON.stringify(ens721TokenIds));
       // 925.eth ERC-721 0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85:53835211818918528779359817553631021141919078878710948845228773628660104698081
       // - ENS: Old ETH Registrar Controller 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires) 0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f
       //   [ '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', namehash, null ],
@@ -2116,26 +2169,6 @@ const dataModule = {
         }
       }
 
-      // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
-      // ERC-1155 yourmum.lovesyou.eth 57229065116737680790555199455465332171886850449809000367294662727325932836690
-      // - ENS: Name Wrapper 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry) 0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340
-      //   [ '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', namehash, null ],
-      for (let i = 0; i < ens1155TokenIds.length && !context.state.sync.halt; i += BATCHSIZE) {
-        const tokenIds = ens1155TokenIds.slice(i, parseInt(i) + BATCHSIZE).map(e => "0x" + ethers.BigNumber.from(e).toHexString().slice(2).padStart(64, '0'));
-        try {
-          let topics = null;
-          topics = [[
-              '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340',
-            ],
-            tokenIds,
-            null,
-          ];
-          const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
-          await processLogs(logs);
-        } catch (e) {
-          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
-        }
-      }
       await context.dispatch('saveData', ['expiries']);
       console.log(now() + " INFO dataModule:actions.syncENSExpiries END");
     },
