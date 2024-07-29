@@ -1,7 +1,7 @@
 const ViewNonFungible = {
   template: `
     <div>
-      <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="lg">
+      <b-modal ref="viewtoken" v-model="show" hide-footer header-class="m-0 px-3 py-2" body-bg-variant="light" size="xl">
         <template #modal-title>
           <div v-if="contract == '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85'">
             ERC-721 ENS Name
@@ -79,21 +79,150 @@ const ViewNonFungible = {
         </b-form-group>
 
         <font size="-2">
+          <b-table small fixed striped responsive hover :fields="eventFields" :items="filteredSortedEvents" show-empty head-variant="light" class="m-0 mt-1">
+            <template #cell(number)="data">
+              {{ parseInt(data.index) + 1 }}
+            </template>
+            <template #cell(when)="data">
+              <span v-if="data.item.timestamp">
+                <!-- <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTxPrefix + data.item.txHash" target="_blank">
+                  {{ formatTimestamp(data.item.timestamp) }}
+                </b-link> -->
+              </span>
+              <span v-else>
+                <!-- <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTxPrefix + data.item.txHash" target="_blank"> -->
+                  {{ data.item.blockNumber + ':' + data.item.txIndex + ':' + data.item.logIndex }}
+                <!-- </b-link> -->
+              </span>
+            </template>
+            <template #cell(contract)="data">
+              <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.contract" v-b-popover.hover.top="data.item.contract" target="_blank">
+                {{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}
+              </b-link>
+            </template>
+            <!-- <template #cell(contract)="data">
+              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.contract" v-b-popover.hover.top="data.item.contract" target="_blank">
+                {{ addressName(data.item.contract) }}
+              </b-link>
+            </template> -->
+            <!-- <template #cell(info)="data">
+              <span v-if="data.item.type == 'Transfer'">
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.from" target="_blank">
+                  {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
+                </b-link>
+                to
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.to" target="_blank">
+                  {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
+                </b-link>
+              </span>
+              <span v-else-if="data.item.type == 'TransferSingle'">
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.from" target="_blank">
+                  {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
+                </b-link>
+                to
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.to" target="_blank">
+                  {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
+                </b-link>
+              </span>
+              <span v-else-if="data.item.type == 'NewOwner'">
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                  {{ data.item.owner.substring(0, 10) + '...' + data.item.owner.slice(-8) }}
+                </b-link>
+              </span>
+              <span v-else-if="data.item.type == 'NewResolver'">
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.resolver" target="_blank">
+                  {{ data.item.resolver.substring(0, 10) + '...' + data.item.resolver.slice(-8) }}
+                </b-link>
+              </span>
+              <span v-else-if="data.item.type == 'NameRegistered'">
+                <span v-if="data.item.label">
+                  Label: {{ data.item.label }}
+                </span>
+                <span v-if="data.item.label">
+                  Cost: {{ formatETH(data.item.cost) + ' ETH' }}
+                </span>
+                Expiry: {{ formatTimestamp(data.item.expires) }}
+              </span>
+              <span v-else-if="data.item.type == 'NameRenewed'">
+                Label: {{ data.item.label }} Cost: {{ formatETH(data.item.cost) + ' ETH' }} Expiry: {{ formatTimestamp(data.item.expiry) }}
+              </span>
+              <span v-else-if="data.item.type == 'TextChanged'">
+                "{{ data.item.key }}":
+                <span v-if="data.item.key == 'avatar'">
+                  <span v-if="data.item.value">
+                    "<b-link :href="data.item.value" target="_blank">{{ data.item.value }}</b-link>"
+                  </span>
+                  <span v-else>
+                    ?
+                  </span>
+                </span>
+                <span v-else>
+                  <span v-if="data.item.value">
+                    Value: {{ data.item.value }}
+                  </span>
+                </span>
+              </span>
+              <span v-else-if="data.item.type == 'AddrChanged'">
+                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.a" target="_blank">
+                  {{ data.item.a }}
+                </b-link>
+              </span>
+              <span v-else-if="data.item.type == 'AddressChanged'">
+                coinType: {{ data.item.coinType }}
+                <span v-if="data.item.coinType == '60'">
+                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.newAddress" target="_blank">
+                    {{ data.item.newAddress }}
+                  </b-link>
+                </span>
+                <span v-else>
+                  {{ data.item.newAddress }}
+                </span>
+              </span>
+              <span v-else-if="data.item.type == 'ContenthashChanged'">
+                {{ data.item.hash }}
+              </span>
+              <span v-else-if="data.item.type == 'NameWrapped'">
+                label: {{ data.item.label }}
+                owner:
+                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                    {{ data.item.owner }}
+                  </b-link>
+                fuses: {{ data.item.fuses }}
+                expiry: {{ formatTimestamp(data.item.expiry) }}
+              </span>
+              <span v-else-if="data.item.type == 'NameUnwrapped'">
+                owner:
+                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                    {{ data.item.owner }}
+                  </b-link>
+              </span>
+              <span v-else>
+                {{ data.item }}
+              </span>
+            </template> -->
+          </b-table>
+        </font>
+
+        <!-- {{ filteredSortedEvents }} -->
+
+        <!-- <font size="-2">
           <pre>
 {{ events }}
           </pre>
-        </font>
+        </font> -->
       </b-modal>
     </div>
   `,
   data: function () {
     return {
-      stealthPrivateKey: null,
-      addressTypeInfo: {
-        "address": { variant: "warning", name: "My Address" },
-        "stealthAddress": { variant: "dark", name: "My Stealth Address" },
-        "stealthMetaAddress": { variant: "success", name: "My Stealth Meta-Address" },
-      },
+      eventFields: [
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+        { key: 'when', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+        { key: 'logIndex', label: 'LogIndex', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+        { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
+        { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
+        { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 55%;' /*, tdClass: 'text-truncate' */ },
+      ],
     }
   },
   computed: {
@@ -129,6 +258,9 @@ const ViewNonFungible = {
     },
     expiries() {
       return store.getters['data/expiries'];
+    },
+    timestamps() {
+      return store.getters['data/timestamps'];
     },
     token() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
@@ -205,6 +337,39 @@ const ViewNonFungible = {
       set: function (show) {
         store.dispatch('viewNonFungible/setShow', show);
       },
+    },
+    filteredEvents() {
+      const timestamps = this.timestamps[this.chainId] || {};
+      const results = (store.getters['viewName/forceRefresh'] % 2) == 0 ? [] : [];
+      for (const [blockNumber, blockData] of Object.entries(this.events)) {
+        for (const [txIndex, txData] of Object.entries(blockData)) {
+          for (const [logIndex, event] of Object.entries(txData)) {
+            const timestamp = timestamps[blockNumber] || null;
+            console.log(blockNumber + "/" + txIndex + "/" + logIndex + " => " + JSON.stringify(event, null, 2));
+            results.push({
+              ...event,
+              blockNumber,
+              txIndex,
+              logIndex,
+              timestamp,
+            });
+          }
+        }
+      }
+      console.log(now() + " DEBUG ViewNonFungible.computed.filteredEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
+      return results;
+    },
+    filteredSortedEvents() {
+      const results = this.filteredEvents;
+      results.sort((a, b) => {
+        if (a.blockNumber == b.blockNumber) {
+          return b.logIndex - a.logIndex;
+        } else {
+          return b.blockNumber - a.blockNumber;
+        }
+      });
+      console.log(now() + " DEBUG ViewNonFungible.computed.filteredSortedEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
+      return results;
     },
   },
   methods: {
@@ -528,9 +693,7 @@ const viewNonFungibleModule = {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
         }
-
-        console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
-
+        // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
         // return;
 
         if (false) {
