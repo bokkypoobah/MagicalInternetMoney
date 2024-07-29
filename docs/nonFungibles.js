@@ -796,11 +796,11 @@ const NonFungibles = {
     },
 
     toggleNonFungibleJunk(item) {
-      console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       store.dispatch('data/toggleNonFungibleJunk', item);
     },
     toggleNonFungibleActive(item) {
-      console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO NonFungibles:methods.toggleNonFungibleActive - item: " + JSON.stringify(item));
       store.dispatch('data/toggleNonFungibleActive', item);
     },
 
@@ -830,7 +830,7 @@ const NonFungibles = {
           }
         }
       }
-      console.log(now() + " INFO NonFungibles:methods.toggleSelected - this.settings.selected: " + JSON.stringify(this.settings.selected));
+      // console.log(now() + " INFO NonFungibles:methods.toggleSelected - this.settings.selected: " + JSON.stringify(this.settings.selected));
       this.saveSettings();
     },
     clearSelected() {
@@ -847,7 +847,7 @@ const NonFungibles = {
       } else {
         Vue.set(this.settings.selectedOwners[this.chainId], owner, true);
       }
-      console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedOwners));
+      // console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedOwners));
       this.saveSettings();
     },
     collectionsFilterChange(contract) {
@@ -859,7 +859,7 @@ const NonFungibles = {
       } else {
         Vue.set(this.settings.selectedCollections[this.chainId], contract, true);
       }
-      console.log(now() + " INFO NonFungibles:methods.ownersFilterChange: " + JSON.stringify(this.settings.selectedCollections));
+      // console.log(now() + " INFO NonFungibles:methods.collectionsFilterChange: " + JSON.stringify(this.settings.selectedCollections));
       this.saveSettings();
     },
 
@@ -906,7 +906,7 @@ const NonFungibles = {
       return e ? ethers.utils.formatUnits(e, decimals).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : null;
     },
     saveSettings() {
-      console.log(now() + " INFO NonFungibles:methods.saveSettings - nonFungiblesSettings: " + JSON.stringify(this.settings));
+      // console.log(now() + " INFO NonFungibles:methods.saveSettings - nonFungiblesSettings: " + JSON.stringify(this.settings));
       localStorage.nonFungiblesSettings = JSON.stringify(this.settings);
     },
     async viewSyncOptions() {
