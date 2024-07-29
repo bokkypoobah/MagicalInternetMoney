@@ -135,7 +135,7 @@ const NonFungibles = {
         </div>
 
         <b-row class="m-0 p-0">
-          <b-col v-if="settings.sidebar" cols="2" class="m-0 p-0 border-0">
+          <b-col v-if="settings.sidebar" cols="2" class="m-0 mr-1 p-0 border-0">
             <b-card no-header no-body class="m-0 p-0 border-0">
               <b-card-body class="m-0 p-1" style="flex-grow: 1; max-height: 2000px; overflow-y: auto;">
                 <b-card header-class="m-0 px-1 py-1 pb-0" body-class="p-0" class="m-0 p-0 border-0">
@@ -222,9 +222,9 @@ const NonFungibles = {
                       </div>
                     </div>
                   </template>
-                  <div v-if="settings.showENSFilter">
-                    Blah
-                  <div>
+                  <div v-if="settings.showENSFilter" class="mt-1">
+                    <b-form-select size="sm" v-model="settings.ensDateOption" @change="saveSettings" :options="ensDateOptions"></b-form-select>
+                  </div>
                 </b-card>
               </b-card-body>
             </b-card>
@@ -381,6 +381,7 @@ const NonFungibles = {
         showcollectionFilter: false,
         collectionFilter: null,
         showENSFilter: false,
+        ensDateOption: null,
         junkFilter: null,
         activeOnly: false,
         selectedOwners: {},
@@ -405,6 +406,16 @@ const NonFungibles = {
         { value: 'collectiondsc', text: '▼ Collection' },
         { value: 'nameasc', text: '▲ Name' },
         { value: 'namedsc', text: '▼ Name' },
+      ],
+      ensDateOptions: [
+        { value: null, text: 'Unfiltered' },
+        { value: 'active', text: 'Active' },
+        { value: 'grace', text: 'Grace Period' },
+        { value: 'expired', text: 'Expired' },
+        { value: 'expiry1m', text: 'Expiry <= 1m' },
+        { value: 'expiry3m', text: 'Expiry <= 3m' },
+        { value: 'expiry1y', text: 'Expiry <= 1y' },
+        { value: 'expiry1yp', text: 'Expiry > 1y' },
       ],
       fields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
