@@ -158,7 +158,7 @@ const NonFungibles = {
                     </div>
                   </template>
                   <font v-if="settings.showOwnerFilter" size="-2">
-                    <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light">
+                    <b-table small fixed striped sticky-header="200px" :fields="ownersFields" :items="ownersWithCounts" head-variant="light" class="mt-1">
                       <template #cell(select)="data">
                         <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
                       </template>
@@ -191,7 +191,7 @@ const NonFungibles = {
                     </div>
                   </template>
                   <font v-if="settings.showcollectionFilter" size="-2">
-                    <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light">
+                    <b-table small fixed striped sticky-header="800px" :fields="collectionsFields" :items="collectionsWithCounts" head-variant="light" class="mt-1">
                       <template #cell(select)="data">
                         <b-form-checkbox size="sm" :checked="settings.selectedCollections[chainId] && settings.selectedCollections[chainId][data.item.contract]" @change="collectionsFilterChange(data.item.contract)"></b-form-checkbox>
                       </template>
