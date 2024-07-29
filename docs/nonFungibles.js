@@ -739,11 +739,19 @@ const NonFungibles = {
       const results = this.filteredItems;
       if (this.settings.sortOption == 'collectionasc') {
         results.sort((a, b) => {
-          return ('' + a.collection).localeCompare(b.collection);
+          let compare = ('' + a.collection).localeCompare(b.collection);
+          if (compare == 0) {
+            compare = ('' + a.name).localeCompare(b.name);
+          }
+          return compare;
         });
       } else if (this.settings.sortOption == 'collectiondsc') {
         results.sort((a, b) => {
-          return ('' + b.collection).localeCompare(a.collection);
+          let compare = ('' + b.collection).localeCompare(a.collection);
+          if (compare == 0) {
+            compare = ('' + b.name).localeCompare(a.name);
+          }
+          return compare;
         });
       } else if (this.settings.sortOption == 'nameasc') {
         results.sort((a, b) => {
