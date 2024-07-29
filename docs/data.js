@@ -572,7 +572,7 @@ const dataModule = {
       }
     },
     addTimestamp(state, info) {
-      // console.log(now() + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
+      console.log(now() + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.timestamps)) {
         Vue.set(state.timestamps, info.chainId, {});
       }
@@ -2640,6 +2640,17 @@ const dataModule = {
       context.commit('setExchangeRates', results);
       context.dispatch('saveData', ['exchangeRates']);
     },
+
+    async addTimestamp(context, info) {
+      console.log(now() + " INFO dataModule:actions.addTimestamp - info: " + JSON.stringify(info, null, 2));
+      context.commit('addTimestamp', info);
+      // await context.dispatch('saveData', ['timestamps']);
+    },
+    async saveTimestamps(context) {
+      console.log(now() + " INFO dataModule:actions.saveTimestamps");
+      await context.dispatch('saveData', ['timestamps']);
+    },
+
     // async syncRefreshENS(context, parameter) {
     //   const provider = new ethers.providers.Web3Provider(window.ethereum);
     //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);

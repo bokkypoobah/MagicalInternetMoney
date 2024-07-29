@@ -85,52 +85,48 @@ const ViewNonFungible = {
             </template>
             <template #cell(when)="data">
               <span v-if="data.item.timestamp">
-                <!-- <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTxPrefix + data.item.txHash" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash" target="_blank">
                   {{ formatTimestamp(data.item.timestamp) }}
-                </b-link> -->
+                </b-link>
               </span>
               <span v-else>
-                <!-- <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerTxPrefix + data.item.txHash" target="_blank"> -->
+                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash" target="_blank">
                   {{ data.item.blockNumber + ':' + data.item.txIndex + ':' + data.item.logIndex }}
-                <!-- </b-link> -->
+                </b-link>
               </span>
             </template>
             <template #cell(contract)="data">
               <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.contract" v-b-popover.hover.top="data.item.contract" target="_blank">
                 {{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}
+                <!-- {{ addressName(data.item.contract) }} -->
               </b-link>
             </template>
-            <!-- <template #cell(contract)="data">
-              <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.contract" v-b-popover.hover.top="data.item.contract" target="_blank">
-                {{ addressName(data.item.contract) }}
-              </b-link>
-            </template> -->
-            <!-- <template #cell(info)="data">
+            <template #cell(info)="data">
               <span v-if="data.item.type == 'Transfer'">
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.from" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
                   {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
                 </b-link>
                 to
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.to" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
                   {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'TransferSingle'">
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.from" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
                   {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
                 </b-link>
                 to
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.to" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
                   {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewOwner'">
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
                   {{ data.item.owner.substring(0, 10) + '...' + data.item.owner.slice(-8) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewResolver'">
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.resolver" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.resolver" target="_blank">
                   {{ data.item.resolver.substring(0, 10) + '...' + data.item.resolver.slice(-8) }}
                 </b-link>
               </span>
@@ -163,14 +159,14 @@ const ViewNonFungible = {
                 </span>
               </span>
               <span v-else-if="data.item.type == 'AddrChanged'">
-                <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.a" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.a" target="_blank">
                   {{ data.item.a }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'AddressChanged'">
                 coinType: {{ data.item.coinType }}
                 <span v-if="data.item.coinType == '60'">
-                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.newAddress" target="_blank">
+                  <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.newAddress" target="_blank">
                     {{ data.item.newAddress }}
                   </b-link>
                 </span>
@@ -184,7 +180,7 @@ const ViewNonFungible = {
               <span v-else-if="data.item.type == 'NameWrapped'">
                 label: {{ data.item.label }}
                 owner:
-                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                  <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
                     {{ data.item.owner }}
                   </b-link>
                 fuses: {{ data.item.fuses }}
@@ -192,14 +188,14 @@ const ViewNonFungible = {
               </span>
               <span v-else-if="data.item.type == 'NameUnwrapped'">
                 owner:
-                  <b-link v-if="chainInfo[chainId]" :href="chainInfo[chainId].explorerAddressPrefix + data.item.owner" target="_blank">
+                  <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
                     {{ data.item.owner }}
                   </b-link>
               </span>
               <span v-else>
                 {{ data.item }}
               </span>
-            </template> -->
+            </template>
           </b-table>
         </font>
 
@@ -491,6 +487,7 @@ const viewNonFungibleModule = {
       console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
       await context.commit('viewNonFungible', info);
       await context.dispatch('loadENSEvents', info);
+      await context.dispatch('loadTimestamps', info);
     },
     async loadENSEvents(context, info) {
       console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - info: " + JSON.stringify(info));
