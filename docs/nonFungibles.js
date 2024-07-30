@@ -163,7 +163,7 @@ const NonFungibles = {
                         <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
                       </template>
                       <template #cell(owner)="data">
-                        {{ addresses[data.item.owner] && addresses[data.item.owner].name || ens[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
+                        {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
                       </template>
                       <template #cell(items)="data">
                         <span v-b-popover.hover="data.item.counts + ' including copies'">{{ data.item.items }}</span>
@@ -314,7 +314,7 @@ const NonFungibles = {
                 <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
                   <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
                     <font size="-1">
-                      {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
+                      {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                       <span v-if="data.item.type == 'erc1155' && info.count > 1" class="small muted">
                         {{ 'x' + info.count }}
                       </span>
@@ -353,7 +353,7 @@ const NonFungibles = {
                         <div v-for="(info, i) in record.owners"  v-bind:key="i" class="m-0 p-0">
                           <b-link :href="explorer + 'address/' + info.owner" target="_blank">
                             <font size="-1">
-                              {{ addresses[info.owner] && addresses[info.owner].name || ens[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
+                              {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                               <span v-if="record.type == 'erc1155' && info.count > 1" class="small muted">
                                 {{ 'x' + info.count }}
                               </span>
@@ -484,8 +484,8 @@ const NonFungibles = {
     expiries() {
       return store.getters['data/expiries'];
     },
-    ens() {
-      return store.getters['data/ens'];
+    names() {
+      return store.getters['data/names'];
     },
     faucets() {
       return FAUCETS && FAUCETS[this.chainId];
