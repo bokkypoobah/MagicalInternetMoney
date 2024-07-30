@@ -58,7 +58,7 @@ const Registry = {
           </template>
           <template #cell(registrant)="data">
             <b-link :href="explorer + 'address/' + data.item.registrant" v-b-popover.hover="'View ' + data.item.registrant + ' in the explorer'" target="_blank">
-              {{ addresses[data.item.registrant] && addresses[data.item.registrant].name || ens[data.item.registrant] || (data.item.registrant.substring(0, 8) + '...' + data.item.registrant.slice(-6)) }}
+              {{ names[data.item.registrant] || (data.item.registrant.substring(0, 8) + '...' + data.item.registrant.slice(-6)) }}
             </b-link>
           </template>
           <template #cell(transfer)="data">
@@ -112,8 +112,8 @@ const Registry = {
     addresses() {
       return store.getters['data/addresses'];
     },
-    ens() {
-      return store.getters['data/ens'];
+    names() {
+      return store.getters['data/names'];
     },
     sync() {
       return store.getters['data/sync'];

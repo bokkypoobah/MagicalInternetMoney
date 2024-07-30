@@ -167,14 +167,11 @@ const ViewAddress = {
     addresses() {
       return store.getters['data/addresses'];
     },
-    ens() {
-      return store.getters['data/ens'];
-    },
     address() {
       return store.getters['viewAddress/address'];
     },
     ensName() {
-      return this.address && this.ens[this.address] || null;
+      return this.address && store.getters['data/ens'][this.address] || null;
     },
     linkedTo() {
       return store.getters['viewAddress/linkedTo'];

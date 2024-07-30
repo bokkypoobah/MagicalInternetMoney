@@ -147,8 +147,8 @@ const app = new Vue({
     addresses() {
       return store.getters['data/addresses'];
     },
-    ens() {
-      return store.getters['data/ens'];
+    names() {
+      return store.getters['data/names'];
     },
     spinnerVariant1() {
       var sv = store.getters['connection/spinnerVariant'];
