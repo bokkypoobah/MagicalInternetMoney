@@ -226,6 +226,7 @@ const dataModule = {
     registry: {}, // Address => StealthMetaAddress
     stealthTransfers: {}, // ChainId, blockNumber, logIndex => data
     ens: {},
+    names: {},
     exchangeRates: {},
     forceRefresh: 0,
     sync: {
@@ -261,6 +262,7 @@ const dataModule = {
     registry: state => state.registry,
     stealthTransfers: state => state.stealthTransfers,
     ens: state => state.ens,
+    names: state => state.names,
     exchangeRates: state => state.exchangeRates,
     forceRefresh: state => state.forceRefresh,
     sync: state => state.sync,
@@ -580,6 +582,10 @@ const dataModule = {
         Vue.set(state.timestamps[info.chainId], info.blockNumber, info.timestamp);
       }
     },
+    updateName(state, info) {
+      // console.log(now() + " INFO dataModule:mutations.updateName info: " + JSON.stringify(info, null, 2));
+      Vue.set(state.names, info.address, info.name);
+    },
     addTx(state, tx) {
       // console.log(now() + " INFO dataModule:mutations.addTx tx: " + JSON.stringify(tx, null, 2));
       if (!(tx.chainId in state.txs)) {
@@ -660,7 +666,7 @@ const dataModule = {
       if (Object.keys(context.state.addresses).length == 0) {
         const db0 = new Dexie(context.state.db.name);
         db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
-        for (let type of ['ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'approvals', 'registry', 'stealthTransfers']) {
+        for (let type of ['names', 'ens', 'addresses', 'expiries', 'timestamps', 'txs', 'tokens', 'balances', 'approvals', 'registry', 'stealthTransfers']) {
           const data = await db0.cache.where("objectName").equals(type).toArray();
           if (data.length == 1) {
             // console.log(now() + " INFO dataModule:actions.restoreState " + type + " => " + JSON.stringify(data[0].object, null, 2));
@@ -959,6 +965,8 @@ const dataModule = {
       if (options.ens && chainId == 1 && !options.devThing) {
         await context.dispatch('syncENS', parameter);
       }
+
+      await context.dispatch('collateNames', parameter);
       // if (options.devThing) {
       //   console.log("Dev Thing");
       // }
@@ -2608,6 +2616,34 @@ const dataModule = {
         context.commit('setSyncCompleted', completed);
       }
       context.dispatch('saveData', ['ens']);
+    },
+
+    async collateNames(context, parameter) {
+      console.log(now() + " INFO dataModule:actions.collateNames BEGIN: " + JSON.stringify(parameter));
+      for (const [address, addressData] of Object.entries(CUSTOMNAMES)) {
+        if (!(address in context.state.names)) {
+          context.commit('updateName', { address, name: addressData[1] });
+        }
+      }
+      for (const [address, name] of Object.entries(VALID_ENS_CONTRACTS)) {
+        if (!(address in context.state.names)) {
+          context.commit('updateName', { address, name });
+        }
+      }
+      for (const [address, addressData] of Object.entries(context.state.addresses)) {
+        if (address.substring(0, 2) == "0x") {
+          if (addressData.name && addressData.name.length > 0 && !(address in context.state.names)) {
+            context.commit('updateName', { address, name: addressData.name });
+          }
+        }
+      }
+      for (const [address, name] of Object.entries(context.state.ens)) {
+        if (!(address in context.state.names)) {
+          context.commit('updateName', { address, name });
+        }
+      }
+      // console.log(now() + " INFO dataModule:actions.collateNames - context.state.names: " + JSON.stringify(context.state.names));
+      context.dispatch('saveData', ['names']);
     },
 
     async syncImportExchangeRates(context, parameter) {

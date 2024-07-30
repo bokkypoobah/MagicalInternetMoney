@@ -1,6 +1,7 @@
 const CUSTOMNAMES = {
   "0x0000000000000000000000000000000000000000": ["eoa", "Null", "Null:0x0000...0000"],
   "0x0000000000000000000000000000000000000001": ["eoa", "Null", "Null:0x0000...0001"],
+  "0x000000000000000000000000000000000000dEaD": ["eoa", "dEaD", "dEaD:0x0000...dEaD"],
   "0x00000000000111AbE46ff893f3B2fdF1F759a8A8": ["nftexchange", "ExecutionDelegate", "Blur:ExecutionDelegate"],
   "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["ftexchange", "Permit2", "Uniswap:Permit2"],
   "0x011C77fa577c500dEeDaD364b8af9e8540b808C0": ["erc721", "IPC", "ImmortalPlayerCharacter"],
