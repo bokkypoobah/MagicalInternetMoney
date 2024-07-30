@@ -10,7 +10,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-txhash" v-model.trim="transfer.item.txHash" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button v-if="transfer.item.txHash" size="sm" :href="explorer + 'tx/' + transfer.item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button v-if="transfer.item.txHash" size="sm" :href="explorer + 'tx/' + transfer.item.txHash" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -23,7 +23,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-sender" v-model.trim="transfer.item.tx.from" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.tx.from" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -33,7 +33,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-receiver" v-model.trim="transfer.item.stealthAddress" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.stealthAddress" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.stealthAddress" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -52,7 +52,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-linkedtoaddress" v-model.trim="transfer.item.linkedTo.address" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -71,7 +71,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-caller" v-model.trim="transfer.item.caller" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.caller" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.caller" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -113,7 +113,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-address" v-model.trim="account.account" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -122,7 +122,7 @@ const StealthTransfers = {
             <b-form-input size="sm" plaintext id="transfer-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group> -->
           <!-- <b-form-group label="" label-for="transfer-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.top="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.ds500.dh50="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group> -->
           <font size="-1">
             <pre>
@@ -135,36 +135,36 @@ const StealthTransfers = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.top="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500.dh50="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
-            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.top="'Click the button on the right to stop. This process can be continued later'">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500.dh50="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
             </b-progress>
           </div>
           <div class="ml-0 mt-1">
-            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.top="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500.dh50="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.top="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500.dh50="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.top="'Yeah. Sort'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500.dh50="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.top="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalTransfers }}</font>
+            <font size="-2" v-b-popover.hover.ds500.dh50="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalTransfers }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
-            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.top="'Page size'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500.dh50="'Page size'"></b-form-select>
           </div>
         </div>
 

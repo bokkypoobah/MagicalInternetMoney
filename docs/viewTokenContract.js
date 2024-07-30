@@ -9,18 +9,18 @@ const ViewTokenContract = {
             <b-form-input size="sm" plaintext id="token-contract" v-model.trim="contract" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button v-if="networkSupported" size="sm" :href="explorer + 'token/' + contract" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button v-if="networkSupported" size="sm" :href="explorer + 'token/' + contract" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
 
         <b-form-group label="" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
+          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover.ds500.dh50="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
             <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="junk ? 'primary' : 'secondary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk || decimals === null || unsupported" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk || decimals === null || unsupported" id="address-active" :pressed.sync="active" variant="transparent" v-b-popover.hover.ds500.dh50="active ? 'Active' : 'Inactive'" class="m-0 mx-2 p-0">
             <b-icon :icon="(active && !junk) ? 'check-circle-fill' : 'check-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !active) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
@@ -35,7 +35,7 @@ const ViewTokenContract = {
         </b-form-group>
 
         <b-form-group v-if="type == 'erc20'" label="Decimals:" label-for="token-decimals" label-size="sm" label-cols-sm="3" label-align-sm="right" :description="contractDecimals && decimals != contractDecimals ? ('Contract value: ' + contractDecimals) : ''" class="mx-0 my-1 p-0">
-          <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover="'Decimals'" class="w-25"></b-form-select>
+          <b-form-select size="sm" id="token-decimals" v-model="decimals" :options="decimalsOptions" v-b-popover.hover.ds500.dh50="'Decimals'" class="w-25"></b-form-select>
         </b-form-group>
 
         <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -53,7 +53,7 @@ const ViewTokenContract = {
         </b-form-group>
 
         <b-form-group label="" label-for="token-refresh" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" :disabled="!networkSupported || sync.section != null"  @click="syncTokenContract();" variant="link" v-b-popover.hover="'Refresh balances and approvals'" ><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
+          <b-button size="sm" :disabled="!networkSupported || sync.section != null"  @click="syncTokenContract();" variant="link" v-b-popover.hover.ds500.dh50="'Refresh balances and approvals'" ><b-icon-arrow-repeat shift-v="+1" font-scale="1.1"></b-icon-arrow-repeat></b-button>
         </b-form-group>
 
         <b-form-group v-if="type == 'erc20'" label="Balances:" label-for="token-balances" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -106,7 +106,7 @@ const ViewTokenContract = {
               <font size="-1">
                 <div v-if="type == 'erc20'">
                   <span v-if="a.value && a.value.toString().length > 30">
-                    <b-badge pill variant="transparent" v-b-popover.hover="formatERC20(a.value, decimals)" class="px-0">&infin;</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover.ds500.dh50="formatERC20(a.value, decimals)" class="px-0">&infin;</b-badge>
                   </span>
                   <span v-else>
                     {{ formatERC20(a.value, decimals || 0) }}
@@ -124,11 +124,11 @@ const ViewTokenContract = {
         </b-form-group>
 
         <!-- <b-form-group label="" label-for="token-refreshtokenmetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.top="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
+          <b-button size="sm" @click="refreshTokenMetadata();" variant="link" v-b-popover.hover.ds500.dh50="'Refresh Token Metadata'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.1" variant="primary"></b-icon-arrow-repeat></b-button>
         </b-form-group> -->
 
         <!-- <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.ds500.dh50="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group> -->
       </b-modal>
     </div>

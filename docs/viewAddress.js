@@ -9,7 +9,7 @@ const ViewAddress = {
             <b-form-input size="sm" plaintext id="address-address" v-model.trim="address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="explorer + 'address/' + address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="explorer + 'address/' + address" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -28,7 +28,7 @@ const ViewAddress = {
             <b-form-input size="sm" plaintext id="address-linkedtoaddress" v-model.trim="linkedTo.address" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="explorer + 'address/' + linkedTo.address" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="explorer + 'address/' + linkedTo.address" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -50,12 +50,12 @@ const ViewAddress = {
           </b-row>
           <b-row v-for="(item, index) of stealthTransfers" v-bind:key="item.txHash" class="px-2">
             <b-col cols="4" class="px-0 mt-1">
-              <b-button size="sm" :href="explorer + 'tx/' + item.txHash" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+              <b-button size="sm" :href="explorer + 'tx/' + item.txHash" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
                 {{ formatTimestamp(item.timestamp) }}
               </b-button>
             </b-col>
             <b-col cols="4" class="px-0 mt-1">
-              <b-button v-if="item.tx && item.tx.from" size="sm" :href="explorer + 'address/' + item.tx.from" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
+              <b-button v-if="item.tx && item.tx.from" size="sm" :href="explorer + 'address/' + item.tx.from" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0 px-2">
                 {{ item.tx.from.substring(0, 10) + '...' + item.tx.from.slice(-8) }}
               </b-button>
             </b-col>
@@ -75,23 +75,23 @@ const ViewAddress = {
         </b-form-group>
 
         <b-form-group label="" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 mt-1 mb-2 p-0">
-          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
+          <b-button size="sm" id="address-junk" :pressed.sync="junk" variant="transparent" v-b-popover.hover.ds500.dh50="junk ? 'Junk' : 'Not junk'" class="m-0 mx-2 p-0">
             <b-icon :icon="junk ? 'trash-fill' : 'trash'" shift-v="+1" font-scale="1.2" :variant="junk ? 'primary' : 'secondary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk" id="address-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk" id="address-mine" :pressed.sync="mine" variant="transparent" v-b-popover.hover.ds500.dh50="mine ? 'My account' : 'Not my account'" class="m-0 mx-2 p-0">
             <b-icon :icon="(mine && !junk) ? 'person-fill' : 'person'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk" id="address-watch" :pressed.sync="watch" variant="transparent" v-b-popover.hover="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 transfers'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk" id="address-watch" :pressed.sync="watch" variant="transparent" v-b-popover.hover.ds500.dh50="(watch ? 'Watch' : 'Do not watch') + ' this address for ETH, ERC-20, ERC-721 and ERC-1155 transfers'" class="m-0 mx-2 p-0">
             <b-icon :icon="(watch && !junk) ? 'eye-fill' : 'eye'" shift-v="+1" font-scale="1.2" :variant="(junk || !watch) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk || !mine" id="address-sendfrom" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk || !mine" id="address-sendfrom" :pressed.sync="sendFrom" variant="transparent" v-b-popover.hover.ds500.dh50="'ETH and tokens ' + (sendFrom ? 'can' : 'cannot') + ' be sent from this address'" class="m-0 mx-2 p-0">
             <b-icon :icon="(sendFrom && mine && !junk) ? 'arrow-up-right-circle-fill' : 'arrow-up-right-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !mine || !sendFrom) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
-          <b-button size="sm" :disabled="junk" id="address-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
+          <b-button size="sm" :disabled="junk" id="address-sendto" :pressed.sync="sendTo" variant="transparent" v-b-popover.hover.ds500.dh50="'ETH and tokens ' + (sendTo ? 'can' : 'cannot') + ' be sent to this address'" class="m-0 mx-2 p-0">
             <b-icon :icon="(sendTo && !junk) ? 'arrow-down-right-circle-fill' : 'arrow-down-right-circle'" shift-v="+1" font-scale="1.2" :variant="(junk || !sendTo) ? 'secondary' : 'primary'">
             </b-icon>
           </b-button>
@@ -102,7 +102,7 @@ const ViewAddress = {
             <b-form-input size="sm" plaintext id="address-ensname" :value="ensName" class="px-2"></b-form-input>
             <b-input-group-append>
               <div>
-                <b-button size="sm" :href="'https://app.ens.domains/' + ensName" variant="link" v-b-popover.hover="'View in ENS dapp'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                <b-button size="sm" :href="'https://app.ens.domains/' + ensName" variant="link" v-b-popover.hover.ds500.dh50="'View in ENS dapp'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
               </div>
             </b-input-group-append>
           </b-input-group>
@@ -119,8 +119,8 @@ const ViewAddress = {
             <!--
             <b-input-group-append>
               <div>
-                <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover="addressTypeInfo[type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[type || 'address'].variant"></b-icon></b-button>
-                <b-button size="sm" :pressed.sync="favourite" variant="transparent" v-b-popover.hover="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
+                <b-button size="sm" :pressed.sync="mine" variant="transparent" v-b-popover.hover.ds500.dh50="addressTypeInfo[type || 'address'].name" class="m-0 ml-5 p-0"><b-icon :icon="mine ? 'star-fill' : 'star'" shift-v="+1" font-scale="0.95" :variant="addressTypeInfo[type || 'address'].variant"></b-icon></b-button>
+                <b-button size="sm" :pressed.sync="favourite" variant="transparent" v-b-popover.hover.ds500.dh50="'Favourite?'" class="m-0 ml-1 p-0"><b-icon :icon="favourite ? 'heart-fill' : 'heart'" shift-v="+1" font-scale="0.95" variant="danger"></b-icon></b-button>
               </div>
             </b-input-group-append>
             -->
@@ -133,7 +133,7 @@ const ViewAddress = {
           <b-form-input size="sm" plaintext id="address-source" :value="source && (source.substring(0, 1).toUpperCase() + source.slice(1))" class="px-2 w-25"></b-form-input>
         </b-form-group>
         <b-form-group v-if="address" label="" label-for="address-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.top="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-button size="sm" @click="deleteAddress(address);" variant="link" v-b-popover.hover.ds500.dh50="'Delete address ' + address.substring(0, 10) + '...' + address.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
       </b-modal>
     </div>
