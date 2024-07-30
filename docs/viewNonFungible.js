@@ -75,7 +75,7 @@ const ViewNonFungible = {
         </b-form-group>
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 10) + '...' + contract.slice(-8) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+          <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 8) + '...' + contract.slice(-6) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
         </b-form-group>
 
         <font size="-2">
@@ -97,37 +97,36 @@ const ViewNonFungible = {
             </template>
             <template #cell(contract)="data">
               <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.contract" v-b-popover.hover.top="data.item.contract" target="_blank">
-                {{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}
-                <!-- {{ addressName(data.item.contract) }} -->
+                {{ names[data.item.contract] || (data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6)) }}
               </b-link>
             </template>
             <template #cell(info)="data">
               <span v-if="data.item.type == 'Transfer'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
-                  {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
+                  {{ data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6) }}
                 </b-link>
                 to
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
-                  {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
+                  {{ data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'TransferSingle'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
-                  {{ data.item.from.substring(0, 10) + '...' + data.item.from.slice(-8) }}
+                  {{ data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6) }}
                 </b-link>
                 to
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
-                  {{ data.item.to.substring(0, 10) + '...' + data.item.to.slice(-8) }}
+                  {{ data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewOwner'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
-                  {{ data.item.owner.substring(0, 10) + '...' + data.item.owner.slice(-8) }}
+                  {{ data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewResolver'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.resolver" target="_blank">
-                  {{ data.item.resolver.substring(0, 10) + '...' + data.item.resolver.slice(-8) }}
+                  {{ data.item.resolver.substring(0, 8) + '...' + data.item.resolver.slice(-6) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NameRegistered'">
@@ -257,6 +256,9 @@ const ViewNonFungible = {
     },
     timestamps() {
       return store.getters['data/timestamps'];
+    },
+    names() {
+      return store.getters['data/names'];
     },
     token() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
