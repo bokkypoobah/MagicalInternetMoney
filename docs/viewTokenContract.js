@@ -68,7 +68,7 @@ const ViewTokenContract = {
           <b-row v-for="(b, i) in balances" v-bind:key="i" class="m-0 p-0">
             <b-col cols="5" class="m-0 px-2">
               <b-link :href="explorer + 'address/' + b.address" target="_blank">
-                <font size="-1">{{ addresses[b.address] && addresses[b.address].name || ens[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}</font>
+                <font size="-1">{{ names[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}</font>
               </b-link>
             </b-col>
             <b-col cols="7" class="m-0 px-2">
@@ -94,18 +94,18 @@ const ViewTokenContract = {
           <b-row v-for="(a, i) in approvals" v-bind:key="i" class="m-0 p-0">
             <b-col cols="4" class="m-0 px-2">
               <b-link :href="explorer + 'address/' + a.owner" target="_blank">
-                <font size="-1">{{ addresses[a.owner] && addresses[a.owner].name || ens[a.owner] || (a.owner.substring(0, 8) + '...' + a.owner.slice(-6)) }}</font>
+                <font size="-1">{{ names[a.owner] || (a.owner.substring(0, 8) + '...' + a.owner.slice(-6)) }}</font>
               </b-link>
             </b-col>
             <b-col cols="4" class="m-0 px-2">
               <b-link :href="explorer + 'address/' + a.spender" target="_blank">
-                <font size="-1">{{ addresses[a.spender] && addresses[a.spender].name || ens[a.spender] || customNames[a.spender] && customNames[a.spender][1] || (a.spender.substring(0, 8) + '...' + a.spender.slice(-6)) }}</font>
+                <font size="-1">{{ names[a.spender] || (a.spender.substring(0, 8) + '...' + a.spender.slice(-6)) }}</font>
               </b-link>
             </b-col>
             <b-col cols="4" class="m-0 px-2">
               <font size="-1">
                 <div v-if="type == 'erc20'">
-                  <span v-if="a.value.toString().length > 30">
+                  <span v-if="a.value && a.value.toString().length > 30">
                     <b-badge pill variant="transparent" v-b-popover.hover="formatERC20(a.value, decimals)" class="px-0">&infin;</b-badge>
                   </span>
                   <span v-else>
@@ -194,11 +194,8 @@ const ViewTokenContract = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    ens() {
-      return store.getters['data/ens'];
-    },
-    customNames() {
-      return CUSTOMNAMES;
+    names() {
+      return store.getters['data/names'];
     },
     sync() {
       return store.getters['data/sync'];

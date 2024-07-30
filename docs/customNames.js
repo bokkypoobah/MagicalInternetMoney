@@ -25,6 +25,7 @@ const CUSTOMNAMES = {
   "0xBB9bc244D798123fDe783fCc1C72d3Bb8C189413": ["erc20", "DAO", "TheDAO", 16],
   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": ["erc20", "WETH", "Wrapped Ether", 18],
   "0xC2C747E0F7004F9E8817Db2ca4997657a7746928": ["erc721", "HM", "Hashmask"],
+  "0xC92E8bdf79f0507f65a392b0ab4667716BFE0110": ["ftexchange", "CoW:GPv2VaultRelayer", "CoW Protocol:GPv2VaultRelayer"],
   "0xd07dc4262BCDbf85190C01c996b4C06a461d2430": ["erc1155", "RARI", "Rarible:RARI Token 3"],
   "0xD152f549545093347A162Dce210e7293f1452150": ["ftexchange", "Disperse.app", "Disperse.app"],
   "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": ["erc1155", "NameWrapper", "ENS:NameWrapper"],
