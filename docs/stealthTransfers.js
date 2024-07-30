@@ -16,7 +16,7 @@ const StealthTransfers = {
             </b-input-group>
           </b-form-group>
           <b-form-group v-if="transfer.item" label="Timestamp:" label-for="transfer-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.bottom="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
+            <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.ds500.dh50="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
           </b-form-group>
           <b-form-group v-if="transfer.item && transfer.item.tx" label="Sender:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
@@ -94,7 +94,7 @@ const StealthTransfers = {
                     <font size="-1">{{ formatETH(item.value) }}</font>
                   </span> -->
                   <!-- <span v-else> -->
-                    <!-- <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.bottom="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button> -->
+                    <!-- <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.ds500.dh50="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button> -->
                   <!-- </span> -->
                 </b-col>
                 <!-- <b-col cols="3" class="px-0 mt-1"> -->
@@ -102,7 +102,7 @@ const StealthTransfers = {
                     <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
                   </span> -->
                   <!-- <span v-else> -->
-                    <!-- <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.bottom="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button> -->
+                    <!-- <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.ds500.dh50="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button> -->
                   <!-- </span> -->
                 <!-- </b-col> -->
               </b-row>
@@ -186,7 +186,7 @@ const StealthTransfers = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(timestamp)="data">
-            <!-- TODO <b-link :href="explorer + 'atx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank"> -->
+            <!-- TODO <b-link :href="explorer + 'atx/' + data.item.txHash" v-b-popover.hover.ds500.dh50="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank"> -->
             <b-link :href="explorer + 'tx/' + data.item.txHash" target="_blank">
               <span v-if="data.item.timestamp">
                 {{ formatTimestamp(data.item.timestamp) }}
@@ -199,14 +199,14 @@ const StealthTransfers = {
           </template>
           <template #cell(sender)="data">
             <div v-if="data.item.tx && data.item.tx.from">
-              <b-link :href="explorer + 'address/' + data.item.tx.from" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.tx.from" v-b-popover.hover.ds500.dh50="'View in etherscan.io'" target="_blank">
                 {{ data.item.tx.from }}
               </b-link>
             </div>
           </template>
           <template #cell(receiver)="data">
             <div v-if="data.item.stealthAddress">
-              <b-link :href="explorer + 'address/' + data.item.stealthAddress" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.stealthAddress" v-b-popover.hover.ds500.dh50="'View in etherscan.io'" target="_blank">
                 {{ data.item.stealthAddress }}
               </b-link>
             </div>
@@ -221,14 +221,14 @@ const StealthTransfers = {
                 <span v-else-if="getTokenType(item.token) == 'erc20'">
                   <font size="-1">
                     {{ formatETH(item.value) }}
-                    <b-link :href="explorer + 'token/' + item.token" v-b-popover.hover.bottom="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
+                    <b-link :href="explorer + 'token/' + item.token" v-b-popover.hover.ds500.dh50="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
                   </font>
                 </span>
                 <span v-else>
                   <!-- TODO -->
                   <font size="-1">
-                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.bottom="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
-                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover.bottom="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
+                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.ds500.dh50="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
+                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover.ds500.dh50="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
                   </font>
                 </span>
               </b-col>
