@@ -103,30 +103,30 @@ const ViewNonFungible = {
             <template #cell(info)="data">
               <span v-if="data.item.type == 'Transfer'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
-                  {{ data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6) }}
+                  {{ names[data.item.from] || (data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6)) }}
                 </b-link>
                 to
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
-                  {{ data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6) }}
+                  {{ names[data.item.to] || (data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6)) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'TransferSingle'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.from" target="_blank">
-                  {{ data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6) }}
+                  {{ names[data.item.from] || (data.item.from.substring(0, 8) + '...' + data.item.from.slice(-6)) }}
                 </b-link>
                 to
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.to" target="_blank">
-                  {{ data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6) }}
+                  {{ names[data.item.to] || (data.item.to.substring(0, 8) + '...' + data.item.to.slice(-6)) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewOwner'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
-                  {{ data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6) }}
+                  {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NewResolver'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.resolver" target="_blank">
-                  {{ data.item.resolver.substring(0, 8) + '...' + data.item.resolver.slice(-6) }}
+                  {{ names[data.item.resolver] || (data.item.resolver.substring(0, 8) + '...' + data.item.resolver.slice(-6)) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'NameRegistered'">
@@ -159,14 +159,14 @@ const ViewNonFungible = {
               </span>
               <span v-else-if="data.item.type == 'AddrChanged'">
                 <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.a" target="_blank">
-                  {{ data.item.a }}
+                  {{ names[data.item.a] || (data.item.a.substring(0, 8) + '...' + data.item.a.slice(-6)) }}
                 </b-link>
               </span>
               <span v-else-if="data.item.type == 'AddressChanged'">
                 coinType: {{ data.item.coinType }}
                 <span v-if="data.item.coinType == '60'">
                   <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.newAddress" target="_blank">
-                    {{ data.item.newAddress }}
+                    {{ names[data.item.newAddress] || (data.item.newAddress.substring(0, 8) + '...' + data.item.newAddress.slice(-6)) }}
                   </b-link>
                 </span>
                 <span v-else>
@@ -180,7 +180,7 @@ const ViewNonFungible = {
                 label: {{ data.item.label }}
                 owner:
                   <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
-                    {{ data.item.owner }}
+                    {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
                   </b-link>
                 fuses: {{ data.item.fuses }}
                 expiry: {{ formatTimestamp(data.item.expiry) }}
@@ -188,7 +188,7 @@ const ViewNonFungible = {
               <span v-else-if="data.item.type == 'NameUnwrapped'">
                 owner:
                   <b-link v-if="networkSupported" :href="explorer + 'address/' + data.item.owner" target="_blank">
-                    {{ data.item.owner }}
+                    {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
                   </b-link>
               </span>
               <span v-else>
@@ -197,14 +197,6 @@ const ViewNonFungible = {
             </template>
           </b-table>
         </font>
-
-        <!-- {{ filteredSortedEvents }} -->
-
-        <!-- <font size="-2">
-          <pre>
-{{ events }}
-          </pre>
-        </font> -->
       </b-modal>
     </div>
   `,
