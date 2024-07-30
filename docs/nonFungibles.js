@@ -163,7 +163,9 @@ const NonFungibles = {
                         <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
                       </template>
                       <template #cell(owner)="data">
+                        <span v-b-popover.hover="data.item.owner">
                         {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
+                        </span>
                       </template>
                       <template #cell(items)="data">
                         <span v-b-popover.hover="data.item.counts + ' including copies'">{{ data.item.items }}</span>
@@ -312,7 +314,7 @@ const NonFungibles = {
 
               <template #cell(owners)="data">
                 <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-                  <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover="'View ' + info.owner + ' in the explorer'" target="_blank">
+                  <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover="info.owner" target="_blank">
                     <font size="-1">
                       {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                       <span v-if="data.item.type == 'erc1155' && info.count > 1" class="small muted">
@@ -351,7 +353,7 @@ const NonFungibles = {
                     <div class="d-flex justify-content-between m-0 p-0">
                       <div class="mt-0 pr-1">
                         <div v-for="(info, i) in record.owners"  v-bind:key="i" class="m-0 p-0">
-                          <b-link :href="explorer + 'address/' + info.owner" target="_blank">
+                          <b-link :href="explorer + 'address/' + info.owner"  v-b-popover.hover="info.owner" target="_blank">
                             <font size="-1">
                               {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                               <span v-if="record.type == 'erc1155' && info.count > 1" class="small muted">
