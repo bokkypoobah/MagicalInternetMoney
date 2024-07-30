@@ -133,7 +133,7 @@ const Fungibles = {
           </template>
           <template #cell(contract)="data">
             <b-link :href="explorer + 'address/' + data.item.contract + '#code'" v-b-popover.hover="data.item.contract" target="_blank">
-              <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
+              <font size="-1">{{ data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6) }}</font>
             </b-link>
             <div v-if="data.item.unsupported">
               <font size="-1">

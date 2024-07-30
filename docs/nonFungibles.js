@@ -201,7 +201,7 @@ const NonFungibles = {
                         <b-link v-if="data.item.collection" :href="'https://opensea.io/collection/' + data.item.slug" target="_blank">
                           {{ data.item.collection }}
                         </b-link>
-                        <b-link v-else :href="explorer + 'token/' + data.item.contract" target="_blank">
+                        <b-link v-else :href="explorer + 'token/' + data.item.contract"  v-b-popover.hover="data.item.contract" target="_blank">
                           {{ data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6) }}
                         </b-link>
                       </template>
