@@ -121,6 +121,10 @@ Deployed on Sepolia:
 
 <kbd><img src="images/SampleScreen_NonFungibles_FilterByCollections_20240727.png" /></kbd>
 
+###### ENS Non-Fungibles With Events
+
+<kbd><img src="images/SampleScreen_ViewNonFungibleENS_20240730.png" /></kbd>
+
 ###### ERC-721 and ERC-1155 Non-Fungibles Icon VIew
 
 <kbd><img src="images/SampleScreen_NonFungibles_Icons_20240727.png" /></kbd>

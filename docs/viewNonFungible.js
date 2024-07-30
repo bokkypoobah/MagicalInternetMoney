@@ -14,65 +14,80 @@ const ViewNonFungible = {
           </div>
         </template>
 
-        <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <b-form-input size="sm" plaintext id="token-contract" v-model.trim="contract" class="px-2"></b-form-input>
-            <b-input-group-append>
-              <div>
-                <b-button v-if="networkSupported" size="sm" :href="explorer + 'token/' + contract" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+        <b-row>
+          <b-col>
+            <b-form-group label="Contract:" label-for="token-contract" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <b-form-input size="sm" plaintext id="token-contract" v-model.trim="contract" class="px-2"></b-form-input>
+                <b-input-group-append>
+                  <div>
+                    <b-button v-if="networkSupported" size="sm" :href="explorer + 'token/' + contract" variant="link" v-b-popover.hover="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  </div>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
 
-        <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-input-group size="sm" class="w-100">
-            <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
-            <b-input-group-append>
-              <div>
-                <b-button v-if="networkSupported" size="sm" :href="nonFungibleViewerURL(contract, tokenId)" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
-              </div>
-            </b-input-group-append>
-          </b-input-group>
-        </b-form-group>
+            <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-input-group size="sm" class="w-100">
+                <component size="sm" plaintext :is="tokenId && tokenId.length > 30 ? 'b-form-textarea' : 'b-form-input'" v-model="tokenId" rows="2" max-rows="3" class="px-2" />
+                <b-input-group-append>
+                  <div>
+                    <b-button v-if="networkSupported" size="sm" :href="nonFungibleViewerURL(contract, tokenId)" variant="link" v-b-popover.hover="'View in NFT explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  </div>
+                </b-input-group-append>
+              </b-input-group>
+            </b-form-group>
 
-        <b-form-group v-if="expiry" label="Expiry:" label-for="token-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-expiry" :value="formatTimestamp(expiry)" class="px-2 w-100"></b-form-input>
-        </b-form-group>
+            <b-form-group v-if="expiry" label="Expiry:" label-for="token-expiry" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input size="sm" plaintext id="token-expiry" :value="formatTimestamp(expiry)" class="px-2 w-100"></b-form-input>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
+            </b-form-group>
 
-        <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
-        </b-form-group>
+            <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
+            </b-form-group>
 
-        <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
-        </b-form-group>
+            <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-button size="sm" :disabled="sync.section != null" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download></b-button>
+              <b-button size="sm" :disabled="sync.section != null" @click="requestReservoirMetadataRefresh();" variant="link" v-b-popover.hover.top="'Request Reservoir API to refresh their metadata. Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat refresh to the left'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill></b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
+                <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+              <!-- </b-avatar> -->
 
-        <b-form-group label="Image:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <!-- <b-avatar v-if="image" button rounded size="15rem" :src="image" class="m-2"> -->
-            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-          <!-- </b-avatar> -->
-
-          <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 300px;">
-            <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
-          </b-img>
+              <b-img v-if="image" button rounded fluid size="15rem" :src="image" class="m-2" style="width: 300px;">
+                <!-- <template v-if="selectedTraits[layer] && selectedTraits[layer][trait.value]" #badge><b-icon icon="check"></b-icon></template> -->
+              </b-img>
 
 
-          <!-- <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
-          </b-img> -->
+              <!-- <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
+              </b-img> -->
 
-        </b-form-group>
-        <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-row v-for="(attribute, i) in attributes" v-bind:key="i" class="m-0 p-0">
-            <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
-            <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
-          </b-row>
-        </b-form-group>
+            </b-form-group>
+          </b-col>
+          <b-col>
+          <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+            <b-row v-for="(attribute, i) in attributes" v-bind:key="i" class="m-0 p-0">
+              <b-col cols="3" class="m-0 px-2 text-right"><font size="-3">{{ attribute.trait_type }}</font></b-col>
+              <b-col cols="9" class="m-0 px-2"><b><font size="-2">{{ ["Created Date", "Registration Date", "Expiration Date"].includes(attribute.trait_type) ? formatTimestamp(attribute.value) : attribute.value }}</font></b></b-col>
+            </b-row>
+          </b-form-group>
+          </b-col>
+        </b-row>
 
-        <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-button size="sm" :disabled="sync.section != null" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.top="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download></b-button>
-          <b-button size="sm" :disabled="sync.section != null" @click="requestReservoirMetadataRefresh();" variant="link" v-b-popover.hover.top="'Request Reservoir API to refresh their metadata. Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat refresh to the left'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill></b-button>
-        </b-form-group>
+
+
+
+
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-button size="sm" @click="deleteAddress(contract);" variant="link" v-b-popover.hover.top="'Delete address ' + contract.substring(0, 8) + '...' + contract.slice(-6) + '?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
