@@ -979,7 +979,7 @@ const NonFungibles = {
       return null;
     },
     rowSelected(item) {
-      console.log(now() + " INFO NonFungibles:methods.rowSelected - item: " + JSON.stringify(item, null, 2));
+      // console.log(now() + " INFO NonFungibles:methods.rowSelected - item: " + JSON.stringify(item, null, 2));
       if (item && item.length > 0) {
         store.dispatch('viewNonFungible/viewNonFungible', { contract: item[0].contract, tokenId: item[0].tokenId });
         this.$refs.tokenContractsTable.clearSelected();

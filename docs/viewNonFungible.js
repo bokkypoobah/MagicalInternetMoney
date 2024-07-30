@@ -350,7 +350,7 @@ const ViewNonFungible = {
         for (const [txIndex, txData] of Object.entries(blockData)) {
           for (const [logIndex, event] of Object.entries(txData)) {
             const timestamp = timestamps[blockNumber] || null;
-            console.log(blockNumber + "/" + txIndex + "/" + logIndex + " => " + JSON.stringify(event, null, 2));
+            // console.log(blockNumber + "/" + txIndex + "/" + logIndex + " => " + JSON.stringify(event, null, 2));
             results.push({
               ...event,
               blockNumber,
@@ -361,7 +361,7 @@ const ViewNonFungible = {
           }
         }
       }
-      console.log(now() + " DEBUG ViewNonFungible.computed.filteredEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
+      // console.log(now() + " DEBUG ViewNonFungible.computed.filteredEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
       return results;
     },
     filteredSortedEvents() {
@@ -373,7 +373,7 @@ const ViewNonFungible = {
           return b.blockNumber - a.blockNumber;
         }
       });
-      console.log(now() + " DEBUG ViewNonFungible.computed.filteredSortedEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
+      // console.log(now() + " DEBUG ViewNonFungible.computed.filteredSortedEvents - results[0..9]: " + JSON.stringify(results.slice(0, 10), null, 2));
       return results;
     },
   },
@@ -463,14 +463,14 @@ const viewNonFungibleModule = {
   },
   mutations: {
     viewNonFungible(state, info) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.tokenId = info.tokenId;
       state.events = {};
       state.show = true;
     },
     addEvents(state, events) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
+      // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
       for (const event of events) {
         if (!(event.blockNumber in state.events)) {
           Vue.set(state.events, event.blockNumber, {});
@@ -493,7 +493,7 @@ const viewNonFungibleModule = {
   },
   actions: {
     async viewNonFungible(context, info) {
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - info: " + JSON.stringify(info));
       await context.commit('viewNonFungible', info);
       await context.dispatch('loadENSEvents', info);
       await context.dispatch('loadTimestamps', info);
@@ -505,21 +505,21 @@ const viewNonFungibleModule = {
       const toBlock = block && block.number || null;
       const fromBlock = 0;
       const [ chainId, contract, tokenId ] = [ store.getters['connection/chainId'], context.state.contract, context.state.tokenId ];
-      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - contract: " + contract);
-      console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - tokenId: " + tokenId);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - contract: " + contract);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - tokenId: " + tokenId);
       const tokenContract = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] || {};
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenContract: " + JSON.stringify(tokenContract));
       const token = store.getters['data/tokens'][chainId] && store.getters['data/tokens'][chainId][info.contract] && store.getters['data/tokens'][chainId][info.contract].tokens[info.tokenId] || {};
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - token: " + JSON.stringify(token));
       const type = tokenContract.type || null;
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - type: " + type);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - type: " + type);
 
       // const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
       const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
       let erc721TokenId = type == "erc721" ? tokenId : null;
       let erc1155TokenId = type == "erc1155" ? tokenId : null;
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
 
       if (contract == ENS_ERC1155_ADDRESS) {
         // ENS Events
@@ -541,9 +541,9 @@ const viewNonFungibleModule = {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
       }
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenIds: " + JSON.stringify(tokenIds));
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenIds: " + JSON.stringify(tokenIds));
 
       // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
       // ENS: Old ETH Registrar Controller 2 @ 0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16 deployed Nov-04-2019 12:43:55 AM +UTC
@@ -604,7 +604,7 @@ const viewNonFungibleModule = {
       }
 
       if (erc721TokenId) {
-        console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+        // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
         // ERC-721 Transfers
         try {
           const topics = [[
@@ -617,7 +617,7 @@ const viewNonFungibleModule = {
           // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - topics: " + JSON.stringify(topics));
           const logs = await provider.getLogs({ address: info.contract == ENS_ERC1155_ADDRESS ? ENS_ERC721_ADDRESS : info.contract, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
@@ -639,7 +639,7 @@ const viewNonFungibleModule = {
             selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
           }
         }
-        console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
+        // console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
 
         // const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
         const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
@@ -698,32 +698,73 @@ const viewNonFungibleModule = {
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
-        }
-        // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
-        // return;
+      }
+      // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - context.state.events: " + JSON.stringify(context.state.events, null, 2));
 
-        if (false) {
-        const eventList = [];
-        for (const [blockNumber, blockData] of Object.entries(context.state.events)) {
-          // console.log(blockNumber + " => " + JSON.stringify(blockData));
-          for (const [txIndex, txData] of Object.entries(blockData)) {
-            for (const [logIndex, event] of Object.entries(txData)) {
-              eventList.push({
-                ...event,
-                blockNumber,
-                txIndex,
-                logIndex,
-              });
-            }
+      const eventList = [];
+      for (const [blockNumber, blockData] of Object.entries(context.state.events)) {
+        // console.log(blockNumber + " => " + JSON.stringify(blockData));
+        for (const [txIndex, txData] of Object.entries(blockData)) {
+          for (const [logIndex, event] of Object.entries(txData)) {
+            eventList.push({
+              ...event,
+              blockNumber,
+              txIndex,
+              logIndex,
+            });
           }
         }
-        eventList.sort((a, b) => {
-          if (a.blockNumber == b.blockNumber) {
-            return b.logIndex - a.logIndex;
-          } else {
-            return b.blockNumber - a.blockNumber;
-          }
-        });
+      }
+      eventList.sort((a, b) => {
+        if (a.blockNumber == b.blockNumber) {
+          return b.logIndex - a.logIndex;
+        } else {
+          return b.blockNumber - a.blockNumber;
+        }
+      });
+      // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - eventList: " + JSON.stringify(eventList, null, 2));
+      const publicResolver2Interface = new ethers.utils.Interface(ENS_PUBLICRESOLVER2_ABI);
+      for (const event of eventList) {
+        console.log(JSON.stringify(event, null, 2));
+        // if (event.contract == ENS_PUBLICRESOLVER2_ADDRESS && event.type == "TextChanged") {
+        //   const tx = await provider.getTransaction(event.txHash);
+        //   const decodedData = publicResolver2Interface.parseTransaction({ data: tx.data, value: tx.value });
+        //   if (decodedData.functionFragment.name == "setText") {
+        //     const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
+        //     await context.commit('setTextValue', {
+        //       chainId: store.getters['connection/chainId'],
+        //       blockNumber: event.blockNumber,
+        //       txIndex: event.txIndex,
+        //       txHash: event.txHash,
+        //       labelhash: decodedFunctionArgs[0],
+        //       key: decodedFunctionArgs[1],
+        //       value: decodedFunctionArgs[2],
+        //     });
+        //
+        //   } else if (decodedData.functionFragment.name == "multicall") {
+        //     const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("multicall", tx.data);
+        //     for (const data1 of decodedFunctionArgs) {
+        //       for (const data2 of data1) {
+        //         const decodedArrayData = publicResolver2Interface.parseTransaction({ data: data2, value: tx.value });
+        //         if (decodedArrayData.functionFragment.name == "setText") {
+        //           const decodedFunctionArgs1 = publicResolver2Interface.decodeFunctionData("setText", data2);
+        //           await context.commit('setTextValue', {
+        //             chainId: store.getters['connection/chainId'],
+        //             blockNumber: event.blockNumber,
+        //             txIndex: event.txIndex,
+        //             txHash: event.txHash,
+        //             labelhash: decodedFunctionArgs1[0],
+        //             key: decodedFunctionArgs1[1],
+        //             value: decodedFunctionArgs1[2],
+        //           });
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
+      }
+
+      if (false) {
         const erc721Transfers = eventList.filter(e => e.type == "Transfer");
         const erc721Owner = erc721Transfers.length > 0 ? erc721Transfers[0].to : null;
         const wrapped = erc721Owner == ENS_NAMEWRAPPER_ADDRESS;
@@ -740,46 +781,6 @@ const viewNonFungibleModule = {
           erc1155TokenId: erc1155TokenIdDecimals,
           image,
         });
-
-        const publicResolver2Interface = new ethers.utils.Interface(ENS_PUBLICRESOLVER2_ABI);
-        for (const event of eventList) {
-          if (event.contract == ENS_PUBLICRESOLVER2_ADDRESS && event.type == "TextChanged") {
-            const tx = await provider.getTransaction(event.txHash);
-            const decodedData = publicResolver2Interface.parseTransaction({ data: tx.data, value: tx.value });
-            if (decodedData.functionFragment.name == "setText") {
-              const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
-              await context.commit('setTextValue', {
-                chainId: store.getters['connection/chainId'],
-                blockNumber: event.blockNumber,
-                txIndex: event.txIndex,
-                txHash: event.txHash,
-                labelhash: decodedFunctionArgs[0],
-                key: decodedFunctionArgs[1],
-                value: decodedFunctionArgs[2],
-              });
-
-            } else if (decodedData.functionFragment.name == "multicall") {
-              const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("multicall", tx.data);
-              for (const data1 of decodedFunctionArgs) {
-                for (const data2 of data1) {
-                  const decodedArrayData = publicResolver2Interface.parseTransaction({ data: data2, value: tx.value });
-                  if (decodedArrayData.functionFragment.name == "setText") {
-                    const decodedFunctionArgs1 = publicResolver2Interface.decodeFunctionData("setText", data2);
-                    await context.commit('setTextValue', {
-                      chainId: store.getters['connection/chainId'],
-                      blockNumber: event.blockNumber,
-                      txIndex: event.txIndex,
-                      txHash: event.txHash,
-                      labelhash: decodedFunctionArgs1[0],
-                      key: decodedFunctionArgs1[1],
-                      value: decodedFunctionArgs1[2],
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
 
         // // 2nd parameter with tokenId
         //
