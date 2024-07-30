@@ -93,29 +93,29 @@
         <div>
           <b-navbar variant="light" fixed="top" class="mx-1 my-0 p-0">
             <b-navbar-brand href="https://bokkypoobah.github.io/MagicalInternetMoney/" variant="primary">
-              <b-avatar rounded variant="light" size="3.0rem" src="images/LarvaChad_1532_zoomed_transparentbg.png" v-b-popover.hover="'gm'" class="ml-0"></b-avatar>
-              <em v-b-popover.hover="'gm gm gm'">Magical Internet Money</em>
+              <b-avatar rounded variant="light" size="3.0rem" src="images/LarvaChad_1532_zoomed_transparentbg.png" v-b-popover.hover.ds500.dh50="'gm'" class="ml-0"></b-avatar>
+              <em v-b-popover.hover.ds500.dh50="'gm gm gm'">Magical Internet Money</em>
             </b-navbar-brand>
             <b-navbar-nav class="ml-auto">
-              <!-- <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover="'Welcome'">Home</b-nav-item> -->
-              <b-nav-item size="sm" to="/addresses" active-class="active" v-b-popover.hover="'View or Edit Your Addresses'" class="mx-2">Addresses</b-nav-item>
-              <b-nav-item size="sm" to="/fungibles" active-class="active" v-b-popover.hover="'ERC-20 Fungible Tokens'" class="mx-2">Fungibles</b-nav-item>
-              <b-nav-item size="sm" to="/nonfungibles" active-class="active" v-b-popover.hover="'ERC-721 and ERC-1155 Non-Fungible Tokens'" class="mx-2">Non-Fungibles</b-nav-item>
-              <b-nav-item size="sm" to="/approvals" active-class="active" v-b-popover.hover="'ERC-20, ERC-721 and ERC-1155 Approvals'" class="mx-2">Approvals</b-nav-item>
-              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover="'ERC-6538 Stealth Meta-Address Registry'" class="mx-2">Registry</b-nav-item>
-              <b-nav-item size="sm" to="/stealthtransfers" active-class="active" v-b-popover.hover="'ERC-5564 Stealth Transfers'" class="mx-2">Stealth Transfers</b-nav-item>
-              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover="'Configuration'" class="mx-2">Config</b-nav-item>
+              <!-- <b-nav-item size="sm" to="/" active-class="active" v-b-popover.hover.ds500.dh50="'Welcome'">Home</b-nav-item> -->
+              <b-nav-item size="sm" to="/addresses" active-class="active" v-b-popover.hover.ds500.dh50="'View or Edit Your Addresses'" class="mx-2">Addresses</b-nav-item>
+              <b-nav-item size="sm" to="/fungibles" active-class="active" v-b-popover.hover.ds500.dh50="'ERC-20 Fungible Tokens'" class="mx-2">Fungibles</b-nav-item>
+              <b-nav-item size="sm" to="/nonfungibles" active-class="active" v-b-popover.hover.ds500.dh50="'ERC-721 and ERC-1155 Non-Fungible Tokens'" class="mx-2">Non-Fungibles</b-nav-item>
+              <b-nav-item size="sm" to="/approvals" active-class="active" v-b-popover.hover.ds500.dh50="'ERC-20, ERC-721 and ERC-1155 Approvals'" class="mx-2">Approvals</b-nav-item>
+              <b-nav-item size="sm" to="/registry" active-class="active" v-b-popover.hover.ds500.dh50="'ERC-6538 Stealth Meta-Address Registry'" class="mx-2">Registry</b-nav-item>
+              <b-nav-item size="sm" to="/stealthtransfers" active-class="active" v-b-popover.hover.ds500.dh50="'ERC-5564 Stealth Transfers'" class="mx-2">Stealth Transfers</b-nav-item>
+              <b-nav-item size="sm" to="/config" active-class="active" v-b-popover.hover.ds500.dh50="'Configuration'" class="mx-2">Config</b-nav-item>
               <b-nav-form>
-                <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
-                <b-button size="sm" variant="link" v-b-popover.hover="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
+                <b-button size="sm" variant="link" class="ml-4" v-b-popover.hover.ds500.dh50="'Power up this app'" @click="setPowerOn();" v-if="!powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
+                <b-button size="sm" variant="link" v-b-popover.hover.ds500.dh50="'Show status'" v-b-toggle.sidebar-status v-if="powerOn"><b-icon-layout-sidebar-reverse class="ml-4 mr-2" shift-v="-1" font-scale="1.3"></b-icon-layout-sidebar-reverse><b-spinner class="m-0" :variant="spinnerVariant" v-if="powerOn" style="animation: spinner-grow 3.75s linear infinite;" small type="grow" label="Spinning"></b-spinner></b-button>
                 <b-sidebar id="sidebar-status" v-model="statusSidebar" title="Status" width="400px" right shadow no-header-close header-class="m-0 p-0">
                   <template v-slot:title="{ hide }">
                     <div class="d-flex flex-row justify-content-between m-0 p-0" style="height: 37px;">
                       <div class="m-0 p-0">
-                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Close sidebar'" @click="hide"><b-icon-x shift-v="-1" font-scale="1.7"></b-icon-x></b-button>
+                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover.ds500.dh50="'Close sidebar'" @click="hide"><b-icon-x shift-v="-1" font-scale="1.7"></b-icon-x></b-button>
                       </div>
                       <div class="m-0 p-0">
-                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power down this app'" @click="setPowerOff();" v-if="powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
+                        <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover.ds500.dh50="'Power down this app'" @click="setPowerOff();" v-if="powerOn"><b-icon-power shift-v="-1" font-scale="1.5"></b-icon-power></b-button>
                       </div>
                       <div class="m-0 p-0 pt-2 pl-4">
                         <h5>Status</h5>
@@ -138,7 +138,7 @@
           <b-card no-header no-body class="m-0 p-0 border-0">
             <b-card-body class="m-0 p-0">
               <b-alert v-if="networkSupported === false" size="sm" variant="warning" show class="m-1 mb-2 px-2 py-1">
-                Please install the MetaMask extension, connect to one of the <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">supported networks</b-link> and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover="'Power up this app'" @click="setPowerOn();"><b-icon-power font-scale="1.2"></b-icon-power></b-button> on the top right and refresh again. <br />Stealth Transfers only supported on Sepolia; ENS names can be synced by connecting to the Ethereum mainnet (TODO).
+                Please install the MetaMask extension, connect to one of the <b-link href="https://stealthaddress.dev/contracts/deployments" target="_blank">supported networks</b-link> and refresh this page. Then click <b-button size="sm" variant="link" class="m-0 p-0" v-b-popover.hover.ds500.dh50="'Power up this app'" @click="setPowerOn();"><b-icon-power font-scale="1.2"></b-icon-power></b-button> on the top right and refresh again. <br />Stealth Transfers only supported on Sepolia; ENS names can be synced by connecting to the Ethereum mainnet (TODO).
               </b-alert>
             </b-card-body>
           </b-card>

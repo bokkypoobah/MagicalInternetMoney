@@ -473,7 +473,7 @@ const viewNonFungibleModule = {
       state.show = true;
     },
     addEvents(state, events) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
+      // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
       for (const event of events) {
         if (!(event.blockNumber in state.events)) {
           Vue.set(state.events, event.blockNumber, {});
