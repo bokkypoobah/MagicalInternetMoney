@@ -109,7 +109,7 @@ const Approvals = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(contract)="data">
-            <b-link :href="explorer + 'address/' + data.item.contract + '#code'" target="_blank">
+            <b-link :href="explorer + 'address/' + data.item.contract + '#code'" v-b-popover.hover="data.item.contract" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 10) + '...' + data.item.contract.slice(-8) }}</font>
             </b-link>
             <div v-if="data.item.unsupported">
@@ -134,14 +134,14 @@ const Approvals = {
           </template>
           <template #cell(owner)="data">
             <font size="-1">
-              <b-link :href="explorer + 'address/' + data.item.owner + '#code'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.owner" v-b-popover.hover="data.item.owner" target="_blank">
                 {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
               </b-link>
             </font>
           </template>
           <template #cell(spender)="data">
             <font size="-1">
-              <b-link :href="explorer + 'address/' + data.item.spender + '#code'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.spender + '#code'" v-b-popover.hover="data.item.spender" target="_blank">
                 {{ names[data.item.spender] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
               </b-link>
             </font>

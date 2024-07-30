@@ -57,7 +57,7 @@ const Registry = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(registrant)="data">
-            <b-link :href="explorer + 'address/' + data.item.registrant" v-b-popover.hover="'View ' + data.item.registrant + ' in the explorer'" target="_blank">
+            <b-link :href="explorer + 'address/' + data.item.registrant" v-b-popover.hover="data.item.registrant" target="_blank">
               {{ names[data.item.registrant] || (data.item.registrant.substring(0, 8) + '...' + data.item.registrant.slice(-6)) }}
             </b-link>
           </template>
