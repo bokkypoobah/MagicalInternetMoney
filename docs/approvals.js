@@ -135,14 +135,14 @@ const Approvals = {
           <template #cell(owner)="data">
             <font size="-1">
               <b-link :href="explorer + 'address/' + data.item.owner + '#code'" target="_blank">
-                {{ addresses[data.item.owner] && addresses[data.item.owner].name || ens[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
+                {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
               </b-link>
             </font>
           </template>
           <template #cell(spender)="data">
             <font size="-1">
               <b-link :href="explorer + 'address/' + data.item.spender + '#code'" target="_blank">
-                {{ addresses[data.item.spender] && addresses[data.item.spender].name || ens[data.item.spender] || customNames[data.item.spender] && customNames[data.item.spender][1] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
+                {{ names[data.item.spender] || (data.item.spender.substring(0, 8) + '...' + data.item.spender.slice(-6)) }}
               </b-link>
             </font>
           </template>
@@ -231,11 +231,8 @@ const Approvals = {
     tokens() {
       return store.getters['data/tokens'];
     },
-    ens() {
-      return store.getters['data/ens'];
-    },
-    customNames() {
-      return CUSTOMNAMES;
+    names() {
+      return store.getters['data/names'];
     },
     sync() {
       return store.getters['data/sync'];

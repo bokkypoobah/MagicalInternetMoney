@@ -2630,6 +2630,11 @@ const dataModule = {
           context.commit('updateName', { address, name });
         }
       }
+      for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
+        if (contractData.name && !(contract in context.state.names)) {
+          context.commit('updateName', { address: contract, name: contractData.name });
+        }
+      }
       for (const [address, addressData] of Object.entries(context.state.addresses)) {
         if (address.substring(0, 2) == "0x") {
           if (addressData.name && addressData.name.length > 0 && !(address in context.state.names)) {
@@ -2642,7 +2647,7 @@ const dataModule = {
           context.commit('updateName', { address, name });
         }
       }
-      // console.log(now() + " INFO dataModule:actions.collateNames - context.state.names: " + JSON.stringify(context.state.names));
+      // console.log(now() + " INFO dataModule:actions.collateNames - context.state.names: " + JSON.stringify(context.state.names, null, 2));
       context.dispatch('saveData', ['names']);
     },
 
