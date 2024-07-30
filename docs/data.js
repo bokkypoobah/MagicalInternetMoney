@@ -574,7 +574,7 @@ const dataModule = {
       }
     },
     addTimestamp(state, info) {
-      console.log(now() + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.addTimestamp info: " + JSON.stringify(info, null, 2));
       if (!(info.chainId in state.timestamps)) {
         Vue.set(state.timestamps, info.chainId, {});
       }
@@ -2683,7 +2683,7 @@ const dataModule = {
     },
 
     async addTimestamp(context, info) {
-      console.log(now() + " INFO dataModule:actions.addTimestamp - info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:actions.addTimestamp - info: " + JSON.stringify(info, null, 2));
       context.commit('addTimestamp', info);
       // await context.dispatch('saveData', ['timestamps']);
     },

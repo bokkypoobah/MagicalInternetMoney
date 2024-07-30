@@ -157,6 +157,7 @@ const ViewNonFungible = {
                 Label: {{ data.item.label }} Cost: {{ formatETH(data.item.cost) + ' ETH' }} Expiry: {{ formatTimestamp(data.item.expiry) }}
               </span>
               <span v-else-if="data.item.type == 'TextChanged'">
+                {{ data.item }}
                 "{{ data.item.key }}":
                 <span v-if="data.item.key == 'avatar'">
                   <span v-if="data.item.value">
@@ -452,20 +453,23 @@ const viewNonFungibleModule = {
   state: {
     contract: null,
     tokenId: null,
+    name: null,
     events: {},
     show: false,
   },
   getters: {
     contract: state => state.contract,
     tokenId: state => state.tokenId,
+    name: state => state.name,
     events: state => state.events,
     show: state => state.show,
   },
   mutations: {
     viewNonFungible(state, info) {
-      // console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
+      console.log(now() + " INFO viewNonFungibleModule:mutations.viewNonFungible - info: " + JSON.stringify(info));
       state.contract = info.contract;
       state.tokenId = info.tokenId;
+      state.name = info.name;
       state.events = {};
       state.show = true;
     },
@@ -487,6 +491,43 @@ const viewNonFungibleModule = {
       }
       // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - state.events: " + JSON.stringify(state.events, null, 2));
     },
+
+    setTextValue(state, info) {
+      console.log(now() + " INFO viewNonFungibleModule:mutations.setTextValue - info: " + JSON.stringify(info, null, 2));
+      // TODO: Find correct event and update the value field
+      // state.info = info;
+      // logInfo("viewNameModule", "mutations.setTextValue - state.events: " + JSON.stringify(state.events, null, 2));
+
+      if (state.events[info.blockNumber] && state.events[info.blockNumber][info.txIndex]) {
+        for (const [logIndex, data] of Object.entries(state.events[info.blockNumber][info.txIndex])) {
+          console.log(now() + " INFO viewNonFungibleModule:mutations.setTextValue - info.labelhash: " + info.labelhash + " vs " + data.node);
+          if (info.labelhash == data.node) {
+            console.log("---------" + info.blockNumber + "/" + info.txIndex + "/" + logIndex + " => " + JSON.stringify(data));
+            const newData = state.events[info.blockNumber][info.txIndex][logIndex];
+            newData.value = info.value;
+            console.log("state.events[info.blockNumber][info.txIndex] - BEFORE: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
+            Vue.set(state.events[info.blockNumber][info.txIndex], logIndex, newData);
+            console.log("state.events[info.blockNumber][info.txIndex] - AFTER: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
+          // } else {
+          //   console.log("different");
+          }
+        }
+        console.log("state.events[info.blockNumber][info.txIndex]: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
+      }
+
+      // await context.commit('setTextValue', {
+      //   chainId: store.getters['connection/chainId'],
+      //   blockNumber: event.blockNumber,
+      //   txIndex: event.txIndex,
+      //   txHash: event.txHash,
+      //   labelhash: decodedFunctionArgs1[0],
+      //   key: decodedFunctionArgs1[1],
+      //   value: decodedFunctionArgs1[2],
+      // });
+
+    },
+
+
     setShow(state, show) {
       state.show = show;
     },
@@ -521,8 +562,32 @@ const viewNonFungibleModule = {
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
 
-      if (contract == ENS_ERC1155_ADDRESS) {
-        // ENS Events
+      if (contract == ENS_ERC721_ADDRESS) {
+        try {
+          const topics = [[
+              '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', // NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
+            ],
+            [ ethers.BigNumber.from(tokenId).toHexString() ],
+            null
+          ];
+          const logs = await provider.getLogs({ address: ENS_OLDETHREGISTRARCONTROLLER_ADDRESS, fromBlock, toBlock, topics });
+          const events = processENSEventLogs(logs);
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          if (events.length > 0) {
+            const label = events[0].label;
+            // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - label: " + label);
+            erc1155TokenId = ethers.BigNumber.from(ethers.utils.namehash(label + ".eth")).toString();
+            // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - erc1155TokenId: " + erc1155TokenId);
+            tokenIds.push(ethers.BigNumber.from(erc1155TokenId).toHexString());
+          } else if (context.state.name != null && context.state.name.length > 4) {
+            erc1155TokenId = ethers.BigNumber.from(ethers.utils.namehash(context.state.name)).toString();
+            // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - erc1155TokenId: " + erc1155TokenId);
+            tokenIds.push(ethers.BigNumber.from(erc1155TokenId).toHexString());
+          }
+        } catch (e) {
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+        }
+      } else if (contract == ENS_ERC1155_ADDRESS) {
         try {
           const topics = [[
               '0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340', // NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
@@ -532,7 +597,7 @@ const viewNonFungibleModule = {
           ];
           const logs = await provider.getLogs({ address: ENS_ERC1155_ADDRESS, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           if (events.length > 0 && events[0].subdomain == null) {
             tokenIds.push(events[0].labelhash);
             erc721TokenId = events[0].labelhashDecimals;
@@ -541,8 +606,8 @@ const viewNonFungibleModule = {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
       }
-      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
-      // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenIds: " + JSON.stringify(tokenIds));
 
       // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
@@ -594,7 +659,9 @@ const viewNonFungibleModule = {
             tokenIds,
             null
           ];
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - topics: " + JSON.stringify(topics, null, 2));
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - logs: " + JSON.stringify(logs, null, 2));
           const events = processENSEventLogs(logs);
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
@@ -658,7 +725,7 @@ const viewNonFungibleModule = {
           const events = processENSEventLogs(logs);
           const selectedEvents = [];
           for (const event of events) {
-            console.log("event: " + JSON.stringify(event, null, 2));
+            // console.log("event: " + JSON.stringify(event, null, 2));
             if (event.type == "TransferSingle" && event.tokenId == erc1155TokenId) {
               // console.log("event: " + JSON.stringify(event, null, 2));
               selectedEvents.push(event);
@@ -666,7 +733,7 @@ const viewNonFungibleModule = {
               // TODO: Handle this
             }
           }
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer to events: " + JSON.stringify(selectedEvents, null, 2));
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer to events: " + JSON.stringify(selectedEvents, null, 2));
           await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
@@ -693,7 +760,7 @@ const viewNonFungibleModule = {
               // TODO: Handle this
             }
           }
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer from events: " + JSON.stringify(selectedEvents, null, 2));
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-1155 transfer from events: " + JSON.stringify(selectedEvents, null, 2));
           await context.commit('addEvents', selectedEvents);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
@@ -725,43 +792,47 @@ const viewNonFungibleModule = {
       // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - eventList: " + JSON.stringify(eventList, null, 2));
       const publicResolver2Interface = new ethers.utils.Interface(ENS_PUBLICRESOLVER2_ABI);
       for (const event of eventList) {
-        console.log(JSON.stringify(event, null, 2));
-        // if (event.contract == ENS_PUBLICRESOLVER2_ADDRESS && event.type == "TextChanged") {
-        //   const tx = await provider.getTransaction(event.txHash);
-        //   const decodedData = publicResolver2Interface.parseTransaction({ data: tx.data, value: tx.value });
-        //   if (decodedData.functionFragment.name == "setText") {
-        //     const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
-        //     await context.commit('setTextValue', {
-        //       chainId: store.getters['connection/chainId'],
-        //       blockNumber: event.blockNumber,
-        //       txIndex: event.txIndex,
-        //       txHash: event.txHash,
-        //       labelhash: decodedFunctionArgs[0],
-        //       key: decodedFunctionArgs[1],
-        //       value: decodedFunctionArgs[2],
-        //     });
-        //
-        //   } else if (decodedData.functionFragment.name == "multicall") {
-        //     const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("multicall", tx.data);
-        //     for (const data1 of decodedFunctionArgs) {
-        //       for (const data2 of data1) {
-        //         const decodedArrayData = publicResolver2Interface.parseTransaction({ data: data2, value: tx.value });
-        //         if (decodedArrayData.functionFragment.name == "setText") {
-        //           const decodedFunctionArgs1 = publicResolver2Interface.decodeFunctionData("setText", data2);
-        //           await context.commit('setTextValue', {
-        //             chainId: store.getters['connection/chainId'],
-        //             blockNumber: event.blockNumber,
-        //             txIndex: event.txIndex,
-        //             txHash: event.txHash,
-        //             labelhash: decodedFunctionArgs1[0],
-        //             key: decodedFunctionArgs1[1],
-        //             value: decodedFunctionArgs1[2],
-        //           });
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
+        if (event.contract == ENS_PUBLICRESOLVER2_ADDRESS && event.type == "TextChanged") {
+          const tx = await provider.getTransaction(event.txHash);
+          const decodedData = publicResolver2Interface.parseTransaction({ data: tx.data, value: tx.value });
+          if (decodedData.functionFragment.name == "setText") {
+            // console.log("setText - event: " + JSON.stringify(event, null, 2));
+            const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
+            console.log("decodedFunctionArgs: " + JSON.stringify(decodedFunctionArgs, null, 2));
+            await context.commit('setTextValue', {
+              chainId,
+              blockNumber: event.blockNumber,
+              txIndex: event.txIndex,
+              txHash: event.txHash,
+              labelhash: decodedFunctionArgs[0],
+              key: decodedFunctionArgs[1],
+              value: decodedFunctionArgs[2],
+            });
+          } else if (decodedData.functionFragment.name == "multicall") {
+            // console.log("multicall - event: " + JSON.stringify(event, null, 2));
+            const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("multicall", tx.data);
+            // console.log("multicall - decodedFunctionArgs: " + JSON.stringify(decodedFunctionArgs, null, 2));
+            for (const data1 of decodedFunctionArgs) {
+              for (const data2 of data1) {
+                const decodedArrayData = publicResolver2Interface.parseTransaction({ data: data2, value: tx.value });
+                // console.log("multicall - decodedArrayData: " + JSON.stringify(decodedArrayData, null, 2));
+                if (decodedArrayData.functionFragment.name == "setText") {
+                  const decodedFunctionArgs1 = publicResolver2Interface.decodeFunctionData("setText", data2);
+                  console.log("multicall - setText - decodedFunctionArgs1: " + JSON.stringify(decodedFunctionArgs1, null, 2));
+                  await context.commit('setTextValue', {
+                    chainId,
+                    blockNumber: event.blockNumber,
+                    txIndex: event.txIndex,
+                    txHash: event.txHash,
+                    labelhash: decodedFunctionArgs1[0],
+                    key: decodedFunctionArgs1[1],
+                    value: decodedFunctionArgs1[2],
+                  });
+                }
+              }
+            }
+          }
+        }
       }
 
       if (false) {
