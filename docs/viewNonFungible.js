@@ -157,7 +157,6 @@ const ViewNonFungible = {
                 Label: {{ data.item.label }} Cost: {{ formatETH(data.item.cost) + ' ETH' }} Expiry: {{ formatTimestamp(data.item.expiry) }}
               </span>
               <span v-else-if="data.item.type == 'TextChanged'">
-                {{ data.item }}
                 "{{ data.item.key }}":
                 <span v-if="data.item.key == 'avatar'">
                   <span v-if="data.item.value">
@@ -474,7 +473,7 @@ const viewNonFungibleModule = {
       state.show = true;
     },
     addEvents(state, events) {
-      // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
+      console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - events: " + JSON.stringify(events));
       for (const event of events) {
         if (!(event.blockNumber in state.events)) {
           Vue.set(state.events, event.blockNumber, {});
@@ -491,43 +490,16 @@ const viewNonFungibleModule = {
       }
       // console.log(now() + " INFO viewNonFungibleModule:mutations.addEvents - state.events: " + JSON.stringify(state.events, null, 2));
     },
-
     setTextValue(state, info) {
-      console.log(now() + " INFO viewNonFungibleModule:mutations.setTextValue - info: " + JSON.stringify(info, null, 2));
-      // TODO: Find correct event and update the value field
-      // state.info = info;
-      // logInfo("viewNameModule", "mutations.setTextValue - state.events: " + JSON.stringify(state.events, null, 2));
-
+      // console.log(now() + " INFO viewNonFungibleModule:mutations.setTextValue - info: " + JSON.stringify(info, null, 2));
       if (state.events[info.blockNumber] && state.events[info.blockNumber][info.txIndex]) {
         for (const [logIndex, data] of Object.entries(state.events[info.blockNumber][info.txIndex])) {
-          console.log(now() + " INFO viewNonFungibleModule:mutations.setTextValue - info.labelhash: " + info.labelhash + " vs " + data.node);
           if (info.labelhash == data.node) {
-            console.log("---------" + info.blockNumber + "/" + info.txIndex + "/" + logIndex + " => " + JSON.stringify(data));
-            const newData = state.events[info.blockNumber][info.txIndex][logIndex];
-            newData.value = info.value;
-            console.log("state.events[info.blockNumber][info.txIndex] - BEFORE: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
-            Vue.set(state.events[info.blockNumber][info.txIndex], logIndex, newData);
-            console.log("state.events[info.blockNumber][info.txIndex] - AFTER: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
-          // } else {
-          //   console.log("different");
+            Vue.set(state.events[info.blockNumber][info.txIndex][logIndex], 'value', info.value);
           }
         }
-        console.log("state.events[info.blockNumber][info.txIndex]: " + JSON.stringify(state.events[info.blockNumber][info.txIndex], null, 2));
       }
-
-      // await context.commit('setTextValue', {
-      //   chainId: store.getters['connection/chainId'],
-      //   blockNumber: event.blockNumber,
-      //   txIndex: event.txIndex,
-      //   txHash: event.txHash,
-      //   labelhash: decodedFunctionArgs1[0],
-      //   key: decodedFunctionArgs1[1],
-      //   value: decodedFunctionArgs1[2],
-      // });
-
     },
-
-
     setShow(state, show) {
       state.show = show;
     },
