@@ -2219,7 +2219,7 @@ const dataModule = {
           totalSupply = await interface.totalSupply();
         } catch (e) {
         }
-        await delay(500);
+        await delay(1000);
         const erc20Logos = NETWORKS['' + parameter.chainId].erc20Logos || [];
         let image = null;
         for (let i = 0; i < erc20Logos.length && !image; i++) {
