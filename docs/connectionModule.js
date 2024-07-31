@@ -24,7 +24,7 @@ const Connection = {
             </b-col>
           </b-row>
           <b-row>
-            <b-col cols="5" v-b-popover.hover.ds500.dh50="'Your Web3 attached account'" class="small px-1 text-right">Attached Account:</b-col>
+            <b-col cols="5" v-b-popover.hover.ds500="'Your Web3 attached account'" class="small px-1 text-right">Attached Account:</b-col>
             <b-col class="small px-1 truncate" cols="7">
               <div v-if="networkSupported">
                 <b-link :href="explorer + 'address/' + coinbase" class="card-link" target="_blank">{{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}</b-link>
@@ -32,7 +32,7 @@ const Connection = {
               <div v-else>
                 {{ coinbase == null ? '' : (coinbase.substring(0, 10) + '...' + coinbase.slice(-8)) }}
               </div>
-              <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover.ds500.dh50="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
+              <!-- <span class="float-right"><b-link v-if="chainInfo[chainId]" v-b-popover.hover.ds500="'View on OpenSea.io'" :href="chainInfo[chainId].nftAccountPrefix + coinbase" target="_blank"><img src="images/381114e-opensea-logomark-flat-colored-blue.png" width="20px" /></b-link></span> -->
             </b-col>
           </b-row>
           <b-row>
@@ -49,7 +49,7 @@ const Connection = {
               <span v-for="(key, hash) in txs">
                 <b-row>
                 <b-col class="small truncate">
-                  <b-link href="#" v-b-popover.hover.ds500.dh50="'Clear transaction ' + hash" @click="removeTx(hash)" class="card-link">x</b-link>
+                  <b-link href="#" v-b-popover.hover.ds500="'Clear transaction ' + hash" @click="removeTx(hash)" class="card-link">x</b-link>
                   <b-link :href="explorer + 'tx/' + hash" class="card-link" target="_blank">{{ hash }}</b-link>
                 </b-col>
                 </b-row>
@@ -61,7 +61,7 @@ const Connection = {
               Last Error
             </b-col>
             <b-col class="small truncate" cols="8">
-              <b-link href="#" v-b-popover.hover.ds500.dh50="'Clear error ' + txError" @click="clearTxError()" class="card-link">x</b-link>
+              <b-link href="#" v-b-popover.hover.ds500="'Clear error ' + txError" @click="clearTxError()" class="card-link">x</b-link>
               {{ txError }}
             </b-col>
           </b-row>

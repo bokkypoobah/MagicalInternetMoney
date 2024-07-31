@@ -8,19 +8,19 @@ const NonFungibles = {
         <!-- :MODALFAUCETS -->
         <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
           <template #modal-title>ERC-721 Faucets</template>
-          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.ds500.dh50="'Select faucet'"></b-form-select>
+          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.ds500="'Select faucet'"></b-form-select>
           <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.sidebar" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show sidebar'"><b-icon :icon="settings.sidebar ? 'layout-sidebar-inset' : 'layout-sidebar'" font-scale="1.1" variant="primary"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="settings.sidebar" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show sidebar'"><b-icon :icon="settings.sidebar ? 'layout-sidebar-inset' : 'layout-sidebar'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 pr-1" style="width: 200px;">
-            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.ds500.dh50="'Regex filter by name, description or tokenId'" placeholder="🔍 name/desc/id regex"></b-form-input>
+            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.ds500="'Regex filter by name, description or tokenId'" placeholder="🔍 name/desc/id regex"></b-form-input>
           </div>
           <div class="mt-0 pr-1">
-            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500.dh50="'Junk filter'">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500="'Junk filter'">
               <template #button-content>
                 <span v-if="settings.junkFilter == 'excludejunk'">
                   <b-iconstack font-scale="1">
@@ -63,49 +63,49 @@ const NonFungibles = {
             </b-dropdown>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.ds500.dh50="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.ds500="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500.dh50="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
-            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500.dh50="'Click the button on the right to stop. This process can be continued later'">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
             </b-progress>
           </div>
           <div class="ml-0 mt-1">
-            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500.dh50="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500.dh50="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500.dh50="'Yeah. Sort'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.ds500.dh50="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + items.length }}</font>
+            <font size="-2" v-b-popover.hover.ds500="'# tokens / total tokens transferred'">{{ filteredSortedItems.length + '/' + items.length }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
-            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500.dh50="'Page size'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500="'Page size'"></b-form-select>
           </div>
           <div class="mt-0 pl-1">
-            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500.dh50="'View'" right>
+            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500="'View'" right>
               <template #button-content>
                 <span v-if="settings.viewOption == 'list'">
                   <b-iconstack font-scale="1">
@@ -143,7 +143,7 @@ const NonFungibles = {
                     <b-input-group v-if="settings.showOwnerFilter">
                       <b-form-input type="text" size="sm" v-model.trim="settings.ownerFilter" @change="saveSettings" debounce="600" placeholder="Owner" class="border-0 m-0 p-0 px-2"></b-form-input>
                       <b-input-group-append>
-                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </b-input-group-append>
                     </b-input-group>
                     <div v-if="!settings.showOwnerFilter" class="d-flex flex-wrap m-0 p-0">
@@ -153,7 +153,7 @@ const NonFungibles = {
                       <div class="mt-0 flex-grow-1">
                       </div>
                       <div class="mt-0 pl-1">
-                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showOwnerFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show owner filter'"><b-icon :icon="settings.showOwnerFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </div>
                     </div>
                   </template>
@@ -163,12 +163,12 @@ const NonFungibles = {
                         <b-form-checkbox size="sm" :checked="settings.selectedOwners[chainId] && settings.selectedOwners[chainId][data.item.owner]" @change="ownersFilterChange(data.item.owner)"></b-form-checkbox>
                       </template>
                       <template #cell(owner)="data">
-                        <span v-b-popover.hover.ds500.dh50="data.item.owner">
+                        <span v-b-popover.hover.ds500="data.item.owner">
                         {{ names[data.item.owner] || (data.item.owner.substring(0, 8) + '...' + data.item.owner.slice(-6)) }}
                         </span>
                       </template>
                       <template #cell(items)="data">
-                        <span v-b-popover.hover.ds500.dh50="data.item.counts + ' including copies'">{{ data.item.items }}</span>
+                        <span v-b-popover.hover.ds500="data.item.counts + ' including copies'">{{ data.item.items }}</span>
                       </template>
                     </b-table>
                   </font>
@@ -178,7 +178,7 @@ const NonFungibles = {
                     <b-input-group v-if="settings.showcollectionFilter">
                       <b-form-input type="text" size="sm" v-model.trim="settings.collectionFilter" @change="saveSettings" debounce="600" placeholder="Collection" class="border-0 m-0 p-0 px-2"></b-form-input>
                       <b-input-group-append>
-                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show owner filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show owner filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </b-input-group-append>
                     </b-input-group>
                     <div v-if="!settings.showcollectionFilter" class="d-flex flex-wrap m-0 p-0">
@@ -188,7 +188,7 @@ const NonFungibles = {
                       <div class="mt-0 flex-grow-1">
                       </div>
                       <div class="mt-0 pl-1">
-                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show collection filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showcollectionFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show collection filter'"><b-icon :icon="settings.showcollectionFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </div>
                     </div>
                   </template>
@@ -201,12 +201,12 @@ const NonFungibles = {
                         <b-link v-if="data.item.collection" :href="'https://opensea.io/collection/' + data.item.slug" target="_blank">
                           {{ data.item.collection }}
                         </b-link>
-                        <b-link v-else :href="explorer + 'token/' + data.item.contract"  v-b-popover.hover.ds500.dh50="data.item.contract" target="_blank">
+                        <b-link v-else :href="explorer + 'token/' + data.item.contract"  v-b-popover.hover.ds500="data.item.contract" target="_blank">
                           {{ data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6) }}
                         </b-link>
                       </template>
                       <template #cell(items)="data">
-                        <span v-b-popover.hover.ds500.dh50="data.item.counts + ' including copies'">{{ data.item.items }}</span>
+                        <span v-b-popover.hover.ds500="data.item.counts + ' including copies'">{{ data.item.items }}</span>
                       </template>
                     </b-table>
                   </font>
@@ -220,7 +220,7 @@ const NonFungibles = {
                       <div class="mt-0 flex-grow-1">
                       </div>
                       <div class="mt-0 pl-1">
-                        <b-button size="sm" :pressed.sync="settings.showENSFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show ENS filter'"><b-icon :icon="settings.showENSFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
+                        <b-button size="sm" :pressed.sync="settings.showENSFilter" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show ENS filter'"><b-icon :icon="settings.showENSFilter ? 'chevron-up' : 'chevron-down'" font-scale="1.1" variant="primary"></b-icon></b-button>
                       </div>
                     </div>
                   </template>
@@ -248,7 +248,7 @@ const NonFungibles = {
               </template>
 
               <template #head(number)="data">
-                <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500.dh50="'Toggle selection'">
+                <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500="'Toggle selection'">
                   <template #button-content>
                     <b-icon-check-square shift-v="+1" font-scale="0.9"></b-icon-check-square>
                   </template>
@@ -257,7 +257,7 @@ const NonFungibles = {
                   <b-dropdown-item href="#" @click="clearSelected()">Clear selection</b-dropdown-item>
                   <b-dropdown-divider></b-dropdown-divider>
                   <b-dropdown-item href="#" @click="refreshSelectedNonFungibles()"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download> Refresh metadata for selected tokens from Reservoir</b-dropdown-item>
-                  <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()" v-b-popover.hover.ds500.dh50="'Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat selection above'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill> Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
+                  <b-dropdown-item href="#" @click="requestSelectedReservoirMetadataRefresh()" v-b-popover.hover.ds500="'Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat selection above'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill> Request Reservoir API to refresh their metadata for selected tokens</b-dropdown-item>
                 </b-dropdown>
               </template>
 
@@ -291,22 +291,22 @@ const NonFungibles = {
                 <br />
                 <font size="-1">{{ data.item.description }}</font>
                 <br />
-                <b-link v-if="networkSupported" @click="viewTokenContract(data.item);" v-b-popover.hover.ds500.dh50="'View token contract'">
+                <b-link v-if="networkSupported" @click="viewTokenContract(data.item);" v-b-popover.hover.ds500="'View token contract'">
                   <font size="-1">{{ names[data.item.contract] || data.item.collection }}</font>
                 </b-link>
 
-                <!-- <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover.ds500.dh50="'View Token Contract'" class="m-0 ml-1 p-0"> -->
+                <!-- <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover.ds500="'View Token Contract'" class="m-0 ml-1 p-0"> -->
                 <font size="-1">
                   <b-badge variant="light">
                     {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
                   </b-badge>
                 </font>
                 <!-- </b-button> -->
-                <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover.ds500.dh50="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
+                <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover.ds500="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
                   <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
                   </b-icon>
                 </b-button>
-                <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover.ds500.dh50="data.item.active ? 'Token active' : 'Token inactive'" class="m-0 ml-1 p-0">
+                <b-button size="sm" :disabled="data.item.junk" @click="toggleNonFungibleActive(data.item);" variant="transparent" v-b-popover.hover.ds500="data.item.active ? 'Token active' : 'Token inactive'" class="m-0 ml-1 p-0">
                   <b-icon :icon="data.item.active & !data.item.junk ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
                   </b-icon>
                 </b-button>
@@ -318,7 +318,7 @@ const NonFungibles = {
 
               <template #cell(owners)="data">
                 <div v-for="(info, i) in data.item.owners"  v-bind:key="i" class="m-0 p-0">
-                  <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover.ds500.dh50="info.owner" target="_blank">
+                  <b-link :href="explorer + 'address/' + info.owner" v-b-popover.hover.ds500="info.owner" target="_blank">
                     <font size="-1">
                       {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                       <span v-if="data.item.type == 'erc1155' && info.count > 1" class="small muted">
@@ -351,14 +351,14 @@ const NonFungibles = {
                   <b-card-text>
                     <div class="d-flex justify-content-between m-0 p-0" style="max-width: 13rem;">
                       <div class="mt-0 pr-1 truncate">
-                        <b-link v-if="networkSupported" @click="viewToken(record);" v-b-popover.hover.ds500.dh50="'View token'">
+                        <b-link v-if="networkSupported" @click="viewToken(record);" v-b-popover.hover.ds500="'View token'">
                           <font size="-1">{{ record.name }}</font>
                         </b-link>
                       </div>
                     </div>
                     <div class="d-flex justify-content-between m-0 p-0" style="max-width: 13rem;">
                       <div class="mt-0 pr-1 truncate">
-                        <b-link v-if="networkSupported" @click="viewTokenContract(record);" v-b-popover.hover.ds500.dh50="'View token contract'">
+                        <b-link v-if="networkSupported" @click="viewTokenContract(record);" v-b-popover.hover.ds500="'View token contract'">
                           <font size="-1">{{ names[record.contract] || record.collection }}</font>
                         </b-link>
                       </div>
@@ -366,7 +366,7 @@ const NonFungibles = {
                     <div class="d-flex justify-content-between m-0 p-0">
                       <div class="mt-0 pr-1">
                         <div v-for="(info, i) in record.owners"  v-bind:key="i" class="m-0 p-0">
-                          <b-link :href="explorer + 'address/' + info.owner"  v-b-popover.hover.ds500.dh50="info.owner" target="_blank">
+                          <b-link :href="explorer + 'address/' + info.owner"  v-b-popover.hover.ds500="info.owner" target="_blank">
                             <font size="-1">
                               {{ names[info.owner] || (info.owner.substring(0, 8) + '...' + info.owner.slice(-6)) }}
                               <span v-if="record.type == 'erc1155' && info.count > 1" class="small muted">

@@ -6,16 +6,16 @@ const Fungibles = {
         <!-- :MODALFAUCETS -->
         <b-modal ref="modalfaucet" id="modal-faucets" hide-footer body-bg-variant="light" size="md">
           <template #modal-title>ERC-20 Faucets</template>
-          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.ds500.dh50="'Select faucet'"></b-form-select>
+          <b-form-select size="sm" v-model="modalFaucet.selectedFaucet" :options="faucetsOptions" v-b-popover.hover.ds500="'Select faucet'"></b-form-select>
           <b-button size="sm" block :disabled="!modalFaucet.selectedFaucet" @click="drip()" variant="warning" class="mt-2">Drip {{ modalFaucet.selectedFaucet && faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0] ? (faucets.filter(e => e.address == modalFaucet.selectedFaucet)[0].drip + ' Tokens') : '' }}</b-button>
         </b-modal>
 
         <div class="d-flex flex-wrap m-0 p-0">
           <div class="mt-0 pr-1" style="width: 200px;">
-            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.ds500.dh50="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
+            <b-form-input type="text" size="sm" v-model.trim="settings.filter" @change="saveSettings" debounce="600" v-b-popover.hover.ds500="'Regex filter by address, symbol or name'" placeholder="🔍 addr/symb/name regex"></b-form-input>
           </div>
           <div class="mt-0 pr-1">
-            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500.dh50="'Junk filter'">
+            <b-dropdown size="sm" variant="link" v-b-popover.hover.ds500="'Junk filter'">
               <template #button-content>
                 <span v-if="settings.junkFilter == 'excludejunk'">
                   <b-iconstack font-scale="1">
@@ -58,46 +58,46 @@ const Fungibles = {
             </b-dropdown>
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500.dh50="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
+            <b-button size="sm" :pressed.sync="settings.activeOnly" @click="saveSettings" variant="transparent" v-b-popover.hover.ds500="'Show active only'"><b-icon :icon="settings.activeOnly ? 'check-circle-fill' : 'check-circle'" font-scale="1.1" variant="primary"></b-icon></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.ds500.dh50="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
+            <b-button size="sm" @click="viewFaucets" variant="link" v-b-popover.hover.ds500="'Drip tokens from ERC-20 and ERC-721 faucets'"><b-icon-plus shift-v="+1" font-scale="1.0"></b-icon-plus></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500.dh50="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
-            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500.dh50="'Click the button on the right to stop. This process can be continued later'">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
             </b-progress>
           </div>
           <div class="ml-0 mt-1">
-            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500.dh50="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500.dh50="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500.dh50="'Yeah. Sort'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.ds500.dh50="'# token contracts'">{{ filteredSortedItems.length + '/' + totalERC20Contracts }}</font>
+            <font size="-2" v-b-popover.hover.ds500="'# token contracts'">{{ filteredSortedItems.length + '/' + totalERC20Contracts }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedItems.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
-            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500.dh50="'Page size'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500="'Page size'"></b-form-select>
           </div>
         </div>
 
@@ -119,11 +119,11 @@ const Fungibles = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(active)="data">
-            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover.ds500.dh50="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
+            <b-button size="sm" @click="toggleFungibleJunk(data.item);" variant="transparent" v-b-popover.hover.ds500="data.item.junk ? 'Junk' : 'Not junk'" class="m-0 ml-1 p-0">
               <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
               </b-icon>
             </b-button>
-            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null || data.item.unsupported" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover.ds500.dh50="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
+            <b-button size="sm" :disabled="data.item.junk || data.item.decimals === null || data.item.unsupported" @click="toggleFungibleActive(data.item);" variant="transparent" v-b-popover.hover.ds500="data.item.active ? 'Active' : 'Inactive'" class="m-0 ml-1 p-0">
               <b-icon :icon="(data.item.active & !data.item.junk) ? 'check-circle-fill' : 'check-circle'" font-scale="1.2" :variant="(data.item.junk || !data.item.active) ? 'secondary' : 'primary'">
               </b-icon>
             </b-button>
@@ -132,12 +132,12 @@ const Fungibles = {
             <b-img v-if="data.item.image" button rounded width="75px;" :src="data.item.image" />
           </template>
           <template #cell(contract)="data">
-            <b-link :href="explorer + 'address/' + data.item.contract + '#code'" v-b-popover.hover.ds500.dh50="data.item.contract" target="_blank">
+            <b-link :href="explorer + 'address/' + data.item.contract + '#code'" v-b-popover.hover.ds500="data.item.contract" target="_blank">
               <font size="-1">{{ data.item.contract.substring(0, 8) + '...' + data.item.contract.slice(-6) }}</font>
             </b-link>
             <div v-if="data.item.unsupported">
               <font size="-1">
-                <b-badge variant="warning" v-b-popover.hover.ds500.dh50="'Unsupported Non-Standard ERC-20'">
+                <b-badge variant="warning" v-b-popover.hover.ds500="'Unsupported Non-Standard ERC-20'">
                   Unsupported
                 </b-badge>
               </font>
@@ -157,7 +157,7 @@ const Fungibles = {
             </div>
             <div v-else>
               <font size="-1">
-                <b-badge variant="warning" v-b-popover.hover.ds500.dh50="'Please set decimals as the fungible contract has not provided this information'">
+                <b-badge variant="warning" v-b-popover.hover.ds500="'Please set decimals as the fungible contract has not provided this information'">
                   To Configure
                 </b-badge>
               </font>
@@ -177,7 +177,7 @@ const Fungibles = {
             <font size="-1">
               <b-row v-for="(b, i) in data.item.balances" v-bind:key="i" class="m-0 p-0">
                 <b-col cols="5" class="m-0 px-1">
-                  <b-link :href="explorer + 'address/' + b.address" v-b-popover.hover.ds500.dh50="b.address" target="_blank">
+                  <b-link :href="explorer + 'address/' + b.address" v-b-popover.hover.ds500="b.address" target="_blank">
                     {{ names[b.address] || (b.address.substring(0, 8) + '...' + b.address.slice(-6)) }}
                   </b-link>
                 </b-col>

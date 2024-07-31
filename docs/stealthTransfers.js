@@ -10,20 +10,20 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-txhash" v-model.trim="transfer.item.txHash" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button v-if="transfer.item.txHash" size="sm" :href="explorer + 'tx/' + transfer.item.txHash" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button v-if="transfer.item.txHash" size="sm" :href="explorer + 'tx/' + transfer.item.txHash" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
           <b-form-group v-if="transfer.item" label="Timestamp:" label-for="transfer-timestamp" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.ds500.dh50="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
+            <b-form-input size="sm" plaintext id="transfer-timestamp" v-b-popover.hover.ds500="'Block #' + commify0(transfer.item.blockNumber)" :value="formatTimestamp(transfer.item.timestamp)" class="px-2"></b-form-input>
           </b-form-group>
           <b-form-group v-if="transfer.item && transfer.item.tx" label="Sender:" label-for="transfer-sender" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
             <b-input-group size="sm" class="w-100">
               <b-form-input size="sm" plaintext id="transfer-sender" v-model.trim="transfer.item.tx.from" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.tx.from" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.tx.from" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -33,7 +33,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-receiver" v-model.trim="transfer.item.stealthAddress" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.stealthAddress" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.stealthAddress" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -52,7 +52,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-linkedtoaddress" v-model.trim="transfer.item.linkedTo.address" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.linkedTo.address" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -71,7 +71,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-caller" v-model.trim="transfer.item.caller" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.caller" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="explorer + 'address/' + transfer.item.caller" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -94,7 +94,7 @@ const StealthTransfers = {
                     <font size="-1">{{ formatETH(item.value) }}</font>
                   </span> -->
                   <!-- <span v-else> -->
-                    <!-- <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.ds500.dh50="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button> -->
+                    <!-- <b-button size="sm" :href="chainInfo.nftTokenPrefix + item.token + '/' + item.value" variant="link" v-b-popover.hover.ds500="item.value" class="m-0 ml-2 p-0" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-button> -->
                   <!-- </span> -->
                 </b-col>
                 <!-- <b-col cols="3" class="px-0 mt-1"> -->
@@ -102,7 +102,7 @@ const StealthTransfers = {
                     <b-button size="sm" disabled variant="transparent" class="m-0 ml-2 p-0">ETH</b-button>
                   </span> -->
                   <!-- <span v-else> -->
-                    <!-- <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.ds500.dh50="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button> -->
+                    <!-- <b-button size="sm" :href="chainInfo.explorerTokenPrefix + item.token" variant="link" v-b-popover.hover.ds500="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ getTokenSymbol(item.token) }}</b-button> -->
                   <!-- </span> -->
                 <!-- </b-col> -->
               </b-row>
@@ -113,7 +113,7 @@ const StealthTransfers = {
               <b-form-input size="sm" plaintext id="transfer-address" v-model.trim="account.account" class="px-2"></b-form-input>
               <b-input-group-append>
                 <div>
-                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover.ds500.dh50="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
+                  <b-button size="sm" :href="'https://sepolia.etherscan.io/address/' + account.account" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank" class="m-0 ml-1 p-0"><b-icon-link45deg shift-v="+1" font-scale="0.95"></b-icon-link45deg></b-button>
                 </div>
               </b-input-group-append>
             </b-input-group>
@@ -122,7 +122,7 @@ const StealthTransfers = {
             <b-form-input size="sm" plaintext id="transfer-ensname" v-model.trim="account.ensName" class="px-2 w-75"></b-form-input>
           </b-form-group> -->
           <!-- <b-form-group label="" label-for="transfer-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.ds500.dh50="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
+            <b-button size="sm" @click="deleteAddress(account.account, 'modaladdress');" variant="link" v-b-popover.hover.ds500="'Delete account?'"><b-icon-trash shift-v="+1" font-scale="1.1" variant="danger"></b-icon-trash></b-button>
           </b-form-group> -->
           <font size="-1">
             <pre>
@@ -135,36 +135,36 @@ const StealthTransfers = {
           <div class="mt-0 flex-grow-1">
           </div>
           <div v-if="sync.section == null" class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500.dh50="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
+            <b-button size="sm" :disabled="!networkSupported" @click="viewSyncOptions" variant="link" v-b-popover.hover.ds500="'Sync data from the blockchain'"><b-icon-arrow-repeat shift-v="+1" font-scale="1.2"></b-icon-arrow-repeat></b-button>
           </div>
           <div v-if="sync.section != null" class="mt-1" style="width: 300px;">
-            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500.dh50="'Click the button on the right to stop. This process can be continued later'">
+            <b-progress height="1.5rem" :max="sync.total" show-progress :animated="sync.section != null" :variant="sync.section != null ? 'success' : 'secondary'" v-b-popover.hover.ds500="'Click the button on the right to stop. This process can be continued later'">
               <b-progress-bar :value="sync.completed">
                 {{ sync.total == null ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
               </b-progress-bar>
             </b-progress>
           </div>
           <div class="ml-0 mt-1">
-            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500.dh50="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
+            <b-button v-if="sync.section != null" size="sm" @click="halt" variant="link" v-b-popover.hover.ds500="'Click to stop. This process can be continued later'"><b-icon-stop-fill shift-v="+1" font-scale="1.0"></b-icon-stop-fill></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500.dh50="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
+            <b-button size="sm" :disabled="!transferHelper" @click="newTransfer(null); " variant="link" v-b-popover.hover.ds500="'New Stealth Transfer'"><b-icon-caret-right shift-v="+1" font-scale="1.1"></b-icon-caret-right></b-button>
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
           <div class="mt-0 pr-1">
-            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500.dh50="'Yeah. Sort'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500="'Yeah. Sort'"></b-form-select>
           </div>
           <div class="mt-0 pr-1">
-            <font size="-2" v-b-popover.hover.ds500.dh50="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalTransfers }}</font>
+            <font size="-2" v-b-popover.hover.ds500="'# registry entries'">{{ filteredSortedTransfers.length + '/' + totalTransfers }}</font>
           </div>
           <div class="mt-0 pr-1">
             <b-pagination size="sm" v-model="settings.currentPage" @input="saveSettings" :total-rows="filteredSortedTransfers.length" :per-page="settings.pageSize" style="height: 0;"></b-pagination>
           </div>
           <div class="mt-0 pl-1">
-            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500.dh50="'Page size'"></b-form-select>
+            <b-form-select size="sm" v-model="settings.pageSize" @change="saveSettings" :options="pageSizes" v-b-popover.hover.ds500="'Page size'"></b-form-select>
           </div>
         </div>
 
@@ -186,7 +186,7 @@ const StealthTransfers = {
             {{ parseInt(data.index) + ((settings.currentPage - 1) * settings.pageSize) + 1 }}
           </template>
           <template #cell(timestamp)="data">
-            <!-- TODO <b-link :href="explorer + 'atx/' + data.item.txHash" v-b-popover.hover.ds500.dh50="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank"> -->
+            <!-- TODO <b-link :href="explorer + 'atx/' + data.item.txHash" v-b-popover.hover.ds500="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank"> -->
             <b-link :href="explorer + 'tx/' + data.item.txHash" target="_blank">
               <span v-if="data.item.timestamp">
                 {{ formatTimestamp(data.item.timestamp) }}
@@ -199,14 +199,14 @@ const StealthTransfers = {
           </template>
           <template #cell(sender)="data">
             <div v-if="data.item.tx && data.item.tx.from">
-              <b-link :href="explorer + 'address/' + data.item.tx.from" v-b-popover.hover.ds500.dh50="'View in etherscan.io'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.tx.from" v-b-popover.hover.ds500="'View in etherscan.io'" target="_blank">
                 {{ data.item.tx.from }}
               </b-link>
             </div>
           </template>
           <template #cell(receiver)="data">
             <div v-if="data.item.stealthAddress">
-              <b-link :href="explorer + 'address/' + data.item.stealthAddress" v-b-popover.hover.ds500.dh50="'View in etherscan.io'" target="_blank">
+              <b-link :href="explorer + 'address/' + data.item.stealthAddress" v-b-popover.hover.ds500="'View in etherscan.io'" target="_blank">
                 {{ data.item.stealthAddress }}
               </b-link>
             </div>
@@ -221,14 +221,14 @@ const StealthTransfers = {
                 <span v-else-if="getTokenType(item.token) == 'erc20'">
                   <font size="-1">
                     {{ formatETH(item.value) }}
-                    <b-link :href="explorer + 'token/' + item.token" v-b-popover.hover.ds500.dh50="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
+                    <b-link :href="explorer + 'token/' + item.token" v-b-popover.hover.ds500="item.tokenId" target="_blank">{{ getTokenSymbol(item.token) }}</b-link>
                   </font>
                 </span>
                 <span v-else>
                   <!-- TODO -->
                   <font size="-1">
-                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.ds500.dh50="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
-                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover.ds500.dh50="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
+                    <b-link :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.value" v-b-popover.hover.ds500="item.value" target="_blank">{{ item.value.toString().length > 20 ? (item.value.toString().substring(0, 8) + '...' + item.value.toString().slice(-8)) : item.value.toString() }}</b-link>
+                    <b-link :href="'https://sepolia.etherscan.io/token/' + item.token" v-b-popover.hover.ds500="item.tokenId" target="_blank">{{ item.token.substring(0, 10) + '...' + item.token.slice(-8) /*getTokenSymbol(item.token)*/ }}</b-link>
                   </font>
                 </span>
               </b-col>
