@@ -4,7 +4,7 @@ const NewTransfer = {
       <!-- :MODALADDTOKENSTOTRANSFER -->
       <b-modal ref="addtokensfortransfer" id="modal-addtokensfortransfer" hide-footer body-bg-variant="light" size="md">
         <template #modal-title>Add Tokens For Transfer</template>
-        <b-form-select size="sm" v-model="modalAddTokensToNewTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.ds500.dh50=="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
+        <b-form-select size="sm" v-model="modalAddTokensToNewTransfer.token" @change="additionalTokenSelected" :options="additionalERC20TokensOptions" v-b-popover.hover.ds500.dh50="'Select ERC-20 or ERC-721 tokens to transfer'" class="w-100"></b-form-select>
         <div v-if="additionalERC20TokensOptions.length == 1">
           <b-alert size="sm" show variant="warning" class="mt-2">Select favourite tokens in the Tokens tab first</b-alert>
         </div>
@@ -34,7 +34,7 @@ const NewTransfer = {
             </font>
           </template>
           <template #cell(tokenId)="data">
-            <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + modalAddTokensToNewTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.ds500.dh50=="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
+            <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + modalAddTokensToNewTransfer.token + '/' + data.item.tokenId" variant="link" v-b-popover.hover.ds500.dh50="data.item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ data.item.tokenId.toString().length > 20 ? (data.item.tokenId.toString().substring(0, 8) + '...' + data.item.tokenId.toString().slice(-8)) : data.item.tokenId.toString() }}</b-button>
           </template>
           <template #cell(select)="data">
             <b-form-checkbox size="sm" :checked="data.item.selected ? 1 : 0" value="1" @change="erc721TokenIdToggle(data.item.tokenId)" class="ml-2"></b-form-checkbox>
@@ -70,7 +70,7 @@ const NewTransfer = {
           <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" class="px-2"></b-form-textarea>
         </b-form-group>
         <b-form-group v-if="!stealthMetaAddressSpecified" label="To:" label-for="newtransfer-to-unspecified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
-          <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.ds500.dh50=="'Select from your approved Stealth Meta-Addresses'" class="w-100"></b-form-select>
+          <b-form-select size="sm" v-model="stealthMetaAddress" :options="stealthMetaAddressesOptions" v-b-popover.hover.ds500.dh50="'Select from your approved Stealth Meta-Addresses'" class="w-100"></b-form-select>
         </b-form-group>
         <b-form-group v-if="!stealthMetaAddressSpecified" label="" label-for="newtransfer-to-specified" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
           <b-form-textarea size="sm" plaintext id="newtransfer-to-specified" :value="stealthMetaAddress" rows="3" max-rows="4" placeholder="Select from above" class="px-2"></b-form-textarea>
@@ -88,11 +88,11 @@ const NewTransfer = {
                 <font size="-1">{{ item.amount }}</font>
               </div>
               <div v-if="item.type == 'erc721'">
-                <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.tokenId" variant="link" v-b-popover.hover.ds500.dh50=="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ item.tokenId.toString().length > 20 ? (item.tokenId.toString().substring(0, 8) + '...' + item.tokenId.toString().slice(-8)) : item.tokenId.toString() }}</b-button>
+                <b-button size="sm" :href="'https://testnets.opensea.io/assets/sepolia/' + item.token + '/' + item.tokenId" variant="link" v-b-popover.hover.ds500.dh50="item.tokenId" class="m-0 ml-2 p-0" target="_blank">{{ item.tokenId.toString().length > 20 ? (item.tokenId.toString().substring(0, 8) + '...' + item.tokenId.toString().slice(-8)) : item.tokenId.toString() }}</b-button>
               </div>
             </b-col>
             <b-col cols="1" class="mx-0 px-1">
-              <b-button size="sm" @click="removeTokensForTransfer(index);" variant="link" v-b-popover.hover.ds500.dh50=="'Remove ' + item.symbol + ' ' + (item.type == 'erc20' ? item.amount : item.tokenId)" class="m-0 ml-2 p-0"><b-icon-dash shift-v="+1" font-scale="1.1"></b-icon-dash></b-button>
+              <b-button size="sm" @click="removeTokensForTransfer(index);" variant="link" v-b-popover.hover.ds500.dh50="'Remove ' + item.symbol + ' ' + (item.type == 'erc20' ? item.amount : item.tokenId)" class="m-0 ml-2 p-0"><b-icon-dash shift-v="+1" font-scale="1.1"></b-icon-dash></b-button>
             </b-col>
           </b-row>
           <b-row>
@@ -101,7 +101,7 @@ const NewTransfer = {
             <b-col cols="3" class="mb-1 pr-1">
             </b-col>
             <b-col cols="1" class="mx-0 px-1">
-              <b-button size="sm" @click="addTokensForTransfer();" variant="link" v-b-popover.hover.ds500.dh50=="'Add ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-plus shift-v="+1" font-scale="1.1"></b-icon-plus></b-button>
+              <b-button size="sm" @click="addTokensForTransfer();" variant="link" v-b-popover.hover.ds500.dh50="'Add ERC-20/ERC-721 tokens to transfer'" class="m-0 ml-2 p-0"><b-icon-plus shift-v="+1" font-scale="1.1"></b-icon-plus></b-button>
             </b-col>
           </b-row>
         </b-form-group>
