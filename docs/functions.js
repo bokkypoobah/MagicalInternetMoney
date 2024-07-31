@@ -471,18 +471,18 @@ function decodeNameWrapperBytes(b) {
 // ENS: ETH Registrar Controller @ 0x253553366Da8546fC250F225fe3d25d0C782303b deployed Mar-28-2023 11:44:59 AM +UTC
 
 const VALID_ENS_CONTRACTS = {
-  "0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455": "ENS:Old ETH Registrar Controller 1",
-  "0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16": "ENS:Old ETH Registrar Controller 2",
-  "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5": "ENS:Old ETH Registrar Controller",
-  "0x253553366Da8546fC250F225fe3d25d0C782303b": "ENS:ETH Registrar Controller",
-  "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": "ENS:Name Wrapper",
-  "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": "ENS:Base Registrar Implementation",
-  "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e": "ENS:Registry with Fallback",
-  "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63": "ENS:Public Resolver",
-  "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41": "ENS:Public Resolver 2",
-  "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8": "ENS:Old Public Resolver 2",
-  "0x314159265dD8dbb310642f98f50C066173C1259b": "ENS:Eth Name Service",
-  "0xFaC7BEA255a6990f749363002136aF6556b31e04": "ENS:Old ENS Token",
+  "0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455": "ENS: Old ETH Registrar Controller 1",
+  "0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16": "ENS: Old ETH Registrar Controller 2",
+  "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5": "ENS: Old ETH Registrar Controller",
+  "0x253553366Da8546fC250F225fe3d25d0C782303b": "ENS: ETH Registrar Controller",
+  "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": "ENS: Name Wrapper",
+  "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": "ENS: Ethereum Name Service",
+  "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e": "ENS: Registry with Fallback",
+  "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63": "ENS: Public Resolver",
+  "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41": "ENS: Public Resolver 2",
+  "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8": "ENS: Old Public Resolver 2",
+  "0x314159265dD8dbb310642f98f50C066173C1259b": "ENS: Eth Name Service",
+  "0xFaC7BEA255a6990f749363002136aF6556b31e04": "ENS: Old ENS Token",
 };
 
 function processENSEventLogs(logs) {

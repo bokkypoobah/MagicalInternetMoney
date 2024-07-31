@@ -291,13 +291,17 @@ const NonFungibles = {
                 <br />
                 <font size="-1">{{ data.item.description }}</font>
                 <br />
-                <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover.ds500.dh50="'View Token Contract'" class="m-0 ml-1 p-0">
-                  <font size="-1">
-                    <b-badge variant="light">
-                      {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
-                    </b-badge>
-                  </font>
-                </b-button>
+                <b-link v-if="networkSupported" @click="viewTokenContract(data.item);" v-b-popover.hover.ds500.dh50="'View token contract'">
+                  <font size="-1">{{ names[data.item.contract] || data.item.collection }}</font>
+                </b-link>
+
+                <!-- <b-button size="sm" @click="viewTokenContract(data.item);" variant="transparent"  v-b-popover.hover.ds500.dh50="'View Token Contract'" class="m-0 ml-1 p-0"> -->
+                <font size="-1">
+                  <b-badge variant="light">
+                    {{ data.item.type == "erc721" ? "ERC-721" : "ERC-1155" }}
+                  </b-badge>
+                </font>
+                <!-- </b-button> -->
                 <b-button size="sm" @click="toggleNonFungibleJunk(data.item);" variant="transparent" v-b-popover.hover.ds500.dh50="data.item.junk ? 'Junk collection' : 'Not junk collection'" class="m-0 ml-1 p-0">
                   <b-icon :icon="data.item.junk ? 'trash-fill' : 'trash'" font-scale="1.2" :variant="data.item.junk ? 'primary' : 'secondary'">
                   </b-icon>
@@ -347,7 +351,16 @@ const NonFungibles = {
                   <b-card-text>
                     <div class="d-flex justify-content-between m-0 p-0" style="max-width: 13rem;">
                       <div class="mt-0 pr-1 truncate">
-                        <font size="-1">{{ record.name }}</font>
+                        <b-link v-if="networkSupported" @click="viewToken(record);" v-b-popover.hover.ds500.dh50="'View token'">
+                          <font size="-1">{{ record.name }}</font>
+                        </b-link>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-between m-0 p-0" style="max-width: 13rem;">
+                      <div class="mt-0 pr-1 truncate">
+                        <b-link v-if="networkSupported" @click="viewTokenContract(record);" v-b-popover.hover.ds500.dh50="'View token contract'">
+                          <font size="-1">{{ names[record.contract] || record.collection }}</font>
+                        </b-link>
                       </div>
                     </div>
                     <div class="d-flex justify-content-between m-0 p-0">
@@ -988,6 +1001,10 @@ const NonFungibles = {
     viewTokenContract(item) {
       console.log(now() + " INFO NonFungibles:methods.viewTokenContract - item: " + JSON.stringify(item, null, 2));
       store.dispatch('viewTokenContract/viewTokenContract', { contract: item.contract, tokenId: item.tokenId });
+    },
+    viewToken(item) {
+      console.log(now() + " INFO NonFungibles:methods.viewToken - item: " + JSON.stringify(item, null, 2));
+      store.dispatch('viewNonFungible/viewNonFungible', { contract: item.contract, tokenId: item.tokenId, name: item.name });
     },
 
 

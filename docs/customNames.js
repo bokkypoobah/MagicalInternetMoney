@@ -10,7 +10,7 @@ const CUSTOMNAMES = {
   "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671": ["erc20", "NMR", "Numeraire"],
   "0x1E0049783F008A0085193E00003D00cd54003c71": ["nftexchange", "OS:Conduit", "OpenSea:Conduit"],
   "0x2f18F339620a63e43f0839Eeb18D7de1e1Be4DfB": ["nftexchange", "Blur:Delegate", "Blur:Delegate"],
-  "0x495f947276749Ce646f68AC8c248420045cb7b5e": ["erc1155", "OSSSF", "OpenSea Shared StoreFront"],
+  "0x495f947276749Ce646f68AC8c248420045cb7b5e": ["erc1155", "OpenSea Shared StoreFront", "OpenSea Shared StoreFront"],
   "0x4feE7B061C97C9c496b01DbcE9CDb10c02f0a0Be": ["nftexchange", "TransferProxy", "Rarible:TransferProxy"],
   // "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": ["erc721", "ENS", "Ethereum Name Service"],
   "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45": ["ftexchange", "UniswapV3:SwapRouter02", "UniswapV3:SwapRouter02"],
