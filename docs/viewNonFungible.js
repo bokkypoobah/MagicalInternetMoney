@@ -578,8 +578,8 @@ const viewNonFungibleModule = {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
         }
       }
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
-      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId);
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId + " / " + ethers.BigNumber.from(tokenId).toHexString());
+      console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc1155TokenId: " + erc1155TokenId + " / " + ethers.BigNumber.from(erc1155TokenId).toHexString());
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - tokenIds: " + JSON.stringify(tokenIds));
 
       // ENS: Old ETH Registrar Controller 1 @ 0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455 deployed Apr-30-2019 03:54:13 AM +UTC
@@ -807,6 +807,58 @@ const viewNonFungibleModule = {
         }
       }
 
+      // // // 2nd parameter with tokenId
+      // //
+      // // const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
+      // // console.log("erc721TokenIdDecimals: " + erc721TokenIdDecimals + " " + erc721TokenId);
+      // // const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
+      // // console.log("erc1155TokenIdDecimals: " + erc1155TokenIdDecimals + " " + erc1155TokenId);
+      // //
+      // const testName = "A2113f1E9A66c3B0A75BB466bbBfeEeC987ac92e.addr.reverse";
+      // const testNamehash = ethers.utils.namehash(testName);
+      // console.log("testName: " + testName + " => " + testNamehash);
+      //
+      // const name = context.state.name;
+      // console.log("name: " + name);
+      // const namehash = ethers.utils.namehash(name);
+      // console.log("namehash: " + namehash);
+      // const namehashDecimals = ethers.BigNumber.from(namehash).toString();
+      // console.log("namehashDecimals: " + namehashDecimals);
+      // const label = name.replace(/\.eth/, '');
+      // console.log("label: " + label);
+      // const labelhash = ethers.utils.namehash(label + ".addr.reverse");
+      // console.log("labelhash: " + labelhash);
+      // const labelhashDecimals = ethers.BigNumber.from(labelhash).toString();
+      // console.log("labelhashDecimals: " + labelhashDecimals);
+      //
+      // // } else if (context.state.name != null && context.state.name.length > 4) {
+      // // erc1155TokenId = ethers.BigNumber.from(ethers.utils.namehash(context.state.name)).toString();
+      // // // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - erc1155TokenId: " + erc1155TokenId);
+      // // tokenIds.push(ethers.BigNumber.from(erc1155TokenId).toHexString());
+      //
+      // console.log("tokenIds: " + JSON.stringify(tokenIds));
+      // try {
+      //   const topics = [
+      //     '0x6ada868dd3058cf77a48a74489fd7963688e5464b2b0fa957ace976243270e92', // ReverseClaimed (index_topic_1 address addr, index_topic_2 bytes32 node)
+      //     null, // "0x000000000000000000000000A2113f1E9A66c3B0A75BB466bbBfeEeC987ac92e",
+      //     // [ erc721TokenId, erc1155TokenId ],
+      //     tokenIds,
+      //   ];
+      //   console.log("topics: " + JSON.stringify(topics, null, 2));
+      //   const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
+      //   console.log("logs: " + JSON.stringify(logs, null, 2));
+      // //   // await processLogs(fromBlock, toBlock, logs);
+      // //   const results = processENSEventLogs(logs);
+      // } catch (e) {
+      //   console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
+      // }
+      // //
+      // // // 0x13c293ab26f380f6555b301eecbae5dc67ce5ce322670655f3396abf2983a145
+      // // const reverseAddress = "a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse";
+      // // const namehash = ethers.utils.namehash(reverseAddress);
+      // // console.log("reverseAddress: " + reverseAddress + ", namehash: " + namehash);
+      // // // reverseAddress: a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse, namehash: 0x7d75f26ebf4147fc33aef5d5d6ae97e7a8e0f8985a40d73bb2ddacdd1e5e3ce0
+
       if (false) {
         const erc721Transfers = eventList.filter(e => e.type == "Transfer");
         const erc721Owner = erc721Transfers.length > 0 ? erc721Transfers[0].to : null;
@@ -825,34 +877,6 @@ const viewNonFungibleModule = {
           image,
         });
 
-        // // 2nd parameter with tokenId
-        //
-        // const erc721TokenIdDecimals = ethers.BigNumber.from(erc721TokenId).toString();
-        // console.log("erc721TokenIdDecimals: " + erc721TokenIdDecimals + " " + erc721TokenId);
-        // const erc1155TokenIdDecimals = ethers.BigNumber.from(erc1155TokenId).toString();
-        // console.log("erc1155TokenIdDecimals: " + erc1155TokenIdDecimals + " " + erc1155TokenId);
-        //
-        // try {
-        //   const topics = [
-        //     '0x6ada868dd3058cf77a48a74489fd7963688e5464b2b0fa957ace976243270e92', // ReverseClaimed (index_topic_1 address addr, index_topic_2 bytes32 node)
-        //     "0x000000000000000000000000A2113f1E9A66c3B0A75BB466bbBfeEeC987ac92e",
-        //     // [ erc721TokenId, erc1155TokenId ],
-        //     // erc1155TokenId,
-        //   ];
-        //   console.log("topics: " + JSON.stringify(topics, null, 2));
-        //   const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
-        //   console.log("logs: " + JSON.stringify(logs, null, 2));
-        //   // await processLogs(fromBlock, toBlock, logs);
-        //   const results = processENSEventLogs(logs);
-        // } catch (e) {
-        //   console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
-        // }
-        //
-        // // 0x13c293ab26f380f6555b301eecbae5dc67ce5ce322670655f3396abf2983a145
-        // const reverseAddress = "a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse";
-        // const namehash = ethers.utils.namehash(reverseAddress);
-        // console.log("reverseAddress: " + reverseAddress + ", namehash: " + namehash);
-        // // reverseAddress: a2113f1e9a66c3b0a75bb466bbbfeeec987ac92e.addr.reverse, namehash: 0x7d75f26ebf4147fc33aef5d5d6ae97e7a8e0f8985a40d73bb2ddacdd1e5e3ce0
 
       }
       // context.commit('forceRefresh');
