@@ -26,6 +26,9 @@ const ViewNonFungible = {
                 </b-input-group-append>
               </b-input-group>
             </b-form-group>
+            <b-form-group label="Collection:" label-for="token-collection" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-input size="sm" plaintext id="token-collection" :value="collection" class="px-2 w-100"></b-form-input>
+            </b-form-group>
 
             <b-form-group label="Token Id:" label-for="token-tokenid" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-input-group size="sm" class="w-100">
@@ -46,11 +49,9 @@ const ViewNonFungible = {
             <b-form-group label="Name:" label-for="token-name" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-form-input size="sm" plaintext id="token-name" :value="name" class="px-2 w-100"></b-form-input>
             </b-form-group>
-
             <b-form-group label="Description:" label-for="token-description" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <component size="sm" plaintext :is="description && description.length > 60 ? 'b-form-textarea' : 'b-form-input'" :value="description" rows="3" max-rows="10" class="px-2" />
             </b-form-group>
-
             <b-form-group label="" label-for="token-refreshnonfungiblemetadata" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
               <b-button size="sm" :disabled="sync.section != null" @click="refreshNonFungibleMetadata();" variant="link" v-b-popover.hover.ds500.dh50="'Refresh Non-Fungible token metadata from Reservoir'"><b-icon-cloud-download shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-download></b-button>
               <b-button size="sm" :disabled="sync.section != null" @click="requestReservoirMetadataRefresh();" variant="link" v-b-popover.hover.ds500.dh50="'Request Reservoir API to refresh their metadata. Use this if Reservoir does not have the correct metadata. Wait a few minutes then repeat refresh to the left'"><b-icon-cloud-fill shift-v="+1" font-scale="1.1" variant="primary"></b-icon-cloud-fill></b-button>
@@ -83,10 +84,6 @@ const ViewNonFungible = {
           </b-form-group>
           </b-col>
         </b-row>
-
-
-
-
 
 
         <b-form-group v-if="false" label="" label-for="token-delete" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -266,6 +263,9 @@ const ViewNonFungible = {
     },
     names() {
       return store.getters['data/names'];
+    },
+    collection() {
+      return this.contract && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].name || null;
     },
     token() {
       return this.contract && this.tokenId && this.tokens[this.chainId] && this.tokens[this.chainId][this.contract] && this.tokens[this.chainId][this.contract].tokens[this.tokenId] || {};
