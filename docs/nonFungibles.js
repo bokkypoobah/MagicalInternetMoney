@@ -525,7 +525,7 @@ const NonFungibles = {
       const results = (store.getters['data/forceRefresh'] % 2) == 0 ? {} : {};
       for (const [address, addressData] of Object.entries(this.addresses)) {
         // TODO: Remove "address" check
-        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
+        if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
           results[address] = true;
         }
       }

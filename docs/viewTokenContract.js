@@ -514,12 +514,12 @@ const viewTokenContractModule = {
         contractName: name,
         contractDecimals: decimals && decimals.toString() || null,
       });
-      const selectedAddressesMap = {};
-      for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
-        if (address.substring(0, 2) == "0x" && addressData.type == "address" && !addressData.junk && addressData.watch) {
-          selectedAddressesMap[address] = true;
-        }
-      }
+      // const selectedAddressesMap = {};
+      // for (const [address, addressData] of Object.entries(store.getters['data/addresses'] || {})) {
+      //   if (address.substring(0, 2) == "0x" && !addressData.junk && addressData.watch) {
+      //     selectedAddressesMap[address] = true;
+      //   }
+      // }
     },
     async setSymbol(context, symbol) {
       console.log(now() + " INFO viewTokenContractModule:actions.setSymbol - symbol: " + symbol);

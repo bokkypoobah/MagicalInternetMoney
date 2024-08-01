@@ -278,7 +278,7 @@ const dataModule = {
       Vue.set(state.balances, info.chainId, info.balances);
     },
     updateApprovals(state, info) {
-      console.log(now() + " INFO dataModule:mutations.updateApprovals - info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:mutations.updateApprovals - info: " + JSON.stringify(info, null, 2));
       Vue.set(state.approvals, info.chainId, info.approvals);
     },
     toggleAddressField(state, info) {

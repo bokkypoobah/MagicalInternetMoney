@@ -95,7 +95,7 @@ const SyncOptions = {
   },
   methods: {
     saveSettings() {
-      console.log(now() + " INFO SyncOptions:methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
+      // console.log(now() + " INFO SyncOptions:methods.saveSettings - syncOptionsSettings: " + JSON.stringify(this.settings, null, 2));
       localStorage.syncOptionsSettings = JSON.stringify(this.settings);
     },
     syncNow() {
