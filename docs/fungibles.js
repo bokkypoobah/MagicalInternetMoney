@@ -325,7 +325,7 @@ const Fungibles = {
               include = false;
             }
           }
-          const unsupported = contract in UNSUPPORTED_FUNGIBLES;
+          const unsupported = CONTRACTS[contract] && !!CONTRACTS[contract].unsupported || false;
           const balances = [];
           for (const [address, balance] of Object.entries(contractData.balances)) {
             balances.push({ address, balance });

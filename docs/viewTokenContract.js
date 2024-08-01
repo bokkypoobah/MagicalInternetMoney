@@ -180,7 +180,7 @@ const ViewTokenContract = {
       return store.getters['viewTokenContract/type'];
     },
     unsupported() {
-      return this.contract in UNSUPPORTED_FUNGIBLES;
+      return CONTRACTS[this.contract] && !!CONTRACTS[this.contract].unsupported || false;      
     },
     contractDecimals() {
       return store.getters['viewTokenContract/contractDecimals'];

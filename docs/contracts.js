@@ -1,4 +1,4 @@
-const CUSTOMNAMES = {
+const CONTRACTS = {
   "0x0000000000000000000000000000000000000000": { type: "eoa", symbol: "Null", name: "Null:0x0000...0000" },
   "0x0000000000000000000000000000000000000001": { type: "eoa", symbol: "Null", name: "Null:0x0000...0001" },
   "0x000000000000000000000000000000000000dEaD": { type: "eoa", symbol: "dEaD", name: "dEaD:0x0000...dEaD" },
@@ -36,4 +36,16 @@ const CUSTOMNAMES = {
   "0xf42aa99F011A1fA7CDA90E5E98b277E306BcA83e": { type: "nftexchange", symbol: "TransferManagerERC721", name: "LooksRare:TransferManagerERC721" },
   "0xF849de01B080aDC3A814FaBE1E2087475cF2E354": { type: "nftexchange", symbol: "ERC721Delegate", name: "X2Y2:ERC721Delegate" },
   "0xFe9231f0e6753a8412a00eC1f0028A24d5220Ba9": { type: "erc1155", symbol: "ZB", name: "ZombieBabies" },
+
+  // Unsupported ERC-20s
+  "0xa74476443119A942dE498590Fe1f2454d7D4aC0d" : { type: "erc20", symbol: "GNT", name: "Golem Network Token", decimals: 18, unsupported: "No approve or transferFrom" },
+  "0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D" : { type: "erc20", symbol: "PUNKSV1", name: "CryptoPunks V1", decimals: 1, unsupported: "Pre ERC-721" },
+  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB" : { type: "erc20", symbol: "PUNKSV2", name: "CryptoPunks V2", decimals: 1, unsupported: "Pre ERC-721" },
+  "0x60cd862c9C687A9dE49aecdC3A99b74A4fc54aB6" : { type: "erc20", symbol: "MoonCats", name: "MoonCats", decimals: 1, unsupported: "Pre ERC-721" },
+  "0xa185B9E63FB83A5a1A13A4460B8E8605672b6020" : { type: "erc20", symbol: "CCATV0", name: "CryptoCats V0", decimals: 1, unsupported: "Pre ERC-721" }, // Nov-25-2017 11:01:12 AM UTC
+  "0x9508008227b6b3391959334604677d60169EF540" : { type: "erc20", symbol: "CCATV1", name: "CryptoCats V1", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-19-2017 03:48:07 PM UTC
+  "0x19c320b43744254ebdBcb1F1BD0e2a3dc08E01dc" : { type: "erc20", symbol: "CCATV2", name: "CryptoCats V2", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:06 PM UTC
+  "0x088C6Ad962812b5Aa905BA6F3c5c145f9D4C079f" : { type: "erc20", symbol: "CCATV3", name: "CryptoCats V3", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:09 PM UTC
+  "0x43fb95c7afA1Ac1E721F33C695b2A0A94C7ddAb2" : { type: "erc20", symbol: "LUNA", name: "LunarToken", decimals: 1, unsupported: "Pre ERC-721" },
+
 };

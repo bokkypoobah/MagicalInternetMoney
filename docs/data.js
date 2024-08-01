@@ -2631,7 +2631,7 @@ const dataModule = {
 
     async collateNames(context, parameter) {
       console.log(now() + " INFO dataModule:actions.collateNames BEGIN: " + JSON.stringify(parameter));
-      for (const [address, addressData] of Object.entries(CUSTOMNAMES)) {
+      for (const [address, addressData] of Object.entries(CONTRACTS)) {
         if (!(address in context.state.names)) {
           context.commit('updateName', { address, name: addressData.name });
         }
