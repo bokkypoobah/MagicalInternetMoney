@@ -1216,7 +1216,7 @@ const dataModule = {
         console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         const writeRecords = [];
         for (const item of data) {
-          if (item.schemeId == 1) {
+          if (item.schemeId == ONLY_SUPPORTED_SCHEME_ID) {
             const sender = item.tx && item.tx.from || null;
             const senderData = sender && addresses[sender] || {};
             // console.log("sender: " + sender + " => " + JSON.stringify(senderData));
@@ -1307,7 +1307,7 @@ const dataModule = {
         let data = await db.announcements.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(now() + " INFO dataModule:actions.collateStealthTransfers - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (item.schemeId == 1) {
+          if (item.schemeId == ONLY_SUPPORTED_SCHEME_ID) {
             context.commit('addStealthTransfer', item);
           }
         }
@@ -1491,7 +1491,7 @@ const dataModule = {
         let data = await db.registrations.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).offset(rows).limit(context.state.DB_PROCESSING_BATCH_SIZE).toArray();
         console.log(now() + " INFO dataModule:actions.collateRegistrations - data.length: " + data.length + ", first[0..9]: " + JSON.stringify(data.slice(0, 10).map(e => e.blockNumber + '.' + e.logIndex )));
         for (const item of data) {
-          if (item.schemeId == 1) {
+          if (item.schemeId == ONLY_SUPPORTED_SCHEME_ID) {
             // console.log(now() + " INFO dataModule:actions.collateRegistrations - processing: " + JSON.stringify(item, null, 2));
             const stealthMetaAddress = item.stealthMetaAddress.match(/^st:eth:0x[0-9a-fA-F]{132}$/) ? item.stealthMetaAddress : STEALTHMETAADDRESS0;
             registry[parameter.chainId][item.registrant] = stealthMetaAddress;
