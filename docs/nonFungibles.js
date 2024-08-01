@@ -345,7 +345,7 @@ const NonFungibles = {
               <div v-for="record in pagedFilteredSortedItems">
                 <b-card body-class="p-1" header-class="p-1" footer-class="p-1" img-top class="m-1 p-0 border-0" >
                   <b-link :href="nonFungibleViewerURL(record.contract, record.tokenId)" target="_blank">
-                    <b-img-lazy v-if="record.image" width="200%" :src="record.image">
+                    <b-img-lazy v-if="record.image" width="200%" height="200%" :src="record.image">
                     </b-img-lazy>
                   </b-link>
                   <b-card-text>

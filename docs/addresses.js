@@ -242,19 +242,17 @@ const Addresses = {
           </template>
           <template #cell(address)="data">
             <div v-if="data.item.account.substring(0, 3) == 'st:'">
-              {{ formatAddress(data.item.account) }}
+              {{ data.item.account }}
             </div>
             <div v-else>
-              <b-link size="sm" :href="explorer + 'address/' + data.item.account" variant="link" v-b-popover.hover.ds500="'View in explorer'" target="_blank">{{ formatAddress(data.item.account) }}</b-link>
+              <b-icon-circle-fill v-if="data.item.type == 'stealthAddress'" shift-v="+7" font-scale="0.5" v-b-popover.hover.ds500="'Stealth Address'">
+              </b-icon-circle-fill>
+              <b-link size="sm" :href="explorer + 'address/' + data.item.account" variant="link" target="_blank">
+                {{ formatAddress(data.item.account) }}
+              </b-link>
             </div>
             <font size="-1">
-              <b-badge v-if="data.item.type == 'stealthMetaAddress'" variant="secondary" v-b-popover.hover.ds500="'Stealth Meta-Address'">
-                stm
-              </b-badge>
-              <b-badge v-else-if="data.item.type == 'stealthAddress'" variant="secondary" v-b-popover.hover.ds500="'Stealth Address'">
-                sa
-              </b-badge>
-              <b-badge v-if="data.item.ensName" :href="'https://app.ens.domains/' + data.item.ensName" variant="info" v-b-popover.hover.ds500="'Click to view in the ENS dapp'" target="_blank">
+              <b-badge v-if="data.item.ensName" :href="'https://app.ens.domains/' + data.item.ensName" variant="light" v-b-popover.hover.ds500="'Click to view in the ENS dapp'" target="_blank">
                 {{ data.item.ensName }}
               </b-badge>
             </font>
@@ -343,7 +341,7 @@ const Addresses = {
       accountsFields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
         { key: 'options', label: 'Options', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-        { key: 'address', label: 'Account', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-truncate' },
+        { key: 'address', label: 'Account', sortable: false, thStyle: 'width: 45%;', tdClass: 'text-left' },
         { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
       ],
@@ -416,7 +414,7 @@ const Addresses = {
               return ('' + a.name).localeCompare(b.name);
             }
           } else {
-            return ('' + b.type).localeCompare(a.type);
+            return ('' + a.type).localeCompare(b.type);
           }
         });
       } else if (this.settings.sortOption == 'typenamedsc') {
@@ -428,7 +426,7 @@ const Addresses = {
               return ('' + a.name).localeCompare(b.name);
             }
           } else {
-            return ('' + a.type).localeCompare(b.type);
+            return ('' + b.type).localeCompare(a.type);
           }
         });
       } else if (this.settings.sortOption == 'nameaddressasc') {
@@ -476,13 +474,13 @@ const Addresses = {
 
     formatAddress(address) {
       const STEALTHMETAADDRESS_SEGMENT_LENGTH = 20;
-      // <!-- const ADDRESS_SEGMENT_LENGTH = 8; -->
+      // const ADDRESS_SEGMENT_LENGTH = 8;
       if (address) {
         if (address.substring(0, 3) == "st:") {
           return address.substring(0, STEALTHMETAADDRESS_SEGMENT_LENGTH + 9) + '...' + address.slice(-STEALTHMETAADDRESS_SEGMENT_LENGTH);
         } else {
           return address;
-          <!-- return address.substring(0, ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-ADDRESS_SEGMENT_LENGTH); -->
+          // return address.substring(0, ADDRESS_SEGMENT_LENGTH + 2) + '...' + address.slice(-ADDRESS_SEGMENT_LENGTH);
         }
       }
       return null;
