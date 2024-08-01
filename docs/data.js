@@ -2633,7 +2633,7 @@ const dataModule = {
       console.log(now() + " INFO dataModule:actions.collateNames BEGIN: " + JSON.stringify(parameter));
       for (const [address, addressData] of Object.entries(CUSTOMNAMES)) {
         if (!(address in context.state.names)) {
-          context.commit('updateName', { address, name: addressData[1] });
+          context.commit('updateName', { address, name: addressData.name });
         }
       }
       for (const [address, name] of Object.entries(VALID_ENS_CONTRACTS)) {
