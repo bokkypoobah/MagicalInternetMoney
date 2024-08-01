@@ -2241,8 +2241,8 @@ const dataModule = {
         context.commit('addFungibleMetadata', {
           chainId: parameter.chainId,
           contract,
-          symbol,
-          name,
+          symbol: symbol && symbol.trim() || null,
+          name: name && name.trim() || null,
           decimals: decimals,
           totalSupply: totalSupply && totalSupply.toString() || null,
           image,

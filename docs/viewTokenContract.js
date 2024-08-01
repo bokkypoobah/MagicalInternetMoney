@@ -410,11 +410,11 @@ const viewTokenContractModule = {
     },
     setSymbol(state, symbol) {
       // console.log(now() + " INFO viewTokenContractModule:mutations.setSymbol - symbol: " + symbol);
-      state.symbol = symbol;
+      state.symbol = symbol && symbol.trim() || null;
     },
     setName(state, name) {
       // console.log(now() + " INFO viewTokenContractModule:mutations.setName - name: " + name);
-      state.name = name;
+      state.name = name && name.trim() || null;
     },
     setDecimals(state, decimals) {
       // console.log(now() + " INFO viewTokenContractModule:mutations.setDecimals - decimals: " + decimals);
@@ -434,8 +434,8 @@ const viewTokenContractModule = {
     },
     setContractValues(state, info) {
       // console.log(now() + " INFO viewTokenContractModule:mutations.setContractValues - info: " + JSON.stringify(info));
-      state.contractSymbol = info.contractSymbol;
-      state.contractName = info.contractName;
+      state.contractSymbol = info.contractSymbol && info.contractSymbol.trim() || null;
+      state.contractName = info.contractName && info.contractName.trim() || null;
       state.contractDecimals = info.contractDecimals;
     },
     setBalances(state, balances) {
