@@ -2636,11 +2636,6 @@ const dataModule = {
           context.commit('updateName', { address, name: addressData.name });
         }
       }
-      for (const [address, name] of Object.entries(VALID_ENS_CONTRACTS)) {
-        if (!(address in context.state.names)) {
-          context.commit('updateName', { address, name });
-        }
-      }
       for (const [contract, contractData] of Object.entries(context.state.tokens[parameter.chainId] || {})) {
         if (contractData.name && !(contract in context.state.names)) {
           context.commit('updateName', { address: contract, name: contractData.name });

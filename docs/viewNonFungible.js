@@ -541,7 +541,7 @@ const viewNonFungibleModule = {
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - type: " + type);
 
       // const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
-      const tokenIds = [ ethers.BigNumber.from(tokenId).toHexString() ];
+      const tokenIds = [ "0x" + ethers.BigNumber.from(tokenId).toHexString().slice(2).padStart(64, '0') ];
       let erc721TokenId = type == "erc721" ? tokenId : null;
       let erc1155TokenId = type == "erc1155" ? tokenId : null;
       // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - erc721TokenId: " + erc721TokenId);
@@ -563,11 +563,11 @@ const viewNonFungibleModule = {
             // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - label: " + label);
             erc1155TokenId = ethers.BigNumber.from(ethers.utils.namehash(label + ".eth")).toString();
             // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - erc1155TokenId: " + erc1155TokenId);
-            tokenIds.push(ethers.BigNumber.from(erc1155TokenId).toHexString());
+            tokenIds.push("0x" + ethers.BigNumber.from(erc1155TokenId).toHexString().slice(2).padStart(64, '0'));
           } else if (context.state.name != null && context.state.name.length > 4) {
             erc1155TokenId = ethers.BigNumber.from(ethers.utils.namehash(context.state.name)).toString();
             // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - erc1155TokenId: " + erc1155TokenId);
-            tokenIds.push(ethers.BigNumber.from(erc1155TokenId).toHexString());
+            tokenIds.push("0x" + ethers.BigNumber.from(erc1155TokenId).toHexString().slice(2).padStart(64, '0'));
           }
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);

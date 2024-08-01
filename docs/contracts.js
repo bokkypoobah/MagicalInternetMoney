@@ -38,14 +38,27 @@ const CONTRACTS = {
   "0xFe9231f0e6753a8412a00eC1f0028A24d5220Ba9": { type: "erc1155", symbol: "ZB", name: "ZombieBabies" },
 
   // Unsupported ERC-20s
-  "0xa74476443119A942dE498590Fe1f2454d7D4aC0d" : { type: "erc20", symbol: "GNT", name: "Golem Network Token", decimals: 18, unsupported: "No approve or transferFrom" },
-  "0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D" : { type: "erc20", symbol: "PUNKSV1", name: "CryptoPunks V1", decimals: 1, unsupported: "Pre ERC-721" },
-  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB" : { type: "erc20", symbol: "PUNKSV2", name: "CryptoPunks V2", decimals: 1, unsupported: "Pre ERC-721" },
-  "0x60cd862c9C687A9dE49aecdC3A99b74A4fc54aB6" : { type: "erc20", symbol: "MoonCats", name: "MoonCats", decimals: 1, unsupported: "Pre ERC-721" },
-  "0xa185B9E63FB83A5a1A13A4460B8E8605672b6020" : { type: "erc20", symbol: "CCATV0", name: "CryptoCats V0", decimals: 1, unsupported: "Pre ERC-721" }, // Nov-25-2017 11:01:12 AM UTC
-  "0x9508008227b6b3391959334604677d60169EF540" : { type: "erc20", symbol: "CCATV1", name: "CryptoCats V1", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-19-2017 03:48:07 PM UTC
-  "0x19c320b43744254ebdBcb1F1BD0e2a3dc08E01dc" : { type: "erc20", symbol: "CCATV2", name: "CryptoCats V2", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:06 PM UTC
-  "0x088C6Ad962812b5Aa905BA6F3c5c145f9D4C079f" : { type: "erc20", symbol: "CCATV3", name: "CryptoCats V3", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:09 PM UTC
-  "0x43fb95c7afA1Ac1E721F33C695b2A0A94C7ddAb2" : { type: "erc20", symbol: "LUNA", name: "LunarToken", decimals: 1, unsupported: "Pre ERC-721" },
+  "0xa74476443119A942dE498590Fe1f2454d7D4aC0d": { type: "erc20", symbol: "GNT", name: "Golem Network Token", decimals: 18, unsupported: "No approve or transferFrom" },
+  "0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D": { type: "erc20", symbol: "PUNKSV1", name: "CryptoPunks V1", decimals: 1, unsupported: "Pre ERC-721" },
+  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB": { type: "erc20", symbol: "PUNKSV2", name: "CryptoPunks V2", decimals: 1, unsupported: "Pre ERC-721" },
+  "0x60cd862c9C687A9dE49aecdC3A99b74A4fc54aB6": { type: "erc20", symbol: "MoonCats", name: "MoonCats", decimals: 1, unsupported: "Pre ERC-721" },
+  "0xa185B9E63FB83A5a1A13A4460B8E8605672b6020": { type: "erc20", symbol: "CCATV0", name: "CryptoCats V0", decimals: 1, unsupported: "Pre ERC-721" }, // Nov-25-2017 11:01:12 AM UTC
+  "0x9508008227b6b3391959334604677d60169EF540": { type: "erc20", symbol: "CCATV1", name: "CryptoCats V1", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-19-2017 03:48:07 PM UTC
+  "0x19c320b43744254ebdBcb1F1BD0e2a3dc08E01dc": { type: "erc20", symbol: "CCATV2", name: "CryptoCats V2", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:06 PM UTC
+  "0x088C6Ad962812b5Aa905BA6F3c5c145f9D4C079f": { type: "erc20", symbol: "CCATV3", name: "CryptoCats V3", decimals: 1, unsupported: "Pre ERC-721" }, // Dec-24-2017 02:10:09 PM UTC
+  "0x43fb95c7afA1Ac1E721F33C695b2A0A94C7ddAb2": { type: "erc20", symbol: "LUNA", name: "LunarToken", decimals: 1, unsupported: "Pre ERC-721" },
 
+  // ENS contracts
+  "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e": { type: "ens", symbol: "ENS: Registry with Fallback", name: "ENS: Registry with Fallback", ens: true },
+  "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8": { type: "ens", symbol: "ENS: Old Public Resolver 2", name: "ENS: Old Public Resolver 2", ens: true },
+  "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63": { type: "ens", symbol: "ENS: Public Resolver", name: "ENS: Public Resolver", ens: true },
+  "0x253553366Da8546fC250F225fe3d25d0C782303b": { type: "ens", symbol: "ENS: ETH Registrar Controller", name: "ENS: ETH Registrar Controller", ens: true },
+  "0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5": { type: "ens", symbol: "ENS: Old ETH Registrar Controller", name: "ENS: Old ETH Registrar Controller", ens: true },
+  "0x314159265dD8dbb310642f98f50C066173C1259b": { type: "ens", symbol: "ENS: Eth Name Service", name: "ENS: Eth Name Service", ens: true },
+  "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41": { type: "ens", symbol: "ENS: Public Resolver 2", name: "ENS: Public Resolver 2", ens: true },
+  "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": { type: "erc721", symbol: "ENS: Ethereum Name Service", name: "ENS: Ethereum Name Service", ens: true },
+  "0xB22c1C159d12461EA124b0deb4b5b93020E6Ad16": { type: "ens", symbol: "ENS: Old ETH Registrar Controller 2", name: "ENS: Old ETH Registrar Controller 2", ens: true },
+  "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": { type: "erc1155", symbol: "ENS: Name Wrapper", name: "ENS: Name Wrapper", ens: true },
+  "0xF0AD5cAd05e10572EfcEB849f6Ff0c68f9700455": { type: "ens", symbol: "ENS: Old ETH Registrar Controller 1", name: "ENS: Old ETH Registrar Controller 1", ens: true },
+  "0xFaC7BEA255a6990f749363002136aF6556b31e04": { type: "ens", symbol: "ENS: Old ENS Token", name: "ENS: Old ENS Token", ens: true },
 };
