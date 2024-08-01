@@ -350,6 +350,12 @@ const dataModule = {
       }
       Vue.set(state.tokens[chainId][contract].tokens[tokenId], 'active', !state.tokens[chainId][contract].tokens[tokenId].active);
     },
+    setNonFungibleField(state, info) {
+      // console.log(now() + " INFO dataModule:mutations.setNonFungibleField: " + JSON.stringify(info, null, 2));
+      if (state.tokens[info.chainId] && state.tokens[info.chainId][info.contract] && state.tokens[info.chainId][info.contract].tokens[info.tokenId]) {
+        Vue.set(state.tokens[info.chainId][info.contract].tokens[info.tokenId], info.field, info.value);
+      }
+    },
 
     addNewAddress(state, newAccount) {
       // console.log(now() + " INFO dataModule:mutations.addNewAddress(" + JSON.stringify(newAccount, null, 2) + ")");
@@ -676,7 +682,7 @@ const dataModule = {
       }
     },
     async saveData(context, types) {
-      console.log(now() + " INFO dataModule:actions.saveData - types: " + JSON.stringify(types));
+      // console.log(now() + " INFO dataModule:actions.saveData - types: " + JSON.stringify(types));
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       for (let type of types) {
@@ -689,17 +695,17 @@ const dataModule = {
     },
 
     async toggleAddressField(context, info) {
-      console.log(now() + " INFO dataModule:actions.toggleAddressField - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO dataModule:actions.toggleAddressField - info: " + JSON.stringify(info));
       await context.commit('toggleAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
     async setAddressField(context, info) {
-      console.log(now() + " INFO dataModule:actions.setAddressField - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO dataModule:actions.setAddressField - info: " + JSON.stringify(info));
       await context.commit('setAddressField', info);
       await context.dispatch('saveData', ['addresses']);
     },
     async updateFungibleTotalSupply(context, info) {
-      console.log(now() + " INFO dataModule:actions.updateFungibleTotalSupply - info: " + JSON.stringify(info));
+      // console.log(now() + " INFO dataModule:actions.updateFungibleTotalSupply - info: " + JSON.stringify(info));
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const interface = new ethers.Contract(info.contract, ERC20ABI, provider);
       try {
@@ -710,32 +716,37 @@ const dataModule = {
       // await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleJunk(context, item) {
-      console.log(now() + " INFO dataModule:actions.toggleFungibleJunk - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:actions.toggleFungibleJunk - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleFungibleActive(context, item) {
-      console.log(now() + " INFO dataModule:actions.toggleFungibleActive - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:actions.toggleFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async setFungibleField(context, item) {
-      console.log(now() + " INFO dataModule:actions.setFungibleField - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:actions.setFungibleField - item: " + JSON.stringify(item));
       await context.commit('setFungibleField', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleJunk(context, item) {
-      console.log(now() + " INFO dataModule:actions.toggleNonFungibleJunk - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:actions.toggleNonFungibleJunk - item: " + JSON.stringify(item));
       await context.commit('toggleNonFungibleJunk', item);
       await context.dispatch('saveData', ['tokens']);
     },
     async toggleNonFungibleActive(context, item) {
-      console.log(now() + " INFO dataModule:actions.toggleNonFungibleActive - item: " + JSON.stringify(item));
+      // console.log(now() + " INFO dataModule:actions.toggleNonFungibleActive - item: " + JSON.stringify(item));
       await context.commit('toggleNonFungibleActive', item);
       await context.dispatch('saveData', ['tokens']);
     },
+    async setNonFungibleField(context, item) {
+      // console.log(now() + " INFO dataModule:actions.setNonFungibleField - item: " + JSON.stringify(item));
+      await context.commit('setNonFungibleField', item);
+      await context.dispatch('saveData', ['tokens']);
+    },
     async addNonFungibleMetadata(context, info) {
-      console.log(now() + " INFO dataModule:actions.addNonFungibleMetadata - info: " + JSON.stringify(info, null, 2));
+      // console.log(now() + " INFO dataModule:actions.addNonFungibleMetadata - info: " + JSON.stringify(info, null, 2));
       context.commit('addNonFungibleMetadata', info);
       await context.dispatch('saveData', ['tokens']);
     },

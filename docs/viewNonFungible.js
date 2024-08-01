@@ -74,6 +74,10 @@ const ViewNonFungible = {
               </b-img> -->
 
             </b-form-group>
+            <b-form-group label="" label-for="token-updateimage" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
+              <b-form-file size="sm" id="token-updateimage" @change="handleImage" accept="image/*" placeholder="Update image" class="w-50">
+              </b-form-file>
+            </b-form-group>
           </b-col>
           <b-col>
           <b-form-group label="Attributes:" label-for="token-image" label-size="sm" label-cols-sm="3" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -378,6 +382,15 @@ const ViewNonFungible = {
     },
   },
   methods: {
+    async handleImage(e) {
+      const selectedImage = e.target.files[0];
+      try {
+        const image = await toBase64(selectedImage);
+        store.dispatch('data/setNonFungibleField', { chainId: this.chainId, contract: this.contract, tokenId: this.tokenId, field: 'image', value: image });
+      } catch (e) {
+        console.log(now() + " ERROR ViewNonFungible:methods.handleImage: " + e.message);
+      }
+    },
     nonFungibleViewerURL(contract, tokenId) {
       return this.nonFungibleViewer.replace(/\${contract}/, contract).replace(/\${tokenId}/, tokenId);
     },
