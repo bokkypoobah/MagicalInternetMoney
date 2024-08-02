@@ -55,23 +55,29 @@ function parseEventLogs(logs, chainId, latestBlockNumber) {
         }
 
       } else if (log.topics[0] == "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c") {
+        // WETH Deposit (index_topic_1 address dst, uint256 wad)
         const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
         tokens = ethers.BigNumber.from(log.data).toString();
         eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
       } else if (log.topics[0] == "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65") {
+        // WETH Withdrawal (index_topic_1 address src, uint256 wad)
         const from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
         tokens = ethers.BigNumber.from(log.data).toString();
         eventRecord = { type: "Transfer", from, to: ADDRESS0, tokens, eventType: "erc20" };
       } else if (log.topics[0] == "0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba") {
+        // CryptoPunks & CryptoCats Assign (index_topic_1 address to, uint256 punkIndex)
         const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
         // tokens = ethers.BigNumber.from(log.data).toString();
         tokens = 1;
         eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
       } else if (log.topics[0] == "0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd") {
+        // MoonCats CatRescued (index_topic_1 address to, index_topic_2 bytes5 catId)
         const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
         tokens = 1;
         eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
       } else if (log.topics[0] == "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925") {
+        // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
+        // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
         if (log.topics.length == 4) {
           const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
           const approved = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
@@ -84,6 +90,8 @@ function parseEventLogs(logs, chainId, latestBlockNumber) {
           eventRecord = { type: "Approval", owner, spender, tokens, eventType: "erc20" };
         }
       } else if (log.topics[0] == "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31") {
+        // ERC-721 ApprovalForAll (index_topic_1 address owner, index_topic_2 address operator, bool approved)
+        // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
         const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
         const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
         approved = ethers.BigNumber.from(log.data) > 0;
@@ -111,14 +119,14 @@ function parseEventLogs(logs, chainId, latestBlockNumber) {
           // ERC-721 NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
           const logData = oldETHRegistarControllerInterface.parseLog(log);
           const [name, label, owner, cost, expires] = logData.args;
-          eventRecord = { type: "NameRegistered", label: name, labelhash: label, owner, cost: cost.toString(), expires: parseInt(expires) };
+          const valid = ethers.utils.isValidName(name);
+          eventRecord = { type: "NameRegistered", label: name, labelhash: label, owner, cost: cost.toString(), expires: parseInt(expires), valid };
         } else if (log.topics[0] == "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae") {
           // ERC-721 NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
           const logData = oldETHRegistarControllerInterface.parseLog(log);
           const [name, label, cost, expiry] = logData.args;
-          if (ethers.utils.isValidName(name)) {
-            eventRecord = { type: "NameRenewed", label: name, cost: cost.toString(), expiry: parseInt(expiry) };
-          }
+          const valid = ethers.utils.isValidName(name);
+          eventRecord = { type: "NameRenewed", label: name, cost: cost.toString(), expiry: parseInt(expiry), valid };
         } else if (log.topics[0] == "0x8ce7013e8abebc55c3890a68f5a27c67c3f7efa64e584de5fb22363c606fd340") {
           // ERC-1155 NameWrapped (index_topic_1 bytes32 node, bytes name, address owner, uint32 fuses, uint64 expiry)
           const logData = nameWrapperInterface.parseLog(log);
@@ -135,13 +143,8 @@ function parseEventLogs(logs, chainId, latestBlockNumber) {
           }
           const namehashDecimals = ethers.BigNumber.from(node).toString();
           const subdomain = parts.length >= 3 && parts[parts.length - 3] || null;
-          if (ethers.utils.isValidName(label)) {
-            eventRecord = { type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, labelhashDecimals, subdomain, owner, fuses, expiry: parseInt(expiry), expirym90: moment.unix(parseInt(expiry)).subtract(90, 'days').unix() };
-            // eventRecord = { type: "NameWrapped", label, owner, fuses, expiry: parseInt(expiry) };
-            // if (subdomain) {
-            //   console.log("With subdomain: " + nameString + " & " + JSON.stringify(eventRecord, null, 2));
-            // }
-          }
+          const valid = !ethers.utils.isValidName(label);
+          eventRecord = { type: "NameWrapped", namehash: node, tokenId: namehashDecimals, name: nameString, label, labelhash, labelhashDecimals, subdomain, owner, fuses, expiry: parseInt(expiry), valid, expirym90: moment.unix(parseInt(expiry)).subtract(90, 'days').unix() };
         } else if (log.topics[0] == "0xee2ba1195c65bcf218a83d874335c6bf9d9067b4c672f3c3bf16cf40de7586c4") {
           // ERC-1155 NameUnwrapped (index_topic_1 bytes32 node, address owner)
           const logData = nameWrapperInterface.parseLog(log);
