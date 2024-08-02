@@ -176,7 +176,7 @@ function parseEventLogs(logs, chainId, latestBlockNumber) {
           // AddressChanged (index_topic_1 bytes32 node, uint256 coinType, bytes newAddress)
           const logData = publicResolverInterface.parseLog(log);
           const [node, coinType, newAddress] = logData.args;
-          eventRecord = { type: "AddressChanged", node, coinType: coinType.toString(), newAddress };
+          eventRecord = { type: "AddressChanged", node, coinType: coinType.toString(), newAddress: coinType == 60 ? ethers.utils.getAddress(newAddress) : newAddress };
         } else if (log.topics[0] == "0xd8c9334b1a9c2f9da342a0a2b32629c1a229b6445dad78947f674b44444a7550") {
           // TextChanged (index_topic_1 bytes32 node, index_topic_2 string indexedKey, string key)
           const logData = publicResolver2Interface.parseLog(log);
