@@ -582,7 +582,7 @@ const viewNonFungibleModule = {
             null
           ];
           const logs = await provider.getLogs({ address: ENS_ERC1155_ADDRESS, fromBlock, toBlock, topics });
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           if (events.length > 0 && events[0].subdomain == null) {
             tokenIds.push(events[0].labelhash);
@@ -648,7 +648,7 @@ const viewNonFungibleModule = {
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - topics: " + JSON.stringify(topics, null, 2));
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - logs: " + JSON.stringify(logs, null, 2));
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
         } catch (e) {
@@ -669,7 +669,7 @@ const viewNonFungibleModule = {
           ];
           // console.log(now() + " INFO viewNonFungibleModule:actions.viewNonFungible - topics: " + JSON.stringify(topics));
           const logs = await provider.getLogs({ address: info.contract == ENS_ERC1155_ADDRESS ? ENS_ERC721_ADDRESS : info.contract, fromBlock, toBlock, topics });
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - ERC-721 transfer events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
         } catch (e) {
@@ -708,7 +708,7 @@ const viewNonFungibleModule = {
             selectedAddresses,
           ];
           const logs = await provider.getLogs({ address: info.contract, fromBlock, toBlock, topics });
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           const selectedEvents = [];
           for (const event of events) {
             // console.log("event: " + JSON.stringify(event, null, 2));
@@ -735,7 +735,7 @@ const viewNonFungibleModule = {
             selectedAddresses,
           ];
           const logs = await provider.getLogs({ address: info.contract, fromBlock, toBlock, topics });
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           const selectedEvents = [];
           for (const event of events) {
             // console.log("event.tokenId: " + event.tokenId + " vs " + erc1155TokenIdDecimals);
@@ -862,7 +862,7 @@ const viewNonFungibleModule = {
       //   const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
       //   console.log("logs: " + JSON.stringify(logs, null, 2));
       // //   // await processLogs(fromBlock, toBlock, logs);
-      // //   const results = processENSEventLogs(logs);
+      // //   const events = parseEventLogs(logs, chainId, toBlock);
       // } catch (e) {
       //   console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);
       // }
