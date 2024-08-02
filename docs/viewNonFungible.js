@@ -649,7 +649,7 @@ const viewNonFungibleModule = {
           const logs = await provider.getLogs({ address: null, fromBlock, toBlock, topics });
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - logs: " + JSON.stringify(logs, null, 2));
           const events = parseEventLogs(logs, chainId, toBlock);
-          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           await context.commit('addEvents', events);
         } catch (e) {
           console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents.getLogs - ERROR fromBlock: " + fromBlock + ", toBlock: " + toBlock + " " + e.message);

@@ -947,12 +947,6 @@ const dataModule = {
       if ((options.tokens || options.selectedContract) && !options.devThing) {
         await context.dispatch('syncTokenEvents', parameter);
       }
-      if (options.timestamps && !options.devThing) {
-        await context.dispatch('syncTokenEventTimestamps', parameter);
-      }
-      if (options.txData && !options.devThing) {
-        await context.dispatch('syncTokenEventTxData', parameter);
-      }
       if ((options.tokens || options.fungiblesMetadata || options.nonFungiblesMetadata || options.selectedContract) && !options.devThing) {
         await context.dispatch('computeBalances', parameter);
         await context.dispatch('computeApprovals', parameter);
@@ -962,8 +956,8 @@ const dataModule = {
         await context.dispatch('computeApprovals', parameter);
       }
 
-      if (options.ensExpiries && chainId == 1 && !options.devThing) {
-        await context.dispatch('syncENSExpiries', parameter);
+      if (options.ensEvents && chainId == 1 && !options.devThing) {
+        await context.dispatch('syncENSEvents', parameter);
       }
 
       if (options.fungiblesMetadata && !options.devThing) {
@@ -974,7 +968,13 @@ const dataModule = {
         // await context.dispatch('syncNonFungiblesMetadata', parameter);
       }
       if (options.ens && chainId == 1 && !options.devThing) {
-        await context.dispatch('syncENS', parameter);
+        await context.dispatch('syncReverseENS', parameter);
+      }
+      if (options.timestamps && !options.devThing) {
+        await context.dispatch('syncTokenEventTimestamps', parameter);
+      }
+      if (options.txData && !options.devThing) {
+        await context.dispatch('syncTokenEventTxData', parameter);
       }
 
       await context.dispatch('collateNames', parameter);
@@ -1914,8 +1914,8 @@ const dataModule = {
       console.log(now() + " INFO dataModule:actions.computeApprovals END");
     },
 
-    async syncENSExpiries(context, parameter) {
-      console.log(now() + " INFO dataModule:actions.syncENSExpiries: " + JSON.stringify(parameter));
+    async syncENSEvents(context, parameter) {
+      console.log(now() + " INFO dataModule:actions.syncENSEvents: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1929,7 +1929,7 @@ const dataModule = {
       async function processLogs(logs) {
         total = parseInt(total) + logs.length;
         context.commit('setSyncCompleted', total);
-        console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - logs.length: " + logs.length + ", total: " + total);
+        console.log(now() + " INFO dataModule:actions.syncENSEvents.processLogs - logs.length: " + logs.length + ", total: " + total);
         const records = [];
         for (const log of logs) {
           if (!log.removed) {
@@ -1976,14 +1976,14 @@ const dataModule = {
                 mapERC721ToERC1155[labelhashDecimals] = namehashDecimals;
               }
             } else {
-              console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - NOT HANDLED: " + JSON.stringify(log));
+              console.log(now() + " INFO dataModule:actions.syncENSEvents.processLogs - NOT HANDLED: " + JSON.stringify(log));
             }
             if (eventRecord) {
               let remapToERC1155 = null;
               if (eventRecord.type == "NameRegistered" || eventRecord.type == "NameRenewed") {
                 if (eventRecord.tokenId in mapERC721ToERC1155) {
                   remapToERC1155 = mapERC721ToERC1155[eventRecord.tokenId];
-                  console.log(now() + " INFO dataModule:actions.syncENSExpiries.processLogs - Remapping ERC-721 to ERC-1155: " + eventRecord.tokenId + " to " + remapToERC1155);
+                  console.log(now() + " INFO dataModule:actions.syncENSEvents.processLogs - Remapping ERC-721 to ERC-1155: " + eventRecord.tokenId + " to " + remapToERC1155);
                 }
               }
               if (remapToERC1155) {
@@ -2003,7 +2003,7 @@ const dataModule = {
         }
       }
 
-      console.log(now() + " INFO dataModule:actions.syncENSExpiries BEGIN");
+      console.log(now() + " INFO dataModule:actions.syncENSEvents BEGIN");
       const ens721TokenIds = [];
       const ens1155TokenIds = [];
       for (const [contract, contractData] of Object.entries(context.state.balances[parameter.chainId] || {})) {
@@ -2026,7 +2026,7 @@ const dataModule = {
       // console.log("ens1155TokenIds: " + JSON.stringify(ens1155TokenIds));
       // return;
       const BATCHSIZE = 100;
-      context.commit('setSyncSection', { section: 'ENS Expiries', total: null });
+      context.commit('setSyncSection', { section: 'ENS Events', total: null });
       context.commit('setSyncCompleted', 0);
 
       // ERC-1155 portraits.eth 27727362303445643037535452095569739813950020376856883309402147522300287323280
@@ -2046,7 +2046,7 @@ const dataModule = {
           const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
           await processLogs(logs);
         } catch (e) {
-          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
+          console.log(now() + " INFO dataModule:actions.syncENSEvents - getLogs ERROR: " + e.message);
         }
       }
 
@@ -2069,12 +2069,12 @@ const dataModule = {
           const logs = await provider.getLogs({ address: null, fromBlock: 0, toBlock: parameter.blockNumber, topics });
           await processLogs(logs);
         } catch (e) {
-          console.log(now() + " INFO dataModule:actions.syncENSExpiries - getLogs ERROR: " + e.message);
+          console.log(now() + " INFO dataModule:actions.syncENSEvents - getLogs ERROR: " + e.message);
         }
       }
 
       await context.dispatch('saveData', ['expiries']);
-      console.log(now() + " INFO dataModule:actions.syncENSExpiries END");
+      console.log(now() + " INFO dataModule:actions.syncENSEvents END");
     },
 
     async syncFungiblesMetadata(context, parameter) {
@@ -2467,8 +2467,8 @@ const dataModule = {
       console.log(now() + " INFO dataModule:actions.syncNonFungiblesMetadataFromReservoir END");
     },
 
-    async syncENS(context, parameter) {
-      console.log(now() + " INFO dataModule:actions.syncENS BEGIN: " + JSON.stringify(parameter));
+    async syncReverseENS(context, parameter) {
+      console.log(now() + " INFO dataModule:actions.syncReverseENS BEGIN: " + JSON.stringify(parameter));
       const db = new Dexie(context.state.db.name);
       db.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -2478,7 +2478,7 @@ const dataModule = {
           owners[address] = true;
         }
       }
-      console.log(now() + " INFO dataModule:actions.syncENS - owners: " + JSON.stringify(owners));
+      console.log(now() + " INFO dataModule:actions.syncReverseENS - owners: " + JSON.stringify(owners));
       context.commit('setSyncSection', { section: "ENS", total: Object.keys(owners).length });
       let completed = 0;
       const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);

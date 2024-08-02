@@ -15,17 +15,17 @@ const SyncOptions = {
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.tokens" @input="saveSettings" v-b-popover.hover.ds500="'ERC-20, ERC-721 and ERC-1155 token transfer events'" class="ml-2 mt-1">
           Token Transfers
         </b-form-checkbox>
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 1" v-model="settings.ensEvents" @input="saveSettings" v-b-popover.hover.ds500="'ENS events, on ETH Mainnet only'" class="ml-2 mt-1">
+          ENS Events (Mainnet)
+        </b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.fungiblesMetadata" @input="saveSettings" v-b-popover.hover.ds500="'ERC-20 fungible token metadata'" class="ml-2 mt-1">
           Fungibles Metadata
         </b-form-checkbox>
         <b-form-checkbox size="sm" switch :disabled="settings.devThing" v-model="settings.nonFungiblesMetadata" @input="saveSettings" v-b-popover.hover.ds500="'ERC-721 non-fungible token metadata'" class="ml-2 mt-1">
           Non-Fungibles Metadata
         </b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 1" v-model="settings.ensExpiries" @input="saveSettings" v-b-popover.hover.ds500="'ENS expiries'" class="ml-2 mt-1">
-          ENS Expiries
-        </b-form-checkbox>
-        <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 1" v-model="settings.ens" @input="saveSettings" class="ml-2 mt-1">
-          ENS Names on ETH Mainnet
+        <b-form-checkbox size="sm" switch :disabled="settings.devThing || chainId != 1" v-model="settings.ens" @input="saveSettings" v-b-popover.hover.ds500="'Reverse ENS names, on ETH Mainnet only'" class="ml-2 mt-1">
+          Reverse ENS Names (Mainnet)
         </b-form-checkbox>
         <b-form-checkbox v-if="false" size="sm" switch :disabled="true" v-model="settings.exchangeRates" @input="saveSettings" class="ml-2 mt-1">
           TODO: Exchange Rates
@@ -55,16 +55,16 @@ const SyncOptions = {
         stealthMetaAddressRegistry: true,
         ethers: true,
         tokens: true,
+        ensEvents: true,
         fungiblesMetadata: true,
         nonFungiblesMetadata: true,
-        ensExpiries: true,
         ens: true,
         exchangeRates: true,
         // incrementalSync: true,
         timestamps: true,
         txData: true,
         devThing: false,
-        version: 2,
+        version: 3,
       },
     }
   },
@@ -104,9 +104,9 @@ const SyncOptions = {
         stealthMetaAddressRegistry: this.settings.stealthMetaAddressRegistry,
         ethers: this.settings.ethers,
         tokens: this.settings.tokens,
+        ensEvents: this.settings.ensEvents,
         fungiblesMetadata: this.settings.fungiblesMetadata,
         nonFungiblesMetadata: this.settings.nonFungiblesMetadata,
-        ensExpiries: this.settings.ensExpiries,
         ens: this.settings.ens,
         exchangeRates: this.settings.exchangeRates,
         // incrementalSync: this.settings.incrementalSync,
