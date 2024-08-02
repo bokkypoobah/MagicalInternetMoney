@@ -551,12 +551,13 @@ const viewNonFungibleModule = {
         try {
           const topics = [[
               '0xca6abbe9d7f11422cb6ca7629fbf6fe9efb1c621f71ce8f02b9f2a230097404f', // NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 cost, uint256 expires)
+              '0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae', // NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
             ],
             [ ethers.BigNumber.from(tokenId).toHexString() ],
             null
           ];
           const logs = await provider.getLogs({ address: ENS_OLDETHREGISTRARCONTROLLER_ADDRESS, fromBlock, toBlock, topics });
-          const events = processENSEventLogs(logs);
+          const events = parseEventLogs(logs, chainId, toBlock);
           // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           if (events.length > 0) {
             const label = events[0].label;
@@ -582,7 +583,7 @@ const viewNonFungibleModule = {
           ];
           const logs = await provider.getLogs({ address: ENS_ERC1155_ADDRESS, fromBlock, toBlock, topics });
           const events = processENSEventLogs(logs);
-          // console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
+          console.log(now() + " INFO viewNonFungibleModule:actions.loadENSEvents - events: " + JSON.stringify(events, null, 2));
           if (events.length > 0 && events[0].subdomain == null) {
             tokenIds.push(events[0].labelhash);
             erc721TokenId = events[0].labelhashDecimals;
@@ -783,7 +784,7 @@ const viewNonFungibleModule = {
           if (decodedData.functionFragment.name == "setText") {
             // console.log("setText - event: " + JSON.stringify(event, null, 2));
             const decodedFunctionArgs = publicResolver2Interface.decodeFunctionData("setText", tx.data);
-            console.log("decodedFunctionArgs: " + JSON.stringify(decodedFunctionArgs, null, 2));
+            // console.log("decodedFunctionArgs: " + JSON.stringify(decodedFunctionArgs, null, 2));
             await context.commit('setTextValue', {
               chainId,
               blockNumber: event.blockNumber,

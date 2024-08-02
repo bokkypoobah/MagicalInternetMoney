@@ -686,7 +686,7 @@ const dataModule = {
       const db0 = new Dexie(context.state.db.name);
       db0.version(context.state.db.version).stores(context.state.db.schemaDefinition);
       for (let type of types) {
-        await db0.cache.put({ objectName: type, object: context.state[type] }).then (function() {
+        await db0.cache.put({ objectName: type, object: context.state[type] }).then(function() {
         }).catch(function(error) {
           console.log("error: " + error);
         });
@@ -1053,7 +1053,7 @@ const dataModule = {
         }
         // console.log("records: " + JSON.stringify(records, null, 2));
         if (records.length) {
-          await db.announcements.bulkAdd(records).then (function(lastKey) {
+          await db.announcements.bulkAdd(records).then(function(lastKey) {
             console.log(now() + " INFO dataModule:actions.syncStealthTransfers.bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
             // console.log(now() + " INFO dataModule:actions.syncStealthTransfers.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
@@ -1168,7 +1168,7 @@ const dataModule = {
           context.commit('setSyncCompleted', rows);
         }
         if (records.length > 0) {
-          await db.announcements.bulkPut(records).then (function() {
+          await db.announcements.bulkPut(records).then(function() {
           }).catch(function(error) {
             console.log(now() + " INFO dataModule:actions.syncStealthTransfersData.bulkPut error: " + error);
           });
@@ -1281,7 +1281,7 @@ const dataModule = {
           }
         }
         if (writeRecords.length > 0) {
-          await db.announcements.bulkPut(writeRecords).then (function() {
+          await db.announcements.bulkPut(writeRecords).then(function() {
           }).catch(function(error) {
             console.log(now() + " INFO dataModule:actions.identifyMyStealthTransfers bulkPut error: " + error);
           });
@@ -1364,7 +1364,7 @@ const dataModule = {
           }
         }
         if (records.length) {
-          await db.registrations.bulkAdd(records).then (function(lastKey) {
+          await db.registrations.bulkAdd(records).then(function(lastKey) {
             console.log(now() + " INFO dataModule:actions.syncRegistrations bulkAdd lastKey: " + JSON.stringify(lastKey));
           }).catch(Dexie.BulkError, function(e) {
             // console.log(now() + " INFO dataModule:actions.syncRegistrations bulkAdd error: " + JSON.stringify(e.failures, null, 2));
@@ -1462,7 +1462,7 @@ const dataModule = {
           }
         }
         if (records.length > 0) {
-          await db.registrations.bulkPut(records).then (function() {
+          await db.registrations.bulkPut(records).then(function() {
           }).catch(function(error) {
             // console.log(now() + " ERROR dataModule:actions.syncRegistrationsData.bulkPut: " + error);
           });
@@ -1550,125 +1550,7 @@ const dataModule = {
       // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
       // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
       let total = 0;
-      let t = this;
-      async function processLogs(fromBlock, toBlock, section, logs) {
-        total = parseInt(total) + logs.length;
-        context.commit('setSyncCompleted', toBlock);
-        console.log(now() + " INFO dataModule:actions.syncTokenEvents.processLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
-        const records = [];
-        for (const log of logs) {
-          if (!log.removed) {
-            const contract = log.address;
-            let eventRecord = null;
-            if (log.topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
-              let from = null;
-              let to = null;
-              let tokensOrTokenId = null;
-              let tokens = null;
-              let tokenId = null;
-              if (log.topics.length == 4) {
-                from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                tokensOrTokenId = ethers.BigNumber.from(log.topics[3]).toString();
-              } else if (log.topics.length == 3) {
-                from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                to = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                tokensOrTokenId = ethers.BigNumber.from(log.data).toString();
-              // TODO: Handle 2
-              } else if (log.topics.length == 1) {
-                from = ethers.utils.getAddress('0x' + log.data.substring(26, 66));
-                to = ethers.utils.getAddress('0x' + log.data.substring(90, 130));
-                tokensOrTokenId = ethers.BigNumber.from('0x' + log.data.substring(130, 193)).toString();
-              }
-              if (from) {
-                if (log.topics.length == 4) {
-                  eventRecord = { type: "Transfer", from, to, tokenId: tokensOrTokenId, eventType: "erc721" };
-                } else {
-                  eventRecord = { type: "Transfer", from, to, tokens: tokensOrTokenId, eventType: "erc20" };
-                }
-              }
-            } else if (log.topics[0] == "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c") {
-              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-              tokens = ethers.BigNumber.from(log.data).toString();
-              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
-            } else if (log.topics[0] == "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65") {
-              const from = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-              tokens = ethers.BigNumber.from(log.data).toString();
-              eventRecord = { type: "Transfer", from, to: ADDRESS0, tokens, eventType: "erc20" };
-            } else if (log.topics[0] == "0x8a0e37b73a0d9c82e205d4d1a3ff3d0b57ce5f4d7bccf6bac03336dc101cb7ba") {
-              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-              // tokens = ethers.BigNumber.from(log.data).toString();
-              tokens = 1;
-              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
-            } else if (log.topics[0] == "0x80d2c1a6c75f471130a64fd71b80dc7208f721037766fb7decf53e10f82211cd") {
-              const to = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-              tokens = 1;
-              eventRecord = { type: "Transfer", from: ADDRESS0, to, tokens, eventType: "erc20" };
-            } else if (log.topics[0] == "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925") {
-              if (log.topics.length == 4) {
-                const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                const approved = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                tokenId = ethers.BigNumber.from(log.topics[3]).toString();
-                eventRecord = { type: "Approval", owner, approved, tokenId, eventType: "erc721" };
-              } else {
-                const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-                const spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-                tokens = ethers.BigNumber.from(log.data).toString();
-                eventRecord = { type: "Approval", owner, spender, tokens, eventType: "erc20" };
-              }
-            } else if (log.topics[0] == "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31") {
-              const owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
-              const operator = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
-              approved = ethers.BigNumber.from(log.data) > 0;
-              // NOTE: Both erc1155 and erc721 fall in this category, but assigning all to erc721
-              eventRecord = { type: "ApprovalForAll", owner, operator, approved, eventType: "erc721" };
-            } else if (log.topics[0] == "0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62") {
-              // ERC-1155 TransferSingle (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256 id, uint256 value)
-              const logData = erc1155Interface.parseLog(log);
-              const [operator, from, to, id, value] = logData.args;
-              tokenId = ethers.BigNumber.from(id).toString();
-              eventRecord = { type: "TransferSingle", operator, from, to, tokenId, value: value.toString(), eventType: "erc1155" };
-            } else if (log.topics[0] == "0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb") {
-              // ERC-1155 TransferBatch (index_topic_1 address operator, index_topic_2 address from, index_topic_3 address to, uint256[] ids, uint256[] values)
-              const logData = erc1155Interface.parseLog(log);
-              const [operator, from, to, ids, values] = logData.args;
-              const tokenIds = ids.map(e => ethers.BigNumber.from(e).toString());
-              eventRecord = { type: "TransferBatch", operator, from, to, tokenIds, values: values.map(e => e.toString()), eventType: "erc1155" };
-            } else {
-              console.log("NOT HANDLED: " + JSON.stringify(log));
-            }
-            // TODO: Testing if (eventRecord && contract == "0x7439E9Bb6D8a84dd3A23fe621A30F95403F87fB9") {
-            // if (eventRecord &&
-            //     ((parameter.erc20 && eventRecord.eventType == "erc20") ||
-            //      (parameter.erc721 && eventRecord.eventType == "erc721") ||
-            //      (parameter.erc1155 && eventRecord.eventType == "erc1155"))) {
-            // const testAddresses = parameter.devThing ? new Set(["0xB32979486938AA9694BFC898f35DBED459F44424","0x286E531F363768Fed5E18b468f5B76a9FFc33af5"]) : null;
-            // if (eventRecord && (!testAddresses || testAddresses.has(contract)) && eventRecord.eventType == "erc1155") {
-            // if (eventRecord && contract == "0xB32979486938AA9694BFC898f35DBED459F44424") {
-            // if (eventRecord && (contract == "0xB32979486938AA9694BFC898f35DBED459F44424" || contract == "0x286E531F363768Fed5E18b468f5B76a9FFc33af5")) {
-            if (eventRecord) {
-              records.push( {
-                chainId: parameter.chainId,
-                blockNumber: parseInt(log.blockNumber),
-                logIndex: parseInt(log.logIndex),
-                txIndex: parseInt(log.transactionIndex),
-                txHash: log.transactionHash,
-                contract,
-                ...eventRecord,
-                confirmations: parameter.blockNumber - log.blockNumber,
-              });
-            }
-          }
-        }
-        if (records.length) {
-          await db.tokenEvents.bulkAdd(records).then (function(lastKey) {
-            console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
-          }).catch(Dexie.BulkError, function(e) {
-            // console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd e: " + JSON.stringify(e.failures, null, 2));
-          });
-        }
-      }
-      async function getLogs(fromBlock, toBlock, section, selectedAddresses, processLogs) {
+      async function getLogs(fromBlock, toBlock, section, selectedAddresses) {
         console.log(now() + " INFO dataModule:actions.syncTokenEvents.getLogs - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section);
         let split = false;
         const maxLogScrapingSize = NETWORKS['' + parameter.chainId].maxLogScrapingSize || null;
@@ -1689,8 +1571,6 @@ const dataModule = {
                 selectedAddresses,
                 null
               ];
-              const logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
-              await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 1) {
               topics = [[
                   '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
@@ -1698,8 +1578,6 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              const logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
-              await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 2) {
               topics = [[
                   '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
@@ -1708,8 +1586,6 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
-              await processLogs(fromBlock, toBlock, section, logs);
             } else if (section == 3) {
               topics = [ [
                   '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
@@ -1719,8 +1595,18 @@ const dataModule = {
                 null,
                 selectedAddresses
               ];
-              logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
-              await processLogs(fromBlock, toBlock, section, logs);
+            }
+            const logs = await provider.getLogs({ address, fromBlock, toBlock, topics });
+            total = parseInt(total) + logs.length;
+            context.commit('setSyncCompleted', toBlock);
+            console.log(now() + " INFO dataModule:actions.syncTokenEvents - fromBlock: " + fromBlock + ", toBlock: " + toBlock + ", section: " + section + ", logs.length: " + logs.length + ", total: " + total);
+            const records = parseEventLogs(logs, parameter.chainId, parameter.blockNumber);
+            if (records.length) {
+              await db.tokenEvents.bulkAdd(records).then(function(lastKey) {
+                console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd lastKey: " + JSON.stringify(lastKey));
+              }).catch(Dexie.BulkError, function(e) {
+                // console.log(now() + " INFO dataModule:actions.syncTokenEvents.bulkAdd BulkError: " + JSON.stringify(e.failures, null, 2));
+              });
             }
           } catch (e) {
             split = true;
@@ -1730,8 +1616,8 @@ const dataModule = {
         }
         if (split) {
           const mid = parseInt((fromBlock + toBlock) / 2);
-          await getLogs(fromBlock, mid, section, selectedAddresses, processLogs);
-          await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses, processLogs);
+          await getLogs(fromBlock, mid, section, selectedAddresses);
+          await getLogs(parseInt(mid) + 1, toBlock, section, selectedAddresses);
         }
       }
       console.log(now() + " INFO dataModule:actions.syncTokenEvents BEGIN");
@@ -1741,7 +1627,7 @@ const dataModule = {
           selectedAddresses.push('0x000000000000000000000000' + address.substring(2, 42).toLowerCase());
         }
       }
-      console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
+      // console.log("selectedAddresses: " + JSON.stringify(selectedAddresses));
       if (selectedAddresses.length > 0) {
         const deleteCall = await db.tokenEvents.where("confirmations").below(parameter.confirmations).delete();
         const latest = await db.tokenEvents.where('[chainId+blockNumber+logIndex]').between([parameter.chainId, Dexie.minKey, Dexie.minKey],[parameter.chainId, Dexie.maxKey, Dexie.maxKey]).last();
@@ -1750,7 +1636,7 @@ const dataModule = {
         for (let section = 0; section < 4; section++) {
           context.commit('setSyncSection', { section: 'Token Events #' + (section + 1), total: parameter.blockNumber });
           context.commit('setSyncCompleted', startBlock);
-          await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses, processLogs);
+          await getLogs(startBlock, parameter.blockNumber, section, selectedAddresses);
         }
       }
       console.log(now() + " INFO dataModule:actions.syncTokenEvents END");

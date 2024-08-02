@@ -470,6 +470,7 @@ function decodeNameWrapperBytes(b) {
 // ENS: Old ETH Registrar Controller @ 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5 deployed Jan-30-2020 12:56:38 AM +UTC
 // ENS: ETH Registrar Controller @ 0x253553366Da8546fC250F225fe3d25d0C782303b deployed Mar-28-2023 11:44:59 AM +UTC
 
+// TODO: Delete
 function processENSEventLogs(logs) {
   // console.log("processENSEventLogs - logs: " + JSON.stringify(logs, null, 2));
   const erc721Interface = new ethers.utils.Interface(ERC721ABI);
