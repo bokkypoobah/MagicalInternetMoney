@@ -109,8 +109,13 @@ const NonFungibles = {
               <template #button-content>
                 <span v-if="settings.viewOption == 'list'">
                   <b-iconstack font-scale="1">
-                    <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                    <b-icon stacked icon="list" variant="primary" scale="0.75"></b-icon>
                   </b-iconstack>
+                </span>
+                <span v-else-if="settings.viewOption == 'detailedlist'">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                </b-iconstack>
                 </span>
                 <span v-else>
                   <b-iconstack font-scale="1">
@@ -120,9 +125,15 @@ const NonFungibles = {
               </template>
               <b-dropdown-item href="#" @click="settings.viewOption = 'list'; saveSettings()">
                 <b-iconstack font-scale="1">
-                  <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                  <b-icon stacked icon="list" variant="primary" scale="0.75"></b-icon>
                 </b-iconstack>
                 List
+              </b-dropdown-item>
+              <b-dropdown-item href="#" @click="settings.viewOption = 'detailedlist'; saveSettings()">
+                <b-iconstack font-scale="1">
+                  <b-icon stacked icon="list-ol" variant="primary" scale="0.75"></b-icon>
+                </b-iconstack>
+                Detailed list
               </b-dropdown-item>
               <b-dropdown-item href="#" @click="settings.viewOption = 'icons'; saveSettings()">
                 <b-iconstack font-scale="1">
@@ -232,7 +243,7 @@ const NonFungibles = {
             </b-card>
           </b-col>
           <b-col class="m-0 p-0">
-            <b-table v-if="settings.viewOption == 'list'" ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="fields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
+            <b-table v-if="settings.viewOption == 'list' || settings.viewOption == 'detailedlist'" ref="tokenContractsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='rowSelected' :fields="settings.viewOption == 'list' ? listFields : detailedListfields" :items="pagedFilteredSortedItems" show-empty head-variant="light" class="m-0 mt-1">
               <template #empty="scope">
                 <h6>{{ scope.emptyText }}</h6>
                 <div>
@@ -277,6 +288,23 @@ const NonFungibles = {
                 <!-- </b-avatar> -->
                 <b-img v-if="data.item.image" button rounded fluid size="7rem" :src="data.item.image">
                 </b-img>
+              </template>
+
+              <template #cell(name)="data">
+                <b-link v-if="networkSupported" :href="nonFungibleViewerURL(data.item.contract, data.item.tokenId)" target="_blank">
+                  <span v-if="data.item.name">
+                    <font size="-1">{{ data.item.name }}</font>
+                  </span>
+                  <span v-else>
+                    <font size="-1">{{ '#' + (data.item.tokenId.length > 20 ? (data.item.tokenId.substring(0, 10) + '...' + data.item.tokenId.slice(-8)) : data.item.tokenId) }}</font>
+                  </span>
+                </b-link>
+              </template>
+
+              <template #cell(collection)="data">
+                <b-link v-if="networkSupported" @click="viewTokenContract(data.item);" v-b-popover.hover.ds500="'View token contract'">
+                  <font size="-1">{{ names[data.item.contract] || data.item.collection }}</font>
+                </b-link>
               </template>
 
               <template #cell(info)="data">
@@ -439,7 +467,17 @@ const NonFungibles = {
         { value: 'expiry1y', text: 'Expiry <= 1y' },
         { value: 'expiry1yp', text: 'Expiry > 1y' },
       ],
-      fields: [
+      listFields: [
+        { key: 'number', label: '#', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
+        // { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+        { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'collection', label: 'Collection', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        // { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'expiry', label: 'Expiry', sortable: false, thStyle: 'width: 13%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        { key: 'owners', label: 'Owner(s)', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+        // { key: 'attributes', label: 'Attributes', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
+      ],
+      detailedListfields: [
         { key: 'number', label: '#', sortable: false, thStyle: 'width: 7%;', tdClass: 'text-truncate' },
         { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
         { key: 'info', label: 'Info', sortable: false, thStyle: 'width: 30%;', thClass: 'text-left', tdClass: 'text-truncate' },
