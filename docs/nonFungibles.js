@@ -238,6 +238,17 @@ const NonFungibles = {
                   <div v-if="settings.showENSFilter" class="mt-1">
                     <b-form-select size="sm" v-model="settings.ensDateOption" @change="saveSettings" :options="ensDateOptions"></b-form-select>
                   </div>
+                  <div v-if="settings.showENSFilter" class="mt-1">
+                    <b-form-group label="Starts With:" label-for="ens-startswith" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="ens-startswith" v-model.trim="settings.startsWith" @change="saveSettings" debounce="600"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Ends With:" label-for="ens-endswith" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="ens-endswith" v-model.trim="settings.endsWith" @change="saveSettings" debounce="600"></b-form-input>
+                    </b-form-group>
+                    <b-form-group label="Contains:" label-for="ens-contains" label-size="sm" label-cols-sm="5" label-align-sm="right" class="mx-0 my-1 p-0">
+                      <b-form-input type="text" size="sm" id="ens-contains" v-model.trim="settings.contains" @change="saveSettings" debounce="600"></b-form-input>
+                    </b-form-group>
+                  </div>
                 </b-card>
               </b-card-body>
             </b-card>
@@ -429,6 +440,9 @@ const NonFungibles = {
         collectionFilter: null,
         showENSFilter: false,
         ensDateOption: null,
+        startsWith: null,
+        endsWith: null,
+        contains: null,
         junkFilter: null,
         activeOnly: false,
         selectedOwners: {},
@@ -437,7 +451,7 @@ const NonFungibles = {
         currentPage: 1,
         pageSize: 10,
         sortOption: 'collectionasc',
-        version: 9,
+        version: 10,
       },
       transfer: {
         item: null,
@@ -706,7 +720,10 @@ const NonFungibles = {
       }
       const selectedOwners = Object.keys(this.settings.selectedOwners[this.chainId] || {}).length > 0 ? this.settings.selectedOwners[this.chainId] : null;
       const selectedCollections = Object.keys(this.settings.selectedCollections[this.chainId] || {}).length > 0 ? this.settings.selectedCollections[this.chainId] : null;
-      const ensOnly = this.settings.ensDateOption != null;
+      const startsWith = this.settings.showENSFilter && this.settings.startsWith && this.settings.startsWith.length > 0 && this.settings.startsWith || null;
+      const endsWith = this.settings.showENSFilter && this.settings.endsWith && this.settings.endsWith.length > 0 && (this.settings.endsWith + '.eth') || null;
+      const contains = this.settings.showENSFilter && this.settings.contains && this.settings.contains.length > 0 && this.settings.contains || null;
+      const ensOnly = this.settings.ensDateOption || startsWith || endsWith || contains;
       const graceFrom = moment().subtract(90, 'days').unix();
       const expiry1m = moment().add(1, 'months').unix();
       const expiry3m = moment().add(3, 'months').unix();
@@ -746,6 +763,21 @@ const NonFungibles = {
         if (include && ensOnly) {
           if (item.contract != ENS_ERC721_ADDRESS && item.contract != ENS_ERC1155_ADDRESS) {
             include = false;
+          }
+          if (include && startsWith) {
+            if (!item.name || !item.name.startsWith(startsWith)) {
+              include = false;
+            }
+          }
+          if (include && endsWith) {
+            if (!item.name || !item.name.endsWith(endsWith)) {
+              include = false;
+            }
+          }
+          if (include && contains) {
+            if (!item.name || !item.name.includes(contains)) {
+              include = false;
+            }
           }
           if (include && dateFrom) {
             if (item.expiry < dateFrom) {
