@@ -92,6 +92,9 @@ const NonFungibles = {
           </div>
           <div class="mt-0 flex-grow-1">
           </div>
+          <div v-if="settings.sortOption == 'random'" class="mt-0 pr-1">
+            <b-button size="sm" :pressed.sync="randomise" variant="link" v-b-popover.hover.ds500="'Randomise'"><b-icon-arrow-clockwise shift-v="-1" font-scale="1.1"></b-icon-arrow-clockwise></b-button>
+          </div>
           <div class="mt-0 pr-1">
             <b-form-select size="sm" v-model="settings.sortOption" @change="saveSettings" :options="sortOptions" v-b-popover.hover.ds500="'Yeah. Sort'"></b-form-select>
           </div>
@@ -430,6 +433,7 @@ const NonFungibles = {
     return {
       count: 0,
       reschedule: true,
+      randomise: false,
       settings: {
         sidebar: false,
         viewOption: 'list',
@@ -469,6 +473,7 @@ const NonFungibles = {
         { value: 'namedsc', text: '▼ Name' },
         { value: 'expiryasc', text: '▲ Expiry' },
         { value: 'expirydsc', text: '▼ Expiry' },
+        { value: 'random', text: 'Random' },
       ],
       ensDateOptions: [
         { value: null, text: 'Unfiltered' },
@@ -584,7 +589,7 @@ const NonFungibles = {
       return results;
     },
     items() {
-      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
+      const results = ((store.getters['data/forceRefresh'] % 2) == 0 && this.randomise) ? [] : [];
       for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc721" || data.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
@@ -708,7 +713,7 @@ const NonFungibles = {
       return results;
     },
     filteredItems() {
-      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
+      const results = ((store.getters['data/forceRefresh'] % 2) == 0 && this.randomise) ? [] : [];
       let regex = null;
       if (this.settings.filter != null && this.settings.filter.length > 0) {
         try {
@@ -866,6 +871,10 @@ const NonFungibles = {
           const expiryA = a.expiry && a.expiry > 0 ? a.expiry : -1234567890123456789;
           const expiryB = b.expiry && b.expiry > 0 ? b.expiry : -1234567890123456789;
           return expiryB - expiryA;
+        });
+      } else if (this.settings.sortOption == 'random') {
+        results.sort(() => {
+          return Math.random() - 0.5;
         });
       }
       return results;
