@@ -589,7 +589,7 @@ const NonFungibles = {
       return results;
     },
     items() {
-      const results = ((store.getters['data/forceRefresh'] % 2) == 0 && this.randomise) ? [] : [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       for (const [contract, data] of Object.entries(this.balances[this.chainId] || {})) {
         if (data.type == "erc721" || data.type == "erc1155") {
           for (const [tokenId, tokenData] of Object.entries(data.tokens)) {
@@ -713,7 +713,7 @@ const NonFungibles = {
       return results;
     },
     filteredItems() {
-      const results = ((store.getters['data/forceRefresh'] % 2) == 0 && this.randomise) ? [] : [];
+      const results = (store.getters['data/forceRefresh'] % 2) == 0 ? [] : [];
       let regex = null;
       if (this.settings.filter != null && this.settings.filter.length > 0) {
         try {
@@ -827,7 +827,7 @@ const NonFungibles = {
       return results;
     },
     filteredSortedItems() {
-      const results = this.filteredItems;
+      const results = this.randomise ? this.filteredItems : this.filteredItems;
       if (this.settings.sortOption == 'collectionasc') {
         results.sort((a, b) => {
           let compare = ('' + a.collection).localeCompare(b.collection);
