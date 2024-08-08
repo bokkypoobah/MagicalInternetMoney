@@ -101,7 +101,7 @@ const ViewNonFungible = {
             </template>
             <template #cell(when)="data">
               <span v-if="data.item.timestamp">
-                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash + '#eventlog#' + data.item.logIndex" target="_blank">
                   {{ formatTimestamp(data.item.timestamp) }}
                 </b-link>
               </span>
