@@ -106,7 +106,7 @@ const ViewNonFungible = {
                 </b-link>
               </span>
               <span v-else>
-                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash" target="_blank">
+                <b-link v-if="networkSupported" :href="explorer + 'tx/' + data.item.txHash + '#eventlog#' + data.item.logIndex" target="_blank">
                   {{ data.item.blockNumber + ':' + data.item.txIndex + ':' + data.item.logIndex }}
                 </b-link>
               </span>
